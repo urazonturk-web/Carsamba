@@ -71,6 +71,18 @@ slice. Stop after the slice is playable and wait for physics feedback.
       consecutive-narrow; all jumps kept reachable). Deterministic-seed hook
       (initWorld(seed?)) added for future shared-map/multiplayer modes (not exposed).
       Jump physics left unchanged. Verified passing by testing_agent (iteration_3).
+- [x] INIT-BUG FIX + CHARGE JUICE (2026-06): added a `gameReady` gate so the world
+      and touch input render only after initWorld() runs with valid screen
+      dimensions — the first visible frame is always fully initialised (starting
+      tower fixed at world x=0, WIDE, blob placed on its top, never floating,
+      never missing). initWorld guarantees starting tower + next 2 towers and the
+      correct camera framing before input. First ~3 upcoming towers are a gentle
+      random warm-up (wide/medium, short gaps, tiny height diffs); maps still fresh
+      per run. Charge duration set to 2.0s (≈50% at 1s, 100% at 2s). Blob charge
+      squash now uses an eased curve (immediate small compression at touch-down,
+      smooth escalation, max shake from ~70%). Numerical charge % stays debug-only
+      (no permanent power meter). Jump forces/gravity/collision/perfect/score/seed
+      architecture unchanged. Verified passing by testing_agent (iteration_4).
 
 ## Backlog (reserved for later milestones — DO NOT build without user go-ahead)
 - P1: physics fine-tuning based on user feedback (values live in `src/game/config.ts`)

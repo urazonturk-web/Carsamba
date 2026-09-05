@@ -27,8 +27,10 @@ export const CONFIG = {
   minJumpVY: 760, // upward launch speed at 0% charge (applied as negative)
   maxJumpVY: 1360, // upward launch speed at 100% charge
 
-  // How long the player must hold to reach full charge.
-  maxChargeDuration: 1.7, // seconds (spec: ~1.5–2s). Holding longer does nothing.
+  // How long the player must hold to reach full charge. Tuned so ~50% charge
+  // lands around 1s and 100% around 2s (charge grows linearly with time; the
+  // VISUAL squash uses an eased curve so it reads well from the very start).
+  maxChargeDuration: 2.0, // seconds. Holding longer does nothing.
 
   // --- Player collision ----------------------------------------------------
   playerWidth: 46, // collision + base render width
@@ -49,6 +51,7 @@ export const CONFIG = {
   heightVarLate: 145, // larger late height differences (< max jump apex)
   difficultyRamp: 40, // platforms over which difficulty ramps 0 -> 1
   noNarrowBeforeId: 6, // never spawn NARROW towers before this platform id
+  warmupTowers: 3, // first N towers are a gentle warm-up (wide/medium, short gaps)
 
   platformMinTopY: -320, // highest a tower top can sit (remember +y is down)
   platformMaxTopY: 320, // lowest a tower top can sit
@@ -84,9 +87,9 @@ export const CONFIG = {
   removeBehind: 200, // remove towers this far behind the visible left edge
 
   // --- Feel / juice --------------------------------------------------------
-  chargeSquashY: 0.32, // how much the blob compresses vertically at full charge
-  chargeStretchX: 0.24, // how much it widens at full charge
-  maxChargeShake: 2.4, // px jitter amplitude once near max charge
+  chargeSquashY: 0.38, // how much the blob compresses vertically at full charge
+  chargeStretchX: 0.28, // how much it widens at full charge
+  maxChargeShake: 2.8, // px jitter amplitude once near max charge
   airStretchY: 0.16, // vertical stretch while airborne
   landPulseDuration: 0.26, // seconds for the landing compression to recover
 } as const;

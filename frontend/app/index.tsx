@@ -48,6 +48,7 @@ export default function Game() {
   const [score, setScore] = useState(0);
   const [best, setBest] = useState(0);
   const [gameOver, setGameOver] = useState(false);
+  const [gameReady, setGameReady] = useState(false);
   const [perfectVisible, setPerfectVisible] = useState(false);
   const [debug, setDebug] = useState({
     charge: 0, vx: 0, vy: 0, dist: 0, width: 0, offset: 0, fps: 0,
@@ -119,21 +120,33 @@ export default function Game() {
 
   const makeNextPlatform = (prev: any, id: number) => {
     "worklet";
+    const warm = id <= CONFIG.warmupTowers; // gentle warm-up section
     const t = Math.min(1, id / CONFIG.difficultyRamp); // 0 early -> 1 late
-    // gap distance (grows with difficulty)
-    const gMin = lerp(CONFIG.gapEarly.min, CONFIG.gapLate.min, t);
-    const gMax = lerp(CONFIG.gapEarly.max, CONFIG.gapLate.max, t);
+    // gap distance (grows with difficulty; warm-up = short/medium only)
+    const gMin = warm ? CONFIG.gapEarly.min : lerp(CONFIG.gapEarly.min, CONFIG.gapLate.min, t);
+    const gMax = warm
+      ? CONFIG.gapEarly.min + 30
+      : lerp(CONFIG.gapEarly.max, CONFIG.gapLate.max, t);
     const gap = gMin + rand() * (gMax - gMin);
-    // height difference (grows with difficulty, always < max jump apex)
-    const hv = lerp(CONFIG.heightVarEarly, CONFIG.heightVarLate, t);
+    // height difference (warm-up = very small; grows with difficulty otherwise)
+    const hv = warm ? 24 : lerp(CONFIG.heightVarEarly, CONFIG.heightVarLate, t);
     let topY = prev.topY + (rand() * 2 - 1) * hv;
     if (topY < CONFIG.platformMinTopY) topY = CONFIG.platformMinTopY;
     if (topY > CONFIG.platformMaxTopY) topY = CONFIG.platformMaxTopY;
-    // width category: early favours WIDE/MEDIUM, late adds more NARROW
-    let wWide = lerp(0.55, 0.2, t);
-    const wMed = 0.4;
-    let wNar = lerp(0.05, 0.42, t);
-    if (id <= CONFIG.noNarrowBeforeId) wNar = 0; // forgiving start
+    // width category: warm-up = WIDE/MEDIUM only; late adds more NARROW
+    let wWide: number;
+    let wMed: number;
+    let wNar: number;
+    if (warm) {
+      wWide = 0.62;
+      wMed = 0.38;
+      wNar = 0;
+    } else {
+      wWide = lerp(0.55, 0.2, t);
+      wMed = 0.4;
+      wNar = lerp(0.05, 0.42, t);
+      if (id <= CONFIG.noNarrowBeforeId) wNar = 0; // forgiving start
+    }
     if (prev.cat === 2) wNar *= 0.25; // avoid consecutive narrow towers
     const sum = wWide + wMed + wNar;
     const r = rand() * sum;
@@ -188,6 +201,11 @@ export default function Game() {
     ) {
       list.push(makeNextPlatform(list[list.length - 1], list.length));
     }
+    // Guarantee the starting tower + at least the next TWO upcoming towers,
+    // regardless of viewport size, so a run never starts under-populated.
+    while (list.length < 3) {
+      list.push(makeNextPlatform(list[list.length - 1], list.length));
+    }
     idCounter.value = list.length;
     lastLandedId.value = 0;
     platforms.value = list;
@@ -219,10 +237,16 @@ export default function Game() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [W, H]);
 
+  // Initialise only once real screen dimensions are known, so the starting
+  // tower + camera are computed correctly. gameReady gates the first playable
+  // frame — no partially initialised state is ever rendered or interactive.
   useEffect(() => {
-    initWorld();
+    if (W > 0 && H > 0 && !gameReady) {
+      initWorld();
+      setGameReady(true);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [W, H, gameReady]);
 
   // ------------------------------------------------------------------------
   // JS callbacks triggered from the worklet (rare, event-based).
@@ -465,13 +489,18 @@ export default function Game() {
     let shake = 0;
     if (phase.value === PHASE.CHARGING) {
       const c = charge.value;
-      sy = 1 - CONFIG.chargeSquashY * c;
-      sx = 1 + CONFIG.chargeStretchX * c;
-      if (c > 0.9) {
+      // Eased curve: a small immediate compression at touch-down that grows
+      // quickly early and keeps escalating toward maximum tension. Charge time
+      // itself stays linear (see maxChargeDuration) — only the visual reads
+      // stronger from the very first moment.
+      const eased = 0.14 + 0.86 * Math.pow(c, 0.7);
+      sy = 1 - CONFIG.chargeSquashY * eased;
+      sx = 1 + CONFIG.chargeStretchX * eased;
+      if (c > 0.7) {
         shake =
           Math.sin(Date.now() * 0.9) *
           CONFIG.maxChargeShake *
-          ((c - 0.9) / 0.1);
+          ((c - 0.7) / 0.3);
       }
     } else if (phase.value === PHASE.AIRBORNE) {
       const s = Math.max(-1, Math.min(1, -vy.value / 1400));
@@ -560,8 +589,10 @@ export default function Game() {
         ))}
       </Animated.View>
 
-      {/* Scaled world container — everything in world coords lives here */}
-      <Animated.View style={[styles.world, worldStyle]}>
+      {gameReady && (
+        <>
+          {/* Scaled world container — everything in world coords lives here */}
+          <Animated.View style={[styles.world, worldStyle]}>
         {/* Platforms (fixed pool, positioned by the worklet) */}
         {POOL_IDX.map((i) => (
           <PlatformView
@@ -675,6 +706,8 @@ export default function Game() {
             </Pressable>
           </View>
         </View>
+      )}
+        </>
       )}
     </View>
   );
