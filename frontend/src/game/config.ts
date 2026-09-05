@@ -36,9 +36,9 @@ export const CONFIG = {
 
   // --- Platform generation -------------------------------------------------
   minPlatformDistance: 150, // min edge-to-edge gap between platforms
-  maxPlatformDistance: 340, // max edge-to-edge gap (kept reachable at full charge)
+  maxPlatformDistance: 260, // max edge-to-edge gap (kept visible + reachable)
   minPlatformWidth: 72,
-  maxPlatformWidth: 150,
+  maxPlatformWidth: 110,
   platformHeightVariation: 78, // max +/- change in platform top height vs previous
   platformThickness: 26, // visual thickness of a platform below its top surface
 
@@ -56,16 +56,19 @@ export const CONFIG = {
   scorePerfectBonus: 2,
 
   // --- Camera --------------------------------------------------------------
-  // Player is kept around the left-middle so upcoming platforms stay visible.
-  cameraPlayerAnchorX: 0.3, // 0 = far left, 0.5 = center. Fraction of screen width.
-  cameraPlayerAnchorY: 0.52, // vertical resting anchor for the standing level
+  // A gentle zoom-out frames more of the route ahead without shrinking the
+  // character too much. The player is kept in the left ~30% so the right side
+  // of the portrait screen always reveals the upcoming platforms.
+  cameraZoom: 0.62, // world -> screen scale. Lower = see more route, smaller art.
+  cameraPlayerAnchorX: 0.3, // player screen position: left 30%
+  cameraPlayerAnchorY: 0.5, // vertical resting anchor for the standing level
   cameraSmoothingX: 0.14, // horizontal follow lerp per frame (0..1). Lower = smoother.
   cameraSmoothingY: 0.07, // vertical follow lerp (only tracks landing levels, not arcs)
   cameraFallSmoothing: 0.1, // vertical follow while falling to Game Over
 
   // --- Generation / cleanup window ----------------------------------------
-  spawnAhead: 700, // keep platforms generated this far past the right screen edge
-  removeBehind: 260, // remove platforms this far behind the left screen edge
+  spawnAhead: 500, // keep platforms generated this far past the visible right edge
+  removeBehind: 200, // remove platforms this far behind the visible left edge
 
   // --- Feel / juice --------------------------------------------------------
   chargeSquashY: 0.32, // how much the blob compresses vertically at full charge

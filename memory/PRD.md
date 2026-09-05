@@ -52,6 +52,12 @@ slice. Stop after the slice is playable and wait for physics feedback.
 - [x] Dev debug overlay with live telemetry (2026-06)
 - [x] Tuned jump balance so a light tap clears the min gap and full charge comfortably
       overshoots (skill window), verified via automated play to score 7 at 60fps (2026-06)
+- [x] CAMERA/VISIBILITY FIX (2026-06): added a scaled world camera container
+      (CONFIG.cameraZoom=0.62) so the current + next (+ often a third) platform are always
+      visible before charging; player kept at left 30%; camera looks ahead (route on the
+      right); platforms generated earlier based on visible-world width; gaps/widths tuned
+      (150–260 / 72–110). No sudden camera move on charge; smooth follow in flight. Jump
+      physics left unchanged. Verified passing by testing_agent (iteration_2).
 
 ## Backlog (reserved for later milestones — DO NOT build without user go-ahead)
 - P1: physics fine-tuning based on user feedback (values live in `src/game/config.ts`)

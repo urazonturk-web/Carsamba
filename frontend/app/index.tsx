@@ -117,18 +117,10 @@ export default function Game() {
   // (Re)initialise the world. Snaps camera into place so restart is instant.
   // ------------------------------------------------------------------------
   const initWorld = useCallback(() => {
+    const s = CONFIG.cameraZoom;
+    const viewW = W / s;
     const first = { id: 0, x: 0, topY: 0, width: 160 };
     const list: any[] = [first];
-    while (
-      list[list.length - 1].x + list[list.length - 1].width <
-      W + CONFIG.spawnAhead
-    ) {
-      const prev = list[list.length - 1];
-      list.push(makeNextPlatform(prev, list.length));
-    }
-    idCounter.value = list.length;
-    lastLandedId.value = 0;
-    platforms.value = list;
 
     px.value = first.x + first.width * 0.42;
     py.value = first.topY - PH / 2;
@@ -138,8 +130,21 @@ export default function Game() {
     landPulse.value = 0;
     baseY.value = first.topY;
     phase.value = PHASE.IDLE;
-    camX.value = px.value - W * CONFIG.cameraPlayerAnchorX;
-    camY.value = baseY.value - H * CONFIG.cameraPlayerAnchorY;
+    camX.value = px.value - (W * CONFIG.cameraPlayerAnchorX) / s;
+    camY.value = baseY.value - (H * CONFIG.cameraPlayerAnchorY) / s;
+
+    // Pre-generate the whole visible route + buffer so the next platforms
+    // already exist and are on-screen before the first jump.
+    while (
+      list[list.length - 1].x + list[list.length - 1].width <
+      camX.value + viewW + CONFIG.spawnAhead
+    ) {
+      const prev = list[list.length - 1];
+      list.push(makeNextPlatform(prev, list.length));
+    }
+    idCounter.value = list.length;
+    lastLandedId.value = 0;
+    platforms.value = list;
     running.value = 1;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [W, H]);
@@ -277,7 +282,7 @@ export default function Game() {
       }
 
       // --- fall -> game over ---
-      if (py.value - camY.value > H + PH * 2) {
+      if ((py.value - camY.value) * CONFIG.cameraZoom > H + 60) {
         phase.value = PHASE.DEAD;
         running.value = 0;
         runOnJS(onGameOver)();
@@ -285,13 +290,15 @@ export default function Game() {
     }
 
     // --- procedural spawn ahead + cleanup behind (reassign, never mutate) ---
+    const s = CONFIG.cameraZoom;
+    const viewW = W / s;
     let working = list;
     let changed = false;
     let last = working[working.length - 1];
-    if (last && last.x + last.width < camX.value + W + CONFIG.spawnAhead) {
+    if (last && last.x + last.width < camX.value + viewW + CONFIG.spawnAhead) {
       const add: any[] = [];
       let cur = last;
-      while (cur.x + cur.width < camX.value + W + CONFIG.spawnAhead) {
+      while (cur.x + cur.width < camX.value + viewW + CONFIG.spawnAhead) {
         const n = makeNextPlatform(cur, idCounter.value);
         idCounter.value += 1;
         add.push(n);
@@ -313,14 +320,14 @@ export default function Game() {
     }
     if (changed) platforms.value = working;
 
-    // --- camera ---
-    const targetX = px.value - W * CONFIG.cameraPlayerAnchorX;
+    // --- camera (look ahead: player anchored left, route revealed on right) ---
+    const targetX = px.value - (W * CONFIG.cameraPlayerAnchorX) / s;
     camX.value += (targetX - camX.value) * CONFIG.cameraSmoothingX;
     if (phase.value === PHASE.DEAD) {
-      const tY = py.value - H * CONFIG.cameraPlayerAnchorY;
+      const tY = py.value - (H * CONFIG.cameraPlayerAnchorY) / s;
       camY.value += (tY - camY.value) * CONFIG.cameraFallSmoothing;
     } else {
-      const tY = baseY.value - H * CONFIG.cameraPlayerAnchorY;
+      const tY = baseY.value - (H * CONFIG.cameraPlayerAnchorY) / s;
       camY.value += (tY - camY.value) * CONFIG.cameraSmoothingY;
     }
 
@@ -377,8 +384,8 @@ export default function Game() {
     sy = sy * (1 - 0.3 * lp);
     sx = sx * (1 + 0.26 * lp);
 
-    const screenLeft = px.value - camX.value - PW / 2;
-    const screenTop = py.value - camY.value - PH / 2;
+    const screenLeft = px.value - PW / 2;
+    const screenTop = py.value - PH / 2;
     const feetComp = ((1 - sy) * PH) / 2; // keep feet planted while squashing
 
     return {
@@ -396,9 +403,23 @@ export default function Game() {
     return {
       opacity: b > 0 && b < 1 ? 1 - b : 0,
       transform: [
-        { translateX: burstX.value - camX.value },
-        { translateY: burstY.value - camY.value },
+        { translateX: burstX.value },
+        { translateY: burstY.value },
         { scale: 0.6 + b * 1.6 },
+      ],
+    };
+  });
+
+  // World camera: maps world coords -> screen as (world - cam) * zoom, with a
+  // top-left transform origin (see styles.world). This keeps the player in the
+  // left band while the zoom reveals the upcoming route on the right.
+  const worldStyle = useAnimatedStyle(() => {
+    const s = CONFIG.cameraZoom;
+    return {
+      transform: [
+        { translateX: -camX.value * s },
+        { translateY: -camY.value * s },
+        { scale: s },
       ],
     };
   });
@@ -441,37 +462,38 @@ export default function Game() {
         ))}
       </Animated.View>
 
-      {/* Platforms (fixed pool, positioned by the worklet) */}
-      {POOL_IDX.map((i) => (
-        <PlatformView
-          key={i}
-          index={i}
-          platforms={platforms}
-          camX={camX}
-          camY={camY}
-          styles={styles}
-        />
-      ))}
+      {/* Scaled world container — everything in world coords lives here */}
+      <Animated.View style={[styles.world, worldStyle]}>
+        {/* Platforms (fixed pool, positioned by the worklet) */}
+        {POOL_IDX.map((i) => (
+          <PlatformView
+            key={i}
+            index={i}
+            platforms={platforms}
+            styles={styles}
+          />
+        ))}
 
-      {/* Perfect-landing particle burst */}
-      <Animated.View style={[styles.burst, burstStyle]}>
-        {[0, 1, 2, 3, 4, 5].map((i) => {
-          const ang = (Math.PI * 2 * i) / 6;
-          return (
-            <View
-              key={i}
-              style={[
-                styles.burstDot,
-                { left: Math.cos(ang) * 20, top: Math.sin(ang) * 20 },
-              ]}
-            />
-          );
-        })}
-      </Animated.View>
+        {/* Perfect-landing particle burst */}
+        <Animated.View style={[styles.burst, burstStyle]}>
+          {[0, 1, 2, 3, 4, 5].map((i) => {
+            const ang = (Math.PI * 2 * i) / 6;
+            return (
+              <View
+                key={i}
+                style={[
+                  styles.burstDot,
+                  { left: Math.cos(ang) * 20, top: Math.sin(ang) * 20 },
+                ]}
+              />
+            );
+          })}
+        </Animated.View>
 
-      {/* Blob */}
-      <Animated.View style={[styles.blob, blobStyle]}>
-        <View style={styles.blobHighlight} />
+        {/* Blob */}
+        <Animated.View style={[styles.blob, blobStyle]}>
+          <View style={styles.blobHighlight} />
+        </Animated.View>
       </Animated.View>
 
       {/* Full-screen touch layer */}
@@ -564,22 +586,19 @@ export default function Game() {
 // A single pooled platform view. Reads its slot from the shared array every
 // frame (camX changes each frame, re-evaluating this style).
 // ---------------------------------------------------------------------------
-function PlatformView({ index, platforms, camX, camY, styles }: any) {
+function PlatformView({ index, platforms, styles }: any) {
   const style = useAnimatedStyle(() => {
     const p = platforms.value[index];
     if (!p) {
       return {
         opacity: 0,
-        transform: [{ translateX: -9999 }, { translateY: -9999 }],
+        transform: [{ translateX: -99999 }, { translateY: -99999 }],
       };
     }
     return {
       opacity: 1,
       width: p.width,
-      transform: [
-        { translateX: p.x - camX.value },
-        { translateY: p.topY - camY.value },
-      ],
+      transform: [{ translateX: p.x }, { translateY: p.topY }],
     };
   });
   const centerStyle = useAnimatedStyle(() => {
@@ -619,6 +638,11 @@ const useStyles = makeStyles((colors) => ({
   root: { flex: 1, backgroundColor: colors.gameSky, overflow: "hidden" },
   fill: absoluteFill(),
   touch: absoluteFill(),
+  world: {
+    ...absoluteFill(),
+    transformOrigin: "0% 0%",
+    pointerEvents: "none",
+  },
 
   hillLayer: { position: "absolute", left: 0, bottom: 0, height: 260, width: 340, pointerEvents: "none" },
   hillFar: {

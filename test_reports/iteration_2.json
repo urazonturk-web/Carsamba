@@ -1,0 +1,41 @@
+{
+  "summary": "Frontend-only regression test focused on the CAMERA FRAMING / NEXT-PLATFORM VISIBILITY bug fix. Tested at mobile viewport 390x844 on the public EXPO_BACKEND_URL. All five primary acceptance checks PASS: (1) At rest before any hold, BOTH the standing platform AND the next intended landing platform are visible on-screen simultaneously (measured 2 visible teal platforms; standing plat x=75/w=99, next plat x=269/w=51, viewport width 390). Debug overlay shows 'next dist 246, next width 82' which corresponds correctly to the on-screen next platform. (2) Visibility persists across MEDIUM (650ms -> perfect landing +3, next dist 233, 2 platforms visible) and MEDIUM2 (700ms -> perfect landing +3 more = score 6, next dist 220, 2 platforms visible). Long hold (1000ms) overshoots and triggers Game Over as expected by physics, so we could not sample idle framing after a long-charge landing, but the framing math is symmetric so this is not a regression. (3) NO camera jump when charging begins: platform screen-x values captured at idle vs 100ms into hold are pixel-identical (75.336, 269.495 -> 75.336, 269.495) and blob screen-x is identical to 6 decimal places (blob center at 30.0000% of width). (4) Camera looks ahead: blob center is anchored at exactly 30.0% of screen width (CONFIG.cameraPlayerAnchorX=0.3 verified in-runtime), leaving the right 70% of the viewport showing upcoming route. (5) Regression pass: charge -> release -> score increments (0->3->6), full-charge overshoot triggers game-over-overlay with correct final-score=6 / final-best=6, play-again-button clears overlay and resets score to 0 instantly. No React Native red screen. Deprecated 'shadow*' and 'pointerEvents' RN-Web warnings persist from iteration_1 (unchanged this iteration).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "Game",
+        "issues": [
+          "Difficulty carry-over from iteration_1 (NOT a camera bug): a very light tap (~0.1s) still cannot clear the first spawned gap. Measured initial 'next dist' is ~246-277 px, but at 0% charge the horizontal reach = 2*minJumpVY/gravity * minJumpVX = 2*760/2600*300 ~= 175 px. So the spec sentence 'a light/short tap still clears the first (min-distance) gap' is not satisfied; instead a tap always fails and eventually causes Game Over. This is a physics/level-gen tuning issue, not a camera regression.",
+          "Full-charge (1.0s+) hold reliably overshoots the next platform on the first jump: at 100% charge vx=560, vy=1360, airtime ~=1.05s, reach ~=586 px, versus a next-platform edge starting ~246 px ahead. Fine as an upper-difficulty mechanic, but combined with the tap-undershoot above, the reliably-safe hold window is roughly 550-800 ms."
+        ]
+      }
+    ],
+    "react_native_issues": [
+      {"component": "styles.card (Game Over overlay)", "issue": "Uses deprecated shadow* style props on web. Console warning: '\"shadow*\" style props are deprecated. Use \"boxShadow\".'. Reference: /app/frontend/app/index.tsx:795-803 (Platform.select default branch)."},
+      {"component": "Multiple Animated.View / View using pointerEvents prop", "issue": "Console warning: 'props.pointerEvents is deprecated. Use style.pointerEvents'. Currently moved into styles for hillLayer/world/platform/blob/burst/hud/hint/perfectWrap/debug/touch (already set via style.pointerEvents), so this warning may be residual — recheck after clean reload. Reference: /app/frontend/app/index.tsx styles block lines 638-773."}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [
+    "(Optional carry-over from iteration_1) Retune physics vs. platform-gap generation so a 0% charge tap clears the min gap. Current mismatch: reach@0charge ~= 175 px vs. actual min initial 'next dist' ~= 246-277 px (because the starting platform is 160 px wide and the blob spawns 42% into it, adding ~93 px onto the raw 150 px minGap). Either raise CONFIG.minJumpVX to ~340 or reduce first-spawn's easy minGap.",
+    "Migrate remaining deprecated shadow* props inside Platform.select default branch of styles.card to boxShadow (or gate the branch to native only).",
+    "No camera-related action items — the visibility fix is working correctly."
+  ],
+  "critical_code_review_comments": [
+    "initWorld() correctly pre-populates platforms out to camX + viewW + spawnAhead using the same makeNextPlatform() worklet, guaranteeing the initial visible-route invariant. Good.",
+    "cameraPlayerAnchorX=0.3 combined with cameraZoom=0.62 gives an effective look-ahead of (1-0.3)*W/zoom = 440 world px to the right of the blob, which comfortably covers the maxPlatformDistance=260 gap + maxPlatformWidth=110 next platform. Framing math is sound.",
+    "camX.value is initialized synchronously in initWorld() before the first frame, so the very first render already has the correct camera position — this is what eliminates the earlier 'camera snaps on first frame' artifact.",
+    "In the frame callback, spawnAhead/removeBehind window is computed off camX+viewW; since camX lerps with cameraSmoothingX=0.14, the effective spawn window trails the player slightly, but spawnAhead=500 covers this safely.",
+    "makeNextPlatform is declared as a 'worklet' but is also invoked from initWorld on the JS thread. Reanimated allows this (worklets are also plain JS functions), but relying on Math.random() inside a worklet means the RNG stream differs between JS and UI threads. This is currently harmless because JS-side is only used at init and UI-side owns all subsequent spawns."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a", "frontend": "100% on camera-visibility acceptance criteria; carry-over difficulty issues from iteration_1 are unchanged and out-of-scope for this fix"},
+  "seed_data_creation": "Cleared localStorage['jumpcharge.bestScore'] before each run to isolate best-score persistence from the camera test.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Camera framing fix is verified working. Viewport 390x844. Blob is anchored at exactly 30.0% of screen width. At idle, expect 2 teal platforms visible (rgb(43,103,119)); the 'next dist' from debug overlay corresponds to the on-screen next platform and should always be visible before the next charge. Reliable hold window for scoring is ~550-800ms; taps <300ms and holds >900ms both cause Game Over on the current physics tuning. Key assertions: (a) capture idle screenshot -> at least 2 teal platforms with x within [0,390] and blob center x/W ~= 0.30; (b) hold for 100ms then read platform x's -> must equal idle x's; (c) release medium hold (~650ms) and after 1.7s idle screenshot should again show 2 platforms.",
+  "rca_of_issue": "The camera-visibility bug in the prior build was caused by CONFIG.cameraZoom=1.0 combined with cameraPlayerAnchorX centered near 0.5 and large maxPlatformDistance, which put the next platform past the right edge of the 390-wide portrait viewport. Fix (verified this iteration): cameraZoom=0.62 (world -> screen scale) so the visible world width becomes 390/0.62 = 629 px, cameraPlayerAnchorX=0.3 which puts the player at screen x=117 and leaves 512 world-px of look-ahead. maxPlatformDistance was also lowered to 260 (from 340) with widths 72-110. Effective worst-case gap-to-next-platform-right-edge from the blob = 260+110 = 370 world px, well inside the 512 look-ahead budget. Additionally, initWorld() now snaps camX synchronously and pre-generates the entire visible-route buffer via the same makeNextPlatform worklet, so the very first rendered frame already contains the next platform on screen — eliminating any perceived camera jump between the pre-hold frame and the first charging frame."
+}
