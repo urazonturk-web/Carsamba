@@ -58,6 +58,19 @@ slice. Stop after the slice is playable and wait for physics feedback.
       right); platforms generated earlier based on visible-world width; gaps/widths tuned
       (150–260 / 72–110). No sudden camera move on charge; smooth follow in flight. Jump
       physics left unchanged. Verified passing by testing_agent (iteration_2).
+- [x] STRUCTURAL ITERATION (2026-06): (a) adaptive look-ahead camera frames
+      CURRENT + NEXT + NEXT+1 towers (player floats left ~22–30%, NEXT tower has
+      absolute priority, smooth flight follow, no camera jump on charge, moderate
+      zoom to keep art readable); (b) platforms redesigned as tall vertical
+      TOWERS/COLUMNS extending below screen, with three matched-width categories
+      WIDE/MEDIUM/NARROW (visible top width == collision width, no hidden margins);
+      (c) seeded procedural generation (mulberry32) drawing a FRESH random seed per
+      run so every restart/Play Again is a different map, with a controlled
+      difficulty envelope (early: wide/medium, short gaps, small height diffs; late:
+      narrower, longer gaps, larger height diffs; no NARROW before id 6; no
+      consecutive-narrow; all jumps kept reachable). Deterministic-seed hook
+      (initWorld(seed?)) added for future shared-map/multiplayer modes (not exposed).
+      Jump physics left unchanged. Verified passing by testing_agent (iteration_3).
 
 ## Backlog (reserved for later milestones — DO NOT build without user go-ahead)
 - P1: physics fine-tuning based on user feedback (values live in `src/game/config.ts`)

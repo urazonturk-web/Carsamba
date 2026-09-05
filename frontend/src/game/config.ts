@@ -34,17 +34,26 @@ export const CONFIG = {
   playerWidth: 46, // collision + base render width
   playerHeight: 46, // collision + base render height
 
-  // --- Platform generation -------------------------------------------------
-  minPlatformDistance: 150, // min edge-to-edge gap between platforms
-  maxPlatformDistance: 260, // max edge-to-edge gap (kept visible + reachable)
-  minPlatformWidth: 72,
-  maxPlatformWidth: 110,
-  platformHeightVariation: 78, // max +/- change in platform top height vs previous
-  platformThickness: 26, // visual thickness of a platform below its top surface
+  // --- Platform generation (towers) ---------------------------------------
+  // Landing-surface widths come in three readable categories. The visible top
+  // width IS the collision width — no hidden margins.
+  widthWide: { min: 138, max: 152 }, // forgiving
+  widthMedium: { min: 96, max: 118 }, // standard
+  widthNarrow: { min: 62, max: 80 }, // precision / risk
 
-  // Bounds for platform top height relative to the starting level (world y).
-  platformMinTopY: -260, // highest a platform can sit (remember +y is down)
-  platformMaxTopY: 260, // lowest a platform can sit
+  // Gaps + height variation interpolate from "early" to "late" over
+  // difficultyRamp platforms (gradual difficulty envelope).
+  gapEarly: { min: 105, max: 140 }, // short, forgiving early gaps
+  gapLate: { min: 150, max: 255 }, // longer late gaps (still reachable)
+  heightVarEarly: 55, // small early height differences
+  heightVarLate: 145, // larger late height differences (< max jump apex)
+  difficultyRamp: 40, // platforms over which difficulty ramps 0 -> 1
+  noNarrowBeforeId: 6, // never spawn NARROW towers before this platform id
+
+  platformMinTopY: -320, // highest a tower top can sit (remember +y is down)
+  platformMaxTopY: 320, // lowest a tower top can sit
+  columnHeight: 1600, // tower body length downward (extends below screen)
+  capHeight: 12, // landing-surface cap thickness
 
   // --- Landing fairness ----------------------------------------------------
   landingForgiveness: 12, // px of extra horizontal grace beyond platform edges
@@ -56,19 +65,23 @@ export const CONFIG = {
   scorePerfectBonus: 2,
 
   // --- Camera --------------------------------------------------------------
-  // A gentle zoom-out frames more of the route ahead without shrinking the
-  // character too much. The player is kept in the left ~30% so the right side
-  // of the portrait screen always reveals the upcoming platforms.
-  cameraZoom: 0.62, // world -> screen scale. Lower = see more route, smaller art.
-  cameraPlayerAnchorX: 0.3, // player screen position: left 30%
+  // Moderate zoom keeps the character/towers big enough to read, while a
+  // strong forward look-ahead reveals the upcoming route on the right.
+  // The player floats between anchorMin (max forward reveal) and anchorMax
+  // (resting) as needed to frame CURRENT + NEXT + NEXT+1 towers. The NEXT
+  // tower always has absolute priority.
+  cameraZoom: 0.62, // world -> screen scale. Kept moderate (not far out).
+  cameraAnchorMin: 0.22, // most-forward player screen fraction (reveals more route)
+  cameraAnchorMax: 0.3, // resting player screen fraction (left band)
+  cameraRevealRight: 0.94, // put the NEXT+1 tower's right edge around here when framing
   cameraPlayerAnchorY: 0.5, // vertical resting anchor for the standing level
   cameraSmoothingX: 0.14, // horizontal follow lerp per frame (0..1). Lower = smoother.
-  cameraSmoothingY: 0.07, // vertical follow lerp (only tracks landing levels, not arcs)
+  cameraSmoothingY: 0.08, // vertical follow lerp
   cameraFallSmoothing: 0.1, // vertical follow while falling to Game Over
 
   // --- Generation / cleanup window ----------------------------------------
-  spawnAhead: 500, // keep platforms generated this far past the visible right edge
-  removeBehind: 200, // remove platforms this far behind the visible left edge
+  spawnAhead: 500, // keep towers generated this far past the visible right edge
+  removeBehind: 200, // remove towers this far behind the visible left edge
 
   // --- Feel / juice --------------------------------------------------------
   chargeSquashY: 0.32, // how much the blob compresses vertically at full charge

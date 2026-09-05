@@ -93,6 +93,7 @@ const light = {
   hillNear: "#B7CFDB", // nearer parallax band
   platform: "#2B6777", // platform body (calm teal-slate)
   platformTop: "#3E93A3", // platform top surface highlight
+  platformShade: "#22515E", // shaded side of the tower body (depth)
   platformCenter: "#EAF6F4", // faint center marker (perfect zone)
   blob: "#E2896A", // placeholder blob body (muted terracotta)
   blobShade: "#C96E50", // blob shading / lower edge

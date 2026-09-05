@@ -28,30 +28,14 @@ const PH = CONFIG.playerHeight;
 const POOL = 14; // fixed pool of platform views (only ~5 are visible at once)
 const POOL_IDX = Array.from({ length: POOL }, (_, i) => i);
 
-// ---------------------------------------------------------------------------
-// Platform generation — a single worklet-safe function used by both the JS
-// init and the UI-thread spawner so the rules never drift.
-// ---------------------------------------------------------------------------
-function makeNextPlatform(prev: any, id: number) {
-  "worklet";
-  const easy = id <= 3; // first few platforms are gentle
-  const minGap = CONFIG.minPlatformDistance;
-  const maxGap = easy ? CONFIG.minPlatformDistance + 70 : CONFIG.maxPlatformDistance;
-  const gap = minGap + Math.random() * (maxGap - minGap);
-  const width =
-    CONFIG.minPlatformWidth +
-    Math.random() * (CONFIG.maxPlatformWidth - CONFIG.minPlatformWidth);
-  let topY = easy
-    ? prev.topY
-    : prev.topY + (Math.random() * 2 - 1) * CONFIG.platformHeightVariation;
-  if (topY < CONFIG.platformMinTopY) topY = CONFIG.platformMinTopY;
-  if (topY > CONFIG.platformMaxTopY) topY = CONFIG.platformMaxTopY;
-  return { id, x: prev.x + prev.width + gap, topY, width };
-}
-
 // tiny helper to avoid repeating absolute-fill spread
 function absoluteFill() {
   return { position: "absolute" as const, top: 0, left: 0, right: 0, bottom: 0 };
+}
+
+function lerp(a: number, b: number, t: number) {
+  "worklet";
+  return a + (b - a) * t;
 }
 
 export default function Game() {
@@ -91,6 +75,12 @@ export default function Game() {
   const dbgAcc = useSharedValue(0);
   const running = useSharedValue(0); // 1 while a round is active
 
+  // Seeded procedural generation. A fresh random seed is drawn each run so
+  // every restart produces a different map; supplying a fixed seed reproduces
+  // the exact same tower sequence (foundation for future shared-seed modes).
+  const rngState = useSharedValue(1);
+  const runSeed = useSharedValue(1);
+
   // Perfect-landing particle burst
   const burst = useSharedValue(0);
   const burstX = useSharedValue(0);
@@ -114,12 +104,71 @@ export default function Game() {
   }, []);
 
   // ------------------------------------------------------------------------
-  // (Re)initialise the world. Snaps camera into place so restart is instant.
+  // Seeded RNG (mulberry32) + tower generator. Both are worklet-safe and used
+  // by the JS init and the UI-thread spawner, consuming one continuous seeded
+  // stream so a given seed always reproduces the same tower sequence.
   // ------------------------------------------------------------------------
-  const initWorld = useCallback(() => {
+  const rand = () => {
+    "worklet";
+    let t = (rngState.value + 0x6d2b79f5) | 0;
+    rngState.value = t;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+
+  const makeNextPlatform = (prev: any, id: number) => {
+    "worklet";
+    const t = Math.min(1, id / CONFIG.difficultyRamp); // 0 early -> 1 late
+    // gap distance (grows with difficulty)
+    const gMin = lerp(CONFIG.gapEarly.min, CONFIG.gapLate.min, t);
+    const gMax = lerp(CONFIG.gapEarly.max, CONFIG.gapLate.max, t);
+    const gap = gMin + rand() * (gMax - gMin);
+    // height difference (grows with difficulty, always < max jump apex)
+    const hv = lerp(CONFIG.heightVarEarly, CONFIG.heightVarLate, t);
+    let topY = prev.topY + (rand() * 2 - 1) * hv;
+    if (topY < CONFIG.platformMinTopY) topY = CONFIG.platformMinTopY;
+    if (topY > CONFIG.platformMaxTopY) topY = CONFIG.platformMaxTopY;
+    // width category: early favours WIDE/MEDIUM, late adds more NARROW
+    let wWide = lerp(0.55, 0.2, t);
+    const wMed = 0.4;
+    let wNar = lerp(0.05, 0.42, t);
+    if (id <= CONFIG.noNarrowBeforeId) wNar = 0; // forgiving start
+    if (prev.cat === 2) wNar *= 0.25; // avoid consecutive narrow towers
+    const sum = wWide + wMed + wNar;
+    const r = rand() * sum;
+    let cat: number;
+    let wr: { min: number; max: number };
+    if (r < wWide) {
+      cat = 0;
+      wr = CONFIG.widthWide;
+    } else if (r < wWide + wMed) {
+      cat = 1;
+      wr = CONFIG.widthMedium;
+    } else {
+      cat = 2;
+      wr = CONFIG.widthNarrow;
+    }
+    const width = wr.min + rand() * (wr.max - wr.min);
+    return { id, x: prev.x + prev.width + gap, topY, width, cat };
+  };
+
+  // ------------------------------------------------------------------------
+  // (Re)initialise the world. A fresh seed is drawn unless one is supplied
+  // (deterministic-seed hook for future shared-map modes). Snaps the camera
+  // into place so restart is instant with no slide.
+  // ------------------------------------------------------------------------
+  const initWorld = useCallback((seed?: number) => {
     const s = CONFIG.cameraZoom;
     const viewW = W / s;
-    const first = { id: 0, x: 0, topY: 0, width: 160 };
+    const seedVal =
+      (seed !== undefined
+        ? seed
+        : (Date.now() ^ Math.floor(Math.random() * 0xffffffff)) >>> 0) >>> 0;
+    runSeed.value = seedVal;
+    rngState.value = seedVal;
+
+    const first = { id: 0, x: 0, topY: 0, width: 160, cat: 0 };
     const list: any[] = [first];
 
     px.value = first.x + first.width * 0.42;
@@ -130,21 +179,42 @@ export default function Game() {
     landPulse.value = 0;
     baseY.value = first.topY;
     phase.value = PHASE.IDLE;
-    camX.value = px.value - (W * CONFIG.cameraPlayerAnchorX) / s;
-    camY.value = baseY.value - (H * CONFIG.cameraPlayerAnchorY) / s;
 
-    // Pre-generate the whole visible route + buffer so the next platforms
-    // already exist and are on-screen before the first jump.
+    // Pre-generate the whole visible route + buffer so the next towers already
+    // exist and are on-screen before the first jump.
     while (
       list[list.length - 1].x + list[list.length - 1].width <
-      camX.value + viewW + CONFIG.spawnAhead
+      px.value + viewW + CONFIG.spawnAhead
     ) {
-      const prev = list[list.length - 1];
-      list.push(makeNextPlatform(prev, list.length));
+      list.push(makeNextPlatform(list[list.length - 1], list.length));
     }
     idCounter.value = list.length;
     lastLandedId.value = 0;
     platforms.value = list;
+
+    // Snap camera to the adaptive framing target (no initial slide).
+    let ni = -1;
+    for (let i = 0; i < list.length; i++) {
+      if (list[i].x > px.value) {
+        ni = i;
+        break;
+      }
+    }
+    const nx = ni >= 0 ? list[ni] : null;
+    const nx1 = ni >= 0 && ni + 1 < list.length ? list[ni + 1] : null;
+    const targetRight = nx1
+      ? nx1.x + nx1.width
+      : nx
+        ? nx.x + nx.width
+        : px.value;
+    const camReveal = targetRight - (CONFIG.cameraRevealRight * W) / s;
+    const camRest = px.value - (CONFIG.cameraAnchorMax * W) / s;
+    const camFwd = px.value - (CONFIG.cameraAnchorMin * W) / s;
+    let cx = camReveal;
+    if (cx < camRest) cx = camRest;
+    if (cx > camFwd) cx = camFwd;
+    camX.value = cx;
+    camY.value = baseY.value - (CONFIG.cameraPlayerAnchorY * H) / s;
     running.value = 1;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [W, H]);
@@ -320,16 +390,44 @@ export default function Game() {
     }
     if (changed) platforms.value = working;
 
-    // --- camera (look ahead: player anchored left, route revealed on right) ---
-    const targetX = px.value - (W * CONFIG.cameraPlayerAnchorX) / s;
-    camX.value += (targetX - camX.value) * CONFIG.cameraSmoothingX;
-    if (phase.value === PHASE.DEAD) {
-      const tY = py.value - (H * CONFIG.cameraPlayerAnchorY) / s;
-      camY.value += (tY - camY.value) * CONFIG.cameraFallSmoothing;
-    } else {
-      const tY = baseY.value - (H * CONFIG.cameraPlayerAnchorY) / s;
-      camY.value += (tY - camY.value) * CONFIG.cameraSmoothingY;
+    // --- camera: adaptive look-ahead framing (current + next + next+1) ---
+    const plist = platforms.value;
+    let ni = -1;
+    for (let i = 0; i < plist.length; i++) {
+      if (plist[i].x > px.value) {
+        ni = i;
+        break;
+      }
     }
+    const nx = ni >= 0 ? plist[ni] : null;
+    const nx1 = ni >= 0 && ni + 1 < plist.length ? plist[ni + 1] : null;
+    const targetRight = nx1
+      ? nx1.x + nx1.width
+      : nx
+        ? nx.x + nx.width
+        : px.value;
+    // Frame so the NEXT+1 tower's right edge sits near cameraRevealRight, but
+    // never pull the player tighter than anchorMax nor push past anchorMin.
+    // The NEXT tower (closer) is therefore always visible.
+    const camReveal = targetRight - (CONFIG.cameraRevealRight * W) / s;
+    const camRest = px.value - (CONFIG.cameraAnchorMax * W) / s;
+    const camFwd = px.value - (CONFIG.cameraAnchorMin * W) / s;
+    let ctx = camReveal;
+    if (ctx < camRest) ctx = camRest;
+    if (ctx > camFwd) ctx = camFwd;
+    camX.value += (ctx - camX.value) * CONFIG.cameraSmoothingX;
+
+    // Vertical: rest on the standing level; in flight blend toward the intended
+    // landing tower so it stays revealed; follow the player down on death.
+    let focusY = baseY.value;
+    if (phase.value === PHASE.AIRBORNE && nx) focusY = (nx.topY + py.value) / 2;
+    if (phase.value === PHASE.DEAD) focusY = py.value;
+    const tY = focusY - (CONFIG.cameraPlayerAnchorY * H) / s;
+    const smoothY =
+      phase.value === PHASE.DEAD
+        ? CONFIG.cameraFallSmoothing
+        : CONFIG.cameraSmoothingY;
+    camY.value += (tY - camY.value) * smoothY;
 
     // --- debug telemetry (throttled to ~10hz) ---
     if (DEBUG_MODE) {
@@ -604,14 +702,15 @@ function PlatformView({ index, platforms, styles }: any) {
   const centerStyle = useAnimatedStyle(() => {
     const p = platforms.value[index];
     return {
-      opacity: p ? 0.6 : 0,
+      opacity: p ? 0.55 : 0,
       left: (p ? p.width : 0) / 2 - CONFIG.perfectTolerance,
     };
   });
   return (
-    <Animated.View style={[styles.platform, style]}>
-      <View style={styles.platformTop} />
-      <Animated.View style={[styles.platformCenter, centerStyle]} />
+    <Animated.View style={[styles.tower, style]}>
+      <View style={styles.towerShade} />
+      <View style={styles.towerCap} />
+      <Animated.View style={[styles.towerCenter, centerStyle]} />
     </Animated.View>
   );
 }
@@ -662,28 +761,39 @@ const useStyles = makeStyles((colors) => ({
     backgroundColor: colors.hillNear,
   },
 
-  platform: {
+  tower: {
     position: "absolute",
     left: 0,
     top: 0,
-    height: CONFIG.platformThickness,
-    borderRadius: 10,
+    height: CONFIG.columnHeight,
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
     backgroundColor: colors.platform,
+    overflow: "hidden",
     pointerEvents: "none",
   },
-  platformTop: {
+  towerShade: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    right: 0,
+    width: "32%",
+    backgroundColor: colors.platformShade,
+    opacity: 0.55,
+  },
+  towerCap: {
     position: "absolute",
     top: 0,
     left: 0,
     right: 0,
-    height: 6,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
+    height: CONFIG.capHeight,
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
     backgroundColor: colors.platformTop,
   },
-  platformCenter: {
+  towerCenter: {
     position: "absolute",
-    top: 1,
+    top: CONFIG.capHeight + 3,
     width: CONFIG.perfectTolerance * 2,
     height: 4,
     borderRadius: 2,
