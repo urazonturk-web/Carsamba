@@ -17,38 +17,39 @@
 
 export const CONFIG = {
   // --- Physics -------------------------------------------------------------
-  gravity: 2600, // px/s^2 downward pull. Higher = snappier / less floaty.
+  gravity: 2300, // px/s^2 downward pull. Higher = snappier / less floaty.
 
   // Jump force is interpolated between MIN (tap) and MAX (full charge).
   // Both horizontal and vertical scale together so a longer hold sends the
   // blob higher AND farther, keeping the mapping intuitive.
-  minJumpVX: 300, // horizontal launch speed at 0% charge
-  maxJumpVX: 560, // horizontal launch speed at 100% charge
-  minJumpVY: 760, // upward launch speed at 0% charge (applied as negative)
-  maxJumpVY: 1360, // upward launch speed at 100% charge
+  minJumpVX: 70, // horizontal launch speed at 0% charge
+  maxJumpVX: 510, // horizontal launch speed at 100% charge
+  minJumpVY: 220, // upward launch speed at 0% charge (applied as negative)
+  maxJumpVY: 1450, // upward launch speed at 100% charge
 
   // How long the player must hold to reach full charge. Tuned so ~50% charge
-  // lands around 1s and 100% around 2s (charge grows linearly with time; the
-  // VISUAL squash uses an eased curve so it reads well from the very start).
-  maxChargeDuration: 2.0, // seconds. Holding longer does nothing.
+  // lands around 0.225s and 100% around 0.45s. Spring compression and launch
+  // power use this same linear charge value.
+  maxChargeDuration: 0.45, // seconds. Holding longer does nothing.
 
   // --- Player collision ----------------------------------------------------
-  playerWidth: 46, // collision + base render width
-  playerHeight: 46, // collision + base render height
+  playerWidth: 54, // collision + base render width
+  playerHeight: 54, // collision + base render height
 
   // --- Platform generation (towers) ---------------------------------------
   // Landing-surface widths come in three readable categories. The visible top
   // width IS the collision width — no hidden margins.
-  widthWide: { min: 138, max: 152 }, // forgiving
-  widthMedium: { min: 96, max: 118 }, // standard
-  widthNarrow: { min: 62, max: 80 }, // precision / risk
+  widthWide: { min: 76, max: 88 }, // forgiving
+  widthMedium: { min: 60, max: 72 }, // standard
+  widthNarrow: { min: 48, max: 58 }, // precision / risk
 
   // Gaps + height variation interpolate from "early" to "late" over
   // difficultyRamp platforms (gradual difficulty envelope).
   gapEarly: { min: 105, max: 140 }, // short, forgiving early gaps
   gapLate: { min: 150, max: 255 }, // longer late gaps (still reachable)
-  heightVarEarly: 55, // small early height differences
-  heightVarLate: 145, // larger late height differences (< max jump apex)
+  heightVarWarmup: 180, // visible climbs/drops even on the opening towers
+  heightVarEarly: 220, // varied early height differences
+  heightVarLate: 300, // larger late height differences (< max jump apex)
   difficultyRamp: 40, // platforms over which difficulty ramps 0 -> 1
   noNarrowBeforeId: 6, // never spawn NARROW towers before this platform id
   warmupTowers: 3, // first N towers are a gentle warm-up (wide/medium, short gaps)
@@ -74,11 +75,11 @@ export const CONFIG = {
   // (resting) as needed to frame CURRENT + NEXT + NEXT+1 towers. The NEXT
   // tower always has absolute priority.
   cameraZoom: 0.62, // world -> screen scale. Kept moderate (not far out).
-  cameraAnchorMin: 0.22, // most-forward player screen fraction (reveals more route)
-  cameraAnchorMax: 0.3, // resting player screen fraction (left band)
+  cameraAnchorMin: 0.31, // most-forward player screen fraction (reveals more route)
+  cameraAnchorMax: 0.31, // resting player screen fraction (left band)
   cameraRevealRight: 0.94, // put the NEXT+1 tower's right edge around here when framing
-  cameraPlayerAnchorY: 0.5, // vertical resting anchor for the standing level
-  cameraSmoothingX: 0.14, // horizontal follow lerp per frame (0..1). Lower = smoother.
+  cameraPlayerAnchorY: 0.67, // vertical resting anchor for the standing level
+  cameraSmoothingX: 1, // lock the player horizontally; no follow lag during flight.
   cameraSmoothingY: 0.08, // vertical follow lerp
   cameraFallSmoothing: 0.1, // vertical follow while falling to Game Over
 
@@ -86,9 +87,14 @@ export const CONFIG = {
   spawnAhead: 500, // keep towers generated this far past the visible right edge
   removeBehind: 200, // remove towers this far behind the visible left edge
 
+  // Visible spring: its lower end is the player collision/landing point.
+  springHeight: 36, // relaxed height in world pixels
+  springMinHeight: 6, // fully charged height
+  springWidth: 28,
+
   // --- Feel / juice --------------------------------------------------------
-  chargeSquashY: 0.38, // how much the blob compresses vertically at full charge
-  chargeStretchX: 0.28, // how much it widens at full charge
+  chargeSquashY: 0.12, // how much the blob compresses vertically at full charge
+  chargeStretchX: 0.08, // how much it widens at full charge
   maxChargeShake: 2.8, // px jitter amplitude once near max charge
   airStretchY: 0.16, // vertical stretch while airborne
   landPulseDuration: 0.26, // seconds for the landing compression to recover

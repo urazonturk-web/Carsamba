@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import Animated, {
   runOnJS,
+  runOnUI,
   useAnimatedStyle,
   useFrameCallback,
   useSharedValue,
@@ -106,7 +107,7 @@ export default function Game() {
 
   // ------------------------------------------------------------------------
   // Seeded RNG (mulberry32) + tower generator. Both are worklet-safe and used
-  // by the JS init and the UI-thread spawner, consuming one continuous seeded
+  // by UI-thread initialisation and spawning, consuming one continuous seeded
   // stream so a given seed always reproduces the same tower sequence.
   // ------------------------------------------------------------------------
   const rand = () => {
@@ -128,11 +129,14 @@ export default function Game() {
       ? CONFIG.gapEarly.min + 30
       : lerp(CONFIG.gapEarly.max, CONFIG.gapLate.max, t);
     const gap = gMin + rand() * (gMax - gMin);
-    // height difference (warm-up = very small; grows with difficulty otherwise)
-    const hv = warm ? 24 : lerp(CONFIG.heightVarEarly, CONFIG.heightVarLate, t);
-    let topY = prev.topY + (rand() * 2 - 1) * hv;
-    if (topY < CONFIG.platformMinTopY) topY = CONFIG.platformMinTopY;
-    if (topY > CONFIG.platformMaxTopY) topY = CONFIG.platformMaxTopY;
+    // Sample within the world bounds instead of clamping: clamping stacks
+    // consecutive tower tops at exactly the same upper/lower limit.
+    const hv = warm
+      ? CONFIG.heightVarWarmup
+      : lerp(CONFIG.heightVarEarly, CONFIG.heightVarLate, t);
+    const minDelta = Math.max(-hv, CONFIG.platformMinTopY - prev.topY);
+    const maxDelta = Math.min(hv, CONFIG.platformMaxTopY - prev.topY);
+    const topY = prev.topY + minDelta + rand() * (maxDelta - minDelta);
     // width category: warm-up = WIDE/MEDIUM only; late adds more NARROW
     let wWide: number;
     let wMed: number;
@@ -172,68 +176,75 @@ export default function Game() {
   // into place so restart is instant with no slide.
   // ------------------------------------------------------------------------
   const initWorld = useCallback((seed?: number) => {
-    const s = CONFIG.cameraZoom;
-    const viewW = W / s;
     const seedVal =
       (seed !== undefined
         ? seed
         : (Date.now() ^ Math.floor(Math.random() * 0xffffffff)) >>> 0) >>> 0;
-    runSeed.value = seedVal;
-    rngState.value = seedVal;
+    // Native SharedValue writes from JS are asynchronous. Build and publish
+    // the entire round on the UI thread before rendering or advancing it.
+    runOnUI((seedVal: number) => {
+      "worklet";
+      running.value = 0;
+      const s = CONFIG.cameraZoom;
+      const viewW = W / s;
+      runSeed.value = seedVal;
+      rngState.value = seedVal;
 
-    const first = { id: 0, x: 0, topY: 0, width: 160, cat: 0 };
-    const list: any[] = [first];
+      const first = { id: 0, x: 0, topY: 0, width: CONFIG.widthWide.max, cat: 0 };
+      const list: any[] = [first];
 
-    px.value = first.x + first.width * 0.42;
-    py.value = first.topY - PH / 2;
-    vx.value = 0;
-    vy.value = 0;
-    charge.value = 0;
-    landPulse.value = 0;
-    baseY.value = first.topY;
-    phase.value = PHASE.IDLE;
+      px.value = first.x + first.width * 0.42;
+      py.value = first.topY - PH / 2;
+      vx.value = 0;
+      vy.value = 0;
+      charge.value = 0;
+      landPulse.value = 0;
+      baseY.value = first.topY;
+      phase.value = PHASE.IDLE;
 
-    // Pre-generate the whole visible route + buffer so the next towers already
-    // exist and are on-screen before the first jump.
-    while (
-      list[list.length - 1].x + list[list.length - 1].width <
-      px.value + viewW + CONFIG.spawnAhead
-    ) {
-      list.push(makeNextPlatform(list[list.length - 1], list.length));
-    }
-    // Guarantee the starting tower + at least the next TWO upcoming towers,
-    // regardless of viewport size, so a run never starts under-populated.
-    while (list.length < 3) {
-      list.push(makeNextPlatform(list[list.length - 1], list.length));
-    }
-    idCounter.value = list.length;
-    lastLandedId.value = 0;
-    platforms.value = list;
-
-    // Snap camera to the adaptive framing target (no initial slide).
-    let ni = -1;
-    for (let i = 0; i < list.length; i++) {
-      if (list[i].x > px.value) {
-        ni = i;
-        break;
+      // Pre-generate the whole visible route + buffer so the next towers already
+      // exist and are on-screen before the first jump.
+      while (
+        list[list.length - 1].x + list[list.length - 1].width <
+        px.value + viewW + CONFIG.spawnAhead
+      ) {
+        list.push(makeNextPlatform(list[list.length - 1], list.length));
       }
-    }
-    const nx = ni >= 0 ? list[ni] : null;
-    const nx1 = ni >= 0 && ni + 1 < list.length ? list[ni + 1] : null;
-    const targetRight = nx1
-      ? nx1.x + nx1.width
-      : nx
-        ? nx.x + nx.width
-        : px.value;
-    const camReveal = targetRight - (CONFIG.cameraRevealRight * W) / s;
-    const camRest = px.value - (CONFIG.cameraAnchorMax * W) / s;
-    const camFwd = px.value - (CONFIG.cameraAnchorMin * W) / s;
-    let cx = camReveal;
-    if (cx < camRest) cx = camRest;
-    if (cx > camFwd) cx = camFwd;
-    camX.value = cx;
-    camY.value = baseY.value - (CONFIG.cameraPlayerAnchorY * H) / s;
-    running.value = 1;
+      // Guarantee the starting tower + at least the next TWO upcoming towers,
+      // regardless of viewport size, so a run never starts under-populated.
+      while (list.length < 3) {
+        list.push(makeNextPlatform(list[list.length - 1], list.length));
+      }
+      idCounter.value = list.length;
+      lastLandedId.value = 0;
+      platforms.value = list;
+
+      // Snap camera to the adaptive framing target (no initial slide).
+      let ni = -1;
+      for (let i = 0; i < list.length; i++) {
+        if (list[i].x > px.value) {
+          ni = i;
+          break;
+        }
+      }
+      const nx = ni >= 0 ? list[ni] : null;
+      const nx1 = ni >= 0 && ni + 1 < list.length ? list[ni + 1] : null;
+      const targetRight = nx1
+        ? nx1.x + nx1.width
+        : nx
+          ? nx.x + nx.width
+          : px.value;
+      const camReveal = targetRight - (CONFIG.cameraRevealRight * W) / s;
+      const camRest = px.value - (CONFIG.cameraAnchorMax * W) / s;
+      const camFwd = px.value - (CONFIG.cameraAnchorMin * W) / s;
+      let cx = camReveal;
+      if (cx < camRest) cx = camRest;
+      if (cx > camFwd) cx = camFwd;
+      camX.value = cx;
+      camY.value = baseY.value - (CONFIG.cameraPlayerAnchorY * H) / s;
+      running.value = 1;
+      runOnJS(setGameReady)(true);
+    })(seedVal);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [W, H]);
 
@@ -243,7 +254,6 @@ export default function Game() {
   useEffect(() => {
     if (W > 0 && H > 0 && !gameReady) {
       initWorld();
-      setGameReady(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [W, H, gameReady]);
@@ -290,22 +300,25 @@ export default function Game() {
   // minimal latency. Only IDLE can start charging; release launches.
   // ------------------------------------------------------------------------
   const onPressIn = useCallback(() => {
-    if (running.value !== 1) return;
-    if (phase.value === PHASE.IDLE) {
+    runOnUI(() => {
+      "worklet";
+      if (running.value !== 1 || phase.value !== PHASE.IDLE) return;
       charge.value = 0;
       phase.value = PHASE.CHARGING;
-    }
+    })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onPressOut = useCallback(() => {
-    if (phase.value === PHASE.CHARGING) {
+    runOnUI(() => {
+      "worklet";
+      if (running.value !== 1 || phase.value !== PHASE.CHARGING) return;
       const c = Math.min(1, Math.max(0, charge.value));
       vx.value = CONFIG.minJumpVX + c * (CONFIG.maxJumpVX - CONFIG.minJumpVX);
       vy.value = -(CONFIG.minJumpVY + c * (CONFIG.maxJumpVY - CONFIG.minJumpVY));
       phase.value = PHASE.AIRBORNE;
       charge.value = 0;
-    }
+    })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -441,10 +454,9 @@ export default function Game() {
     if (ctx > camFwd) ctx = camFwd;
     camX.value += (ctx - camX.value) * CONFIG.cameraSmoothingX;
 
-    // Vertical: rest on the standing level; in flight blend toward the intended
-    // landing tower so it stays revealed; follow the player down on death.
-    let focusY = baseY.value;
-    if (phase.value === PHASE.AIRBORNE && nx) focusY = (nx.topY + py.value) / 2;
+    // Keep one vertical world reference for the whole round. Landing on a
+    // taller/shorter tower must not pan the entire route up/down.
+    let focusY = 0;
     if (phase.value === PHASE.DEAD) focusY = py.value;
     const tY = focusY - (CONFIG.cameraPlayerAnchorY * H) / s;
     const smoothY =
@@ -489,11 +501,8 @@ export default function Game() {
     let shake = 0;
     if (phase.value === PHASE.CHARGING) {
       const c = charge.value;
-      // Eased curve: a small immediate compression at touch-down that grows
-      // quickly early and keeps escalating toward maximum tension. Charge time
-      // itself stays linear (see maxChargeDuration) — only the visual reads
-      // stronger from the very first moment.
-      const eased = 0.14 + 0.86 * Math.pow(c, 0.7);
+      // The spring is the primary power cue; body squash uses the same charge.
+      const eased = c;
       sy = 1 - CONFIG.chargeSquashY * eased;
       sx = 1 + CONFIG.chargeStretchX * eased;
       if (c > 0.7) {
@@ -512,7 +521,9 @@ export default function Game() {
     sx = sx * (1 + 0.26 * lp);
 
     const screenLeft = px.value - PW / 2;
-    const screenTop = py.value - PH / 2;
+    const c = phase.value === PHASE.CHARGING ? charge.value : 0;
+    const springHeight = lerp(CONFIG.springHeight, CONFIG.springMinHeight, c);
+    const screenTop = py.value - PH / 2 - springHeight;
     const feetComp = ((1 - sy) * PH) / 2; // keep feet planted while squashing
 
     return {
@@ -521,6 +532,20 @@ export default function Game() {
         { translateY: screenTop + feetComp },
         { scaleX: sx },
         { scaleY: sy },
+      ],
+    };
+  });
+
+  // Compress around the bottom so the spring remains planted on the tower.
+  // Both this cue and launch velocity read the same UI-thread charge value.
+  const springStyle = useAnimatedStyle(() => {
+    const c = phase.value === PHASE.CHARGING ? charge.value : 0;
+    const height = lerp(CONFIG.springHeight, CONFIG.springMinHeight, c);
+    return {
+      transform: [
+        { translateX: px.value - CONFIG.springWidth / 2 },
+        { translateY: py.value + PH / 2 - CONFIG.springHeight },
+        { scaleY: height / CONFIG.springHeight },
       ],
     };
   });
@@ -619,6 +644,13 @@ export default function Game() {
           })}
         </Animated.View>
 
+        {/* Spring foot: compression shows the actual stored jump power. */}
+        <Animated.View testID="charge-spring" style={[styles.spring, springStyle]}>
+          {[0, 1, 2, 3, 4].map((i) => (
+            <View key={i} style={[styles.springCoil, { top: i * (CONFIG.springHeight - 8) / 4 }]} />
+          ))}
+        </Animated.View>
+
         {/* Blob */}
         <Animated.View style={[styles.blob, blobStyle]}>
           <View style={styles.blobHighlight} />
@@ -715,7 +747,7 @@ export default function Game() {
 
 // ---------------------------------------------------------------------------
 // A single pooled platform view. Reads its slot from the shared array every
-// frame (camX changes each frame, re-evaluating this style).
+// time the shared platform array changes.
 // ---------------------------------------------------------------------------
 function PlatformView({ index, platforms, styles }: any) {
   const style = useAnimatedStyle(() => {
@@ -831,6 +863,26 @@ const useStyles = makeStyles((colors) => ({
     height: 4,
     borderRadius: 2,
     backgroundColor: colors.platformCenter,
+  },
+
+  spring: {
+    position: "absolute",
+    left: 0,
+    top: 0,
+    width: CONFIG.springWidth,
+    height: CONFIG.springHeight,
+    transformOrigin: "50% 100%",
+    pointerEvents: "none",
+  },
+  springCoil: {
+    position: "absolute",
+    left: 0,
+    width: CONFIG.springWidth,
+    height: 8,
+    borderWidth: 2.5,
+    borderRadius: 5,
+    borderColor: colors.blobShade,
+    backgroundColor: colors.blobFace,
   },
 
   blob: {
