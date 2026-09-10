@@ -65,6 +65,7 @@ export default function Game() {
   const vy = useSharedValue(0);
   const phase = useSharedValue<number>(PHASE.IDLE);
   const charge = useSharedValue(0);
+  const releasedCharge = useSharedValue(0); // visual compression held during flight
   const camX = useSharedValue(0);
   const camY = useSharedValue(0);
   const baseY = useSharedValue(0);
@@ -198,6 +199,7 @@ export default function Game() {
       vx.value = 0;
       vy.value = 0;
       charge.value = 0;
+      releasedCharge.value = 0;
       landPulse.value = 0;
       baseY.value = first.topY;
       phase.value = PHASE.IDLE;
@@ -318,6 +320,7 @@ export default function Game() {
       const c = Math.min(1, Math.max(0, charge.value));
       vx.value = CONFIG.minJumpVX + c * (CONFIG.maxJumpVX - CONFIG.minJumpVX);
       vy.value = -(CONFIG.minJumpVY + c * (CONFIG.maxJumpVY - CONFIG.minJumpVY));
+      releasedCharge.value = c;
       phase.value = PHASE.AIRBORNE;
       charge.value = 0;
     })();
@@ -366,6 +369,7 @@ export default function Game() {
             vx.value = 0;
             vy.value = 0;
             baseY.value = p.topY;
+            releasedCharge.value = 0;
             phase.value = PHASE.IDLE;
             landPulse.value = 1;
             landPulse.value = withTiming(0, {
@@ -524,7 +528,8 @@ export default function Game() {
     sx = sx * (1 + 0.26 * lp);
 
     const screenLeft = px.value - PW / 2;
-    const c = phase.value === PHASE.CHARGING ? charge.value : 0;
+    const inFlight = phase.value === PHASE.AIRBORNE || phase.value === PHASE.DEAD;
+    const c = phase.value === PHASE.CHARGING ? charge.value : inFlight ? releasedCharge.value : 0;
     const springHeight = lerp(CONFIG.springHeight, CONFIG.springMinHeight, c);
     const screenTop = py.value - PH / 2 - springHeight;
     const feetComp = ((1 - sy) * PH) / 2; // keep feet planted while squashing
@@ -542,11 +547,12 @@ export default function Game() {
   // Compress around the bottom so the spring remains planted on the tower.
   // Both this cue and launch velocity read the same UI-thread charge value.
   const springStyle = useAnimatedStyle(() => {
-    const c = phase.value === PHASE.CHARGING ? charge.value : 0;
+    const inFlight = phase.value === PHASE.AIRBORNE || phase.value === PHASE.DEAD;
+    const c = phase.value === PHASE.CHARGING ? charge.value : inFlight ? releasedCharge.value : 0;
     const height = lerp(CONFIG.springHeight, CONFIG.springMinHeight, c);
     return {
       transform: [
-        { translateX: px.value - CONFIG.springWidth / 2 },
+        { translateX: px.value - (CONFIG.springWidth + 8) / 2 },
         { translateY: py.value + PH / 2 - CONFIG.springHeight },
         { scaleY: height / CONFIG.springHeight },
       ],
@@ -865,7 +871,7 @@ const useStyles = makeStyles((colors) => ({
     position: "absolute",
     left: 0,
     top: 0,
-    width: CONFIG.springWidth,
+    width: CONFIG.springWidth + 8,
     height: CONFIG.springHeight,
     transformOrigin: "50% 100%",
     pointerEvents: "none",
@@ -873,12 +879,12 @@ const useStyles = makeStyles((colors) => ({
   springCoil: {
     position: "absolute",
     left: 0,
-    width: CONFIG.springWidth,
+    width: CONFIG.springWidth + 8,
     height: 8,
-    borderWidth: 2.5,
+    borderWidth: 4,
     borderRadius: 5,
-    borderColor: colors.blobShade,
-    backgroundColor: colors.blobFace,
+    borderColor: colors.onSurface,
+    backgroundColor: colors.surface,
   },
 
   blob: {
