@@ -65,7 +65,8 @@ export const CONFIG = {
   perfectTolerance: 22, // px from platform center that still counts as PERFECT
 
   // --- Scoring -------------------------------------------------------------
-  scorePerLanding: 1,
+  scorePerLanding: 1, // base points per tower advanced
+  scoreMultiTowerBonus: 1, // extra per tower when advancing 2+ in one jump
   scorePerfectBonus: 2,
 
   // --- Camera --------------------------------------------------------------
@@ -106,7 +107,7 @@ export const CONFIG = {
 // physics telemetry (charge %, velocities, platform distance/width, landing
 // offset, FPS).
 // ============================================================================
-export const DEBUG_MODE = true;
+export const DEBUG_MODE = false;
 
 // Phase enum shared between the JS side and the UI-thread worklet loop.
 export const PHASE = {

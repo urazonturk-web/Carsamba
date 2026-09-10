@@ -261,9 +261,11 @@ export default function Game() {
   // ------------------------------------------------------------------------
   // JS callbacks triggered from the worklet (rare, event-based).
   // ------------------------------------------------------------------------
-  const onLanding = useCallback((perfect: number) => {
+  const onLanding = useCallback((perfect: number, towersCrossed: number) => {
     const gained =
-      CONFIG.scorePerLanding + (perfect ? CONFIG.scorePerfectBonus : 0);
+      towersCrossed * CONFIG.scorePerLanding +
+      (towersCrossed > 1 ? towersCrossed * CONFIG.scoreMultiTowerBonus : 0) +
+      (perfect ? CONFIG.scorePerfectBonus : 0);
     scoreRef.current += gained;
     setScore(scoreRef.current);
     if (perfect) {
@@ -374,6 +376,7 @@ export default function Game() {
             const perfect = Math.abs(offset) <= CONFIG.perfectTolerance ? 1 : 0;
             // Score only the first time we reach a new (higher id) platform.
             if (p.id > lastLandedId.value) {
+              const towersCrossed = p.id - lastLandedId.value;
               lastLandedId.value = p.id;
               if (perfect) {
                 burstX.value = cx;
@@ -381,7 +384,7 @@ export default function Game() {
                 burst.value = 0;
                 burst.value = withTiming(1, { duration: 620 });
               }
-              runOnJS(onLanding)(perfect);
+              runOnJS(onLanding)(perfect, towersCrossed);
             }
             break;
           }
@@ -667,14 +670,14 @@ export default function Game() {
       />
 
       {/* Score HUD */}
-      <View style={[styles.hud, { top: insets.top + 10 }]}>
+      {!gameOver && <View style={[styles.hud, { top: insets.top + 24 }]}>
         <Text style={styles.scoreText} testID="score-value">
           {score}
         </Text>
         <Text style={styles.bestText} testID="best-value">
           BEST {best}
         </Text>
-      </View>
+      </View>}
 
       {/* Hint (only before first jump) */}
       {score === 0 && !gameOver && (
@@ -712,20 +715,13 @@ export default function Game() {
         <View style={styles.overlay} testID="game-over-overlay">
           <View style={styles.card}>
             <Text style={styles.gameOverTitle}>Game Over</Text>
-            <View style={styles.statRow}>
-              <View style={styles.statBox}>
-                <Text style={styles.statLabel}>SCORE</Text>
-                <Text style={styles.statValue} testID="final-score">
-                  {score}
-                </Text>
-              </View>
-              <View style={styles.statBox}>
-                <Text style={styles.statLabel}>BEST</Text>
-                <Text style={styles.statValue} testID="final-best">
-                  {best}
-                </Text>
-              </View>
-            </View>
+            <Text style={styles.statLabel}>SCORE</Text>
+            <Text style={styles.statValue} testID="final-score">
+              {score}
+            </Text>
+            <Text style={styles.finalBest} testID="final-best">
+              BEST {best}
+            </Text>
             <Pressable
               testID="play-again-button"
               style={({ pressed }) => [
@@ -917,7 +913,7 @@ const useStyles = makeStyles((colors) => ({
     backgroundColor: colors.perfect,
   },
 
-  hud: { position: "absolute", left: 20, alignItems: "flex-start", pointerEvents: "none" },
+  hud: { position: "absolute", left: 0, right: 0, alignItems: "center", pointerEvents: "none" },
   scoreText: {
     fontSize: 56,
     fontWeight: "800",
@@ -981,7 +977,8 @@ const useStyles = makeStyles((colors) => ({
     justifyContent: "center",
   },
   card: {
-    width: "78%",
+    width: "84%",
+    maxWidth: 360,
     backgroundColor: colors.surface,
     borderRadius: 24,
     paddingVertical: 28,
@@ -1004,13 +1001,12 @@ const useStyles = makeStyles((colors) => ({
     color: colors.onSurface,
     marginBottom: 20,
   },
-  statRow: { flexDirection: "row", gap: 16, marginBottom: 24 },
-  statBox: {
-    flex: 1,
-    alignItems: "center",
-    backgroundColor: colors.surfaceTertiary,
-    borderRadius: 16,
-    paddingVertical: 14,
+  finalBest: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: colors.muted,
+    marginTop: 4,
+    marginBottom: 24,
   },
   statLabel: {
     fontSize: 11,
@@ -1019,7 +1015,7 @@ const useStyles = makeStyles((colors) => ({
     letterSpacing: 1,
   },
   statValue: {
-    fontSize: 30,
+    fontSize: 56,
     fontWeight: "800",
     color: colors.onSurface,
     marginTop: 2,
