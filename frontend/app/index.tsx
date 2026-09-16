@@ -1,8 +1,11 @@
+import { Image as CachedImage } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Haptics from "expo-haptics";
 import { StatusBar } from "expo-status-bar";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
+  type GestureResponderEvent,
+  Image,
   Platform,
   Pressable,
   Text,
@@ -16,27 +19,42 @@ import Animated, {
   useFrameCallback,
   useSharedValue,
   withTiming,
+  withSpring,
+  withSequence,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { CONFIG, DEBUG_MODE, PHASE } from "@/src/game/config";
+import { AmbientBirds } from "../src/game/AmbientBirds";
+import { jumpVelocity, advanceFlight } from "../src/game/jump";
+import { findFootLanding } from "../src/game/landing";
+import { referencePlatform, referenceTowerWidth } from "../src/game/reference-course";
+import { generateProceduralPlatform, mulberry32Step } from "../src/game/procedural-course";
+import { CONFIG, DEBUG_MODE, EXPERIMENTAL_COURSE, PHASE, REFERENCE_TRIAL } from "@/src/game/config";
 import { makeStyles, useTheme } from "@/src/theme";
 import { storage } from "@/src/utils/storage";
 
-const BEST_SCORE_KEY = "jumpcharge.bestScore";
+// Small shared texture travels with the JS bundle, avoiding a separate Metro image request.
+const BRICK_SOURCE = require("@/assets/environment/brick-inline.json");
+
+// Preserve historical scores separately because the scoring rules changed.
+const BEST_SCORE_KEY = REFERENCE_TRIAL ? "jumpcharge.bestScore.reference.v1" : "jumpcharge.bestScore";
+// EXPERIMENTAL_COURSE (see src/game/config.ts) swaps the fixed, measured
+// REFERENCE_COURSE for the procedural generator below, independent of
+// REFERENCE_TRIAL's physics constants. Only this one flag decides which
+// tower source is used -- everywhere else in this file keep using
+// REFERENCE_TRIAL for physics/scoring exactly as before.
+const USE_REFERENCE_COURSE = REFERENCE_TRIAL && !EXPERIMENTAL_COURSE;
 const PW = CONFIG.playerWidth;
 const PH = CONFIG.playerHeight;
+// Render size is independent of the existing collision dimensions.
+const CHARACTER_WIDTH = PW * 2.16;
+const CHARACTER_HEIGHT = PH * 2.16;
 const POOL = 14; // fixed pool of platform views (only ~5 are visible at once)
 const POOL_IDX = Array.from({ length: POOL }, (_, i) => i);
 
 // tiny helper to avoid repeating absolute-fill spread
 function absoluteFill() {
   return { position: "absolute" as const, top: 0, left: 0, right: 0, bottom: 0 };
-}
-
-function lerp(a: number, b: number, t: number) {
-  "worklet";
-  return a + (b - a) * t;
 }
 
 export default function Game() {
@@ -47,10 +65,43 @@ export default function Game() {
 
   // --- JS-side reactive state (events only, never per-frame) ---------------
   const [score, setScore] = useState(0);
+  const [lastJump, setLastJump] = useState<{ ms: number; percent: number; visualPercent: number; pressToFirstFrameMs: number } | null>(null);
+  const reportJump = useCallback((ms: number, power: number, launchVX: number, launchVY: number, width: number, fromId: number, lastVisualCharge: number, pressToFirstFrameMs: number) => {
+    setLastJump({ ms: Math.round(ms), percent: Math.round(power * 100), visualPercent: Math.round(lastVisualCharge * 100), pressToFirstFrameMs: Math.round(pressToFirstFrameMs) });
+    // TEMPORARY diagnostic fields (visualCharge, pressToFirstFrameMs) added
+    // per CLAUDE_CHARGE_TIMING_RESULT.md to compare what the player saw
+    // against the launch-determining native-timestamp charge on a real
+    // device. Safe to remove once the mismatch question is settled.
+    console.info("[jump-measurement]", JSON.stringify({ heldMs: ms, charge: power, visualCharge: lastVisualCharge, pressToFirstFrameMs, vx: launchVX, vy: launchVY, screenWidth: width, fromPlatformId: fromId }));
+  }, []);
   const [best, setBest] = useState(0);
   const [gameOver, setGameOver] = useState(false);
   const [gameReady, setGameReady] = useState(false);
+  const [loadedArt, setLoadedArt] = useState<Record<string, boolean>>({});
+  const [artError, setArtError] = useState(false);
+  // Temporary device measurement: JS-observed native image events, not separate network/decode timings.
+  const [artOrigin] = useState(() => performance.now());
+  const [artTimings, setArtTimings] = useState({ starts: {} as Record<string, number>, ends: {} as Record<string, number> });
+  const artClock = useRef({ origin: artOrigin, starts: {} as Record<string, number>, ends: {} as Record<string, number> });
+  const [showArtTiming, setShowArtTiming] = useState(true);
+  const markArtStarted = useCallback((name: string) => {
+    const clock = artClock.current;
+    if (clock.starts[name] === undefined) clock.starts[name] = performance.now() - clock.origin;
+  }, []);
+  const markArtLoaded = useCallback((name: string) => {
+    const clock = artClock.current;
+    if (clock.ends[name] === undefined) {
+      clock.ends[name] = performance.now() - clock.origin;
+      setArtTimings({ starts: { ...clock.starts }, ends: { ...clock.ends } });
+      console.info("[art-load]", name, JSON.stringify({ startMs: clock.starts[name], readyMs: clock.ends[name] }));
+    }
+    setLoadedArt(previous => previous[name] ? previous : { ...previous, [name]: true });
+  }, []);
+  const failArt = useCallback(() => setArtError(true), []);
+  const artReady = loadedArt.background && loadedArt.body && loadedArt.head && loadedArt.bricks;
+
   const [perfectVisible, setPerfectVisible] = useState(false);
+  const [landingLabel, setLandingLabel] = useState("PERFECT!");
   const [debug, setDebug] = useState({
     charge: 0, vx: 0, vy: 0, dist: 0, width: 0, offset: 0, fps: 0,
   });
@@ -65,7 +116,20 @@ export default function Game() {
   const vy = useSharedValue(0);
   const phase = useSharedValue<number>(PHASE.IDLE);
   const charge = useSharedValue(0);
+  const touchStartedAt = useSharedValue(0);
+  // Diagnostic only (not read by the charge formula below): records the
+  // display-link timestamp of the first frame tick seen while CHARGING, so
+  // onPressOut can report how long press-processing took to reach the frame
+  // loop. See CLAUDE_CHARGE_TIMING_RESULT.md.
+  const firstChargeFrameSeen = useSharedValue(0);
+  const firstChargeFrameTs = useSharedValue(0);
   const releasedCharge = useSharedValue(0); // visual compression held during flight
+  const visualCharge = useSharedValue(0);
+  const jacketOpen = useSharedValue(0);
+  const jacketPopped = useSharedValue(0);
+  const puffAge = useSharedValue(1);
+  const headTilt = useSharedValue(0);
+  const headVelocity = useSharedValue(0);
   const camX = useSharedValue(0);
   const camY = useSharedValue(0);
   const baseY = useSharedValue(0);
@@ -113,62 +177,21 @@ export default function Game() {
   // ------------------------------------------------------------------------
   const rand = () => {
     "worklet";
-    let t = (rngState.value + 0x6d2b79f5) | 0;
-    rngState.value = t;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    const r = mulberry32Step(rngState.value);
+    rngState.value = r.nextState;
+    return r.value;
   };
 
+  // Procedural math itself lives in src/game/procedural-course.ts (a single
+  // source of truth also imported by offline test scripts, avoiding a
+  // hand-duplicated copy that could silently drift from the live game).
   const makeNextPlatform = (prev: any, id: number) => {
     "worklet";
-    const warm = id <= CONFIG.warmupTowers; // gentle warm-up section
-    const t = Math.min(1, id / CONFIG.difficultyRamp); // 0 early -> 1 late
-    // gap distance (grows with difficulty; warm-up = short/medium only)
-    const gMin = warm ? CONFIG.gapEarly.min : lerp(CONFIG.gapEarly.min, CONFIG.gapLate.min, t);
-    const gMax = warm
-      ? CONFIG.gapEarly.min + 30
-      : lerp(CONFIG.gapEarly.max, CONFIG.gapLate.max, t);
-    const gap = gMin + rand() * (gMax - gMin);
-    // Sample within the world bounds instead of clamping: clamping stacks
-    // consecutive tower tops at exactly the same upper/lower limit.
-    const hv = warm
-      ? CONFIG.heightVarWarmup
-      : lerp(CONFIG.heightVarEarly, CONFIG.heightVarLate, t);
-    const minDelta = Math.max(-hv, CONFIG.platformMinTopY - prev.topY);
-    const maxDelta = Math.min(hv, CONFIG.platformMaxTopY - prev.topY);
-    const topY = prev.topY + minDelta + rand() * (maxDelta - minDelta);
-    // width category: warm-up = WIDE/MEDIUM only; late adds more NARROW
-    let wWide: number;
-    let wMed: number;
-    let wNar: number;
-    if (warm) {
-      wWide = 0.62;
-      wMed = 0.38;
-      wNar = 0;
-    } else {
-      wWide = lerp(0.55, 0.2, t);
-      wMed = 0.4;
-      wNar = lerp(0.05, 0.42, t);
-      if (id <= CONFIG.noNarrowBeforeId) wNar = 0; // forgiving start
-    }
-    if (prev.cat === 2) wNar *= 0.25; // avoid consecutive narrow towers
-    const sum = wWide + wMed + wNar;
-    const r = rand() * sum;
-    let cat: number;
-    let wr: { min: number; max: number };
-    if (r < wWide) {
-      cat = 0;
-      wr = CONFIG.widthWide;
-    } else if (r < wWide + wMed) {
-      cat = 1;
-      wr = CONFIG.widthMedium;
-    } else {
-      cat = 2;
-      wr = CONFIG.widthNarrow;
-    }
-    const width = wr.min + rand() * (wr.max - wr.min);
-    return { id, x: prev.x + prev.width + gap, topY, width, cat };
+    const measured = USE_REFERENCE_COURSE ? referencePlatform(id, W, CONFIG.cameraZoom) : null;
+    if (measured) return measured;
+    const generated = generateProceduralPlatform(prev, id, rand, W);
+    const width = USE_REFERENCE_COURSE ? referenceTowerWidth(W, CONFIG.cameraZoom) : generated.width;
+    return { ...generated, width };
   };
 
   // ------------------------------------------------------------------------
@@ -191,15 +214,26 @@ export default function Game() {
       runSeed.value = seedVal;
       rngState.value = seedVal;
 
-      const first = { id: 0, x: 0, topY: 0, width: CONFIG.widthWide.max, cat: 0 };
+      const first = (USE_REFERENCE_COURSE ? referencePlatform(0, W, CONFIG.cameraZoom) : null)
+        ?? { id: 0, x: 0, topY: 0, width: CONFIG.widthWide.max, cat: 0 };
       const list: any[] = [first];
 
-      px.value = first.x + first.width * 0.42;
+      // Reference video: character's rest stance sits ~0.53-0.58 of the way
+      // across the first tower's width (measured from two frame features,
+      // 11-12-55 reference), not 0.42. Centering here (0.5) is a conservative
+      // read of that range. See CLAUDE_TAKEOFF_RESULT.md.
+      px.value = first.x + first.width * 0.5;
       py.value = first.topY - PH / 2;
       vx.value = 0;
       vy.value = 0;
       charge.value = 0;
       releasedCharge.value = 0;
+      visualCharge.value = 0;
+      jacketOpen.value = 0;
+      jacketPopped.value = 0;
+      puffAge.value = 1;
+      headTilt.value = 0;
+      headVelocity.value = 0;
       landPulse.value = 0;
       baseY.value = first.topY;
       phase.value = PHASE.IDLE;
@@ -270,10 +304,11 @@ export default function Game() {
       (perfect ? CONFIG.scorePerfectBonus : 0);
     scoreRef.current += gained;
     setScore(scoreRef.current);
-    if (perfect) {
-      if (Platform.OS !== "web") {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
-      }
+    if (perfect && Platform.OS !== "web") {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+    }
+    if (REFERENCE_TRIAL ? towersCrossed > 1 : perfect) {
+      setLandingLabel(REFERENCE_TRIAL ? `+${gained}` : "PERFECT!");
       setPerfectVisible(true);
       if (perfectTimer.current) clearTimeout(perfectTimer.current);
       perfectTimer.current = setTimeout(() => setPerfectVisible(false), 750);
@@ -294,35 +329,68 @@ export default function Game() {
   const restart = useCallback(() => {
     scoreRef.current = 0;
     setScore(0);
+    setLastJump(null);
     setGameOver(false);
     setPerfectVisible(false);
     initWorld();
   }, [initWorld]);
 
   // ------------------------------------------------------------------------
-  // Touch input — Pressable gives immediate touch-down / touch-up with
-  // minimal latency. Only IDLE can start charging; release launches.
+  // Raw responder events avoid Pressability's 130ms minimum press duration.
+  // Use native event timestamps so JS/UI queue delays do not add jump power.
   // ------------------------------------------------------------------------
-  const onPressIn = useCallback(() => {
-    runOnUI(() => {
+  const onPressIn = useCallback((event: GestureResponderEvent) => {
+    const timestamp = event.nativeEvent.timestamp;
+    runOnUI((startedAt: number) => {
       "worklet";
       if (running.value !== 1 || phase.value !== PHASE.IDLE) return;
+      touchStartedAt.value = startedAt;
       charge.value = 0;
+      firstChargeFrameSeen.value = 0;
+      jacketOpen.value = withSpring(0, { damping: 19, stiffness: 220, mass: 0.7 });
+      jacketPopped.value = 0;
+      puffAge.value = 1;
       phase.value = PHASE.CHARGING;
-    })();
+    })(timestamp);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const onPressOut = useCallback(() => {
-    runOnUI(() => {
+  const onPressOut = useCallback((event: GestureResponderEvent) => {
+    const timestamp = event.nativeEvent.timestamp;
+    runOnUI((endedAt: number) => {
       "worklet";
       if (running.value !== 1 || phase.value !== PHASE.CHARGING) return;
-      const c = Math.min(1, Math.max(0, charge.value));
-      vx.value = CONFIG.minJumpVX + c * (CONFIG.maxJumpVX - CONFIG.minJumpVX);
-      vy.value = -(CONFIG.minJumpVY + c * (CONFIG.maxJumpVY - CONFIG.minJumpVY));
+      const heldSeconds = Math.max(0, endedAt - touchStartedAt.value) / 1000;
+      const c = Math.min(1, heldSeconds / CONFIG.maxChargeDuration);
+      const launch = jumpVelocity(c, W);
+      // Diagnostic snapshot (see CLAUDE_CHARGE_TIMING_RESULT.md): charge.value
+      // BEFORE it is reset below is what the player was actually looking at
+      // this instant; pressToFirstFrameMs is how long press-processing took
+      // to reach the frame loop's first CHARGING tick.
+      const lastVisualCharge = charge.value;
+      const pressToFirstFrameMs = firstChargeFrameSeen.value === 1 ? firstChargeFrameTs.value - touchStartedAt.value : -1;
+      if (__DEV__) runOnJS(reportJump)(heldSeconds * 1000, c, launch.vx, launch.vy, W, lastLandedId.value, lastVisualCharge, pressToFirstFrameMs);
+      vx.value = launch.vx;
+      vy.value = launch.vy;
+      headVelocity.value = -65 - c * 55;
       releasedCharge.value = c;
       phase.value = PHASE.AIRBORNE;
       charge.value = 0;
+    })(timestamp);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [W, reportJump]);
+
+  const cancelCharge = useCallback(() => {
+    runOnUI(() => {
+      "worklet";
+      if (phase.value !== PHASE.CHARGING) return;
+      phase.value = PHASE.IDLE;
+      charge.value = 0;
+      releasedCharge.value = 0;
+      visualCharge.value = 0;
+      jacketOpen.value = withSpring(0, { damping: 19, stiffness: 220, mass: 0.7 });
+      jacketPopped.value = 0;
+      puffAge.value = 1;
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -338,59 +406,95 @@ export default function Game() {
     if (dt > 1 / 30) dt = 1 / 30; // clamp big hitches so physics stays stable
     if (dt <= 0) return;
 
+    // Visual damped spring, integrated in small steps; never feeds game physics.
+    let angle = headTilt.value;
+    let angularVelocity = headVelocity.value;
+    for (let step = 0; step < 4; step++) {
+      const h = dt / 4;
+      angularVelocity += (-100 * angle - 8 * angularVelocity) * h;
+      angle += angularVelocity * h;
+    }
+    headTilt.value = Math.max(-12, Math.min(12, angle));
+    headVelocity.value = angularVelocity;
+
     fps.value = fps.value * 0.9 + (1 / dt) * 0.1;
     const list = platforms.value;
 
     // --- charge ---
+    // Recomputed fresh from timestamps every frame instead of accumulating a
+    // per-frame delta. This removes drift AND the charge-start boundary
+    // question entirely: there is no "which side of press-down does this
+    // interval belong to" ambiguity when there is no interval being
+    // accumulated in the first place, only a direct elapsed-time readout.
+    //
+    // frame.timestamp (Reanimated, from CADisplayLink.targetTimestamp * 1000
+    // -- see node_modules/react-native-reanimated/apple/reanimated/apple/
+    // native/PlatformDepMethodsHolderImpl.mm) and touchStartedAt.value (from
+    // event.nativeEvent.timestamp, i.e. UITouch.timestamp * 1000 -- see
+    // node_modules/react-native/React/Base/RCTTouchHandler.m) are VERIFIED
+    // to share the same clock on iOS: both are CACurrentMediaTime-based
+    // seconds converted to ms with the same *1000. Subtracting them directly
+    // is therefore safe. (Android uses a different native path and has not
+    // been verified the same way.) See CLAUDE_CHARGE_TIMING_RESULT.md.
     if (phase.value === PHASE.CHARGING) {
-      charge.value = Math.min(1, charge.value + dt / CONFIG.maxChargeDuration);
+      if (firstChargeFrameSeen.value === 0) {
+        firstChargeFrameSeen.value = 1;
+        firstChargeFrameTs.value = frame.timestamp; // diagnostic only, see onPressOut
+      }
+      const heldMs = frame.timestamp - touchStartedAt.value;
+      charge.value = Math.min(1, Math.max(0, heldMs / 1000 / CONFIG.maxChargeDuration));
+    }
+
+    if (puffAge.value < 1) puffAge.value = Math.min(1, puffAge.value + dt);
+    if (phase.value === PHASE.CHARGING && charge.value >= 1 && jacketPopped.value === 0) {
+      jacketPopped.value = 1;
+      puffAge.value = 0;
+      jacketOpen.value = withSpring(1, { damping: 15, stiffness: 240, mass: 0.7 });
     }
 
     // --- airborne physics ---
     if (phase.value === PHASE.AIRBORNE) {
+      const prevX = px.value;
       const prevBottom = py.value + PH / 2;
-      vy.value += CONFIG.gravity * dt;
-      px.value += vx.value * dt;
-      py.value += vy.value * dt;
+      const flight = advanceFlight(px.value, py.value, vx.value, vy.value, dt, W);
+      px.value = flight.x;
+      py.value = flight.y;
+      vy.value = flight.vy;
       const newBottom = py.value + PH / 2;
 
       if (vy.value > 0) {
-        for (let i = 0; i < list.length; i++) {
-          const p = list[i];
-          const cx = px.value;
-          if (
-            cx >= p.x - CONFIG.landingForgiveness &&
-            cx <= p.x + p.width + CONFIG.landingForgiveness &&
-            newBottom >= p.topY &&
-            prevBottom <= p.topY + CONFIG.landingTopTolerance
-          ) {
-            // fair landing
-            py.value = p.topY - PH / 2;
-            vx.value = 0;
-            vy.value = 0;
-            baseY.value = p.topY;
-            releasedCharge.value = 0;
-            phase.value = PHASE.IDLE;
-            landPulse.value = 1;
-            landPulse.value = withTiming(0, {
-              duration: CONFIG.landPulseDuration * 1000,
-            });
-            const offset = cx - (p.x + p.width / 2);
-            lastOffset.value = offset;
-            const perfect = Math.abs(offset) <= CONFIG.perfectTolerance ? 1 : 0;
-            // Score only the first time we reach a new (higher id) platform.
-            if (p.id > lastLandedId.value) {
-              const towersCrossed = p.id - lastLandedId.value;
-              lastLandedId.value = p.id;
-              if (perfect) {
-                burstX.value = cx;
-                burstY.value = p.topY;
-                burst.value = 0;
-                burst.value = withTiming(1, { duration: 620 });
-              }
-              runOnJS(onLanding)(perfect, towersCrossed);
+        const contact = findFootLanding(list, prevX, px.value, prevBottom, newBottom, CHARACTER_WIDTH * 0.8);
+        if (contact) {
+          const p = list[contact.index];
+          const cx = contact.x;
+          px.value = cx;
+          // fair landing
+          py.value = p.topY - PH / 2;
+          vx.value = 0;
+          headVelocity.value = Math.min(150, 45 + Math.abs(vy.value) * 0.06);
+          vy.value = 0;
+          baseY.value = p.topY;
+          jacketOpen.value = withSpring(0, { damping: 19, stiffness: 220, mass: 0.7 });
+          releasedCharge.value = 0;
+          phase.value = PHASE.IDLE;
+          landPulse.value = withSequence(
+            withTiming(1, { duration: 55 }),
+            withTiming(0, { duration: CONFIG.landPulseDuration * 1000 }),
+          );
+          const offset = cx - (p.x + p.width / 2);
+          lastOffset.value = offset;
+          const perfect = Math.abs(offset) <= CONFIG.perfectTolerance ? 1 : 0;
+          // Score only the first time we reach a new (higher id) platform.
+          if (p.id > lastLandedId.value) {
+            const towersCrossed = p.id - lastLandedId.value;
+            lastLandedId.value = p.id;
+            if (perfect) {
+              burstX.value = cx;
+              burstY.value = p.topY;
+              burst.value = 0;
+              burst.value = withTiming(1, { duration: 620 });
             }
-            break;
+            runOnJS(onLanding)(perfect, towersCrossed);
           }
         }
       }
@@ -402,6 +506,11 @@ export default function Game() {
         runOnJS(onGameOver)();
       }
     }
+
+    // Charge remains immediate; only recovery after landing is softened.
+    if (phase.value === PHASE.CHARGING) visualCharge.value = charge.value;
+    else if (phase.value === PHASE.AIRBORNE || phase.value === PHASE.DEAD) visualCharge.value = releasedCharge.value;
+    else visualCharge.value *= Math.exp(-18 * dt);
 
     // --- procedural spawn ahead + cleanup behind (reassign, never mutate) ---
     const s = CONFIG.cameraZoom;
@@ -502,59 +611,51 @@ export default function Game() {
   // ------------------------------------------------------------------------
   // Blob animated style — charge squash, air stretch, landing pulse, shake.
   // ------------------------------------------------------------------------
-  const blobStyle = useAnimatedStyle(() => {
-    let sx = 1;
-    let sy = 1;
-    let shake = 0;
-    if (phase.value === PHASE.CHARGING) {
-      const c = charge.value;
-      // The spring is the primary power cue; body squash uses the same charge.
-      const eased = c;
-      sy = 1 - CONFIG.chargeSquashY * eased;
-      sx = 1 + CONFIG.chargeStretchX * eased;
-      if (c > 0.7) {
-        shake =
-          Math.sin(Date.now() * 0.9) *
-          CONFIG.maxChargeShake *
-          ((c - 0.7) / 0.3);
-      }
-    } else if (phase.value === PHASE.AIRBORNE) {
-      const s = Math.max(-1, Math.min(1, -vy.value / 1400));
-      sy = 1 + CONFIG.airStretchY * Math.abs(s);
-      sx = 1 - CONFIG.airStretchY * Math.abs(s) * 0.7;
-    }
-    const lp = landPulse.value;
-    sy = sy * (1 - 0.3 * lp);
-    sx = sx * (1 + 0.26 * lp);
-
-    const screenLeft = px.value - PW / 2;
-    const inFlight = phase.value === PHASE.AIRBORNE || phase.value === PHASE.DEAD;
-    const c = phase.value === PHASE.CHARGING ? charge.value : inFlight ? releasedCharge.value : 0;
-    const springHeight = lerp(CONFIG.springHeight, CONFIG.springMinHeight, c);
-    const screenTop = py.value - PH / 2 - springHeight;
-    const feetComp = ((1 - sy) * PH) / 2; // keep feet planted while squashing
-
+  const bodyStyle = useAnimatedStyle(() => {
+    const c = visualCharge.value;
+    const sy = (1 - 0.28 * c) * (1 - 0.22 * landPulse.value);
     return {
       transform: [
-        { translateX: screenLeft + shake },
-        { translateY: screenTop + feetComp },
-        { scaleX: sx },
+        { translateX: px.value - CHARACTER_WIDTH * 0.4 },
+        { translateY: py.value + PH / 2 - CHARACTER_HEIGHT * 0.8 },
+        { scaleX: (1 + 0.35 * c) * (1 + 0.26 * landPulse.value) },
         { scaleY: sy },
+        { skewX: `${headTilt.value * 0.25}deg` },
       ],
     };
   });
 
-  // Compress around the bottom so the spring remains planted on the tower.
-  // Both this cue and launch velocity read the same UI-thread charge value.
-  const springStyle = useAnimatedStyle(() => {
-    const inFlight = phase.value === PHASE.AIRBORNE || phase.value === PHASE.DEAD;
-    const c = phase.value === PHASE.CHARGING ? charge.value : inFlight ? releasedCharge.value : 0;
-    const height = lerp(CONFIG.springHeight, CONFIG.springMinHeight, c);
+  const feetStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateX: px.value - CHARACTER_WIDTH * 0.4 },
+      { translateY: py.value + PH / 2 - CHARACTER_HEIGHT * 0.8 },
+      { scaleY: (1 - 0.28 * visualCharge.value) * (1 - 0.22 * landPulse.value) },
+    ],
+  }));
+
+  const jacketLeftStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: -10 * jacketOpen.value }, { rotate: `${-14 * jacketOpen.value}deg` }],
+  }));
+  const jacketRightStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: 10 * jacketOpen.value }, { rotate: `${14 * jacketOpen.value}deg` }],
+  }));
+  const bellyStyle = useAnimatedStyle(() => ({
+    opacity: Math.max(0, Math.min(1, jacketOpen.value)),
+    transform: [{ scale: 0.85 + 0.15 * jacketOpen.value + (puffAge.value < 0.45 ? Math.sin(puffAge.value / 0.45 * Math.PI) * 0.08 : 0) }],
+  }));
+  const puffStyle = useAnimatedStyle(() => ({
+    opacity: puffAge.value < 0.48 ? Math.sin(Math.PI * Math.min(1, puffAge.value / 0.48)) * 0.85 : 0,
+    transform: [{ scale: 0.35 + (1 - Math.pow(1 - Math.min(1, puffAge.value / 0.48), 3)) * 1.2 }],
+  }));
+
+  const blobStyle = useAnimatedStyle(() => {
+    const c = visualCharge.value;
+    const sy = (1 - 0.28 * c) * (1 - 0.22 * landPulse.value);
     return {
       transform: [
-        { translateX: px.value - (CONFIG.springWidth + 8) / 2 },
-        { translateY: py.value + PH / 2 - CONFIG.springHeight },
-        { scaleY: height / CONFIG.springHeight },
+        { translateX: px.value - CHARACTER_WIDTH / 2 },
+        { translateY: py.value + PH / 2 - CHARACTER_HEIGHT * 0.8 * sy - CHARACTER_HEIGHT + 10 },
+        { rotate: `${headTilt.value}deg` },
       ],
     };
   });
@@ -585,18 +686,6 @@ export default function Game() {
     };
   });
 
-  // Parallax hill layers (decorative, follow camera at a fraction of speed)
-  const hillFarStyle = useAnimatedStyle(() => {
-    const p = 340;
-    const off = -((((camX.value * 0.15) % p) + p) % p);
-    return { transform: [{ translateX: off }] };
-  });
-  const hillNearStyle = useAnimatedStyle(() => {
-    const p = 260;
-    const off = -((((camX.value * 0.32) % p) + p) % p);
-    return { transform: [{ translateX: off }] };
-  });
-
   return (
     <View style={styles.root} testID="game-root">
       <StatusBar style="dark" />
@@ -605,23 +694,17 @@ export default function Game() {
         style={styles.fill}
       />
 
-      {/* Parallax background */}
-      <Animated.View
-        style={[styles.hillLayer, hillFarStyle]}
+      <CachedImage cachePolicy="memory-disk" priority="high" transition={0}
+        source={require("@/assets/environment/neighborhood-mobile.jpg")}
+        onLoadStart={() => markArtStarted("background")}
+        onLoad={() => markArtLoaded("background")}
+        onError={failArt}
        
-      >
-        {[0, 1, 2, 3, 4].map((i) => (
-          <View key={`f${i}`} style={[styles.hillFar, { left: i * 340 }]} />
-        ))}
-      </Animated.View>
-      <Animated.View
-        style={[styles.hillLayer, hillNearStyle]}
-       
-      >
-        {[0, 1, 2, 3, 4].map((i) => (
-          <View key={`n${i}`} style={[styles.hillNear, { left: i * 260 }]} />
-        ))}
-      </Animated.View>
+        style={[styles.fill, { width: W, height: H }]}
+        contentFit="cover"
+      />
+      <View style={styles.backgroundWash} pointerEvents="none" />
+      <AmbientBirds width={W} height={H} />
 
       {gameReady && (
         <>
@@ -634,6 +717,9 @@ export default function Game() {
             index={i}
             platforms={platforms}
             styles={styles}
+            onArtLoad={markArtLoaded}
+            onArtStart={markArtStarted}
+            onArtError={failArt}
           />
         ))}
 
@@ -653,26 +739,48 @@ export default function Game() {
           })}
         </Animated.View>
 
-        {/* Spring foot: compression shows the actual stored jump power. */}
-        <Animated.View testID="charge-spring" style={[styles.spring, springStyle]}>
-          {[0, 1, 2, 3, 4].map((i) => (
-            <View key={i} style={[styles.springCoil, { top: i * (CONFIG.springHeight - 8) / 4 }]} />
-          ))}
+        {/* Elastic body and independent head; both are visual-only. */}
+        <Animated.View testID="elastic-body" style={[styles.body, bodyStyle]}>
+          <Animated.View testID="undershirt-belly" style={[styles.belly, bellyStyle]}>
+            <View style={styles.bellyFold} />
+          </Animated.View>
+          <Animated.View style={[styles.jacketHalf, styles.jacketLeft, jacketLeftStyle]}>
+            <CachedImage cachePolicy="memory-disk" priority="high" transition={0} onLoadStart={() => markArtStarted("body")} onLoad={() => markArtLoaded("body")} onError={failArt} source={require("../assets/characters/tracksuit-body-mobile.png")} style={styles.jacketImage} contentFit="fill" />
+          </Animated.View>
+          <Animated.View style={[styles.jacketHalf, styles.jacketRight, jacketRightStyle]}>
+            <CachedImage cachePolicy="memory-disk" priority="high" transition={0} onLoadStart={() => markArtStarted("body")} onLoad={() => markArtLoaded("body")} onError={failArt} source={require("../assets/characters/tracksuit-body-mobile.png")} style={[styles.jacketImage, styles.jacketRightImage]} contentFit="fill" />
+          </Animated.View>
+          <Animated.View testID="jacket-puff" style={[styles.puff, puffStyle]}>
+            {[0, 1, 2, 3, 4].map((i) => <View key={i} style={[styles.puffCloud, { left: i * 11, top: i % 2 * 9 }]} />)}
+          </Animated.View>
         </Animated.View>
-
-        {/* Blob */}
+        <Animated.View testID="player-feet" style={[styles.body, feetStyle]}>
+          <View style={styles.pantsClip}>
+            <CachedImage cachePolicy="memory-disk" priority="high" transition={0} onLoadStart={() => markArtStarted("body")} onLoad={() => markArtLoaded("body")} onError={failArt} source={require("../assets/characters/tracksuit-body-mobile.png")} style={[styles.jacketImage, styles.pantsImage]} contentFit="fill" />
+          </View>
+        </Animated.View>
         <Animated.View style={[styles.blob, blobStyle]}>
-          <View style={styles.blobHighlight} />
+          <CachedImage cachePolicy="memory-disk" priority="high" transition={0}
+            testID="comic-character"
+            onLoadStart={() => markArtStarted("head")}
+            onLoad={() => markArtLoaded("head")}
+            onError={failArt}
+            source={require("../assets/characters/absurd-head-mobile.png")}
+            style={styles.characterImage}
+            contentFit="contain"
+
+          />
         </Animated.View>
       </Animated.View>
 
       {/* Full-screen touch layer */}
-      <Pressable
+      <View
         testID="charge-surface"
         style={styles.touch}
-        onPressIn={onPressIn}
-        onPressOut={onPressOut}
-        disabled={gameOver}
+        onStartShouldSetResponder={() => !gameOver}
+        onResponderGrant={onPressIn}
+        onResponderRelease={onPressOut}
+        onResponderTerminate={cancelCharge}
       />
 
       {/* Score HUD */}
@@ -685,6 +793,12 @@ export default function Game() {
         </Text>
       </View>}
 
+      {__DEV__ && lastJump && (
+        <View pointerEvents="none" style={{ position: "absolute", top: insets.top + 116, alignSelf: "center", paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8, backgroundColor: "rgba(255,255,255,0.85)" }}>
+          <Text style={{ color: "#26383b", fontSize: 12 }}>Son basış: {lastJump.ms} ms · Güç: %{lastJump.percent} · Görsel: %{lastJump.visualPercent} · İlk kare: {lastJump.pressToFirstFrameMs}ms</Text>
+        </View>
+      )}
+
       {/* Hint (only before first jump) */}
       {score === 0 && !gameOver && (
         <View style={styles.hint}>
@@ -695,7 +809,7 @@ export default function Game() {
       {/* PERFECT! popup */}
       {perfectVisible && (
         <View style={styles.perfectWrap}>
-          <PerfectPop styles={styles} />
+          <PerfectPop key={`${score}-${landingLabel}`} styles={styles} label={landingLabel} />
         </View>
       )}
 
@@ -743,6 +857,23 @@ export default function Game() {
       )}
         </>
       )}
+      {__DEV__ && showArtTiming && (
+        <View style={styles.artTiming}>
+          <Text style={styles.artLoadingText}>Görsel yükleme ölçümü</Text>
+          <Text style={styles.artTimingText}>Başlangıç → hazır / yükleme olayı süresi</Text>
+          {([["background", "Manzara"], ["bricks", "Tuğla"], ["head", "Kafa"], ["body", "Vücut"]] as const).map(([id, label]) => {
+            const clock = artTimings;
+            const end = clock.ends[id];
+            const start = clock.starts[id];
+            return <Text key={id} style={styles.artTimingText}>{label}: {end === undefined ? "Yükleme bildirimi bekleniyor" : `${Math.round(end)} ms`} / {start === undefined || end === undefined ? "—" : `${Math.round(end - start)} ms`}</Text>;
+          })}
+          <Text style={styles.artTimingText}>{artReady ? `Tüm görseller hazır: ${Math.round(Math.max(...Object.values(artTimings.ends)))} ms` : "Ölçüm sürüyor; oyuna giriş engellenmiyor."}</Text>
+          {artError && <Text style={styles.artTimingText}>Bir görsel yükleme hatası bildirildi.</Text>}
+          <Text style={styles.artTimingText}>Süreler eşzamanlıdır, toplanmaz. Expo açılışı dahil değildir.</Text>
+          <Pressable accessibilityRole="button" onPress={() => setShowArtTiming(false)}><Text style={styles.artLoadingText}>Kapat</Text></Pressable>
+        </View>
+      )}
+
     </View>
   );
 }
@@ -751,7 +882,7 @@ export default function Game() {
 // A single pooled platform view. Reads its slot from the shared array every
 // time the shared platform array changes.
 // ---------------------------------------------------------------------------
-function PlatformView({ index, platforms, styles }: any) {
+function PlatformView({ index, platforms, styles, onArtLoad, onArtStart, onArtError }: any) {
   const style = useAnimatedStyle(() => {
     const p = platforms.value[index];
     if (!p) {
@@ -775,15 +906,29 @@ function PlatformView({ index, platforms, styles }: any) {
   });
   return (
     <Animated.View style={[styles.tower, style]}>
+      {/* One native tiled image per tower, rather than 17 separate image views. */}
+      <View style={styles.towerBrick}>
+        <Image
+          source={BRICK_SOURCE}
+          onLoadStart={index === 0 ? () => onArtStart("bricks") : undefined}
+          onLoad={index === 0 ? () => onArtLoad("bricks") : undefined}
+          onError={index === 0 ? onArtError : undefined}
+          fadeDuration={0}
+          style={styles.brickImage}
+          resizeMode="repeat"
+        />
+      </View>
       <View style={styles.towerShade} />
+      <View style={styles.capShadow} />
       <View style={styles.towerCap} />
+      <View style={styles.capHighlight} />
       <Animated.View style={[styles.towerCenter, centerStyle]} />
     </Animated.View>
   );
 }
 
 // PERFECT! pop with a quick scale-in.
-function PerfectPop({ styles }: any) {
+function PerfectPop({ styles, label }: any) {
   const s = useSharedValue(0);
   useEffect(() => {
     s.value = withTiming(1, { duration: 180 });
@@ -795,13 +940,16 @@ function PerfectPop({ styles }: any) {
   }));
   return (
     <Animated.View style={st} testID="perfect-label">
-      <Text style={styles.perfectText}>PERFECT!</Text>
+      <Text style={styles.perfectText}>{label}</Text>
     </Animated.View>
   );
 }
 
 const useStyles = makeStyles((colors) => ({
   root: { flex: 1, backgroundColor: colors.gameSky, overflow: "hidden" },
+  artTiming: { position: "absolute", top: "25%", left: 16, right: 16, padding: 12, borderRadius: 12, backgroundColor: colors.gameSky },
+  artTimingText: { color: colors.hudText, fontSize: 14, marginBottom: 8 },
+  artLoadingText: { color: colors.hudText, fontSize: 18, padding: 12 },
   fill: absoluteFill(),
   touch: absoluteFill(),
   world: {
@@ -810,22 +958,20 @@ const useStyles = makeStyles((colors) => ({
     pointerEvents: "none",
   },
 
-  hillLayer: { position: "absolute", left: 0, bottom: 0, height: 260, width: 340, pointerEvents: "none" },
-  hillFar: {
-    position: "absolute",
-    bottom: -60,
-    width: 300,
-    height: 220,
-    borderRadius: 150,
-    backgroundColor: colors.hillFar,
+  backgroundWash: {
+    ...absoluteFill(),
+    backgroundColor: colors.gameSky,
+    opacity: 0.26,
   },
-  hillNear: {
+  brickImage: { width: "100%", height: "100%" },
+  capShadow: { position: "absolute", top: CONFIG.capHeight, left: 0, right: 0, height: 4, backgroundColor: colors.platformShade, opacity: 0.5 },
+  capHighlight: { position: "absolute", top: 2, left: 3, right: 3, height: 2, backgroundColor: colors.platformCenter },
+  towerBrick: {
     position: "absolute",
-    bottom: -80,
-    width: 240,
-    height: 200,
-    borderRadius: 130,
-    backgroundColor: colors.hillNear,
+    left: 3,
+    right: 3,
+    top: CONFIG.capHeight,
+    bottom: 0,
   },
 
   tower: {
@@ -833,8 +979,8 @@ const useStyles = makeStyles((colors) => ({
     left: 0,
     top: 0,
     height: CONFIG.columnHeight,
-    borderTopLeftRadius: 12,
-    borderTopRightRadius: 12,
+    borderTopLeftRadius: 3,
+    borderTopRightRadius: 3,
     backgroundColor: colors.platform,
     overflow: "hidden",
     pointerEvents: "none",
@@ -844,9 +990,9 @@ const useStyles = makeStyles((colors) => ({
     top: 0,
     bottom: 0,
     right: 0,
-    width: "32%",
+    width: "14%",
     backgroundColor: colors.platformShade,
-    opacity: 0.55,
+    opacity: 0.28,
   },
   towerCap: {
     position: "absolute",
@@ -854,9 +1000,11 @@ const useStyles = makeStyles((colors) => ({
     left: 0,
     right: 0,
     height: CONFIG.capHeight,
-    borderTopLeftRadius: 12,
-    borderTopRightRadius: 12,
+    borderTopLeftRadius: 3,
+    borderTopRightRadius: 3,
     backgroundColor: colors.platformTop,
+    borderWidth: 1.5,
+    borderColor: colors.platformShade,
   },
   towerCenter: {
     position: "absolute",
@@ -867,48 +1015,33 @@ const useStyles = makeStyles((colors) => ({
     backgroundColor: colors.platformCenter,
   },
 
-  spring: {
-    position: "absolute",
-    left: 0,
-    top: 0,
-    width: CONFIG.springWidth + 8,
-    height: CONFIG.springHeight,
+  body: {
+    position: "absolute", left: 0, top: 0,
+    width: CHARACTER_WIDTH * 0.8, height: CHARACTER_HEIGHT * 0.8,
     transformOrigin: "50% 100%",
     pointerEvents: "none",
   },
-  springCoil: {
-    position: "absolute",
-    left: 0,
-    width: CONFIG.springWidth + 8,
-    height: 8,
-    borderWidth: 4,
-    borderRadius: 5,
-    borderColor: colors.onSurface,
-    backgroundColor: colors.surface,
-  },
-
+  jacketImage: { position: "absolute", left: 0, width: CHARACTER_WIDTH * 0.8, top: -CHARACTER_HEIGHT * 0.8 * 17 / 1259, height: CHARACTER_HEIGHT * 0.8 * 1322 / 1259 },
+  pantsClip: { position: "absolute", left: 0, right: 0, top: "65%", bottom: 0, overflow: "hidden" },
+  pantsImage: { top: -CHARACTER_HEIGHT * 0.8 * (17 / 1259 + 0.65) },
+  jacketHalf: { position: "absolute", top: 0, width: "50%", height: "70%", overflow: "hidden" },
+  jacketLeft: { left: 0, transformOrigin: "0% 15%" },
+  jacketRight: { right: 0, transformOrigin: "100% 15%" },
+  jacketRightImage: { left: -CHARACTER_WIDTH * 0.4 },
+  belly: { position: "absolute", left: "20%", top: "17%", width: "60%", height: "53%", borderRadius: 28, backgroundColor: colors.surface, borderWidth: 2, borderColor: colors.onSurface },
+  bellyFold: { position: "absolute", left: "25%", right: "25%", bottom: "18%", height: 6, borderBottomWidth: 2, borderColor: colors.muted, borderRadius: 8 },
+  puff: { position: "absolute", left: "15%", top: "31%", width: 65, height: 35, pointerEvents: "none" },
+  puffCloud: { position: "absolute", width: 24, height: 24, borderRadius: 12, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.muted },
   blob: {
     position: "absolute",
     left: 0,
     top: 0,
-    width: PW,
-    height: PH,
-    borderRadius: PW * 0.42,
-    backgroundColor: colors.blob,
-    borderBottomWidth: 3,
-    borderBottomColor: colors.blobShade,
+    width: CHARACTER_WIDTH,
+    height: CHARACTER_HEIGHT,
+    transformOrigin: "50% 100%",
     pointerEvents: "none",
   },
-  blobHighlight: {
-    position: "absolute",
-    top: PH * 0.2,
-    left: PW * 0.22,
-    width: PW * 0.24,
-    height: PH * 0.18,
-    borderRadius: PW * 0.12,
-    backgroundColor: colors.blobFace,
-    opacity: 0.85,
-  },
+  characterImage: { width: "100%", height: "100%" },
 
   burst: { position: "absolute", left: 0, top: 0, width: 1, height: 1, pointerEvents: "none" },
   burstDot: {

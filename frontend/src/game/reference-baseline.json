@@ -1,0 +1,75 @@
+{
+  "description": "Before reference flight/spacing experiment; foot-contact fix already applied.",
+  "config": {
+    "gravity": 2300,
+    "minJumpVX": 70,
+    "maxJumpVX": 510,
+    "minJumpVY": 220,
+    "maxJumpVY": 1450,
+    "maxChargeDuration": 0.45,
+    "playerWidth": 54,
+    "playerHeight": 54,
+    "widthWide": {
+      "min": 76,
+      "max": 88
+    },
+    "widthMedium": {
+      "min": 60,
+      "max": 72
+    },
+    "widthNarrow": {
+      "min": 48,
+      "max": 58
+    },
+    "gapEarly": {
+      "min": 105,
+      "max": 140
+    },
+    "gapLate": {
+      "min": 150,
+      "max": 255
+    },
+    "heightVarWarmup": 180,
+    "heightVarEarly": 220,
+    "heightVarLate": 300,
+    "difficultyRamp": 40,
+    "noNarrowBeforeId": 6,
+    "warmupTowers": 3,
+    "platformMinTopY": -320,
+    "platformMaxTopY": 320,
+    "columnHeight": 1600,
+    "capHeight": 12,
+    "footSoles": [
+      [
+        0.2,
+        0.41
+      ],
+      [
+        0.59,
+        0.795
+      ]
+    ],
+    "perfectTolerance": 22,
+    "scorePerLanding": 1,
+    "scoreMultiTowerBonus": 1,
+    "scorePerfectBonus": 2,
+    "cameraZoom": 0.62,
+    "cameraAnchorMin": 0.31,
+    "cameraAnchorMax": 0.31,
+    "cameraRevealRight": 0.94,
+    "cameraPlayerAnchorY": 0.67,
+    "cameraSmoothingX": 1,
+    "cameraSmoothingY": 0.08,
+    "cameraFallSmoothing": 0.1,
+    "spawnAhead": 500,
+    "removeBehind": 200,
+    "springHeight": 36,
+    "springMinHeight": 6,
+    "springWidth": 28,
+    "chargeSquashY": 0.12,
+    "chargeStretchX": 0.08,
+    "maxChargeShake": 2.8,
+    "airStretchY": 0.16,
+    "landPulseDuration": 0.26
+  }
+}
