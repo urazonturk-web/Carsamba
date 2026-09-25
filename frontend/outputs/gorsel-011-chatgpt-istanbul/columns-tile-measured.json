@@ -1,0 +1,26 @@
+{
+ "column-wide-v1": {
+  "w": 525,
+  "h": 455,
+  "bandTop": 404,
+  "bandBottom": 859,
+  "shaftL": 38,
+  "shaftR": 562
+ },
+ "column-tall-v1": {
+  "w": 376,
+  "h": 472,
+  "bandTop": 419,
+  "bandBottom": 891,
+  "shaftL": 45,
+  "shaftR": 420
+ },
+ "column-medium-v1": {
+  "w": 401,
+  "h": 461,
+  "bandTop": 409,
+  "bandBottom": 870,
+  "shaftL": 46,
+  "shaftR": 446
+ }
+}

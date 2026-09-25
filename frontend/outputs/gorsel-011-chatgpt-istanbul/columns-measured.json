@@ -1,0 +1,41 @@
+{
+ "column-wide-v1": {
+  "canvas": [
+   599,
+   1343
+  ],
+  "capTopPx": 2,
+  "shaftWidthPx": 525,
+  "shaftLeft": 38,
+  "shaftRight": 562,
+  "capWidthPx": 506,
+  "checkerLo": 99.0,
+  "checkerHi": 231.0
+ },
+ "column-tall-v1": {
+  "canvas": [
+   465,
+   1392
+  ],
+  "capTopPx": 2,
+  "shaftWidthPx": 376,
+  "shaftLeft": 45,
+  "shaftRight": 420,
+  "capWidthPx": 417,
+  "checkerLo": 180.0,
+  "checkerHi": 255
+ },
+ "column-medium-v1": {
+  "canvas": [
+   492,
+   1359
+  ],
+  "capTopPx": 2,
+  "shaftWidthPx": 401,
+  "shaftLeft": 46,
+  "shaftRight": 446,
+  "capWidthPx": 399,
+  "checkerLo": 172.0,
+  "checkerHi": 255
+ }
+}

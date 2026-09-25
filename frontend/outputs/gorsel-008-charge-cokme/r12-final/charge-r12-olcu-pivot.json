@@ -1,0 +1,291 @@
+{
+ "alpha_threshold": 128,
+ "pivot_method": "pivotY = lowest alpha>128 row + 1; pivotX/feet_span from alpha>128 columns of the bottom 7 rows (same method as character-pose.ts). Heel lift in the deep squat narrows that band, so pivotX/feet_span vary per pose; they are NOT a scale reference.",
+ "stable_foot_anchor": "stable_foot_anchor_x/y = midpoint of the two shoe toe tips (toes stay planted while heels lift); the same world point in every pose, y equals the PNG bottom edge. Prefer it for keeping the feet planted between poses.",
+ "scale_check": {
+  "all_heads_pixel_exact_at_1to1": true,
+  "note": "Every PNG contains the GORSEL-006 head at exact 1:1 pixels (verified per pose) and the same shoe pixels, so all nine share ONE pixel scale; the only resampling is the fixed 0.92 rear shoe, identical in all poses. Use one constant scale for all poses, never per-pose normalisation.",
+  "toe_anchor_on_bottom_row_all": true
+ },
+ "poses": {
+  "charge-000-r12": {
+   "file": "charge-000-r12.png",
+   "charge_percent": 0,
+   "width": 516,
+   "height": 1103,
+   "pivotX": 224,
+   "pivotY": 1102,
+   "stable_foot_anchor_x": 308.0,
+   "stable_foot_anchor_y": 1103.0,
+   "feet_span": 271,
+   "feet_x_range": [
+    88,
+    358
+   ],
+   "lowest_opaque_row": 1101,
+   "alpha_threshold": 128,
+   "corners_alpha": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "rgb_under_alpha0": 0,
+   "connected_components_alpha_gt0": 1,
+   "stray_speck_pixels_removed": 0,
+   "head_pixel_exact_vs_gorsel006": true,
+   "head_offset_in_canvas": [
+    -204,
+    -278
+   ]
+  },
+  "charge-012-r12": {
+   "file": "charge-012-r12.png",
+   "charge_percent": 12.5,
+   "width": 516,
+   "height": 1080,
+   "pivotX": 226,
+   "pivotY": 1079,
+   "stable_foot_anchor_x": 311.0,
+   "stable_foot_anchor_y": 1080.0,
+   "feet_span": 271,
+   "feet_x_range": [
+    91,
+    361
+   ],
+   "lowest_opaque_row": 1078,
+   "alpha_threshold": 128,
+   "corners_alpha": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "rgb_under_alpha0": 0,
+   "connected_components_alpha_gt0": 1,
+   "stray_speck_pixels_removed": 8,
+   "head_pixel_exact_vs_gorsel006": true,
+   "head_offset_in_canvas": [
+    -207,
+    -255
+   ]
+  },
+  "charge-025-r12": {
+   "file": "charge-025-r12.png",
+   "charge_percent": 25,
+   "width": 516,
+   "height": 1056,
+   "pivotX": 226,
+   "pivotY": 1055,
+   "stable_foot_anchor_x": 310.0,
+   "stable_foot_anchor_y": 1056.0,
+   "feet_span": 271,
+   "feet_x_range": [
+    90,
+    360
+   ],
+   "lowest_opaque_row": 1054,
+   "alpha_threshold": 128,
+   "corners_alpha": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "rgb_under_alpha0": 0,
+   "connected_components_alpha_gt0": 1,
+   "stray_speck_pixels_removed": 11,
+   "head_pixel_exact_vs_gorsel006": true,
+   "head_offset_in_canvas": [
+    -206,
+    -231
+   ]
+  },
+  "charge-037-r12": {
+   "file": "charge-037-r12.png",
+   "charge_percent": 37.5,
+   "width": 516,
+   "height": 1031,
+   "pivotX": 230,
+   "pivotY": 1030,
+   "stable_foot_anchor_x": 309.0,
+   "stable_foot_anchor_y": 1031.0,
+   "feet_span": 260,
+   "feet_x_range": [
+    100,
+    359
+   ],
+   "lowest_opaque_row": 1029,
+   "alpha_threshold": 128,
+   "corners_alpha": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "rgb_under_alpha0": 0,
+   "connected_components_alpha_gt0": 1,
+   "stray_speck_pixels_removed": 4,
+   "head_pixel_exact_vs_gorsel006": true,
+   "head_offset_in_canvas": [
+    -205,
+    -206
+   ]
+  },
+  "charge-050-r12": {
+   "file": "charge-050-r12.png",
+   "charge_percent": 50,
+   "width": 516,
+   "height": 1005,
+   "pivotX": 253,
+   "pivotY": 1004,
+   "stable_foot_anchor_x": 306.0,
+   "stable_foot_anchor_y": 1005.0,
+   "feet_span": 208,
+   "feet_x_range": [
+    149,
+    356
+   ],
+   "lowest_opaque_row": 1003,
+   "alpha_threshold": 128,
+   "corners_alpha": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "rgb_under_alpha0": 0,
+   "connected_components_alpha_gt0": 1,
+   "stray_speck_pixels_removed": 10,
+   "head_pixel_exact_vs_gorsel006": true,
+   "head_offset_in_canvas": [
+    -202,
+    -180
+   ]
+  },
+  "charge-062-r12": {
+   "file": "charge-062-r12.png",
+   "charge_percent": 62.5,
+   "width": 516,
+   "height": 979,
+   "pivotX": 264,
+   "pivotY": 978,
+   "stable_foot_anchor_x": 302.0,
+   "stable_foot_anchor_y": 979.0,
+   "feet_span": 180,
+   "feet_x_range": [
+    174,
+    353
+   ],
+   "lowest_opaque_row": 977,
+   "alpha_threshold": 128,
+   "corners_alpha": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "rgb_under_alpha0": 0,
+   "connected_components_alpha_gt0": 1,
+   "stray_speck_pixels_removed": 4,
+   "head_pixel_exact_vs_gorsel006": true,
+   "head_offset_in_canvas": [
+    -198,
+    -154
+   ]
+  },
+  "charge-075-r12": {
+   "file": "charge-075-r12.png",
+   "charge_percent": 75,
+   "width": 516,
+   "height": 951,
+   "pivotX": 269,
+   "pivotY": 950,
+   "stable_foot_anchor_x": 298.0,
+   "stable_foot_anchor_y": 951.0,
+   "feet_span": 162,
+   "feet_x_range": [
+    188,
+    349
+   ],
+   "lowest_opaque_row": 949,
+   "alpha_threshold": 128,
+   "corners_alpha": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "rgb_under_alpha0": 0,
+   "connected_components_alpha_gt0": 1,
+   "stray_speck_pixels_removed": 5,
+   "head_pixel_exact_vs_gorsel006": true,
+   "head_offset_in_canvas": [
+    -194,
+    -126
+   ]
+  },
+  "charge-087-r12": {
+   "file": "charge-087-r12.png",
+   "charge_percent": 87.5,
+   "width": 516,
+   "height": 922,
+   "pivotX": 270,
+   "pivotY": 921,
+   "stable_foot_anchor_x": 293.0,
+   "stable_foot_anchor_y": 922.0,
+   "feet_span": 150,
+   "feet_x_range": [
+    195,
+    344
+   ],
+   "lowest_opaque_row": 920,
+   "alpha_threshold": 128,
+   "corners_alpha": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "rgb_under_alpha0": 0,
+   "connected_components_alpha_gt0": 1,
+   "stray_speck_pixels_removed": 9,
+   "head_pixel_exact_vs_gorsel006": true,
+   "head_offset_in_canvas": [
+    -189,
+    -97
+   ]
+  },
+  "charge-100-r12": {
+   "file": "charge-100-r12.png",
+   "charge_percent": 100,
+   "width": 516,
+   "height": 892,
+   "pivotX": 269,
+   "pivotY": 891,
+   "stable_foot_anchor_x": 288.0,
+   "stable_foot_anchor_y": 892.0,
+   "feet_span": 142,
+   "feet_x_range": [
+    198,
+    339
+   ],
+   "lowest_opaque_row": 890,
+   "alpha_threshold": 128,
+   "corners_alpha": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "rgb_under_alpha0": 0,
+   "connected_components_alpha_gt0": 1,
+   "stray_speck_pixels_removed": 3,
+   "head_pixel_exact_vs_gorsel006": true,
+   "head_offset_in_canvas": [
+    -184,
+    -67
+   ]
+  }
+ }
+}

@@ -1,3 +1,5 @@
+import type { PlatformVisualType } from "./procedural-course";
+
 // Measured from 11-12-55, ~29.4–92.7s, the uninterrupted 61-point run.
 // Camera translation removed. Units: pixels at 330px source width.
 // Approximate cap boundaries (animation/rasterization), not original source data.
@@ -249,7 +251,12 @@ export function referencePlatform(id: number, screenWidth: number, zoom: number)
   const cap = REFERENCE_COURSE[id];
   if (!cap) return null;
   const scale = screenWidth / (330 * zoom);
-  return { id, x: cap.x * scale, topY: cap.topY * scale, width: cap.width * scale, cat: 1 };
+  // GORSEL-004A: visualType is required on every Platform now, but the
+  // fixed/measured reference course stays "normal" for every platform for
+  // now (per decision, 2026-09-18) -- this path is dormant while
+  // EXPERIMENTAL_COURSE=true, and this does not touch any measured x/topY/
+  // width value above.
+  return { id, x: cap.x * scale, topY: cap.topY * scale, width: cap.width * scale, cat: 1, visualType: "normal" as PlatformVisualType };
 }
 
 // Most measured caps are 28px wide at 330px source width. Keep this width

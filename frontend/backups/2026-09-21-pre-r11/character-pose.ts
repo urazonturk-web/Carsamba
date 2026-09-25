@@ -1,0 +1,34 @@
+// GORSEL-008 Phase 1: charge-driven character pose (VISUAL ONLY).
+// Five measured keyframes at charge 0/25/50/75/100 %. Every pose PNG is
+// authored at the same pixel scale (both feet span exactly 249 px, measured
+// from alpha > 128 on the bottom rows), so one shared uniform scale keeps the
+// character size constant; each pose is placed by ITS OWN feet pivot.
+// pivotX = feet-span centre column, pivotY = lowest opaque row + 1.
+
+export const POSE_FEET_SPAN_PX = 249;
+
+export const CHARGE_POSES = [
+  { source: require("@/assets/characters/charge-000-idle-r5.png"), w: 522, h: 1074, pivotX: 126, pivotY: 1073 },
+  { source: require("@/assets/characters/charge-025.png"), w: 567, h: 1050, pivotX: 170, pivotY: 1049 },
+  { source: require("@/assets/characters/charge-050.png"), w: 648, h: 987, pivotX: 205, pivotY: 986 },
+  { source: require("@/assets/characters/charge-075.png"), w: 712, h: 911, pivotX: 231, pivotY: 910 },
+  { source: require("@/assets/characters/charge-100-max.png"), w: 729, h: 825, pivotX: 221, pivotY: 824 },
+] as const;
+
+const SEGMENTS = CHARGE_POSES.length - 1;
+
+/**
+ * Opacity of pose `i` for charge c (0..1). Layer 0 (idle) is the base. Inside
+ * segment k the lower pose k stays opaque for the first half of the blend,
+ * then fades out while pose k+1 fades in over it, so the taller silhouette
+ * never pops away and the mid-blend never dips below ~87% coverage.
+ */
+export function poseOpacity(i: number, c: number) {
+  "worklet";
+  const x = Math.min(1, Math.max(0, c)) * SEGMENTS;
+  const k = Math.min(SEGMENTS - 1, Math.floor(x));
+  const t = x - k;
+  if (i === k + 1) return t;
+  if (i === k) return t < 0.5 ? 1 : 2 * (1 - t);
+  return 0;
+}

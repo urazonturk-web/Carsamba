@@ -1,0 +1,1593 @@
+import { Image as CachedImage } from "expo-image";
+import { LinearGradient } from "expo-linear-gradient";
+import * as Haptics from "expo-haptics";
+import { StatusBar } from "expo-status-bar";
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  type GestureResponderEvent,
+  Image,
+  Platform,
+  Pressable,
+  Text,
+  useWindowDimensions,
+  View,
+} from "react-native";
+import Animated, {
+  runOnJS,
+  runOnUI,
+  useAnimatedReaction,
+  useAnimatedStyle,
+  useDerivedValue,
+  useFrameCallback,
+  useSharedValue,
+  withTiming,
+  withSpring,
+  withSequence,
+} from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+import { AmbientBirds } from "../src/game/AmbientBirds";
+import { ColumnSmokeBack, ColumnSmokeFront, ColumnSmokeMountProbe, useColumnSmokeClock } from "../src/game/ColumnSmoke";
+import { ChargePoses } from "../src/game/ChargePoses";
+import { ANCHOR_SHIFT_PX, GLOBAL_VISUAL_SCALE, POSE_FEET_SPAN_PX } from "../src/game/character-pose";
+import { classifyColumnVariant } from "../src/game/column-variant";
+import { GAME_OVER_LINE } from "../src/game/copy";
+import { jumpVelocity, advanceFlight } from "../src/game/jump";
+import { findFootLanding } from "../src/game/landing";
+import { referencePlatform, referenceTowerWidth } from "../src/game/reference-course";
+import { generateProceduralPlatform, mulberry32Step, type PlatformVisualType } from "../src/game/procedural-course";
+import { CONFIG, DEBUG_MODE, EXPERIMENTAL_COURSE, PHASE, REFERENCE_TRIAL } from "@/src/game/config";
+import { makeStyles, useTheme } from "@/src/theme";
+import { storage } from "@/src/utils/storage";
+
+// Small shared texture travels with the JS bundle, avoiding a separate Metro image request.
+const BRICK_SOURCE = require("@/assets/environment/brick-inline.json");
+
+// GORSEL-004A: approved short chimney TOP-SECTION overlay (flue + tabla +
+// collar), 424x314 RGBA (outputs/gorsel-007-baca-platform/
+// baca-ust-bolum-final.png, 2026-09-21). It is drawn ONLY as an overlay on top
+// of the normal column, whose body/brick texture continues below it -- the
+// old full 424x1228 chimney is no longer used.
+const CHIMNEY_SOURCE = require("@/assets/environment/chimney-top.png");
+// Source pixel geometry, measured from the asset (its rows are pixel-identical
+// to the top 314 rows of the earlier full asset, so the earlier measurements
+// still hold): the flue is ~108-143px wide from y=10 to y=95, then the tabla
+// starts at y=97 and reaches a stable ~397-399px width by y~120-190. So the
+// walkable tabla TOP is y=97 and 398px is the reference width scaled to the
+// platform's real collision `width`.
+const CHIMNEY_ASSET_W = 424;
+const CHIMNEY_ASSET_H = 314;
+const CHIMNEY_TABLA_TOP_PX = 97;
+const CHIMNEY_TABLA_WIDTH_PX = 398;
+
+// GORSEL-011 (accepted, 2026-09-22): three ChatGPT column sprites, drawn as
+// an overlay SIBLING on top of the existing tower (same pattern as the
+// chimney overlay above) -- the plain brick tower underneath is UNCHANGED
+// and keeps covering the full CONFIG.columnHeight, so there is never a gap
+// below/behind the new art. Each PNG was cropped to its opaque bbox
+// (checkerboard-only background removed by color-key + connected-component
+// cleanup -- the source PNGs had no real alpha channel; see AI_REVIEW.md for
+// the method and its limits) with a 2px pad. Measured per asset (own canvas
+// px): cap top row (capTopPx, landing surface) and a stable shaft width
+// (shaftWidthPx, measured 60% down the opaque height, below the cap's
+// overhang) used as the physical-width reference, exactly like
+// CHIMNEY_TABLA_WIDTH_PX above.
+const COLUMN_SOURCES = [
+  require("@/assets/environment/column-wide-v1.png"),
+  require("@/assets/environment/column-tall-v1.png"),
+  require("@/assets/environment/column-medium-v1.png"),
+] as const;
+const COLUMN_ASSET = [
+  { w: 599, h: 1343, capTopPx: 2, shaftWidthPx: 525 },
+  { w: 465, h: 1392, capTopPx: 2, shaftWidthPx: 376 },
+  { w: 492, h: 1359, capTopPx: 2, shaftWidthPx: 401 },
+] as const;
+// 2026-09-22 (iPhone test rejection fix, item 1+3): a small crop of each
+// column's OWN shaft (below the cap, well clear of the bottom edge -- see
+// outputs/gorsel-011-chatgpt-istanbul/columns-tile-measured.json for the
+// exact source rows) repeated (resizeMode="repeat", same technique already
+// used for BRICK_SOURCE) to fill the body all the way down, instead of the
+// flat COLUMN_FALLBACK_COLOR showing after a short distance. Same pixel
+// scale as the matching COLUMN_ASSET entry, so the tile lines up in width
+// with the cap sitting on top of it. The repeat seam is visible up close
+// (this is a crop, not a authored seamless texture) but reads as continued
+// plaster/brick, not a flat colour break -- COLUMN_FALLBACK_COLOR is kept
+// as a deeper zero-risk fallback in case the tile is ever shorter than the
+// visible column (it never fully disappears from the code path).
+const COLUMN_TILE_SOURCES = [
+  require("@/assets/environment/column-wide-v1-tile.png"),
+  require("@/assets/environment/column-tall-v1-tile.png"),
+  require("@/assets/environment/column-medium-v1-tile.png"),
+] as const;
+const COLUMN_TILE_ASSET = [
+  { w: 525, h: 455 },
+  { w: 376, h: 472 },
+  { w: 401, h: 461 },
+] as const;
+// Covers well past anything the camera can show in one frame (see
+// CONFIG.columnHeight itself, 1600) without needing a per-platform height.
+const COLUMN_TILE_FILL_HEIGHT = 1400;
+// 2026-09-22 (iPhone test rejection fix): average shaft colour measured
+// across the three cutouts (mean RGB ~191,112,76), darkened ~25% for a
+// shadowed lower-body read. Used ONLY as the `tower` container's own flat
+// backgroundColor on non-chimney platforms, replacing the old brick-family
+// `colors.platform` there -- it is the always-present, zero-risk gapless
+// fallback fill below/around the short illustrated column art (nothing
+// about its size/position changes, so collision/footSoles are untouched);
+// on chimney platforms this branch is not used, `colors.platform` is kept.
+const COLUMN_FALLBACK_COLOR = "#8f5439";
+
+// Preserve historical scores separately because the scoring rules changed.
+const BEST_SCORE_KEY = REFERENCE_TRIAL ? "jumpcharge.bestScore.reference.v1" : "jumpcharge.bestScore";
+// EXPERIMENTAL_COURSE (see src/game/config.ts) swaps the fixed, measured
+// REFERENCE_COURSE for the procedural generator below, independent of
+// REFERENCE_TRIAL's physics constants. Only this one flag decides which
+// tower source is used -- everywhere else in this file keep using
+// REFERENCE_TRIAL for physics/scoring exactly as before.
+const USE_REFERENCE_COURSE = REFERENCE_TRIAL && !EXPERIMENTAL_COURSE;
+const PW = CONFIG.playerWidth;
+const PH = CONFIG.playerHeight;
+// Render size is independent of the existing collision dimensions.
+const CHARACTER_WIDTH = PW * 2.16;
+
+// GORSEL-006: temporary single-pose main character (approved side-profile
+// sprite, 1024x1024 RGBA, facing right) replacing the old layered character
+// render. VISUAL ONLY: the sprite is placed relative to the existing physics
+// point (px, py) and never feeds back into physics. Sprite measurements
+// (from the PNG's alpha > 128): both feet span x=244..492 (249px, center
+// x=368) and the lowest opaque row is y=922 (its bottom edge = 923).
+// Scale from the physics side, read-only: the sprite's feet are drawn exactly
+// as wide as the sole span landing detection already uses (CONFIG.footSoles
+// over CHARACTER_WIDTH*0.8), so the visible feet match what can land.
+// Uniform scale only (no stretch): world units per sprite pixel.
+const SOLE_BODY_WIDTH = CHARACTER_WIDTH * 0.8;
+const SOLE_LEFT = CONFIG.footSoles[0][0];
+const SOLE_RIGHT = CONFIG.footSoles[1][1];
+const SOLE_CENTER_OFFSET = ((SOLE_LEFT + SOLE_RIGHT) / 2 - 0.5) * SOLE_BODY_WIDTH;
+const SPRITE_SCALE = ((SOLE_RIGHT - SOLE_LEFT) * SOLE_BODY_WIDTH) / POSE_FEET_SPAN_PX;
+const POOL = 14; // fixed pool of platform views (only ~5 are visible at once)
+const POOL_IDX = Array.from({ length: POOL }, (_, i) => i);
+
+// tiny helper to avoid repeating absolute-fill spread
+function absoluteFill() {
+  return { position: "absolute" as const, top: 0, left: 0, right: 0, bottom: 0 };
+}
+
+export default function Game() {
+  const insets = useSafeAreaInsets();
+  const { colors } = useTheme();
+  const styles = useStyles();
+  const { width: W, height: H } = useWindowDimensions();
+
+  // --- JS-side reactive state (events only, never per-frame) ---------------
+  const [score, setScore] = useState(0);
+  const [lastJump, setLastJump] = useState<{ ms: number; percent: number; visualPercent: number; pressToFirstFrameMs: number } | null>(null);
+  const reportJump = useCallback((ms: number, power: number, launchVX: number, launchVY: number, width: number, fromId: number, lastVisualCharge: number, pressToFirstFrameMs: number) => {
+    setLastJump({ ms: Math.round(ms), percent: Math.round(power * 100), visualPercent: Math.round(lastVisualCharge * 100), pressToFirstFrameMs: Math.round(pressToFirstFrameMs) });
+    // TEMPORARY diagnostic fields (visualCharge, pressToFirstFrameMs) added
+    // per CLAUDE_CHARGE_TIMING_RESULT.md to compare what the player saw
+    // against the launch-determining native-timestamp charge on a real
+    // device. Safe to remove once the mismatch question is settled.
+    console.info("[jump-measurement]", JSON.stringify({ heldMs: ms, charge: power, visualCharge: lastVisualCharge, pressToFirstFrameMs, vx: launchVX, vy: launchVY, screenWidth: width, fromPlatformId: fromId }));
+  }, []);
+  const [best, setBest] = useState(0);
+  const [gameOver, setGameOver] = useState(false);
+  const [gameReady, setGameReady] = useState(false);
+  const [loadedArt, setLoadedArt] = useState<Record<string, boolean>>({});
+  const [artError, setArtError] = useState(false);
+  // Temporary device measurement: JS-observed native image events, not separate network/decode timings.
+  const [artOrigin] = useState(() => performance.now());
+  const [artTimings, setArtTimings] = useState({ starts: {} as Record<string, number>, ends: {} as Record<string, number> });
+  const artClock = useRef({ origin: artOrigin, starts: {} as Record<string, number>, ends: {} as Record<string, number> });
+  // 2026-09-22 (iPhone test rejection, item 4): was defaulting to visible,
+  // so this dev-only debug box (already __DEV__-gated at render below) sat
+  // on top of the charge area on every single launch, blocking the first
+  // tap until "Kapat" was pressed -- that, not the asset loading itself,
+  // was the "slow/dirty startup" the tester saw. It no longer auto-opens;
+  // the underlying measurement still runs (markArtStarted/Loaded always
+  // fire), it is just not shown unless something sets this true.
+  const [showArtTiming, setShowArtTiming] = useState(false);
+  const markArtStarted = useCallback((name: string) => {
+    const clock = artClock.current;
+    if (clock.starts[name] === undefined) clock.starts[name] = performance.now() - clock.origin;
+  }, []);
+  const markArtLoaded = useCallback((name: string) => {
+    const clock = artClock.current;
+    if (clock.ends[name] === undefined) {
+      clock.ends[name] = performance.now() - clock.origin;
+      setArtTimings({ starts: { ...clock.starts }, ends: { ...clock.ends } });
+      console.info("[art-load]", name, JSON.stringify({ startMs: clock.starts[name], readyMs: clock.ends[name] }));
+    }
+    setLoadedArt(previous => previous[name] ? previous : { ...previous, [name]: true });
+  }, []);
+  const failArt = useCallback(() => setArtError(true), []);
+  const artReady = loadedArt.background && loadedArt.character && loadedArt.bricks;
+
+  const [perfectVisible, setPerfectVisible] = useState(false);
+  const [landingLabel, setLandingLabel] = useState("PERFECT!");
+  const [debug, setDebug] = useState({
+    charge: 0, vx: 0, vy: 0, dist: 0, width: 0, offset: 0, fps: 0,
+  });
+  const scoreRef = useRef(0);
+  const bestRef = useRef(0);
+  const perfectTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // --- Shared (UI-thread) game state ---------------------------------------
+  const px = useSharedValue(0);
+  const py = useSharedValue(0);
+  const vx = useSharedValue(0);
+  const vy = useSharedValue(0);
+  const phase = useSharedValue<number>(PHASE.IDLE);
+  const charge = useSharedValue(0);
+  const touchStartedAt = useSharedValue(0);
+  // Diagnostic only (not read by the charge formula below): records the
+  // display-link timestamp of the first frame tick seen while CHARGING, so
+  // onPressOut can report how long press-processing took to reach the frame
+  // loop. See CLAUDE_CHARGE_TIMING_RESULT.md.
+  const firstChargeFrameSeen = useSharedValue(0);
+  const firstChargeFrameTs = useSharedValue(0);
+  const releasedCharge = useSharedValue(0); // visual compression held during flight
+  const visualCharge = useSharedValue(0);
+  const jacketOpen = useSharedValue(0);
+  const jacketPopped = useSharedValue(0);
+  const puffAge = useSharedValue(1);
+  const headTilt = useSharedValue(0);
+  const headVelocity = useSharedValue(0);
+  const camX = useSharedValue(0);
+  const camY = useSharedValue(0);
+  const baseY = useSharedValue(0);
+  const landPulse = useSharedValue(0);
+  const platforms = useSharedValue<any[]>([]);
+  const idCounter = useSharedValue(1);
+  const lastLandedId = useSharedValue(0);
+  // Visual-only, unrelated to score: which platform the character is
+  // currently standing on, and the world-space point the column-smoke
+  // effect anchors to. Distinct from lastLandedId, which only advances on a
+  // NEW high-score platform and must not be repurposed for this (see
+  // GORSEL-004 task notes).
+  const standingPlatformId = useSharedValue(0);
+  // GORSEL-004A: whether the platform above is a "chimney" (visualType),
+  // read directly from platform data at landing time -- this, not a bare id
+  // hash, is what ColumnSmoke now gates on. standingPlatformId above is kept
+  // only for the TEMP DEBUG panel display.
+  const standingPlatformIsChimney = useSharedValue(false);
+  const smokeAnchorX = useSharedValue(0);
+  const smokeAnchorY = useSharedValue(0);
+  const lastOffset = useSharedValue(0);
+  const fps = useSharedValue(60);
+  const dbgAcc = useSharedValue(0);
+  const running = useSharedValue(0); // 1 while a round is active
+
+  // Seeded procedural generation. A fresh random seed is drawn each run so
+  // every restart produces a different map; supplying a fixed seed reproduces
+  // the exact same tower sequence (foundation for future shared-seed modes).
+  const rngState = useSharedValue(1);
+  const runSeed = useSharedValue(1);
+
+  // Perfect-landing particle burst
+  const burst = useSharedValue(0);
+  const burstX = useSharedValue(0);
+  const burstY = useSharedValue(0);
+
+  // ------------------------------------------------------------------------
+  // Load persisted best score once.
+  // ------------------------------------------------------------------------
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      const saved = await storage.getItem<number>(BEST_SCORE_KEY, 0);
+      if (alive && typeof saved === "number") {
+        bestRef.current = saved;
+        setBest(saved);
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  // ------------------------------------------------------------------------
+  // Seeded RNG (mulberry32) + tower generator. Both are worklet-safe and used
+  // by UI-thread initialisation and spawning, consuming one continuous seeded
+  // stream so a given seed always reproduces the same tower sequence.
+  // ------------------------------------------------------------------------
+  const rand = () => {
+    "worklet";
+    const r = mulberry32Step(rngState.value);
+    rngState.value = r.nextState;
+    return r.value;
+  };
+
+  // Procedural math itself lives in src/game/procedural-course.ts (a single
+  // source of truth also imported by offline test scripts, avoiding a
+  // hand-duplicated copy that could silently drift from the live game).
+  const makeNextPlatform = (prev: any, id: number) => {
+    "worklet";
+    const measured = USE_REFERENCE_COURSE ? referencePlatform(id, W, CONFIG.cameraZoom) : null;
+    if (measured) return measured;
+    const generated = generateProceduralPlatform(prev, id, rand, W);
+    const width = USE_REFERENCE_COURSE ? referenceTowerWidth(W, CONFIG.cameraZoom) : generated.width;
+    return { ...generated, width };
+  };
+
+  // ------------------------------------------------------------------------
+  // (Re)initialise the world. A fresh seed is drawn unless one is supplied
+  // (deterministic-seed hook for future shared-map modes). Snaps the camera
+  // into place so restart is instant with no slide.
+  // ------------------------------------------------------------------------
+  const initWorld = useCallback((seed?: number) => {
+    const seedVal =
+      (seed !== undefined
+        ? seed
+        : (Date.now() ^ Math.floor(Math.random() * 0xffffffff)) >>> 0) >>> 0;
+    // Native SharedValue writes from JS are asynchronous. Build and publish
+    // the entire round on the UI thread before rendering or advancing it.
+    runOnUI((seedVal: number) => {
+      "worklet";
+      running.value = 0;
+      const s = CONFIG.cameraZoom;
+      const viewW = W / s;
+      runSeed.value = seedVal;
+      rngState.value = seedVal;
+
+      const first = (USE_REFERENCE_COURSE ? referencePlatform(0, W, CONFIG.cameraZoom) : null)
+        ?? { id: 0, x: 0, topY: 0, width: CONFIG.widthWide.max, cat: 0, visualType: "normal" as PlatformVisualType };
+      const list: any[] = [first];
+
+      // Reference video: character's rest stance sits ~0.53-0.58 of the way
+      // across the first tower's width (measured from two frame features,
+      // 11-12-55 reference), not 0.42. Centering here (0.5) is a conservative
+      // read of that range. See CLAUDE_TAKEOFF_RESULT.md.
+      px.value = first.x + first.width * 0.5;
+      py.value = first.topY - PH / 2;
+      vx.value = 0;
+      vy.value = 0;
+      charge.value = 0;
+      releasedCharge.value = 0;
+      visualCharge.value = 0;
+      jacketOpen.value = 0;
+      jacketPopped.value = 0;
+      puffAge.value = 1;
+      headTilt.value = 0;
+      headVelocity.value = 0;
+      landPulse.value = 0;
+      baseY.value = first.topY;
+      phase.value = PHASE.IDLE;
+
+      // Pre-generate the whole visible route + buffer so the next towers already
+      // exist and are on-screen before the first jump.
+      while (
+        list[list.length - 1].x + list[list.length - 1].width <
+        px.value + viewW + CONFIG.spawnAhead
+      ) {
+        list.push(makeNextPlatform(list[list.length - 1], list.length));
+      }
+      // Guarantee the starting tower + at least the next TWO upcoming towers,
+      // regardless of viewport size, so a run never starts under-populated.
+      while (list.length < 3) {
+        list.push(makeNextPlatform(list[list.length - 1], list.length));
+      }
+      idCounter.value = list.length;
+      lastLandedId.value = 0;
+      standingPlatformId.value = first.id;
+      standingPlatformIsChimney.value = first.visualType === "chimney";
+      smokeAnchorX.value = px.value;
+      smokeAnchorY.value = first.topY;
+      platforms.value = list;
+
+      // Snap camera to the adaptive framing target (no initial slide).
+      let ni = -1;
+      for (let i = 0; i < list.length; i++) {
+        if (list[i].x > px.value) {
+          ni = i;
+          break;
+        }
+      }
+      const nx = ni >= 0 ? list[ni] : null;
+      const nx1 = ni >= 0 && ni + 1 < list.length ? list[ni + 1] : null;
+      const targetRight = nx1
+        ? nx1.x + nx1.width
+        : nx
+          ? nx.x + nx.width
+          : px.value;
+      const camReveal = targetRight - (CONFIG.cameraRevealRight * W) / s;
+      const camRest = px.value - (CONFIG.cameraAnchorMax * W) / s;
+      const camFwd = px.value - (CONFIG.cameraAnchorMin * W) / s;
+      let cx = camReveal;
+      if (cx < camRest) cx = camRest;
+      if (cx > camFwd) cx = camFwd;
+      camX.value = cx;
+      camY.value = baseY.value - (CONFIG.cameraPlayerAnchorY * H) / s;
+      running.value = 1;
+      runOnJS(setGameReady)(true);
+    })(seedVal);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [W, H]);
+
+  // Initialise only once real screen dimensions are known, so the starting
+  // tower + camera are computed correctly. gameReady gates the first playable
+  // frame — no partially initialised state is ever rendered or interactive.
+  useEffect(() => {
+    if (W > 0 && H > 0 && !gameReady) {
+      initWorld();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [W, H, gameReady]);
+
+  // ------------------------------------------------------------------------
+  // JS callbacks triggered from the worklet (rare, event-based).
+  // ------------------------------------------------------------------------
+  const onLanding = useCallback((perfect: number, towersCrossed: number) => {
+    const gained =
+      towersCrossed * CONFIG.scorePerLanding +
+      (towersCrossed > 1 ? towersCrossed * CONFIG.scoreMultiTowerBonus : 0) +
+      (perfect ? CONFIG.scorePerfectBonus : 0);
+    scoreRef.current += gained;
+    setScore(scoreRef.current);
+    if (perfect && Platform.OS !== "web") {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+    }
+    if (REFERENCE_TRIAL ? towersCrossed > 1 : perfect) {
+      setLandingLabel(REFERENCE_TRIAL ? `+${gained}` : "PERFECT!");
+      setPerfectVisible(true);
+      if (perfectTimer.current) clearTimeout(perfectTimer.current);
+      perfectTimer.current = setTimeout(() => setPerfectVisible(false), 750);
+    }
+  }, []);
+
+  const onGameOver = useCallback(() => {
+    setGameOver(true);
+    if (scoreRef.current > bestRef.current) {
+      bestRef.current = scoreRef.current;
+      setBest(scoreRef.current);
+      storage.setItem(BEST_SCORE_KEY, scoreRef.current);
+    }
+  }, []);
+
+  const pushDebug = useCallback((d: typeof debug) => setDebug(d), []);
+
+  const restart = useCallback(() => {
+    scoreRef.current = 0;
+    setScore(0);
+    setLastJump(null);
+    setGameOver(false);
+    setPerfectVisible(false);
+    initWorld();
+  }, [initWorld]);
+
+  // ------------------------------------------------------------------------
+  // Raw responder events avoid Pressability's 130ms minimum press duration.
+  // Use native event timestamps so JS/UI queue delays do not add jump power.
+  // ------------------------------------------------------------------------
+  const onPressIn = useCallback((event: GestureResponderEvent) => {
+    const timestamp = event.nativeEvent.timestamp;
+    runOnUI((startedAt: number) => {
+      "worklet";
+      if (running.value !== 1 || phase.value !== PHASE.IDLE) return;
+      touchStartedAt.value = startedAt;
+      charge.value = 0;
+      firstChargeFrameSeen.value = 0;
+      jacketOpen.value = withSpring(0, { damping: 19, stiffness: 220, mass: 0.7 });
+      jacketPopped.value = 0;
+      puffAge.value = 1;
+      phase.value = PHASE.CHARGING;
+    })(timestamp);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const onPressOut = useCallback((event: GestureResponderEvent) => {
+    const timestamp = event.nativeEvent.timestamp;
+    runOnUI((endedAt: number) => {
+      "worklet";
+      if (running.value !== 1 || phase.value !== PHASE.CHARGING) return;
+      const heldSeconds = Math.max(0, endedAt - touchStartedAt.value) / 1000;
+      const c = Math.min(1, heldSeconds / CONFIG.maxChargeDuration);
+      const launch = jumpVelocity(c, W);
+      // Diagnostic snapshot (see CLAUDE_CHARGE_TIMING_RESULT.md): charge.value
+      // BEFORE it is reset below is what the player was actually looking at
+      // this instant; pressToFirstFrameMs is how long press-processing took
+      // to reach the frame loop's first CHARGING tick.
+      const lastVisualCharge = charge.value;
+      const pressToFirstFrameMs = firstChargeFrameSeen.value === 1 ? firstChargeFrameTs.value - touchStartedAt.value : -1;
+      if (__DEV__) runOnJS(reportJump)(heldSeconds * 1000, c, launch.vx, launch.vy, W, lastLandedId.value, lastVisualCharge, pressToFirstFrameMs);
+      vx.value = launch.vx;
+      vy.value = launch.vy;
+      headVelocity.value = -65 - c * 55;
+      releasedCharge.value = c;
+      phase.value = PHASE.AIRBORNE;
+      charge.value = 0;
+    })(timestamp);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [W, reportJump]);
+
+  const cancelCharge = useCallback(() => {
+    runOnUI(() => {
+      "worklet";
+      if (phase.value !== PHASE.CHARGING) return;
+      phase.value = PHASE.IDLE;
+      charge.value = 0;
+      releasedCharge.value = 0;
+      visualCharge.value = 0;
+      jacketOpen.value = withSpring(0, { damping: 19, stiffness: 220, mass: 0.7 });
+      jacketPopped.value = 0;
+      puffAge.value = 1;
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ------------------------------------------------------------------------
+  // THE GAME LOOP — runs on the UI thread every frame (~60fps).
+  // ------------------------------------------------------------------------
+  useFrameCallback((frame) => {
+    "worklet";
+    if (running.value !== 1) return;
+
+    let dt = (frame.timeSincePreviousFrame ?? 16.7) / 1000;
+    if (dt > 1 / 30) dt = 1 / 30; // clamp big hitches so physics stays stable
+    if (dt <= 0) return;
+
+    // Visual damped spring, integrated in small steps; never feeds game physics.
+    let angle = headTilt.value;
+    let angularVelocity = headVelocity.value;
+    for (let step = 0; step < 4; step++) {
+      const h = dt / 4;
+      angularVelocity += (-100 * angle - 8 * angularVelocity) * h;
+      angle += angularVelocity * h;
+    }
+    headTilt.value = Math.max(-12, Math.min(12, angle));
+    headVelocity.value = angularVelocity;
+
+    fps.value = fps.value * 0.9 + (1 / dt) * 0.1;
+    const list = platforms.value;
+
+    // --- charge ---
+    // Recomputed fresh from timestamps every frame instead of accumulating a
+    // per-frame delta. This removes drift AND the charge-start boundary
+    // question entirely: there is no "which side of press-down does this
+    // interval belong to" ambiguity when there is no interval being
+    // accumulated in the first place, only a direct elapsed-time readout.
+    //
+    // frame.timestamp (Reanimated, from CADisplayLink.targetTimestamp * 1000
+    // -- see node_modules/react-native-reanimated/apple/reanimated/apple/
+    // native/PlatformDepMethodsHolderImpl.mm) and touchStartedAt.value (from
+    // event.nativeEvent.timestamp, i.e. UITouch.timestamp * 1000 -- see
+    // node_modules/react-native/React/Base/RCTTouchHandler.m) are VERIFIED
+    // to share the same clock on iOS: both are CACurrentMediaTime-based
+    // seconds converted to ms with the same *1000. Subtracting them directly
+    // is therefore safe. (Android uses a different native path and has not
+    // been verified the same way.) See CLAUDE_CHARGE_TIMING_RESULT.md.
+    if (phase.value === PHASE.CHARGING) {
+      if (firstChargeFrameSeen.value === 0) {
+        firstChargeFrameSeen.value = 1;
+        firstChargeFrameTs.value = frame.timestamp; // diagnostic only, see onPressOut
+      }
+      const heldMs = frame.timestamp - touchStartedAt.value;
+      charge.value = Math.min(1, Math.max(0, heldMs / 1000 / CONFIG.maxChargeDuration));
+    }
+
+    if (puffAge.value < 1) puffAge.value = Math.min(1, puffAge.value + dt);
+    if (phase.value === PHASE.CHARGING && charge.value >= 1 && jacketPopped.value === 0) {
+      jacketPopped.value = 1;
+      puffAge.value = 0;
+      jacketOpen.value = withSpring(1, { damping: 15, stiffness: 240, mass: 0.7 });
+    }
+
+    // --- airborne physics ---
+    if (phase.value === PHASE.AIRBORNE) {
+      const prevX = px.value;
+      const prevBottom = py.value + PH / 2;
+      const flight = advanceFlight(px.value, py.value, vx.value, vy.value, dt, W);
+      px.value = flight.x;
+      py.value = flight.y;
+      vy.value = flight.vy;
+      const newBottom = py.value + PH / 2;
+
+      if (vy.value > 0) {
+        const contact = findFootLanding(list, prevX, px.value, prevBottom, newBottom, CHARACTER_WIDTH * 0.8);
+        if (contact) {
+          const p = list[contact.index];
+          const cx = contact.x;
+          px.value = cx;
+          // fair landing
+          py.value = p.topY - PH / 2;
+          vx.value = 0;
+          headVelocity.value = Math.min(150, 45 + Math.abs(vy.value) * 0.06);
+          vy.value = 0;
+          baseY.value = p.topY;
+          // Visual-only, unconditional on every successful landing (unlike
+          // the score-only lastLandedId gate a few lines below). Anchored to
+          // the actual resolved landing x (cx), not the platform's center,
+          // so the cloud tracks an off-center landing and wraps the
+          // character where they actually stand.
+          standingPlatformId.value = p.id;
+          standingPlatformIsChimney.value = p.visualType === "chimney";
+          smokeAnchorX.value = cx;
+          smokeAnchorY.value = p.topY;
+          jacketOpen.value = withSpring(0, { damping: 19, stiffness: 220, mass: 0.7 });
+          releasedCharge.value = 0;
+          phase.value = PHASE.IDLE;
+          landPulse.value = withSequence(
+            withTiming(1, { duration: 55 }),
+            withTiming(0, { duration: CONFIG.landPulseDuration * 1000 }),
+          );
+          const offset = cx - (p.x + p.width / 2);
+          lastOffset.value = offset;
+          const perfect = Math.abs(offset) <= CONFIG.perfectTolerance ? 1 : 0;
+          // Score only the first time we reach a new (higher id) platform.
+          if (p.id > lastLandedId.value) {
+            const towersCrossed = p.id - lastLandedId.value;
+            lastLandedId.value = p.id;
+            if (perfect) {
+              burstX.value = cx;
+              burstY.value = p.topY;
+              burst.value = 0;
+              burst.value = withTiming(1, { duration: 620 });
+            }
+            runOnJS(onLanding)(perfect, towersCrossed);
+          }
+        }
+      }
+
+      // --- fall -> game over ---
+      if ((py.value - camY.value) * CONFIG.cameraZoom > H + 60) {
+        phase.value = PHASE.DEAD;
+        running.value = 0;
+        runOnJS(onGameOver)();
+      }
+    }
+
+    // Charge remains immediate; only recovery after landing is softened.
+    if (phase.value === PHASE.CHARGING) visualCharge.value = charge.value;
+    else if (phase.value === PHASE.AIRBORNE || phase.value === PHASE.DEAD) visualCharge.value = releasedCharge.value;
+    else visualCharge.value *= Math.exp(-18 * dt);
+
+    // --- procedural spawn ahead + cleanup behind (reassign, never mutate) ---
+    const s = CONFIG.cameraZoom;
+    const viewW = W / s;
+    let working = list;
+    let changed = false;
+    let last = working[working.length - 1];
+    if (last && last.x + last.width < camX.value + viewW + CONFIG.spawnAhead) {
+      const add: any[] = [];
+      let cur = last;
+      while (cur.x + cur.width < camX.value + viewW + CONFIG.spawnAhead) {
+        const n = makeNextPlatform(cur, idCounter.value);
+        idCounter.value += 1;
+        add.push(n);
+        cur = n;
+      }
+      working = working.concat(add);
+      changed = true;
+    }
+    let startIdx = 0;
+    while (
+      startIdx < working.length - 2 &&
+      working[startIdx].x + working[startIdx].width < camX.value - CONFIG.removeBehind
+    ) {
+      startIdx += 1;
+    }
+    if (startIdx > 0) {
+      working = working.slice(startIdx);
+      changed = true;
+    }
+    if (changed) platforms.value = working;
+
+    // --- camera: adaptive look-ahead framing (current + next + next+1) ---
+    const plist = platforms.value;
+    let ni = -1;
+    for (let i = 0; i < plist.length; i++) {
+      if (plist[i].x > px.value) {
+        ni = i;
+        break;
+      }
+    }
+    const nx = ni >= 0 ? plist[ni] : null;
+    const nx1 = ni >= 0 && ni + 1 < plist.length ? plist[ni + 1] : null;
+    const targetRight = nx1
+      ? nx1.x + nx1.width
+      : nx
+        ? nx.x + nx.width
+        : px.value;
+    // Frame so the NEXT+1 tower's right edge sits near cameraRevealRight, but
+    // never pull the player tighter than anchorMax nor push past anchorMin.
+    // The NEXT tower (closer) is therefore always visible.
+    const camReveal = targetRight - (CONFIG.cameraRevealRight * W) / s;
+    const camRest = px.value - (CONFIG.cameraAnchorMax * W) / s;
+    const camFwd = px.value - (CONFIG.cameraAnchorMin * W) / s;
+    let ctx = camReveal;
+    if (ctx < camRest) ctx = camRest;
+    if (ctx > camFwd) ctx = camFwd;
+    camX.value += (ctx - camX.value) * CONFIG.cameraSmoothingX;
+
+    // Keep one vertical world reference for the whole round. Landing on a
+    // taller/shorter tower must not pan the entire route up/down.
+    let focusY = 0;
+    if (phase.value === PHASE.DEAD) focusY = py.value;
+    const tY = focusY - (CONFIG.cameraPlayerAnchorY * H) / s;
+    const smoothY =
+      phase.value === PHASE.DEAD
+        ? CONFIG.cameraFallSmoothing
+        : CONFIG.cameraSmoothingY;
+    camY.value += (tY - camY.value) * smoothY;
+
+    // --- debug telemetry (throttled to ~10hz) ---
+    if (DEBUG_MODE) {
+      dbgAcc.value += dt;
+      if (dbgAcc.value >= 0.1) {
+        dbgAcc.value = 0;
+        let dist = 0;
+        let pw = 0;
+        for (let i = 0; i < list.length; i++) {
+          if (list[i].x > px.value) {
+            dist = list[i].x - px.value;
+            pw = list[i].width;
+            break;
+          }
+        }
+        runOnJS(pushDebug)({
+          charge: Math.round(charge.value * 100),
+          vx: Math.round(vx.value),
+          vy: Math.round(vy.value),
+          dist: Math.round(dist),
+          width: Math.round(pw),
+          offset: Math.round(lastOffset.value),
+          fps: Math.round(fps.value),
+        });
+      }
+    }
+  }, true);
+
+  // ------------------------------------------------------------------------
+  // GORSEL-006 sprite placement (visual only). The sprite's own feet-bottom
+  // row is put on py + PH/2 -- the same physical feet line the old render and
+  // landing detection use (py = topY - PH/2 at rest, so feet == topY) -- and
+  // the feet's horizontal center on the physical sole-span center. Pure
+  // translation, no scale/skew/rotate: proportions never change.
+  // ------------------------------------------------------------------------
+  // Pose driver: the RAW charge.value (decision 2026-09-21, no platform
+  // compensation). poseOverride >= 0 is a __DEV__-only visual freeze for
+  // 0/25/50/75/100 % screenshots; it never touches `charge`.
+  const poseOverride = useSharedValue(-1);
+  const poseCharge = useDerivedValue(() => (poseOverride.value >= 0 ? poseOverride.value : charge.value));
+
+  const burstStyle = useAnimatedStyle(() => {
+    const b = burst.value;
+    return {
+      opacity: b > 0 && b < 1 ? 1 - b : 0,
+      transform: [
+        { translateX: burstX.value },
+        { translateY: burstY.value },
+        { scale: 0.6 + b * 1.6 },
+      ],
+    };
+  });
+
+  // Single shared clock for the column-smoke effect (see GORSEL-004); the
+  // hook itself stops the underlying frame callback whenever nothing could
+  // be visible (wrong column, airborne/dead, round not running, or app
+  // backgrounded) instead of ticking unconditionally every frame.
+  const smokeElapsed = useColumnSmokeClock({ standingPlatformIsChimney, phase, running });
+
+  // TEMP DEBUG (GORSEL-004B iPhone diagnosis) -- delete once the root cause
+  // is found and confirmed fixed on-device (kept alive through 004A per
+  // instruction). Updated for 004A: reads `standingPlatformIsChimney`
+  // directly (the real value ColumnSmoke.tsx now gates on) instead of
+  // re-deriving it from a bare id via the since-removed `isSmokyPlatform`.
+  const [smokeDebug, setSmokeDebug] = useState({ id: 0, chimney: false, phase: -1, running: 0, active: false, ax: 0, ay: 0 });
+  const pushSmokeDebug = useCallback((d: typeof smokeDebug) => setSmokeDebug(d), []);
+  useAnimatedReaction(
+    () => {
+      "worklet";
+      const id = standingPlatformId.value;
+      const chimney = standingPlatformIsChimney.value;
+      const active = running.value === 1 && (phase.value === PHASE.IDLE || phase.value === PHASE.CHARGING) && chimney;
+      return { id, chimney, phase: phase.value, running: running.value, active, ax: smokeAnchorX.value, ay: smokeAnchorY.value };
+    },
+    (cur, prev) => {
+      if (!prev || cur.id !== prev.id || cur.active !== prev.active || cur.ax !== prev.ax || cur.ay !== prev.ay || cur.phase !== prev.phase) {
+        runOnJS(pushSmokeDebug)(cur);
+      }
+    },
+  );
+
+  // World camera: maps world coords -> screen as (world - cam) * zoom, with a
+  // top-left transform origin (see styles.world). This keeps the player in the
+  // left band while the zoom reveals the upcoming route on the right.
+  const worldStyle = useAnimatedStyle(() => {
+    const s = CONFIG.cameraZoom;
+    return {
+      transform: [
+        { translateX: -camX.value * s },
+        { translateY: -camY.value * s },
+        { scale: s },
+      ],
+    };
+  });
+
+  return (
+    <View style={styles.root} testID="game-root">
+      <StatusBar style="dark" />
+      <LinearGradient
+        colors={[colors.gameSky, colors.gameSkyFar]}
+        style={styles.fill}
+      />
+
+      {/* GORSEL-011 (accepted, 2026-09-22): ChatGPT-produced Istanbul view
+          replaces the old neighborhood-mobile.jpg background. Single static
+          image, no parallax in this round (per decision) -- same fixed
+          styles.fill placement, cover fit, the old jpg used. */}
+      <CachedImage cachePolicy="memory-disk" priority="high" transition={0}
+        source={require("@/assets/environment/istanbul-background-v1.png")}
+        onLoadStart={() => markArtStarted("background")}
+        onLoad={() => markArtLoaded("background")}
+        onError={failArt}
+
+        style={[styles.fill, { width: W, height: H }]}
+        contentFit="cover"
+      />
+      <View style={styles.backgroundWash} pointerEvents="none" />
+      <AmbientBirds width={W} height={H} />
+
+      {gameReady && (
+        <>
+          {/* Scaled world container — everything in world coords lives here */}
+          <Animated.View style={[styles.world, worldStyle]}>
+        {/* Platforms (fixed pool, positioned by the worklet) */}
+        {POOL_IDX.map((i) => (
+          <PlatformView
+            key={i}
+            index={i}
+            platforms={platforms}
+            styles={styles}
+            onArtLoad={markArtLoaded}
+            onArtStart={markArtStarted}
+            onArtError={failArt}
+          />
+        ))}
+
+        {/* Atmosphere-only smoke on select columns, back layer (behind the
+            character); visible only while standing on that column, see
+            GORSEL-004. Front counterpart is mounted after the character
+            layers below so the character reads as wrapped in the cloud. */}
+        <ColumnSmokeBack
+          standingPlatformIsChimney={standingPlatformIsChimney}
+          smokeAnchorX={smokeAnchorX}
+          smokeAnchorY={smokeAnchorY}
+          phase={phase}
+          running={running}
+          elapsed={smokeElapsed}
+        />
+
+        {/* Perfect-landing particle burst */}
+        <Animated.View style={[styles.burst, burstStyle]}>
+          {[0, 1, 2, 3, 4, 5].map((i) => {
+            const ang = (Math.PI * 2 * i) / 6;
+            return (
+              <View
+                key={i}
+                style={[
+                  styles.burstDot,
+                  { left: Math.cos(ang) * 20, top: Math.sin(ang) * 20 },
+                ]}
+              />
+            );
+          })}
+        </Animated.View>
+
+        {/* GORSEL-006: temporary single-pose character (same sprite for idle/
+            charge/jump/fall/landing until the 5-pose set exists). Drawn after
+            the platforms and the back smoke layer, before the front smoke
+            layer -- same z-order slot the old layered character had. The old
+            layered character (jacket halves, belly, puff, pants, head) is no
+            longer part of the render tree. */}
+        <ChargePoses
+          px={px}
+          py={py}
+          poseCharge={poseCharge}
+          scale={SPRITE_SCALE * GLOBAL_VISUAL_SCALE}
+          feetCenterOffset={SOLE_CENTER_OFFSET + ANCHOR_SHIFT_PX * SPRITE_SCALE}
+          feetHalf={PH / 2}
+          onLoadStart={() => markArtStarted("character")}
+          onLoad={() => markArtLoaded("character")}
+          onError={failArt}
+        />
+
+        {/* Front counterpart of the column smoke, rendered AFTER every
+            character layer above so the character reads as wrapped in the
+            cloud instead of fully occluding it (R1 director fix, P1). Lower
+            opacity, offset low/to the sides -- does not cover the face or
+            the column's landing edge, and does not intercept touches. */}
+        <ColumnSmokeFront
+          standingPlatformIsChimney={standingPlatformIsChimney}
+          smokeAnchorX={smokeAnchorX}
+          smokeAnchorY={smokeAnchorY}
+          phase={phase}
+          running={running}
+          elapsed={smokeElapsed}
+        />
+      </Animated.View>
+
+      {/* Full-screen touch layer */}
+      <View
+        testID="charge-surface"
+        style={styles.touch}
+        onStartShouldSetResponder={() => !gameOver}
+        onResponderGrant={onPressIn}
+        onResponderRelease={onPressOut}
+        onResponderTerminate={cancelCharge}
+      />
+
+      {/* Score HUD */}
+      {!gameOver && <View style={[styles.hud, { top: insets.top + 24 }]}>
+        <Text style={styles.scoreText} testID="score-value">
+          {score}
+        </Text>
+        <Text style={styles.bestText} testID="best-value">
+          BEST {best}
+        </Text>
+      </View>}
+
+      {__DEV__ && lastJump && (
+        <View pointerEvents="none" style={{ position: "absolute", top: insets.top + 116, alignSelf: "center", paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8, backgroundColor: "rgba(255,255,255,0.85)" }}>
+          <Text style={{ color: "#26383b", fontSize: 12 }}>Son basış: {lastJump.ms} ms · Güç: %{lastJump.percent} · Görsel: %{lastJump.visualPercent} · İlk kare: {lastJump.pressToFirstFrameMs}ms</Text>
+        </View>
+      )}
+
+      {/* Hint (only before first jump) */}
+      {score === 0 && !gameOver && (
+        <View style={styles.hint}>
+          <Text style={styles.hintText}>Hold to charge · Release to jump</Text>
+        </View>
+      )}
+
+      {/* PERFECT! popup */}
+      {perfectVisible && (
+        <View style={styles.perfectWrap}>
+          <PerfectPop key={`${score}-${landingLabel}`} styles={styles} label={landingLabel} />
+        </View>
+      )}
+
+      {/* Debug overlay */}
+      {DEBUG_MODE && (
+        <View
+          style={[styles.debug, { top: insets.top + 60 }]}
+         
+          testID="debug-overlay"
+        >
+          <Text style={styles.debugText}>charge {debug.charge}%</Text>
+          <Text style={styles.debugText}>vx {debug.vx}</Text>
+          <Text style={styles.debugText}>vy {debug.vy}</Text>
+          <Text style={styles.debugText}>next dist {debug.dist}</Text>
+          <Text style={styles.debugText}>next width {debug.width}</Text>
+          <Text style={styles.debugText}>land offset {debug.offset}</Text>
+          <Text style={styles.debugText}>fps {debug.fps}</Text>
+        </View>
+      )}
+
+      {/* Game Over */}
+      {gameOver && (
+        <View style={styles.overlay} testID="game-over-overlay">
+          <View style={styles.card}>
+            <Text style={styles.gameOverTitle}>Game Over</Text>
+            <Text style={styles.statLabel}>SCORE</Text>
+            <Text style={styles.statValue} testID="final-score">
+              {score}
+            </Text>
+            <Text style={styles.finalBest} testID="final-best">
+              BEST {best}
+            </Text>
+            <Text style={styles.gameOverLine} testID="game-over-line">
+              {GAME_OVER_LINE}
+            </Text>
+            <Pressable
+              testID="play-again-button"
+              style={({ pressed }) => [
+                styles.playBtn,
+                pressed && styles.playBtnPressed,
+              ]}
+              onPress={restart}
+            >
+              <Text style={styles.playBtnText}>Play Again</Text>
+            </Pressable>
+          </View>
+        </View>
+      )}
+        </>
+      )}
+      {__DEV__ && showArtTiming && (
+        <View style={styles.artTiming}>
+          <Text style={styles.artLoadingText}>Görsel yükleme ölçümü</Text>
+          <Text style={styles.artTimingText}>Başlangıç → hazır / yükleme olayı süresi</Text>
+          {([["background", "Manzara"], ["bricks", "Tuğla"], ["character", "Karakter"]] as const).map(([id, label]) => {
+            const clock = artTimings;
+            const end = clock.ends[id];
+            const start = clock.starts[id];
+            return <Text key={id} style={styles.artTimingText}>{label}: {end === undefined ? "Yükleme bildirimi bekleniyor" : `${Math.round(end)} ms`} / {start === undefined || end === undefined ? "—" : `${Math.round(end - start)} ms`}</Text>;
+          })}
+          <Text style={styles.artTimingText}>{artReady ? `Tüm görseller hazır: ${Math.round(Math.max(...Object.values(artTimings.ends)))} ms` : "Ölçüm sürüyor; oyuna giriş engellenmiyor."}</Text>
+          {artError && <Text style={styles.artTimingText}>Bir görsel yükleme hatası bildirildi.</Text>}
+          <Text style={styles.artTimingText}>Süreler eşzamanlıdır, toplanmaz. Expo açılışı dahil değildir.</Text>
+          <Pressable accessibilityRole="button" onPress={() => setShowArtTiming(false)}><Text style={styles.artLoadingText}>Kapat</Text></Pressable>
+        </View>
+      )}
+      {/* TEMP DEBUG (GORSEL-004B iPhone diagnosis) -- delete once the root
+          cause is found AND fixed on-device. Always-visible (no DEBUG_MODE
+          gate) so it shows up in Expo Go with no extra setup. Magenta dot
+          top-right proves ColumnSmoke.tsx's components mount/render at all
+          (layer 2); the text lines below read the real
+          standingPlatformId/standingPlatformIsChimney (visualType)/active/
+          anchor state (layers 1, 3, 4) directly from the same SharedValues
+          ColumnSmoke itself uses. Updated for GORSEL-004A's visualType
+          switch -- "chimney" replaces the old "smoky" field name only. */}
+      {__DEV__ && (
+        <>
+          <ColumnSmokeMountProbe />
+          <View style={styles.poseDevRow}>
+            {[0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1, -1].map(v => (
+              <Pressable key={v} onPress={() => { poseOverride.value = v; }} style={styles.poseDevBtn}>
+                <Text style={styles.artTimingText}>{v < 0 ? "OFF" : String(v * 100)}</Text>
+              </Pressable>
+            ))}
+          </View>
+          <View style={styles.smokeDebugPanel} pointerEvents="none">
+            <Text style={styles.artTimingText}>[smoke-debug] id {smokeDebug.id} chimney {String(smokeDebug.chimney)}</Text>
+            <Text style={styles.artTimingText}>phase {smokeDebug.phase} running {smokeDebug.running} active {String(smokeDebug.active)}</Text>
+            <Text style={styles.artTimingText}>anchor {Math.round(smokeDebug.ax)}, {Math.round(smokeDebug.ay)}</Text>
+          </View>
+        </>
+      )}
+
+    </View>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// A single pooled platform view. Reads its slot from the shared array every
+// time the shared platform array changes.
+// ---------------------------------------------------------------------------
+function PlatformView({ index, platforms, styles, onArtLoad, onArtStart, onArtError }: any) {
+  const style = useAnimatedStyle(() => {
+    const p = platforms.value[index];
+    if (!p) {
+      return {
+        opacity: 0,
+        transform: [{ translateX: -99999 }, { translateY: -99999 }],
+      };
+    }
+    return {
+      opacity: 1,
+      width: p.width,
+      // GORSEL-011 fix: on non-chimney platforms the old brick texture/cap
+      // are hidden below (oldBodyStyle), leaving only this container's own
+      // flat colour as the gapless fallback -- recoloured to the new
+      // column family instead of the old brick colour. Chimney platforms
+      // keep the original colour (their look is unchanged).
+      backgroundColor: p.visualType === "chimney" ? styles.tower.backgroundColor : COLUMN_FALLBACK_COLOR,
+      transform: [{ translateX: p.x }, { translateY: p.topY }],
+    };
+  });
+  // GORSEL-011 fix (iPhone test rejection, 2026-09-22): the old brick
+  // texture + flat cap/shadow/highlight/shade must NEVER be visible on a
+  // normal platform, and must ALWAYS stay visible (unchanged) on a chimney
+  // platform -- a single boolean, not a hash/id special-case, so there is
+  // no scenario where it can leak through. towerCenter (the perfect-landing
+  // hint stripe) is intentionally NOT covered by this -- it stays visible
+  // on every platform regardless of look.
+  const oldBodyStyle = useAnimatedStyle(() => {
+    const p = platforms.value[index];
+    return { opacity: p && p.visualType === "chimney" ? 1 : 0 };
+  });
+  const centerStyle = useAnimatedStyle(() => {
+    const p = platforms.value[index];
+    return {
+      opacity: p ? 0.55 : 0,
+      left: (p ? p.width : 0) / 2 - CONFIG.perfectTolerance,
+    };
+  });
+  // The chimney TOP overlay (flue + tabla + collar only; the normal column,
+  // brick texture included, keeps continuing below it) is a SIBLING of the
+  // tower (rendered after it below), not a child: `styles.tower` has overflow:"hidden" (needed for its own
+  // rounded top corners), and the flue rises ABOVE the landing surface, so
+  // as a child it was clipped on every platform. It is positioned in the
+  // same world coordinates as the tower (translate by p.x / p.topY, the same
+  // convention `style` above uses) and sized from the platform's own real
+  // `width`, never from device pixels: scale = width / measured tabla width,
+  // so it is identical on iOS, Android and web for a given platform.
+  const chimneyStyle = useAnimatedStyle(() => {
+    const p = platforms.value[index];
+    if (!p || p.visualType !== "chimney") {
+      return { opacity: 0, transform: [{ translateX: -99999 }, { translateY: -99999 }] };
+    }
+    const scale = p.width / CHIMNEY_TABLA_WIDTH_PX;
+    const renderedWidth = CHIMNEY_ASSET_W * scale;
+    return {
+      opacity: 1,
+      width: renderedWidth,
+      height: CHIMNEY_ASSET_H * scale,
+      // Center the (slightly wider than tabla) canvas on the platform, and
+      // lift it so the asset's own tabla-top pixel row (measured, see
+      // CHIMNEY_TABLA_TOP_PX above) lands exactly on p.topY, the physical
+      // landing surface -- the same surface the plain towerCap sits on.
+      transform: [
+        { translateX: p.x + (p.width - renderedWidth) / 2 },
+        { translateY: p.topY - CHIMNEY_TABLA_TOP_PX * scale },
+      ],
+    };
+  });
+  // GORSEL-011: one of the three column sprites, drawn as a sibling overlay
+  // over the same plain brick tower (still full CONFIG.columnHeight tall
+  // underneath -- nothing removed, so there is never a gap). Suppressed on
+  // chimney platforms (the chimney overlay already owns that top region).
+  // Which of the three PNGs is "active" is a pure function of the
+  // platform's own id (classifyColumnVariant), never random per frame, so a
+  // given platform always shows the same column sprite.
+  const columnStyle0 = useAnimatedStyle(() => {
+    const p = platforms.value[index];
+    if (!p || p.visualType === "chimney" || classifyColumnVariant(p.id) !== 0) {
+      return { opacity: 0, transform: [{ translateX: -99999 }, { translateY: -99999 }] };
+    }
+    const asset = COLUMN_ASSET[0];
+    const scale = p.width / asset.shaftWidthPx;
+    const renderedWidth = asset.w * scale;
+    return {
+      opacity: 1,
+      width: renderedWidth,
+      height: asset.h * scale,
+      transform: [
+        { translateX: p.x + (p.width - renderedWidth) / 2 },
+        { translateY: p.topY - asset.capTopPx * scale },
+      ],
+    };
+  });
+  const columnStyle1 = useAnimatedStyle(() => {
+    const p = platforms.value[index];
+    if (!p || p.visualType === "chimney" || classifyColumnVariant(p.id) !== 1) {
+      return { opacity: 0, transform: [{ translateX: -99999 }, { translateY: -99999 }] };
+    }
+    const asset = COLUMN_ASSET[1];
+    const scale = p.width / asset.shaftWidthPx;
+    const renderedWidth = asset.w * scale;
+    return {
+      opacity: 1,
+      width: renderedWidth,
+      height: asset.h * scale,
+      transform: [
+        { translateX: p.x + (p.width - renderedWidth) / 2 },
+        { translateY: p.topY - asset.capTopPx * scale },
+      ],
+    };
+  });
+  const columnStyle2 = useAnimatedStyle(() => {
+    const p = platforms.value[index];
+    if (!p || p.visualType === "chimney" || classifyColumnVariant(p.id) !== 2) {
+      return { opacity: 0, transform: [{ translateX: -99999 }, { translateY: -99999 }] };
+    }
+    const asset = COLUMN_ASSET[2];
+    const scale = p.width / asset.shaftWidthPx;
+    const renderedWidth = asset.w * scale;
+    return {
+      opacity: 1,
+      width: renderedWidth,
+      height: asset.h * scale,
+      transform: [
+        { translateX: p.x + (p.width - renderedWidth) / 2 },
+        { translateY: p.topY - asset.capTopPx * scale },
+      ],
+    };
+  });
+  // GORSEL-011 fix, item 1+3: the tiled shaft fill (see COLUMN_TILE_SOURCES
+  // above) for whichever variant is active -- same visibility condition as
+  // the matching columnStyleN, drawn UNDER it (mounted earlier below) so the
+  // cap's own clean top edge sits on top of the tile seam, not the other
+  // way round. The tile's own width already equals shaftWidthPx, so at this
+  // scale its rendered width is exactly p.width (flush with the physical
+  // platform, unlike the slightly-wider cap).
+  const tileStyle0 = useAnimatedStyle(() => {
+    const p = platforms.value[index];
+    if (!p || p.visualType === "chimney" || classifyColumnVariant(p.id) !== 0) {
+      return { opacity: 0, transform: [{ translateX: -99999 }, { translateY: -99999 }] };
+    }
+    const cap = COLUMN_ASSET[0];
+    const tile = COLUMN_TILE_ASSET[0];
+    const scale = p.width / cap.shaftWidthPx;
+    const renderedWidth = tile.w * scale;
+    return {
+      opacity: 1,
+      width: renderedWidth,
+      height: COLUMN_TILE_FILL_HEIGHT,
+      transform: [
+        { translateX: p.x + (p.width - renderedWidth) / 2 },
+        { translateY: p.topY + (cap.h - cap.capTopPx) * scale },
+      ],
+    };
+  });
+  const tileStyle1 = useAnimatedStyle(() => {
+    const p = platforms.value[index];
+    if (!p || p.visualType === "chimney" || classifyColumnVariant(p.id) !== 1) {
+      return { opacity: 0, transform: [{ translateX: -99999 }, { translateY: -99999 }] };
+    }
+    const cap = COLUMN_ASSET[1];
+    const tile = COLUMN_TILE_ASSET[1];
+    const scale = p.width / cap.shaftWidthPx;
+    const renderedWidth = tile.w * scale;
+    return {
+      opacity: 1,
+      width: renderedWidth,
+      height: COLUMN_TILE_FILL_HEIGHT,
+      transform: [
+        { translateX: p.x + (p.width - renderedWidth) / 2 },
+        { translateY: p.topY + (cap.h - cap.capTopPx) * scale },
+      ],
+    };
+  });
+  const tileStyle2 = useAnimatedStyle(() => {
+    const p = platforms.value[index];
+    if (!p || p.visualType === "chimney" || classifyColumnVariant(p.id) !== 2) {
+      return { opacity: 0, transform: [{ translateX: -99999 }, { translateY: -99999 }] };
+    }
+    const cap = COLUMN_ASSET[2];
+    const tile = COLUMN_TILE_ASSET[2];
+    const scale = p.width / cap.shaftWidthPx;
+    const renderedWidth = tile.w * scale;
+    return {
+      opacity: 1,
+      width: renderedWidth,
+      height: COLUMN_TILE_FILL_HEIGHT,
+      transform: [
+        { translateX: p.x + (p.width - renderedWidth) / 2 },
+        { translateY: p.topY + (cap.h - cap.capTopPx) * scale },
+      ],
+    };
+  });
+  // GORSEL-011 fix, item 2: a short, visual-only "roof stub" (terracotta
+  // eave/tile base) right where the illustrated column art ends, so a
+  // normal-platform column reads as rising OUT of a small local roof patch
+  // (the reference look) instead of standing as a bare, ground-independent
+  // post. pointerEvents="none"; does not read or write platform width,
+  // topY, footSoles or any collision value -- purely decorative, positioned
+  // from the SAME measured asset numbers the column sprite above already
+  // uses (so it always sits flush with that sprite's own bottom edge,
+  // whatever the platform's width). Not shown on chimney platforms (their
+  // accepted look is unchanged).
+  const roofStubStyle = useAnimatedStyle(() => {
+    const p = platforms.value[index];
+    if (!p || p.visualType === "chimney") {
+      return { opacity: 0, transform: [{ translateX: -99999 }, { translateY: -99999 }] };
+    }
+    const asset = COLUMN_ASSET[classifyColumnVariant(p.id)];
+    const scale = p.width / asset.shaftWidthPx;
+    const renderedWidth = asset.w * scale;
+    const columnBottomY = p.topY + (asset.h - asset.capTopPx) * scale;
+    const stubWidth = renderedWidth * 1.32;
+    const stubHeight = Math.max(9, 15 * scale);
+    return {
+      opacity: 1,
+      width: stubWidth,
+      height: stubHeight,
+      transform: [
+        { translateX: p.x + (p.width - stubWidth) / 2 },
+        { translateY: columnBottomY },
+      ],
+    };
+  });
+  return (
+    <>
+      <Animated.View style={[styles.tower, style]}>
+        {/* GORSEL-011 fix: this whole old brick/cap look is now wrapped in
+            oldBodyStyle -- opacity 1 ONLY on a chimney platform (unchanged
+            look there), opacity 0 on every normal platform, unconditionally
+            (see oldBodyStyle above). towerCenter stays OUTSIDE this wrapper
+            so the perfect-landing hint keeps showing on every platform. */}
+        <Animated.View style={oldBodyStyle} pointerEvents="none">
+          {/* One native tiled image per tower, rather than 17 separate image views. */}
+          <View style={styles.towerBrick}>
+            <Image
+              source={BRICK_SOURCE}
+              onLoadStart={index === 0 ? () => onArtStart("bricks") : undefined}
+              onLoad={index === 0 ? () => onArtLoad("bricks") : undefined}
+              onError={index === 0 ? onArtError : undefined}
+              fadeDuration={0}
+              style={styles.brickImage}
+              resizeMode="repeat"
+            />
+          </View>
+          <View style={styles.towerShade} />
+          <View style={styles.capShadow} />
+          <View style={styles.towerCap} />
+          <View style={styles.capHighlight} />
+        </Animated.View>
+        <Animated.View style={[styles.towerCenter, centerStyle]} />
+      </Animated.View>
+      <Animated.View style={[styles.chimneyImage, chimneyStyle]}>
+        <Image source={CHIMNEY_SOURCE} style={styles.chimneyImageFill} resizeMode="stretch" />
+      </Animated.View>
+      {/* GORSEL-011 fix, item 2: roof stub UNDER the column art (drawn
+          before it so the column's own cap slightly overlaps its top edge,
+          same z-order convention as the rest of this file: earlier = further
+          back). Plain flat-shaded Views, no image asset. */}
+      {/* GORSEL-011 fix, item 1+3: tiled shaft fill, drawn BEFORE (so
+          visually behind/under) both the roof stub and the cap image below
+          -- fills the body all the way down instead of the flat fallback
+          colour showing after a short distance. */}
+      <Animated.View style={[styles.chimneyImage, tileStyle0]} pointerEvents="none">
+        <Image source={COLUMN_TILE_SOURCES[0]} style={styles.chimneyImageFill} resizeMode="repeat" />
+      </Animated.View>
+      <Animated.View style={[styles.chimneyImage, tileStyle1]} pointerEvents="none">
+        <Image source={COLUMN_TILE_SOURCES[1]} style={styles.chimneyImageFill} resizeMode="repeat" />
+      </Animated.View>
+      <Animated.View style={[styles.chimneyImage, tileStyle2]} pointerEvents="none">
+        <Image source={COLUMN_TILE_SOURCES[2]} style={styles.chimneyImageFill} resizeMode="repeat" />
+      </Animated.View>
+      {/* Roof stub drawn AFTER (in front of) the tile fill, so it visibly
+          marks the column-meets-roof transition instead of being hidden
+          behind the tile texture continuing past it. */}
+      <Animated.View style={[styles.roofStub, roofStubStyle]} pointerEvents="none">
+        <View style={styles.roofStubEave} />
+        <View style={styles.roofStubTileA} />
+        <View style={styles.roofStubTileB} />
+      </Animated.View>
+      <Animated.View style={[styles.chimneyImage, columnStyle0]} pointerEvents="none">
+        <Image source={COLUMN_SOURCES[0]} style={styles.chimneyImageFill} resizeMode="stretch"
+          onLoadStart={index === 0 ? () => onArtStart("columns") : undefined}
+          onLoad={index === 0 ? () => onArtLoad("columns") : undefined}
+          onError={index === 0 ? onArtError : undefined}
+        />
+      </Animated.View>
+      <Animated.View style={[styles.chimneyImage, columnStyle1]} pointerEvents="none">
+        <Image source={COLUMN_SOURCES[1]} style={styles.chimneyImageFill} resizeMode="stretch" />
+      </Animated.View>
+      <Animated.View style={[styles.chimneyImage, columnStyle2]} pointerEvents="none">
+        <Image source={COLUMN_SOURCES[2]} style={styles.chimneyImageFill} resizeMode="stretch" />
+      </Animated.View>
+    </>
+  );
+}
+
+// PERFECT! pop with a quick scale-in.
+function PerfectPop({ styles, label }: any) {
+  const s = useSharedValue(0);
+  useEffect(() => {
+    s.value = withTiming(1, { duration: 180 });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const st = useAnimatedStyle(() => ({
+    opacity: s.value,
+    transform: [{ scale: 0.6 + s.value * 0.4 }],
+  }));
+  return (
+    <Animated.View style={st} testID="perfect-label">
+      <Text style={styles.perfectText}>{label}</Text>
+    </Animated.View>
+  );
+}
+
+const useStyles = makeStyles((colors) => ({
+  root: { flex: 1, backgroundColor: colors.gameSky, overflow: "hidden" },
+  artTiming: { position: "absolute", top: "25%", left: 16, right: 16, padding: 12, borderRadius: 12, backgroundColor: colors.gameSky },
+  // TEMP DEBUG (GORSEL-004 iPhone diagnosis, 2026-09-18) -- delete alongside
+  // the panel above once the root cause is found.
+  poseDevRow: { position: "absolute", left: 4, bottom: 90, flexDirection: "row", gap: 4 },
+  poseDevBtn: { backgroundColor: "rgba(0,0,0,0.6)", paddingHorizontal: 8, paddingVertical: 6, borderRadius: 6 },
+  smokeDebugPanel: { position: "absolute", bottom: 40, left: 16, right: 16, padding: 10, borderRadius: 10, backgroundColor: "rgba(0,0,0,0.6)" },
+  artTimingText: { color: colors.hudText, fontSize: 14, marginBottom: 8 },
+  artLoadingText: { color: colors.hudText, fontSize: 18, padding: 12 },
+  fill: absoluteFill(),
+  touch: absoluteFill(),
+  world: {
+    ...absoluteFill(),
+    transformOrigin: "0% 0%",
+    pointerEvents: "none",
+  },
+
+  backgroundWash: {
+    ...absoluteFill(),
+    backgroundColor: colors.gameSky,
+    opacity: 0.26,
+  },
+  brickImage: { width: "100%", height: "100%" },
+  capShadow: { position: "absolute", top: CONFIG.capHeight, left: 0, right: 0, height: 4, backgroundColor: colors.platformShade, opacity: 0.5 },
+  capHighlight: { position: "absolute", top: 2, left: 3, right: 3, height: 2, backgroundColor: colors.platformCenter },
+  towerBrick: {
+    position: "absolute",
+    left: 3,
+    right: 3,
+    top: CONFIG.capHeight,
+    bottom: 0,
+  },
+
+  tower: {
+    position: "absolute",
+    left: 0,
+    top: 0,
+    height: CONFIG.columnHeight,
+    borderTopLeftRadius: 3,
+    borderTopRightRadius: 3,
+    backgroundColor: colors.platform,
+    overflow: "hidden",
+    pointerEvents: "none",
+  },
+  towerShade: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    right: 0,
+    width: "14%",
+    backgroundColor: colors.platformShade,
+    opacity: 0.28,
+  },
+  towerCap: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: CONFIG.capHeight,
+    borderTopLeftRadius: 3,
+    borderTopRightRadius: 3,
+    backgroundColor: colors.platformTop,
+    borderWidth: 1.5,
+    borderColor: colors.platformShade,
+  },
+  // GORSEL-004A: sized/positioned per-platform in chimneyStyle above
+  // (useAnimatedStyle sets width/height/left/top); this is just the base.
+  chimneyImage: { position: "absolute", left: 0, top: 0, pointerEvents: "none" },
+  chimneyImageFill: { width: "100%", height: "100%" },
+  // GORSEL-011 fix, item 2: roof stub -- a short, flat-shaded terracotta
+  // eave/tile base drawn under the column art. Sized/positioned only by
+  // roofStubStyle (width/height/transform); the three child Views below use
+  // percentages so they always scale with that animated box, no per-variant
+  // constants needed.
+  roofStub: { position: "absolute", left: 0, top: 0, pointerEvents: "none" },
+  roofStubEave: { position: "absolute", left: 0, top: 0, width: "100%", height: "100%", backgroundColor: "#a8623a", borderRadius: 2, borderWidth: 1, borderColor: "#3a2418" },
+  roofStubTileA: { position: "absolute", left: "10%", right: "10%", top: "30%", height: "16%", backgroundColor: "#7c4326", opacity: 0.8, borderRadius: 1 },
+  roofStubTileB: { position: "absolute", left: "10%", right: "10%", top: "62%", height: "16%", backgroundColor: "#7c4326", opacity: 0.8, borderRadius: 1 },
+  towerCenter: {
+    position: "absolute",
+    top: CONFIG.capHeight + 3,
+    width: CONFIG.perfectTolerance * 2,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: colors.platformCenter,
+  },
+
+  // GORSEL-006 sprite box: square, same aspect as the 1024x1024 canvas, sized
+  // from the physical sole span (SPRITE_SCALE) -- never from device pixels.
+
+  burst: { position: "absolute", left: 0, top: 0, width: 1, height: 1, pointerEvents: "none" },
+  burstDot: {
+    position: "absolute",
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: colors.perfect,
+  },
+
+  hud: { position: "absolute", left: 0, right: 0, alignItems: "center", pointerEvents: "none" },
+  scoreText: {
+    fontSize: 56,
+    fontWeight: "800",
+    color: colors.hudText,
+    letterSpacing: -1,
+  },
+  bestText: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: colors.muted,
+    letterSpacing: 1,
+    marginTop: -4,
+  },
+
+  hint: {
+    position: "absolute",
+    bottom: 70,
+    left: 0,
+    right: 0,
+    alignItems: "center",
+    pointerEvents: "none",
+  },
+  hintText: { fontSize: 14, fontWeight: "600", color: colors.muted },
+
+  perfectWrap: {
+    position: "absolute",
+    top: "26%",
+    left: 0,
+    right: 0,
+    alignItems: "center",
+    pointerEvents: "none",
+  },
+  perfectText: {
+    fontSize: 34,
+    fontWeight: "900",
+    color: colors.perfect,
+    letterSpacing: 1,
+  },
+
+  debug: {
+    position: "absolute",
+    right: 14,
+    backgroundColor: "rgba(32,70,83,0.82)",
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 12,
+    minWidth: 132,
+    pointerEvents: "none",
+  },
+  debugText: {
+    color: "#EAF6F4",
+    fontSize: 12,
+    fontVariant: ["tabular-nums"],
+    lineHeight: 18,
+  },
+
+  overlay: {
+    ...absoluteFill(),
+    backgroundColor: "rgba(20,48,58,0.35)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  card: {
+    width: "84%",
+    maxWidth: 360,
+    backgroundColor: colors.surface,
+    borderRadius: 24,
+    paddingVertical: 28,
+    paddingHorizontal: 24,
+    alignItems: "center",
+    ...Platform.select({
+      web: { boxShadow: "0px 12px 24px rgba(0,0,0,0.15)" },
+      default: {
+        shadowColor: "#000",
+        shadowOpacity: 0.15,
+        shadowRadius: 24,
+        shadowOffset: { width: 0, height: 12 },
+        elevation: 8,
+      },
+    }),
+  },
+  gameOverTitle: {
+    fontSize: 26,
+    fontWeight: "800",
+    color: colors.onSurface,
+    marginBottom: 20,
+  },
+  finalBest: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: colors.muted,
+    marginTop: 4,
+    marginBottom: 24,
+  },
+  gameOverLine: {
+    fontSize: 13,
+    fontStyle: "italic",
+    color: colors.muted,
+    marginTop: -16,
+    marginBottom: 24,
+    textAlign: "center",
+  },
+  statLabel: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: colors.muted,
+    letterSpacing: 1,
+  },
+  statValue: {
+    fontSize: 56,
+    fontWeight: "800",
+    color: colors.onSurface,
+    marginTop: 2,
+  },
+  playBtn: {
+    width: "100%",
+    backgroundColor: colors.brandPrimary,
+    borderRadius: 16,
+    paddingVertical: 16,
+    alignItems: "center",
+  },
+  playBtnPressed: { opacity: 0.85, transform: [{ scale: 0.98 }] },
+  playBtnText: {
+    color: colors.onBrandPrimary,
+    fontSize: 17,
+    fontWeight: "800",
+    letterSpacing: 0.5,
+  },
+}));

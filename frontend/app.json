@@ -28,10 +28,9 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-image.png",
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#000000"
+          "image": "./assets/images/splash-bosphorus-blur.png",
+          "resizeMode": "cover",
+          "backgroundColor": "#4f9ec4"
         }
       ],
       "expo-font",

@@ -1,0 +1,102 @@
+{
+ "charge-000-idle": {
+  "file": "charge-000-idle.png",
+  "size": [
+   516,
+   1098
+  ],
+  "charge_percent": 0,
+  "pivot_px": [
+   167,
+   1098
+  ],
+  "head_pixel_exact": true,
+  "corners": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "rgb_under_alpha0": 0
+ },
+ "charge-025": {
+  "file": "charge-025.png",
+  "size": [
+   567,
+   1050
+  ],
+  "charge_percent": 25,
+  "pivot_px": [
+   169,
+   1050
+  ],
+  "head_pixel_exact": true,
+  "corners": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "rgb_under_alpha0": 0
+ },
+ "charge-050": {
+  "file": "charge-050.png",
+  "size": [
+   648,
+   987
+  ],
+  "charge_percent": 50,
+  "pivot_px": [
+   204,
+   987
+  ],
+  "head_pixel_exact": true,
+  "corners": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "rgb_under_alpha0": 0
+ },
+ "charge-075": {
+  "file": "charge-075.png",
+  "size": [
+   712,
+   911
+  ],
+  "charge_percent": 75,
+  "pivot_px": [
+   230,
+   911
+  ],
+  "head_pixel_exact": true,
+  "corners": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "rgb_under_alpha0": 0
+ },
+ "charge-100-max": {
+  "file": "charge-100-max.png",
+  "size": [
+   729,
+   825
+  ],
+  "charge_percent": 100,
+  "pivot_px": [
+   220,
+   825
+  ],
+  "head_pixel_exact": null,
+  "corners": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "rgb_under_alpha0": 0
+ }
+}

@@ -1,0 +1,16 @@
+[0:v]crop=1320:900:0:550,scale=660:-1,drawtext=fontfile=/System/Library/Fonts/Supplemental/Arial.ttf:text='A_full_38.670.png':fontsize=18:fontcolor=yellow:x=4:y=4:box=1:boxcolor=black@0.7[c0];
+[1:v]crop=1320:900:0:550,scale=660:-1,drawtext=fontfile=/System/Library/Fonts/Supplemental/Arial.ttf:text='A_full_38.720.png':fontsize=18:fontcolor=yellow:x=4:y=4:box=1:boxcolor=black@0.7[c1];
+[2:v]crop=1320:900:0:550,scale=660:-1,drawtext=fontfile=/System/Library/Fonts/Supplemental/Arial.ttf:text='A_full_38.787.png':fontsize=18:fontcolor=yellow:x=4:y=4:box=1:boxcolor=black@0.7[c2];
+[3:v]crop=1320:900:0:550,scale=660:-1,drawtext=fontfile=/System/Library/Fonts/Supplemental/Arial.ttf:text='A_full_38.853.png':fontsize=18:fontcolor=yellow:x=4:y=4:box=1:boxcolor=black@0.7[c3];
+[4:v]crop=1320:900:0:550,scale=660:-1,drawtext=fontfile=/System/Library/Fonts/Supplemental/Arial.ttf:text='A_full_38.920.png':fontsize=18:fontcolor=yellow:x=4:y=4:box=1:boxcolor=black@0.7[c4];
+[5:v]crop=1320:900:0:550,scale=660:-1,drawtext=fontfile=/System/Library/Fonts/Supplemental/Arial.ttf:text='A_full_39.000.png':fontsize=18:fontcolor=yellow:x=4:y=4:box=1:boxcolor=black@0.7[c5];
+[6:v]crop=1320:900:0:550,scale=660:-1,drawtext=fontfile=/System/Library/Fonts/Supplemental/Arial.ttf:text='A_full_39.070.png':fontsize=18:fontcolor=yellow:x=4:y=4:box=1:boxcolor=black@0.7[c6];
+[7:v]crop=1320:900:0:550,scale=660:-1,drawtext=fontfile=/System/Library/Fonts/Supplemental/Arial.ttf:text='A_full_39.100.png':fontsize=18:fontcolor=yellow:x=4:y=4:box=1:boxcolor=black@0.7[c7];
+[8:v]crop=1320:900:0:550,scale=660:-1,drawtext=fontfile=/System/Library/Fonts/Supplemental/Arial.ttf:text='A_full_39.150.png':fontsize=18:fontcolor=yellow:x=4:y=4:box=1:boxcolor=black@0.7[c8];
+[9:v]crop=1320:900:0:550,scale=660:-1,drawtext=fontfile=/System/Library/Fonts/Supplemental/Arial.ttf:text='A_full_39.220.png':fontsize=18:fontcolor=yellow:x=4:y=4:box=1:boxcolor=black@0.7[c9];
+[10:v]crop=1320:900:0:550,scale=660:-1,drawtext=fontfile=/System/Library/Fonts/Supplemental/Arial.ttf:text='A_full_39.300.png':fontsize=18:fontcolor=yellow:x=4:y=4:box=1:boxcolor=black@0.7[c10];
+[11:v]crop=1320:900:0:550,scale=660:-1,drawtext=fontfile=/System/Library/Fonts/Supplemental/Arial.ttf:text='A_full_39.380.png':fontsize=18:fontcolor=yellow:x=4:y=4:box=1:boxcolor=black@0.7[c11];
+[12:v]crop=1320:900:0:550,scale=660:-1,drawtext=fontfile=/System/Library/Fonts/Supplemental/Arial.ttf:text='A_full_39.450.png':fontsize=18:fontcolor=yellow:x=4:y=4:box=1:boxcolor=black@0.7[c12];
+[13:v]crop=1320:900:0:550,scale=660:-1,drawtext=fontfile=/System/Library/Fonts/Supplemental/Arial.ttf:text='A_full_39.520.png':fontsize=18:fontcolor=yellow:x=4:y=4:box=1:boxcolor=black@0.7[c13];
+[14:v]crop=1320:900:0:550,scale=660:-1,drawtext=fontfile=/System/Library/Fonts/Supplemental/Arial.ttf:text='A_full_39.590.png':fontsize=18:fontcolor=yellow:x=4:y=4:box=1:boxcolor=black@0.7[c14];
+[c0][c1][c2][c3][c4][c5][c6][c7][c8][c9][c10][c11][c12][c13][c14]vstack=inputs=15[out]

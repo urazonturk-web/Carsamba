@@ -43,6 +43,15 @@ const PREVIOUS_CONFIG = {
   // width IS the collision width — no hidden margins.
   widthWide: { min: 76, max: 96 }, // forgiving
   widthMedium: { min: 56, max: 68 }, // standard
+  // GORSEL-016 (2026-09-23): raised from {38,46}. With the new, much smaller
+  // character (GLOBAL_VISUAL_SCALE 0.42, see character-pose.ts), the narrow
+  // cap's rendered on-screen width fell to ~2.0-2.4x the character's screen
+  // width -- short of the "kapak genişliği >= 2.5x karakter ekran genişliği"
+  // target (medium/wide already clear it at 3.1x/5.1x, measured live via DOM
+  // getBoundingClientRect). {48,58} clears 2.5x at both ends (measured
+  // ~2.5-2.9x) with only a proportional, self-consistent height increase via
+  // rootedTopY (short chimneys ~26% taller, still clearly shorter than
+  // medium/wide) -- no change to the reachability FORMULA itself.
   widthNarrow: { min: 38, max: 46 }, // precision / risk
 
   // Gaps + height variation interpolate from "early" to "late" over
@@ -74,23 +83,41 @@ const PREVIOUS_CONFIG = {
   scorePerfectBonus: 2,
 
   // --- Camera --------------------------------------------------------------
-  // Moderate zoom keeps the character/towers big enough to read, while a
-  // strong forward look-ahead reveals the upcoming route on the right.
-  // The player floats between anchorMin (max forward reveal) and anchorMax
-  // (resting) as needed to frame CURRENT + NEXT + NEXT+1 towers. The NEXT
-  // tower always has absolute priority.
   cameraZoom: 0.62, // world -> screen scale. Kept moderate (not far out).
-  cameraAnchorMin: 0.31, // most-forward player screen fraction (reveals more route)
-  cameraAnchorMax: 0.31, // resting player screen fraction (left band)
-  cameraRevealRight: 0.94, // put the NEXT+1 tower's right edge around here when framing
+  // OYUN_AKISI-002 (2026-09-22, user-authorized, replaces the GORSEL-014
+  // anchorMin/anchorMax/revealRight model entirely -- that model recomputed
+  // an "ideal" camX target from the NEXT/NEXT+1 tower's position every
+  // frame, which jumps discontinuously the instant the player's nearest
+  // platform changes identity, producing a visible kink even with a smooth
+  // lerp on top of it; suspected contributor to the device-reported "kare
+  // kare atlama / ani kamera kilidi"). Replaced with a plain DEAD ZONE: the
+  // player can move freely anywhere left of cameraDeadZoneRight (no camera
+  // reaction at all -- true corridor, not just a narrow anchor band); only
+  // once the player's OWN screen fraction would exceed this threshold does
+  // the camera start interpolating forward, by just enough to hold the
+  // player at the threshold. Never depends on platform pool contents.
+  // KAMERA-021 (2026-09-24): was 0.64. Spring Ninja device video keeps the character in the left-middle 30-40% band while the camera only ever moves right; lower threshold shows the next 2-3 landing surfaces before the jump.
+  cameraDeadZoneRight: 0.30,
+  cameraSmoothTimeY: 0.16, // REVIZYON-022: critically damped vertical follow time (s)
+  cameraStartFraction: 0.30, // where the player sits on screen at the very start/restart snap only
   cameraPlayerAnchorY: 0.67, // vertical resting anchor for the standing level
-  cameraSmoothingX: 1, // lock the player horizontally; no follow lag during flight.
+  // Was 1 (instant snap, "no follow lag"). User asked for smooth follow;
+  // 0.18 is a gentle lerp (same order of magnitude as cameraSmoothingY
+  // below) -- purely a camera-transform easing constant, does not touch
+  // px/py, physics, or collision.
+  cameraSmoothingX: 0.18,
   cameraSmoothingY: 0.08, // vertical follow lerp
   cameraFallSmoothing: 0.1, // vertical follow while falling to Game Over
 
   // --- Generation / cleanup window ----------------------------------------
   spawnAhead: 500, // keep towers generated this far past the visible right edge
-  removeBehind: 200, // remove towers this far behind the visible left edge
+  // OYUN_AKISI-002 (2026-09-22, item 0 audit): bumped 200->260 -- the
+  // rooftop art's own visual bounding box is WIDER than the platform's
+  // physical width (its roof base overhangs each side), up to ~66 world
+  // units past the platform's own right edge for the widest towers; 260
+  // keeps a comfortable margin past that so a pool slot is never
+  // repositioned while its art could still be even partially on screen.
+  removeBehind: 260, // remove towers this far behind the visible left edge
 
   // Visible spring: its lower end is the player collision/landing point.
   springHeight: 36, // relaxed height in world pixels
@@ -228,6 +255,13 @@ export const CONFIG = REFERENCE_TRIAL ? {
   //    entirely, back to the fixed reference course), or restore
   //    gapLate.max to 380 and heightVarLate to 300 below to keep
   //    EXPERIMENTAL_COURSE on with the original (untightened) ranges.
+  // OYUN_AKISI-001 (2026-09-22, user-authorized difficulty increase): these
+  // two values now ACTUALLY drive the late-game gap/height ceiling (see
+  // procedural-course.ts, gMax/swing -- previously they were wired to a
+  // hardcoded 300/150 there, so this override was a no-op for real
+  // gameplay difficulty; that dead-config situation is fixed as part of
+  // this change, not just these two numbers). 340/220 -- see GAME_STUDIO.md
+  // for the full reasoning and the min/max table.
   gapLate: EXPERIMENTAL_COURSE ? { min: PREVIOUS_CONFIG.gapLate.min, max: 260 } : PREVIOUS_CONFIG.gapLate,
   heightVarLate: EXPERIMENTAL_COURSE ? 180 : PREVIOUS_CONFIG.heightVarLate,
 } as const : PREVIOUS_CONFIG;

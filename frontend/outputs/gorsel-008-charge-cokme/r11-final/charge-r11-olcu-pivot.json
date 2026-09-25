@@ -1,0 +1,143 @@
+{
+ "alpha_threshold": 128,
+ "pivot_method": "pivotY = lowest alpha>128 row + 1; pivotX and feet_span from alpha>128 columns of the bottom 7 rows (same method as character-pose.ts). NOTE: heel lift in deep squat narrows that bottom band, so pivotX/feet_span vary per pose; feet_span is NOT a scale reference.",
+ "scale_note": "All five PNGs share ONE pixel scale (same shoe pixels, no per-pose resizing). Use a single constant scale for every pose; do not re-normalise by feet_span.",
+ "stable_foot_anchor_note": "stable_foot_anchor = midpoint of the two shoe toe tips, which stay planted while heels lift; identical world point in every pose. Use it if the bottom-band pivotX jitter matters.",
+ "poses": {
+  "charge-000-idle-r11": {
+   "file": "charge-000-idle-r11.png",
+   "charge_percent": 0,
+   "width": 516,
+   "height": 1103,
+   "pivotX": 224,
+   "pivotY": 1102,
+   "feet_span": 271,
+   "feet_x_range": [
+    88,
+    358
+   ],
+   "lowest_opaque_row": 1101,
+   "alpha_threshold": 128,
+   "stable_foot_anchor_x": 308.0,
+   "stable_foot_anchor_y": 1103,
+   "corners_alpha": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "rgb_under_alpha0": 0,
+   "connected_components_alpha_gt0": 1,
+   "stray_speck_pixels_removed": 0,
+   "head_pixel_exact_vs_gorsel006": true
+  },
+  "charge-025-r11": {
+   "file": "charge-025-r11.png",
+   "charge_percent": 25,
+   "width": 516,
+   "height": 1056,
+   "pivotX": 226,
+   "pivotY": 1055,
+   "feet_span": 271,
+   "feet_x_range": [
+    90,
+    360
+   ],
+   "lowest_opaque_row": 1054,
+   "alpha_threshold": 128,
+   "stable_foot_anchor_x": 310.0,
+   "stable_foot_anchor_y": 1056,
+   "corners_alpha": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "rgb_under_alpha0": 0,
+   "connected_components_alpha_gt0": 1,
+   "stray_speck_pixels_removed": 11,
+   "head_pixel_exact_vs_gorsel006": true
+  },
+  "charge-050-r11": {
+   "file": "charge-050-r11.png",
+   "charge_percent": 50,
+   "width": 516,
+   "height": 1005,
+   "pivotX": 253,
+   "pivotY": 1004,
+   "feet_span": 208,
+   "feet_x_range": [
+    149,
+    356
+   ],
+   "lowest_opaque_row": 1003,
+   "alpha_threshold": 128,
+   "stable_foot_anchor_x": 306.0,
+   "stable_foot_anchor_y": 1005,
+   "corners_alpha": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "rgb_under_alpha0": 0,
+   "connected_components_alpha_gt0": 1,
+   "stray_speck_pixels_removed": 10,
+   "head_pixel_exact_vs_gorsel006": true
+  },
+  "charge-075-r11": {
+   "file": "charge-075-r11.png",
+   "charge_percent": 75,
+   "width": 516,
+   "height": 951,
+   "pivotX": 269,
+   "pivotY": 950,
+   "feet_span": 162,
+   "feet_x_range": [
+    188,
+    349
+   ],
+   "lowest_opaque_row": 949,
+   "alpha_threshold": 128,
+   "stable_foot_anchor_x": 298.0,
+   "stable_foot_anchor_y": 951,
+   "corners_alpha": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "rgb_under_alpha0": 0,
+   "connected_components_alpha_gt0": 1,
+   "stray_speck_pixels_removed": 5,
+   "head_pixel_exact_vs_gorsel006": true
+  },
+  "charge-100-r11": {
+   "file": "charge-100-r11.png",
+   "charge_percent": 100,
+   "width": 516,
+   "height": 892,
+   "pivotX": 269,
+   "pivotY": 891,
+   "feet_span": 142,
+   "feet_x_range": [
+    198,
+    339
+   ],
+   "lowest_opaque_row": 890,
+   "alpha_threshold": 128,
+   "stable_foot_anchor_x": 288.0,
+   "stable_foot_anchor_y": 892,
+   "corners_alpha": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "rgb_under_alpha0": 0,
+   "connected_components_alpha_gt0": 1,
+   "stray_speck_pixels_removed": 3,
+   "head_pixel_exact_vs_gorsel006": true
+  }
+ }
+}

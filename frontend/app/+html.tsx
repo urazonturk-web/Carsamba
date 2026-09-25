@@ -31,6 +31,7 @@ export default function Root({ children }: PropsWithChildren) {
       <body
         style={{
           margin: 0,
+          backgroundColor: "#4f9ec4",
           height: "100%",
           overflow: "hidden",
           display: "flex",

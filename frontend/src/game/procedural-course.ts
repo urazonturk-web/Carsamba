@@ -110,3 +110,28 @@ export function generateProceduralPlatform(
   const gap = safeMin + gapSample * (safeMax - safeMin);
   return { id, x: prev.x + prev.width + gap, topY, width, cat };
 }
+
+// ---------------------------------------------------------------------------
+// REVIZYON-027: everything ABOVE this line is byte-identical to commit 7b8bd6b
+// (frontend/src/game/procedural-course.ts). Everything below is render-only
+// support kept from the working tree: it never feeds generateProceduralPlatform.
+// ---------------------------------------------------------------------------
+
+// Rooftop sprite geometry (measured from the real alpha-keyed PNGs): used ONLY
+// by app/index.tsx to size/place the chimney art from a platform's physical
+// topY/width. cat 0=wide->long, 1=medium, 2=narrow->short.
+export const ROOFTOP_ASSET_GEOMETRY = [
+  { w: 533, h: 756, capTopPx: 3, capWidthPx: 223 }, // long
+  { w: 526, h: 556, capTopPx: 3, capWidthPx: 225 }, // medium
+  { w: 517, h: 408, capTopPx: 3, capWidthPx: 224 }, // short
+] as const;
+export const ROOFTOP_GROUND_Y = 150;
+
+export type PlatformVisualType = "normal" | "chimney";
+// Purely visual (smoke anchor); decided from the platform id, never reads rand.
+export function classifyPlatformVisualType(id: number): PlatformVisualType {
+  "worklet";
+  if (id <= 0) return "normal";
+  const hash = Math.imul(id ^ 0x45d9f3b, 0x45d9f3b) >>> 0;
+  return hash % 7 === 0 ? "chimney" : "normal";
+}

@@ -1,0 +1,26 @@
+{
+ "short": {
+  "w": 517,
+  "h": 408,
+  "capTopPx": 3,
+  "capWidthPx": 224,
+  "edge_leak": 0,
+  "residual_magenta_samples": 720
+ },
+ "medium": {
+  "w": 526,
+  "h": 556,
+  "capTopPx": 3,
+  "capWidthPx": 225,
+  "edge_leak": 0,
+  "residual_magenta_samples": 806
+ },
+ "long": {
+  "w": 533,
+  "h": 756,
+  "capTopPx": 3,
+  "capWidthPx": 223,
+  "edge_leak": 0,
+  "residual_magenta_samples": 683
+ }
+}

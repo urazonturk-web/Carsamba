@@ -1,0 +1,13 @@
+[0:v]crop=800:1000:50:200,scale=260:-1,drawtext=fontfile=/System/Library/Fonts/Supplemental/Arial.ttf:text='A_38.653.png':fontsize=14:fontcolor=yellow:x=2:y=2:box=1:boxcolor=black@0.7[c0];
+[1:v]crop=800:1000:50:200,scale=260:-1,drawtext=fontfile=/System/Library/Fonts/Supplemental/Arial.ttf:text='A_38.687.png':fontsize=14:fontcolor=yellow:x=2:y=2:box=1:boxcolor=black@0.7[c1];
+[2:v]crop=800:1000:50:200,scale=260:-1,drawtext=fontfile=/System/Library/Fonts/Supplemental/Arial.ttf:text='A_38.720.png':fontsize=14:fontcolor=yellow:x=2:y=2:box=1:boxcolor=black@0.7[c2];
+[3:v]crop=800:1000:50:200,scale=260:-1,drawtext=fontfile=/System/Library/Fonts/Supplemental/Arial.ttf:text='A_38.753.png':fontsize=14:fontcolor=yellow:x=2:y=2:box=1:boxcolor=black@0.7[c3];
+[4:v]crop=800:1000:50:200,scale=260:-1,drawtext=fontfile=/System/Library/Fonts/Supplemental/Arial.ttf:text='A_38.787.png':fontsize=14:fontcolor=yellow:x=2:y=2:box=1:boxcolor=black@0.7[c4];
+[5:v]crop=800:1000:50:200,scale=260:-1,drawtext=fontfile=/System/Library/Fonts/Supplemental/Arial.ttf:text='A_38.820.png':fontsize=14:fontcolor=yellow:x=2:y=2:box=1:boxcolor=black@0.7[c5];
+[6:v]crop=800:1000:50:200,scale=260:-1,drawtext=fontfile=/System/Library/Fonts/Supplemental/Arial.ttf:text='A_38.853.png':fontsize=14:fontcolor=yellow:x=2:y=2:box=1:boxcolor=black@0.7[c6];
+[7:v]crop=800:1000:50:200,scale=260:-1,drawtext=fontfile=/System/Library/Fonts/Supplemental/Arial.ttf:text='A_38.887.png':fontsize=14:fontcolor=yellow:x=2:y=2:box=1:boxcolor=black@0.7[c7];
+[8:v]crop=800:1000:50:200,scale=260:-1,drawtext=fontfile=/System/Library/Fonts/Supplemental/Arial.ttf:text='A_38.920.png':fontsize=14:fontcolor=yellow:x=2:y=2:box=1:boxcolor=black@0.7[c8];
+[9:v]crop=800:1000:50:200,scale=260:-1,drawtext=fontfile=/System/Library/Fonts/Supplemental/Arial.ttf:text='A_39.070.png':fontsize=14:fontcolor=yellow:x=2:y=2:box=1:boxcolor=black@0.7[c9];
+[10:v]crop=800:1000:50:200,scale=260:-1,drawtext=fontfile=/System/Library/Fonts/Supplemental/Arial.ttf:text='A_39.100.png':fontsize=14:fontcolor=yellow:x=2:y=2:box=1:boxcolor=black@0.7[c10];
+[11:v]crop=800:1000:50:200,scale=260:-1,drawtext=fontfile=/System/Library/Fonts/Supplemental/Arial.ttf:text='A_39.150.png':fontsize=14:fontcolor=yellow:x=2:y=2:box=1:boxcolor=black@0.7[c11];
+[c0][c1][c2][c3][c4][c5][c6][c7][c8][c9][c10][c11]concat=n=12:v=1:a=0[cc];[cc]tile=4x3[out]

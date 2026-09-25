@@ -1,0 +1,32 @@
+{
+ "column-wide-v1": {
+  "w": 1228,
+  "h": 806,
+  "capTopPx": 2,
+  "shaftWidthPx": 525,
+  "roofTopY": 311,
+  "roofW": 1208,
+  "roofH": 483,
+  "chimX": 314
+ },
+ "column-tall-v1": {
+  "w": 885,
+  "h": 732,
+  "capTopPx": 2,
+  "shaftWidthPx": 376,
+  "roofTopY": 322,
+  "roofW": 865,
+  "roofH": 398,
+  "chimX": 210
+ },
+ "column-medium-v1": {
+  "w": 942,
+  "h": 722,
+  "capTopPx": 2,
+  "shaftWidthPx": 401,
+  "roofTopY": 314,
+  "roofW": 922,
+  "roofH": 396,
+  "chimX": 225
+ }
+}

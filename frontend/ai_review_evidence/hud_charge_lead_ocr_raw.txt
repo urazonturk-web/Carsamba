@@ -1,0 +1,1201 @@
+hud_a/h_0001.png|=—~ > . — o
+hud_a/h_0002.png|igo +
+hud_a/h_0003.png|igo +
+hud_a/h_0004.png|igo +
+hud_a/h_0005.png|igo +
+hud_a/h_0006.png|igo +
+hud_a/h_0007.png|—
+hud_a/h_0008.png|— oe
+hud_a/h_0009.png|— oe
+hud_a/h_0010.png|— oe
+hud_a/h_0011.png|— oe
+hud_a/h_0012.png|Son basis: 146 ms - Gig: %32 - Gorsel: %41 - ilk kare: 50ms
+hud_a/h_0013.png|Son basis: 146 ms - Gig: %32 - Gorsel: %41 - ilk kare: 50ms
+hud_a/h_0014.png|Son basis: 146 ms - Gig: %32 - Gorsel: %41 - ilk kare: 50ms
+hud_a/h_0015.png|Son basis: 146 ms - Gig: %32 - Gorsel: %41 - ilk kare: 50ms
+hud_a/h_0016.png|Son basis: 146 ms - Gig: %32 - Gorsel: %41 - ilk kare: 50ms
+hud_a/h_0017.png|Son basis: 146 ms - Gig: %32 - Gorsel: %41 - ilk kare: 50ms
+hud_a/h_0018.png|Son basis: 146 ms - Gig: %32 - Gorsel: %41 - ilk kare: 50ms
+hud_a/h_0019.png|Son basis: 146 ms - Gig: %32 - Gorsel: %41 - ilk kare: 50ms
+hud_a/h_0020.png|Son basis: 146 ms - Gig: %32 - Gorsel: %41 - ilk kare: 50ms
+hud_a/h_0021.png|Son basis: 146 ms - Gig: %32 - Gorsel: %41 - ilk kare: 50ms
+hud_a/h_0022.png|Son basis: 146 ms - Gig: %32 - Gorsel: %41 - ilk kare: 50ms
+hud_a/h_0023.png|liptega ~—
+hud_a/h_0024.png|liptega +
+hud_a/h_0025.png|liptega +
+hud_a/h_0026.png|liptega “+
+hud_a/h_0027.png|Son basis: 213 ms - Gilg: %47 - Gorsel: %54 - ilk kare: 58ms
+hud_a/h_0028.png|Son basis: 213 ms - Gilg: %47 - Gorsel: %54 - ilk kare: 58ms
+hud_a/h_0029.png|Son basis: 213 ms - Gilg: %47 - Gorsel: %54 - ilk kare: 58ms
+hud_a/h_0030.png|Son basis: 213 ms - Gilg: %47 - Gorsel: %54 - ilk kare: 58ms
+hud_a/h_0031.png|Son basis: 213 ms - Gilg: %47 - Gorsel: %54 - ilk kare: 58ms
+hud_a/h_0032.png|Son basis: 213 ms - Gilg: %47 - Gorsel: %54 - ilk kare: 58ms
+hud_a/h_0033.png|Son basis: 213 oe %A7 - Gorsel: %54 - ilk kare: 58ms
+hud_a/h_0034.png|Son basis: 213 ms “Gus: %A7 - Gorsel: %54 - ilk kare: 58ms
+hud_a/h_0035.png|Son basis: 213 ms "Gus: %A7 - Gorsel: %54 - ilk kare: 58ms
+hud_a/h_0036.png|Son basis: 213 ms - Gus: %A7 - Gorsel: %54 - ilk kare: 58ms
+hud_a/h_0037.png|Son basis: 213 ms - Cus: %A7 - Gorsel: %54 - ilk kare: 58ms
+hud_a/h_0038.png|oe
+hud_a/h_0039.png|a
+hud_a/h_0040.png|a
+hud_a/h_0041.png|a
+hud_a/h_0042.png|Son basis: 213 ms - Gilg: %47 - Gorsel: %56 - ilk kare: 50ms
+hud_a/h_0043.png|Son basis: 213 ms - Gilg: %47 - Gorsel: %56 - ilk kare: 50ms
+hud_a/h_0044.png|Son basis: 213 ms - Gilg: %47 - Gorsel: %56 - ilk kare: 50ms
+hud_a/h_0045.png|Son basis: 213 ms - Gilg: %47 - Gorsel: %56 - ilk kare: 50ms
+hud_a/h_0046.png|Son basis: 213 ms - Gilg: %47 - Gorsel: %56 - ilk kare: 50ms
+hud_a/h_0047.png|Son basis: 213 ms - Gilg: %47 - Gorsel: %56 - ilk kare: 50ms
+hud_a/h_0048.png|Son basis: 213 ms - Gilg: %47 - Gorsel: %56 - ilk kare: 50ms
+hud_a/h_0049.png|Son basis: 213 ms - Gilg: %47 - Gorsel: %56 - ilk kare: 50ms
+hud_a/h_0050.png|Son basis: 213 ms - Gilg: %47 - Gorsel: %56 - ilk kare: 50ms
+hud_a/h_0051.png|Son basis: 354 ms - Gilg: %79 - Gorsel: %85 - ilk kare: 50ms
+hud_a/h_0052.png|Son basis: 354 ms - Gilg: %79 - Gorsel: %85 - ilk kare: 50ms
+hud_a/h_0053.png|Son basis: 354 ms - Gilg: %79 - Gorsel: %85 - ilk kare: 50ms
+hud_a/h_0054.png|Son basis: 354 ms - Gilg: %79 - Gorsel: %85 - ilk kare: 50ms
+hud_a/h_0055.png|Son basis: 354 ms - Gilg: %79 - Gorsel: %85 - ilk kare: 50ms
+hud_a/h_0056.png|Son basis: 354 ms - Gilg: %79 - Gorsel: %85 - ilk kare: 50ms
+hud_a/h_0057.png|Son basis: 354 ms - Gilg: %79 - Gorsel: %85 - ilk kare: 50ms
+hud_a/h_0058.png|Son basis: 354 ms - Gilg: %79 - Gorsel: %85 - ilk kare: 50ms
+hud_a/h_0059.png|Son basis: 354 ms - Gilg: %79 - Gorsel: %85 - ilk kare: 50ms
+hud_a/h_0060.png|Son basis: 354 ms - Gilg: %79 - Gorsel: %85 - ilk kare: 50ms
+hud_a/h_0061.png|Son basis: 354 ms - Gilg: %79 - Gorsel: %85 - ilk kare: 50ms
+hud_a/h_0062.png|Son basis: 354 ms - Gilg: %79 - Gorsel: %85 - ilk kare: 50ms
+hud_a/h_0063.png|Son basis: 354 ms - Gilg: %79 - Gorsel: %85 - ilk kare: 50ms
+hud_a/h_0064.png|Son basis: 271 ms - Giig: %60 - Gérsel: %69 - ilk kare: 92ms
+hud_a/h_0065.png|Son basis: 271 ms - Giig: %60 - Gérsel: %69 - ilk kare: 92ms
+hud_a/h_0066.png|Son basis: 271 ms - Giig: %60 - Gérsel: %69 - ilk kare: 92ms
+hud_a/h_0067.png|Son basis: 271 ms - Gig: %60 - Gérsel: %69 - ilk kare: 92ms
+hud_a/h_0068.png|Son basis: 271 ms - Giig: %60 - Gérsel: %69 - ilk kare: 92ms
+hud_a/h_0069.png|Son basis: 271 ms - Giig: %60 - Gérsel: %69 - ilk kare: 92ms
+hud_a/h_0070.png|Son basis: 271 ms - Giig: %60 - Gérsel: %69 - ilk kare: 92ms
+hud_a/h_0071.png|Son basis: 271 ms - Giig: %60 - Gérsel: %69 - ilk kare: 92ms
+hud_a/h_0072.png|Son basis: 271 ms - Giig: %60 - Gérsel: %69 - ilk kare: 92ms
+hud_a/h_0073.png|Son basis: 271 ms - Gig: %60 - Gérsel: %69 - ilk kare: 92ms
+hud_a/h_0074.png|Son basis: 271 ms - Gig: %60 - Gérsel: %69 - ilk kare: 92ms
+hud_a/h_0075.png|Son basis: 329 ms - Gig: %73 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0076.png|Son basis: 329 ms - Gig: %73 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0077.png|Son basis: 329 ms - Gig: %73 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0078.png|Son basis: 329 ms - Gig: %73 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0079.png|Son basis: 329 ms - Gig: %73 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0080.png|Son basis: 329 ms - Gug: %73 - Gorsel: ‘aii - ilk kare: 58ms
+hud_a/h_0081.png|Son basis: 329 ms - GUug: %73 - Gorsel: ‘aia - ilk kare: 58ms
+hud_a/h_0082.png|Son basis: 329 ms - Gug: %73 - Gorsel: ca ilk kare: 58ms
+hud_a/h_0083.png|Son basis: 329 ms - Gug: %73 - Gorsel: ca ilk kare: 58ms
+hud_a/h_0084.png|Son basis: 329 ms - Gug: %73 - Gorsel: ca ilk kare: 58ms
+hud_a/h_0085.png|Son basis: 329 ms - Gug: %73 - Gorsel: ges kare: 58ms
+hud_a/h_0086.png|Son basis: 338 ms - Gug: %75 - Gorsel: ale kare: 50ms
+hud_a/h_0087.png|Son basis: 338 ms - Gilg: %75 - Gorsel: %81 - ilk kare: 50ms
+hud_a/h_0088.png|Son basis: 338 ms - Gilg: %75 - Gorsel: %81 - ilk kare: 50ms
+hud_a/h_0089.png|Son basis: 338 ms - Gilg: %75 - Gorsel: %81 - ilk kare: 50ms
+hud_a/h_0090.png|Son basis: 338 ms - Gilg: %75 - Gorsel: %81 - ilk kare: 50ms
+hud_a/h_0091.png|Son basis: 338 ms - Gilg: %75 - Gorsel: %81 - ilk kare: 50ms
+hud_a/h_0092.png|Son basis: 338 ms - Gilg: %75 - Gorsel: %81 - ilk kare: 50ms
+hud_a/h_0093.png|Son basis: 338 ms - Gilg: %75 - Gorsel: %81 - ilk kare: 50ms
+hud_a/h_0094.png|Son basis: 338 ms - Gilg: %75 - Gorsel: %81 - ilk kare: 50ms
+hud_a/h_0095.png|Son basis: 338 ms - Gilg: %75 - Gorsel: %81 - ilk kare: 50ms
+hud_a/h_0096.png|Son basis: 338 ms - Gilg: %75 - Gorsel: %81 - ilk kare: 50ms
+hud_a/h_0097.png|align ~—
+hud_a/h_0098.png|liptega ~—
+hud_a/h_0099.png|liptega ~—
+hud_a/h_0100.png|liptega ~—
+hud_a/h_0101.png|liptega ~—
+hud_a/h_0102.png|liptega ~—
+hud_a/h_0103.png|Son basis: 329 ms - Gig: %73 - Gorsel: %80 - ilk kare: 58ms
+hud_a/h_0104.png|Son basis: 329 ms - Gig: %73 - Gorsel: %80 - ilk kare: 58ms
+hud_a/h_0105.png|Son basis: 329 ms - Gig: %73 - Gorsel: %80 - ilk kare: 58ms
+hud_a/h_0106.png|Son basis: 329 ms - Gig: %73 - Gorsel: %80 - ilk kare: 58ms
+hud_a/h_0107.png|Son basis: 329 ms - Gig: %73 - Gorsel: %80 - ilk kare: 58ms
+hud_a/h_0108.png|Son basis: 329 ms - Gig: %73 - Gorsel: %80 - ilk kare: 58ms
+hud_a/h_0109.png|Son basis: 329 ms - Gig: %73 - Gorsel: %80 - ilk kare: 58ms
+hud_a/h_0110.png|Son basis: 329 ms - Gig: %73 - Gorsel: %80 - ilk kare: 58ms
+hud_a/h_0111.png|Son basis: 329 ms - Gig: %73 - Gorsel: %80 - ilk kare: 58ms
+hud_a/h_0112.png|Son basis: 329 ms - Gig: %73 - Gorsel: %80 - ilk kare: 58ms
+hud_a/h_0113.png|Son basis: 329 ms - Gii¢: %73 - Gorsel: %80 - ilk kare: 58ms
+hud_a/h_0114.png|Son basis: 329 ms - Gii¢: %73 - Gorsel: %80 - ilk kare: 58ms
+hud_a/h_0115.png|align ~—
+hud_a/h_0116.png|liptega ~—
+hud_a/h_0117.png|liptega ~—
+hud_a/h_0118.png|liptega ~—
+hud_a/h_0119.png|liptega ~—
+hud_a/h_0120.png|Son basis: 237 ms - Gilg: %53 - Gorsel: %61 - ilk kare: 58ms
+hud_a/h_0121.png|Son basis: 237 ms - Gilg: %53 - Gorsel: %61 - ilk kare: 58ms
+hud_a/h_0122.png|Son basis: 237 ms - Gilg: %53 - Gorsel: %61 - ilk kare: 58ms
+hud_a/h_0123.png|Son basis: 237 ms - Gilg: %53 - Gorsel: %61 - ilk kare: 58ms
+hud_a/h_0124.png|Son basis: 237 ms - Gilg: %53 - Gorsel: %61 - ilk kare: 58ms
+hud_a/h_0125.png|Son basis: 237 ms - Gilg: %53 - Gorsel: %61 - ilk kare: 58ms
+hud_a/h_0126.png|Son basis: 237 ms - Gilg: %53 - Gorsel: %61 - ilk kare: 58ms
+hud_a/h_0127.png|Son basis: 237 ms - Gilg: %53 - Gorsel: %61 - ilk kare: 58ms
+hud_a/h_0128.png|Son basis: 237 ms - Gilg: %53 - Gorsel: %61 - ilk kare: 58ms
+hud_a/h_0129.png|Son basis: 237 ms - Gilg: %53 - Gorsel: %61 - ilk kare: 58ms
+hud_a/h_0130.png|Son basis: 237 ms - Gilg: %53 - Gorsel: %61 - ilk kare: 58ms
+hud_a/h_0131.png|Son basis: 338 ms - Gii¢: %75 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0132.png|Son basis: 338 ms - Gii¢: %75 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0133.png|Son basis: 338 ms - Gii¢: %75 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0134.png|Son basis: 338 ms - Gii¢: %75 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0135.png|Son basis: 338 ms - Gii¢: %75 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0136.png|Son basis: 338 ms - Gii¢: %75 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0137.png|Son basis: 338 ms - Gii¢: %75 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0138.png|Son basis: 338 ms - Gii¢: %75 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0139.png|Son basis: 338 ms - Gii¢: %75 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0140.png|Son basis: 338 ms - Gii¢: %75 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0141.png|Son basis: 304 ms - Gii¢: %68 - Gorsel: %76 - ilk kare: 58ms
+hud_a/h_0142.png|Son basis: 304 ms - Gilg: %68 - Gorsel: %76 - ilk kare: 58ms
+hud_a/h_0143.png|Son basis: 304 ms - Gilg: %68 - Gorsel: %76 - ilk kare: 58ms
+hud_a/h_0144.png|Son basis: 304 ms - Gii¢: %68 - Gorsel: %76 - ilk kare: 58ms
+hud_a/h_0145.png|Son basis: 304 ms - Gilg: %68 - Gorsel: %76 - ilk kare: 58ms
+hud_a/h_0146.png|Son basis: 304 ms - Gilg: %68 - Gorsel: %76 - ilk kare: 58ms
+hud_a/h_0147.png|Son basis: 304 ms - Gilg: %68 - Gorsel: %76 - ilk kare: 58ms
+hud_a/h_0148.png|Son basis: 304 ms - Gilg: %68 - Gorsel: %76 - ilk kare: 58ms
+hud_a/h_0149.png|Son basis: 304 ms - Gilg: %68 - Gorsel: %76 - ilk kare: 58ms
+hud_a/h_0150.png|Son basis: 304 ms - Gilg: %68 - Gorsel: %76 - ilk kare: 58ms
+hud_a/h_0151.png|Son basis: 146 ms - Gig: %32 - Gorsel: %39 - ilk kare: 58ms
+hud_a/h_0152.png|Son basis: 146 ms - Gig: %32 - Gorsel: %39 - ilk kare: 58ms
+hud_a/h_0153.png|Son basis: 146 ms - Gig: %32 - Gorsel: %39 - ilk kare: 58ms
+hud_a/h_0154.png|Son basis: 146 ms - Gig: %32 - Gorsel: %39 - ilk kare: 58ms
+hud_a/h_0155.png|Son basis: 146 ms - Gig: %32 - Gorsel: %39 - ilk kare: 58ms
+hud_a/h_0156.png|Son basis: 146 ms - Gig: %32 - Gorsel: %39 - ilk kare: 58ms
+hud_a/h_0157.png|Son basis: 146 ms - Gig: %32 - Gorsel: %39 - ilk kare: 58ms
+hud_a/h_0158.png|Son basis: 146 ms - Gig: %32 - Gorsel: %39 - ilk kare: 58ms
+hud_a/h_0159.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %85 - ilk kare: 50ms
+hud_a/h_0160.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %85 - ilk kare: 50ms
+hud_a/h_0161.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %85 - ilk kare: 50ms
+hud_a/h_0162.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %85 - ilk kare: 50ms
+hud_a/h_0163.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %85 - ilk kare: 50ms
+hud_a/h_0164.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %85 - ilk kare: 50ms
+hud_a/h_0165.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %85 - ilk kare: 50ms
+hud_a/h_0166.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %85 - ilk kare: 50ms
+hud_a/h_0167.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %85 - ilk kare: 50ms
+hud_a/h_0168.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %85 - ilk kare: 50ms
+hud_a/h_0169.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %85 - ilk kare: 50ms
+hud_a/h_0170.png|Son basis: 313 ms - Gig: %69 - Gérsel: %76 - ilk kare: 58ms
+hud_a/h_0171.png|Son basis: 313 ms - Gig: %69 - Gérsel: %76 - ilk kare: 58ms
+hud_a/h_0172.png|Son basis: 313 ms - Gucg: %69 - Gérsel: %76 - ilk kare: 58ms
+hud_a/h_0173.png|Son basis: 313 ms - Gucg: %69 - Gérsel: %76 - ilk kare: 58ms
+hud_a/h_0174.png|Son basis: 313 ms - Gug: %69 - Gérsel: %76 - ilk kare: 58ms
+hud_a/h_0175.png|Son basis: 313 ms - Gig: %69 - Gérsel: %76 - ilk kare: 58ms
+hud_a/h_0176.png|Son basis: 313 ms - Gig: %69 - Gérsel: %76 - ilk kare: 58ms
+hud_a/h_0177.png|Son basis: 313 ms - Gig: %69 - Gérsel: %76 - ilk kare: 58ms
+hud_a/h_0178.png|Son basis: 313 ms - Gig: %69 - Gérsel: %76 - ilk kare: 58ms
+hud_a/h_0179.png|Son basis: 313 ms - Gig: %69 - Gérsel: %76 - ilk kare: 58ms
+hud_a/h_0180.png|Son basis: 313 ms - Gig: %69 - Gérsel: %76 - ilk kare: 58ms
+hud_a/h_0181.png|Son basis: 313 ms - Gig: %69 - Gorsel: %81 - ilk kare: 50ms
+hud_a/h_0182.png|Son basis: 313 ms - Gig: %69 - Gorsel: %81 - ilk kare: 50ms
+hud_a/h_0183.png|Son basis: 313 ms - Gig: %69 - Gorsel: %81 - ilk kare: 50ms
+hud_a/h_0184.png|Son basis: 313 ms - Gig: %69 - Gorsel: %81 - ilk kare: 50ms
+hud_a/h_0185.png|Son basis: 313 ms - Gig: %69 - Gorsel: %81 - ilk kare: 50ms
+hud_a/h_0186.png|Son basis: 313 ms - Gig: %69 - Gérsel: %81 - ilk kare: 50ms
+hud_a/h_0187.png|Son basis: 313 ms - Gig: %69 - Gorsel: %81 - ilk kare: 50ms
+hud_a/h_0188.png|Son basis: 313 ms - Gig: %69 - Gérsel: %81 - ilk kare: 50ms
+hud_a/h_0189.png|Son basis: 313 ms - Gig: %69 - Gérsel: %81 - ilk kare: 50ms
+hud_a/h_0190.png|Son basis: 313 ms - Gig: %69 - Gérsel: %81 - ilk kare: 50ms
+hud_a/h_0191.png|Son basis: 288 ms - Gilg: %64 - Gorsel: %72 - ilk kare: 58ms
+hud_a/h_0192.png|Son basis: 288 ms - Gilg: %64 - Gorsel: %72 - ilk kare: 58ms
+hud_a/h_0193.png|Son basis: 288 ms - Gilg: %64 - Gorsel: %72 - ilk kare: 58ms
+hud_a/h_0194.png|Son basis: 288 ms - Gilg: %64 - Gorsel: %72 - ilk kare: 58ms
+hud_a/h_0195.png|Son basis: 288 ms - Gilg: %64 - Gorsel: %72 - ilk kare: 58ms
+hud_a/h_0196.png|Son basis: 288 ms - Gilg: %64 - Gorsel: %72 - ilk kare: 58ms
+hud_a/h_0197.png|Son basis: 288 ms - Gilg: %64 - Gorsel: %72 - ilk kare: 58ms
+hud_a/h_0198.png|Son basis: 288 ms - Gilg: %64 - Gorsel: %72 - ilk kare: 58ms
+hud_a/h_0199.png|Son basis: 288 ms - Gilg: %64 - Gorsel: %72 - ilk kare: 58ms
+hud_a/h_0200.png|Son basis: 288 ms - Gilg: %64 - Gorsel: %72 - ilk kare: 58ms
+hud_a/h_0201.png|Son basis: 288 ms - Gilg: %64 - Gorsel: %72 - ilk kare: 58ms
+hud_a/h_0202.png|Son basis: 237 ms - Gilg: %53 - Gorsel: %59 - ilk kare: 50ms
+hud_a/h_0203.png|Son basis: 237 ms - Gilg: %53 - Gorsel: %59 - ilk kare: 50ms
+hud_a/h_0204.png|Son basis: 237 ms - Gilg: %53 - Gorsel: %59 - ilk kare: 50ms
+hud_a/h_0205.png|Son basis: 237 ms - Gilg: %53 - Gorsel: %59 - ilk kare: 50ms
+hud_a/h_0206.png|Son basis: 237 ms - Gilg: %53 - Gorsel: %59 - ilk kare: 50ms
+hud_a/h_0207.png|Son basis: 237 ms - Gilg: %53 - Gorsel: %59 - ilk kare: 50ms
+hud_a/h_0208.png|Son basis: 237 ms - Gilg: %53 - Gorsel: %59 - ilk kare: 50ms
+hud_a/h_0209.png|Son basis: 237 ms - Gilg: %53 - Gorsel: %59 - ilk kare: 50ms
+hud_a/h_0210.png|Son basis: 237 ms - Gilg: %53 - Gorsel: %59 - ilk kare: 50ms
+hud_a/h_0211.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0212.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0213.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0214.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0215.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0216.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0217.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0218.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0219.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0220.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0221.png|Son basis: 279 ms - Gilg: %62 - Gorsel: %69 - ilk kare: 58ms
+hud_a/h_0222.png|Son basis: 279 ms - Gilg: %62 - Gorsel: %69 - ilk kare: 58ms
+hud_a/h_0223.png|Son basis: 279 ms - Gilg: %62 - Gorsel: %69 - ilk kare: 58ms
+hud_a/h_0224.png|Son basis: 279 ms - Gilg: %62 - Gorsel: %69 - ilk kare: 58ms
+hud_a/h_0225.png|Son basis: 279 ms - Gilg: %62 - Gorsel: %69 - ilk kare: 58ms
+hud_a/h_0226.png|Son sue 279 ms - Gig: %62 - Gorsel: %69 - ilk kare: 58ms
+hud_a/h_0227.png|Son sina ms - Gig: %62 - Gorsel: %69 - ilk kare: 58ms
+hud_a/h_0228.png|Son sina ms - Gig: %62 - Gorsel: %69 - ilk kare: 58ms
+hud_a/h_0229.png|Son sina ms - Gig: %62 - Gorsel: %69 - ilk kare: 58ms
+hud_a/h_0230.png|Son oo aaa ms - Gig: %55 - Gorsel: %63 - ilk kare: 50ms
+hud_a/h_0231.png|Son oo aaa ms - Gig: %55 - Gorsel: %63 - ilk kare: 50ms
+hud_a/h_0232.png|Son basis: ane ms - Gig: %55 - Gorsel: %63 - ilk kare: 50ms
+hud_a/h_0233.png|Son basis: 246 ms - Gig: %55 - Gérsel: %63 - ilk kare: 50ms
+hud_a/h_0234.png|Son basis: 246 ms - Gig: %55 - Gorsel: %63 - ilk kare: 50ms
+hud_a/h_0235.png|Son basis: 246 ms - Gilg: %55 - Gérsel: %63 - ilk kare: 50ms
+hud_a/h_0236.png|Son basis: 246 ms - Gig: %55 - Gérsel: %63 - ilk kare: 50ms
+hud_a/h_0237.png|Son basis: 246 ms - Gilg: %55 - Gérsel: %63 - ilk kare: 50ms
+hud_a/h_0238.png|Son basis: 246 ms - Gilg: %55 - Gorsel: %63 - ilk kare: 50ms
+hud_a/h_0239.png|Son basis: 246 ms - Gilg: %55 - Gérsel: %63 - ilk kare: 50ms
+hud_a/h_0240.png|Son basis: 246 ms - Gilg: %55 - Gérsel: %63 - ilk kare: 50ms
+hud_a/h_0241.png|Son basis: 246 ms - Gilg: %55 - Gérsel: %63 - ilk kare: 50ms
+hud_a/h_0242.png|— oe
+hud_a/h_0243.png|— oe
+hud_a/h_0244.png|— oe
+hud_a/h_0245.png|— oe
+hud_a/h_0246.png|—
+hud_a/h_0247.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %74 - ilk kare: 50ms
+hud_a/h_0248.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %74 - ilk kare: 50ms
+hud_a/h_0249.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %74 - ilk kare: 50ms
+hud_a/h_0250.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %74 - ilk kare: 50ms
+hud_a/h_0251.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %74 - ilk kare: 50ms
+hud_a/h_0252.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %74 - ilk kare: 50ms
+hud_a/h_0253.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %74 - ilk kare: 50ms
+hud_a/h_0254.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %74 - ilk kare: 50ms
+hud_a/h_0255.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %74 - ilk kare: 50ms
+hud_a/h_0256.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %74 - ilk kare: 50ms
+hud_a/h_0257.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %74 - ilk kare: 50ms
+hud_a/h_0258.png|liptega ~—
+hud_a/h_0259.png|liptega ~—
+hud_a/h_0260.png|liptega ~—
+hud_a/h_0261.png|liptega ~—
+hud_a/h_0262.png|liptega ~—
+hud_a/h_0263.png|Son basis: 371 ms - Gig: %82 - Gérsel: %91 - ilk kare: 58ms
+hud_a/h_0264.png|Son basis: 371 ms - Gig: %82 - Gérsel: %91 - ilk kare: 58ms
+hud_a/h_0265.png|Son basis: 371 ms - Gig: %82 - Gérsel: %91 - ilk kare: 58ms
+hud_a/h_0266.png|Son basis: 371 ms - Gig: %82 - Gérsel: %91 - ilk kare: 58ms
+hud_a/h_0267.png|Son basis: 371 ms - Gig: %82 - Gérsel: %91 - ilk kare: 58ms
+hud_a/h_0268.png|Son basis: 371 ms - Gig: %82 - Gérsel: %91 - ilk kare: 58ms
+hud_a/h_0269.png|Son basis: 371 ms - Gig: %82 - Gérsel: %91 - ilk kare: 58ms
+hud_a/h_0270.png|Son basis: 371 ms - Gig: %82 - Gérsel: %91 - ilk kare: 58ms
+hud_a/h_0271.png|Son basis: 371 ms - Gilg: %82 - Gérsel: %91 - ilk kare: 58ms
+hud_a/h_0272.png|Son basis: 371 ms - Gig: %82 - Gérsel: %91 - ilk kare: 58ms
+hud_a/h_0273.png|Son basis: 371 ms - Gug: %82 ioe %91 - ilk kare: 58ms
+hud_a/h_0274.png|Son basis: 213 ms - Gug¢: %47 a %56 - ilk kare: 50ms
+hud_a/h_0275.png|Son basis: 213 ms - Gug: %47 - ia %56 - ilk kare: 50ms
+hud_a/h_0276.png|Son basis: 213 ms - Gug: %47 - ia %56 - ilk kare: 50ms
+hud_a/h_0277.png|Son basis: 213 ms - Gug: %47 - a %56 - ilk kare: 50ms
+hud_a/h_0278.png|Son basis: 213 ms - Gug: %47 - a %56 - ilk kare: 50ms
+hud_a/h_0279.png|Son basis: 213 ms - Gug: %47 - a %56 - ilk kare: 50ms
+hud_a/h_0280.png|Son basis: 213 ms - Gilg: %47 - Gorsel: %56 - ilk kare: 50ms
+hud_a/h_0281.png|Son basis: 213 ms - Gilg: %47 - Gorsel: %56 - ilk kare: 50ms
+hud_a/h_0282.png|Son basis: 254 ms - Gig: %56 - Gorsel: %63 - ilk kare: 50ms
+hud_a/h_0283.png|Son basis: 254 ms - Gig: %56 - Gorsel: %63 - ilk kare: 50ms
+hud_a/h_0284.png|Son basis: 254 ms - Gig: %56 - Gorsel: %63 - ilk kare: 50ms
+hud_a/h_0285.png|Son basis: 254 ms - Gig: %56 - Gorsel: %63 - ilk kare: 50ms
+hud_a/h_0286.png|Son basis: 254 ms - Gig: %56 - Gorsel: %63 - ilk kare: 50ms
+hud_a/h_0287.png|Son basis: 254 ms - Gig: %56 - Gorsel: %63 - ilk kare: 50ms
+hud_a/h_0288.png|Son basis: 254 ms - Gii¢: %56 - Gorsel: %63 - ilk kare: 50ms
+hud_a/h_0289.png|Son basis: 254 ms - Gig: %56 - Gorsel: %63 - ilk kare: 50ms
+hud_a/h_0290.png|Son basis: 263 ms - Gig: %58 - Gorsel: %67 - ilk kare: 50ms
+hud_a/h_0291.png|Son basis: 263 ms - Gii¢: %58 - Gorsel: %67 - ilk kare: 50ms
+hud_a/h_0292.png|Son basis: 263 ms - Gig: %58 - Gorsel: %67 - ilk kare: 50ms
+hud_a/h_0293.png|Son basis: 263 ms - Gig: %58 - Gorsel: %67 - ilk kare: 50ms
+hud_a/h_0294.png|Son basis: 263 ms - Gii¢: %58 - Gorsel: %67 - ilk kare: 50ms
+hud_a/h_0295.png|Son basis: 263 ms - Gig: %58 - Gorsel: %67 - ilk kare: 50ms
+hud_a/h_0296.png|Son basis: 263 ms - Gig: %58 - Gorsel: %67 - ilk kare: 50ms
+hud_a/h_0297.png|Son basis: 263 ms - Gig: %58 - Gorsel: %67 - ilk kare: 50ms
+hud_a/h_0298.png|Son basis: 263 ms - Gig: %58 - Gorsel: %67 - ilk kare: 50ms
+hud_a/h_0299.png|Son basis: 221 ms - Gig: %49 - Gorsel: %57 - ilk kare: 58ms
+hud_a/h_0300.png|Son basis: 221 ms - Gilg: %49 - Gorsel: %57 - ilk kare: 58ms
+hud_a/h_0301.png|Son basis: 221 ms - Gilg: %49 - Gorsel: %57 - ilk kare: 58ms
+hud_a/h_0302.png|Son basis: 221 ms - Gilg: %49 - Gorsel: %57 - ilk kare: 58ms
+hud_a/h_0303.png|Son basis: 221 ms - Gilg: %49 - Gorsel: %57 - ilk kare: 58ms
+hud_a/h_0304.png|Son basis: 221 ms - Gilg: %49 - Gorsel: %57 - ilk kare: 58ms
+hud_a/h_0305.png|Son basis: 221 ms - Gilg: %49 - Gorsel: %57 - ilk kare: 58ms
+hud_a/h_0306.png|Son basis: 221 ms - Gilg: %49 - Gorsel: %57 - ilk kare: 58ms
+hud_a/h_0307.png|Son basis: 313 ms - Gig: %69 - Gérsel: %78 - ilk kare: 50ms
+hud_a/h_0308.png|Son basis: 313 ms - Gig: %69 - Gérsel: %78 - ilk kare: 50ms
+hud_a/h_0309.png|Son basis: 313 ms - Gig: %69 - Gérsel: %78 - ilk kare: 50ms
+hud_a/h_0310.png|Son basis: 313 ms - Gig: %69 - Goérsel: %78 - ilk kare: 50ms
+hud_a/h_0311.png|Son basis: 313 ms - Gig: %69 - Gérsel: %78 - ilk kare: 50ms
+hud_a/h_0312.png|Son basis: 313 ms - Gig: %69 - Gérsel: %78 - ilk kare: 50ms
+hud_a/h_0313.png|Son basis: 313 ms - Gig: %69 - Gérsel: %78 - ilk kare: 50ms
+hud_a/h_0314.png|Son basis: 313 ms - Guig: %69 - Gérsel: %78 - ilk kare: 50ms
+hud_a/h_0315.png|Son basis: 313 ms - Guig: %69 - Gérsel: %78 - ilk kare: 50ms
+hud_a/h_0316.png|Son basis: 313 ms - Gig: %69 - Gérsel: %78 - ilk kare: 50ms
+hud_a/h_0317.png|Son basis: 313 ms - Gig: %69 - Gorsel: %78 - ilk kare: 50ms
+hud_a/h_0318.png|Son basis: 313 ms - Gig: %69 - Gérsel: %78 - ilk kare: 50ms
+hud_a/h_0319.png|—
+hud_a/h_0320.png|— oe
+hud_a/h_0321.png|— oe
+hud_a/h_0322.png|— oe
+hud_a/h_0323.png|— oe
+hud_a/h_0324.png|— oe ;
+hud_a/h_0325.png|nil ~—
+hud_a/h_0326.png|liptega ~—
+hud_a/h_0327.png|liptega ~—
+hud_a/h_0328.png|liptega ~—
+hud_a/h_0329.png|liptega ~—
+hud_a/h_0330.png|liptega ~—
+hud_a/h_0331.png|liptega ~—
+hud_a/h_0332.png|liptega ~—
+hud_a/h_0333.png|liptega ~—
+hud_a/h_0334.png|liptega ~—
+hud_a/h_0335.png|liptega ~—
+hud_a/h_0336.png|liptega ~—
+hud_a/h_0337.png|liptega ~—
+hud_a/h_0338.png|liptega ~—
+hud_a/h_0339.png|liptega ~—
+hud_a/h_0340.png|liptega ~—
+hud_a/h_0341.png|liptega ~—
+hud_a/h_0342.png|liptega ~—
+hud_a/h_0343.png|liptega ~—
+hud_a/h_0344.png|liptega ~—
+hud_a/h_0345.png|liptega ~—
+hud_a/h_0346.png|liptega ~—
+hud_a/h_0347.png|liptega ~—
+hud_a/h_0348.png|liptega ~—
+hud_a/h_0349.png|liptega ~—
+hud_a/h_0350.png|liptega ~—
+hud_a/h_0351.png|liptega ~—
+hud_a/h_0352.png|liptega ~—
+hud_a/h_0353.png|liptega ~—
+hud_a/h_0354.png|liptega ~—
+hud_a/h_0355.png|liptega ~—
+hud_a/h_0356.png|liptega ~—
+hud_a/h_0357.png|liptega ~—
+hud_a/h_0358.png|liptega ~—
+hud_a/h_0359.png|liptega ~—
+hud_a/h_0360.png|liptega ~—
+hud_a/h_0361.png|lpn +
+hud_a/h_0362.png|Son basis: 204 ms - Gii¢: %45 - Gorsel: %52 - ilk kare: 50ms
+hud_a/h_0363.png|Son basis: 204 ms - Gig: %45 - Gorsel: %52 - ilk kare: 50ms
+hud_a/h_0364.png|Son basis: 204 ms - Gii¢: %45 - Gorsel: %52 - ilk kare: 50ms
+hud_a/h_0365.png|Son basis: 204 ms - Gii¢: %45 - Gorsel: %52 - ilk kare: 50ms
+hud_a/h_0366.png|Son basis: 204 ms - Gii¢: %45 - Gorsel: %52 - ilk kare: 50ms
+hud_a/h_0367.png|Son basis: 204 ms - Gii¢: %45 - Gorsel: %52 - ilk kare: 50ms
+hud_a/h_0368.png|Son basis: 204 ms - Gii¢: %45 - Gorsel: %52 - ilk kare: 50ms
+hud_a/h_0369.png|Son basis: 204 ms - Gii¢: %45 - Gorsel: %52 - ilk kare: 50ms
+hud_a/h_0370.png|Son basis: 204 ms - Gii¢: %45 - Gorsel: %52 - ilk kare: 50ms
+hud_a/h_0371.png|Son basis: 204 ms - Gii¢: %45 - Gorsel: %52 - ilk kare: 50ms
+hud_a/h_0372.png|Son basis: 204 ms - Gii¢: %45 - Gorsel: %52 - ilk kare: 50ms
+hud_a/h_0373.png|Son basis: 204 ms - Gii¢: %45 - Gorsel: %52 - ilk kare: 50ms
+hud_a/h_0374.png|Son basis: 254 ms - Gig: %56 - Gorsel: %65 - ilk kare: 58ms
+hud_a/h_0375.png|Son basis: 254 ms - Gii¢: %56 - Gorsel: %65 - ilk kare: 58ms
+hud_a/h_0376.png|Son basis: 254 ms - Gig: %56 - Gorsel: %65 - ilk kare: 58ms
+hud_a/h_0377.png|Son basis: 254 ms - Gii¢: %56 - Gorsel: %65 - ilk kare: 58ms
+hud_a/h_0378.png|Son basis: 254 ms - Gii¢: %56 - Gorsel: %65 - ilk kare: 58ms
+hud_a/h_0379.png|Son basis: 254 ms - Gig: %56 - Gorsel: %65 - ilk kare: 58ms
+hud_a/h_0380.png|Son basis: 254 ms - Gii¢: %56 - Gorsel: %65 - ilk kare: 58ms
+hud_a/h_0381.png|Son basis: 254 ms - Gig: %56 - Gorsel: %65 - ilk kare: 58ms
+hud_a/h_0382.png|Son basis: 254 ms - Gig: %56 - Gorsel: %65 - ilk kare: 58ms
+hud_a/h_0383.png|Son basis: 254 ms - Gig: %56 - Gorsel: %65 - ilk kare: 58ms
+hud_a/h_0384.png|Son basis: 254 ms - Gii¢: %56 - Gorsel: %65 - ilk kare: 58ms
+hud_a/h_0385.png|Son basis: 271 ms - Gig: %60 - Gorsel: %69 - ilk kare: 58ms
+hud_a/h_0386.png|Son basis: 271 ms - Gig: %60 - Gérsel: %69 - ilk kare: 58ms
+hud_a/h_0387.png|Son basis: 271 ms - Gig: %60 - Gérsel: %69 - ilk kare: 58ms
+hud_a/h_0388.png|Son basis: 271 ms - Gig: %60 - Gérsel: %69 - ilk kare: 58ms
+hud_a/h_0389.png|Son basis: 271 ms - Gig: %60 - Gérsel: %69 - ilk kare: 58ms
+hud_a/h_0390.png|Son basis: 271 ms - Gig: %60 - Gérsel: %69 - ilk kare: 58ms
+hud_a/h_0391.png|Son basis: 271 ms - Gig: %60 - Gorsel: %69 - ilk kare: 58ms
+hud_a/h_0392.png|Son basis: 271 ms - Gig: %60 - Gorsel: %69 - ilk kare: 58ms
+hud_a/h_0393.png|Son basis: 271 ms - Gii¢: %60 - Gérsel: %69 - ilk kare: 58ms
+hud_a/h_0394.png|Son basis: 263 ms - Gig: %58 - Gorsel: %65 - ilk kare: 58ms
+hud_a/h_0395.png|Son basis: 263 ms - Gig: %58 - Gorsel: %65 - ilk kare: 58ms
+hud_a/h_0396.png|Son basis: 263 ms - Gig: %58 - Gorsel: %65 - ilk kare: 58ms
+hud_a/h_0397.png|Son basis: 263 ms - Gig: %58 - Gorsel: %65 - ilk kare: 58ms
+hud_a/h_0398.png|Son basis: 263 ms - Gig: %58 - Gorsel: %65 - ilk kare: 58ms
+hud_a/h_0399.png|Son basis: 263 ms - Gig: %58 - Gorsel: %65 - ilk kare: 58ms
+hud_a/h_0400.png|Son basis: 263 ms - Gii¢: %58 - Gorsel: %65 - ilk kare: 58ms
+hud_a/h_0401.png|Son basis: 263 ms - Gig: %58 - Gorsel: %65 - ilk kare: 58ms
+hud_a/h_0402.png|Son basis: 263 ms - Gig: %58 - Gorsel: %65 - ilk kare: 58ms
+hud_a/h_0403.png|Son basis: 263 ms - Gig: %58 - Gorsel: %65 - ilk kare: 58ms
+hud_a/h_0404.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %72 - ilk kare: 58ms
+hud_a/h_0405.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %72 - ilk kare: 58ms
+hud_a/h_0406.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %72 - ilk kare: 58ms
+hud_a/h_0407.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %72 - ilk kare: 58ms
+hud_a/h_0408.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %72 - ilk kare: 58ms
+hud_a/h_0409.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %72 - ilk kare: 58ms
+hud_a/h_0410.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %72 - ilk kare: 58ms
+hud_a/h_0411.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %72 - ilk kare: 58ms
+hud_a/h_0412.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %72 - ilk kare: 58ms
+hud_a/h_0413.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %72 - ilk kare: 58ms
+hud_a/h_0414.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %72 - ilk kare: 58ms
+hud_a/h_0415.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %72 - ilk kare: 58ms
+hud_a/h_0416.png|Son basis: 296 ms - Gig: %66 - Gorsel: %72 - ilk kare: 58ms
+hud_a/h_0417.png|Son basis: 288 ms - Gilg: %64 - Gorsel: %72 - ilk kare: 75ms
+hud_a/h_0418.png|| Son basis: 288 ms - Gilg: %64 - Gorsel: %72 - ilk kare: 75ms
+hud_a/h_0419.png|: Son basis: 288 ms - Gig: %64 - Gorsel: %72 - ilk kare: 75ms
+hud_a/h_0420.png|Son basis: 288 ms - Gilg: %64 - Gorsel: %72 - ilk kare: 75ms
+hud_a/h_0421.png|ial basis: 288 ms - Giic: %64 - Gorsel: %72 - ilk kare: 75ms
+hud_a/h_0422.png|Son basis: 288 ms - Gilg: %64 - Gorsel: %72 - ilk kare: 75ms
+hud_a/h_0423.png|eeu basis: 288 ms - Giic: %64 - Gorsel: %72 - ilk kare: 75ms
+hud_a/h_0424.png|Son basis: 288 ms - Gilg: %64 - Gorsel: %72 - ilk kare: 75ms
+hud_a/h_0425.png|Son basis: 288 ms - Gilg: %64 - Gorsel: %72 - ilk kare: 75ms
+hud_a/h_0426.png|Son basis: 288 ms - Gilg: %64 - Gorsel: %72 - ilk kare: 75ms
+hud_a/h_0427.png|Son basis: 363 ms - Gilg: %81 - Gorsel: %93 - ilk kare: 50ms
+hud_a/h_0428.png|Son basis: 363 ms - Gig: %81 - Gorsel: %93 - ilk kare: 50ms
+hud_a/h_0429.png|Son basis: 363 ms - Gig: %81 - Gorsel: %93 - ilk kare: 50ms
+hud_a/h_0430.png|Son basis: 363 ms - Gig: %81 - Gorsel: %93 - ilk kare: 50ms
+hud_a/h_0431.png|Son basis: 363 ms - Gig: %81 - Gorsel: %93 - ilk kare: 50ms
+hud_a/h_0432.png|Son basis: 363 ms - Gii¢: %81 - Gorsel: %93 - ilk kare: 50ms
+hud_a/h_0433.png|Son basis: 363 ms - Gig: %81 - Gorsel: %93 - ilk kare: 50ms
+hud_a/h_0434.png|Son basis: 363 ms - Gilg: %81 - Gorsel: %93 - ilk kare: 50ms
+hud_a/h_0435.png|Son basis: 363 ms - Gilg: %81 - Gorsel: %93 - ilk kare: 50ms
+hud_a/h_0436.png|Son basis: 363 ms - Gilg: %81 - Gorsel: %93 - ilk kare: 50ms
+hud_a/h_0437.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0438.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0439.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0440.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0441.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0442.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0443.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0444.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0445.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0446.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0447.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0448.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0449.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0450.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0451.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0452.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0453.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0454.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0455.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0456.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0457.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0458.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0459.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0460.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0461.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0462.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0463.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0464.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0465.png|Son basis: 346 ms - ae %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0466.png|Son basis: 346 ms - ae %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0467.png|Son basis: 346 ms - ne %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0468.png|Son basis: 346 ms - Ee %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0469.png|Son basis: 346 ms - Gus: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0470.png|Son basis: 346 ms - acd - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0471.png|Son basis: 346 ms - acd - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0472.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0473.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0474.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0475.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0476.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0477.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0478.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0479.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0480.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0481.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0482.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0483.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0484.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0485.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0486.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0487.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0488.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %83 - ilk kare: 58ms
+hud_a/h_0489.png|lips ~—
+hud_a/h_0490.png|liptega ~—
+hud_a/h_0491.png|liptega ~—
+hud_a/h_0492.png|liptega ~—
+hud_a/h_0493.png|liptega ~—
+hud_a/h_0494.png|Son basis: 246 ms - Gii¢: %55 - Gérsel: %61 - ilk kare: 58ms
+hud_a/h_0495.png|Son basis: 246 ms - Gii¢: %55 - Gorsel: %61 - ilk kare: 58ms
+hud_a/h_0496.png|Son basis: 246 ms - Gii¢: %55 - Gorsel: %61 - ilk kare: 58ms
+hud_a/h_0497.png|Son basis: 246 ms - Gii¢: %55 - Gorsel: %61 - ilk kare: 58ms
+hud_a/h_0498.png|Son basis: 246 ms - Gii¢: %55 - Gorsel: %61 - ilk kare: 58ms
+hud_a/h_0499.png|Son basis: 246 ms - Gig: %55 - Gérsel: %61 - ilk kare: 58ms
+hud_a/h_0500.png|Son basis: 246 ms - Gig: %55 - Gorsel: %61 - ilk kare: 58ms
+hud_a/h_0501.png|Son basis: 246 ms - Gii¢: %55 - Gérsel: %61 - ilk kare: 58ms
+hud_a/h_0502.png|Son basis: 338 ms - Gilg: %75 - Gorsel: %81 - ilk kare: 50ms
+hud_a/h_0503.png|Son basis: 338 ms - Gilg: %75 - Gorsel: %81 - ilk kare: 50ms
+hud_a/h_0504.png|Son basis: 338 ms - Gilg: %75 - Gorsel: %81 - ilk kare: 50ms
+hud_a/h_0505.png|Son basis: 338 ms - Gilg: %75 - Gorsel: %81 - ilk kare: 50ms
+hud_a/h_0506.png|Son basis: 338 ms - Gilg: %75 - Gorsel: %81 - ilk kare: 50ms
+hud_a/h_0507.png|Son basis: 338 ms - Gii¢: %75 - Gorsel: %81 - ilk kare: 50ms
+hud_a/h_0508.png|Son basis: 338 ms - Gilg: %75 - Gorsel: %81 - ilk kare: 50ms
+hud_a/h_0509.png|Son basis: 338 ms - Gilg: %75 - Gorsel: %81 - ilk kare: 50ms
+hud_a/h_0510.png|Son basis: 338 ms - Gilg: %75 - Gorsel: %81 - ilk kare: 50ms
+hud_a/h_0511.png|Son basis: 338 ms - Gilg: %75 - Gorsel: %81 - ilk kare: 50ms
+hud_a/h_0512.png|Son basis: 338 ms - Gug: %75 - Gorsel: 781 tlk kare: 50ms
+hud_a/h_0513.png|Son basis: 338 ms - Gug: %75 - Gorsel: 781 «tlk kare: 50ms
+hud_a/h_0514.png|Son basis: 338 ms - Gug¢: %75 - Gorsel: %81 tk kare: 50ms
+hud_a/h_0515.png|lips ~—
+hud_a/h_0516.png|liptega ~—
+hud_a/h_0517.png|liptega ~—
+hud_a/h_0518.png|liptega ~—
+hud_a/h_0519.png|Son basis: 221 ms - Gilg: %49 - Gorsel: %57 - ilk kare: 58ms
+hud_a/h_0520.png|Son basis: 221 ms - Gug: %49 - Gorsel: %57 - Uae 58ms
+hud_a/h_0521.png|Son basis: 221 ms - Gug: %49 - Gorsel: %57 - lis 58ms
+hud_a/h_0522.png|Son basis: 221 ms - Gilg: %49 - Gorsel: %57 - ilk kare: 58ms
+hud_a/h_0523.png|Son basis: 221 ms - Gig: %49 - Gorsel: %57 - ilk kare: 58ms
+hud_a/h_0524.png|Son basis: 221 ms - Gilg: %49 - Gorsel: %57 - ilk kare: 58ms
+hud_a/h_0525.png|Son basis: 221 ms - Gig: %49 - Gorsel: %57 - ilk kare: 58ms
+hud_a/h_0526.png|Son basis: 221 ms - Gig: %49 - Gorsel: %57 - ilk kare: 58ms
+hud_a/h_0527.png|Son basis: 221 ms - Gilg: %49 - Gorsel: %57 - ilk kare: 58ms
+hud_a/h_0528.png|Son basis: 221 ms - Gig: %49 - Gorsel: %57 - ilk kare: 58ms
+hud_a/h_0529.png|Son basis: 246 ms - Gii¢: %55 - Gérsel: %61 - ilk kare: 58ms
+hud_a/h_0530.png|Son basis: 246 ms - Gig: %55 - Gérsel: %61 - ilk kare: 58ms
+hud_a/h_0531.png|Son basis: 246 ms - Gii¢: %55 - Gérsel: %61 - ilk kare: 58ms
+hud_a/h_0532.png|Son basis: 246 ms - Gii¢: %55 - Gorsel: %61 - ilk kare: 58ms
+hud_a/h_0533.png|Son basis: 246 ms - Gii¢: %55 - Gorsel: %61 - ilk kare: 58ms
+hud_a/h_0534.png|Son basis: 246 ms - Gii¢: %55 - Gérsel: %61 - ilk kare: 58ms
+hud_a/h_0535.png|Son basis: 246 ms - Gig: %55 - Gérsel: %61 - ilk kare: 58ms
+hud_a/h_0536.png|Son basis: 246 ms - Gii¢: %55 - Gorsel: %61 - ilk kare: 58ms
+hud_a/h_0537.png|Son basis: 246 ms - Gii¢: %55 - Gérsel: %61 - ilk kare: 58ms
+hud_a/h_0538.png|Son basis: 246 ms - Gii¢: %55 - Gérsel: %61 - ilk kare: 58ms
+hud_a/h_0539.png|Son basis: 246 ms - Gii¢: %55 - Gérsel: %61 - ilk kare: 58ms
+hud_a/h_0540.png|Son basis: 246 ms - Gii¢: %55 - Gérsel: %61 - ilk kare: 58ms
+hud_a/h_0541.png|Son basis: 238 ms - Gig: %53 - Gorsel: %59 - ilk kare: 50ms
+hud_a/h_0542.png|Son basis: 238 ms - Gilg: %53 - Gorsel: %59 - ilk kare: 50ms
+hud_a/h_0543.png|Son basis: 238 ms - Gig: %53 - Gorsel: %59 - ilk kare: 50ms
+hud_a/h_0544.png|Son basis: 238 ms - Gig: %53 - Gorsel: %59 - ilk kare: 50ms
+hud_a/h_0545.png|Son basis: 238 ms - Gig: %53 - Gorsel: %59 - ilk kare: 50ms
+hud_a/h_0546.png|Son basis: 238 ms - Gig: %53 - Gorsel: %59 - ilk kare: 50ms
+hud_a/h_0547.png|Son basis: 238 ms - Gig: %53 - Gorsel: %59 - ilk kare: 50ms
+hud_a/h_0548.png|Son basis: 238 ms - Gig: %53 - Gorsel: %59 - ilk kare: 50ms
+hud_a/h_0549.png|Son basis: 312 ms - Gilg: %69 - Gorsel: %76 - ilk kare: 58ms
+hud_a/h_0550.png|Son basis: 312 ms - Gilg: %69 - Gorsel: %76 - ilk kare: 58ms
+hud_a/h_0551.png|Son basis: 312 ms - Gilg: %69 - Gorsel: %76 - ilk kare: 58ms
+hud_a/h_0552.png|Son basis: 312 ms - Gilg: %69 - Gorsel: %76 - ilk kare: 58ms
+hud_a/h_0553.png|Son basis: 312 ms - Gilg: %69 - Gorsel: %76 - ilk kare: 58ms
+hud_a/h_0554.png|Son basis: 312 ms - Gilg: %69 - Gorsel: %76 - ilk kare: 58ms
+hud_a/h_0555.png|Son basis: 312 ms - Gilg: %69 - Gorsel: %76 - ilk kare: 58ms
+hud_a/h_0556.png|Son basis: 312 ms - Gilg: %69 - Gorsel: %76 - ilk kare: 58ms
+hud_a/h_0557.png|Son basis: 312 ms - Gilg: %69 - Gorsel: %76 - ilk kare: 58ms
+hud_a/h_0558.png|Son basis: 312 ms - Gilg: %69 - Gorsel: %76 - ilk kare: 58ms
+hud_a/h_0559.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %72 - ilk kare: 58ms
+hud_a/h_0560.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %72 - ilk kare: 58ms
+hud_a/h_0561.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %72 - ilk kare: 58ms
+hud_a/h_0562.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %72 - ilk kare: 58ms
+hud_a/h_0563.png|Son basis: 296 ms - Gig: %66 - Gorsel: %72 - ilk kare: 58ms
+hud_a/h_0564.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %72 - ilk kare: 58ms
+hud_a/h_0565.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %72 - ilk kare: 58ms
+hud_a/h_0566.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %72 - ilk kare: 58ms
+hud_a/h_0567.png|Son basis: 296 ms - Gig: %66 - Gorsel: %72 - ilk kare: 58ms
+hud_a/h_0568.png|Son basis: 296 ms - Gig: %66 - Gorsel: %72 - ilk kare: 58ms
+hud_a/h_0569.png|Son basis: 246 ms - Gig: %55 - Gorsel: %63 - ilk kare: 50ms
+hud_a/h_0570.png|Son basis: 246 ms - Gig: %55 - Gorsel: %63 - ilk kare: 50ms
+hud_a/h_0571.png|Son basis: 246 ms - Gig: %55 - Gorsel: %63 - ilk kare: 50ms
+hud_a/h_0572.png|Son basis: 246 ms - Gig: %55 - Gorsel: %63 - ilk kare: 50ms
+hud_a/h_0573.png|Son basis: 246 ms - Gilg: %55 - Gorsel: %63 - ilk kare: 50ms
+hud_a/h_0574.png|Son basis: 246 ms - Gilg: %55 - Gorsel: %63 - ilk kare: 50ms
+hud_a/h_0575.png|Son basis: 246 ms - Gilg: %55 - Gorsel: %63 - ilk kare: 50ms
+hud_a/h_0576.png|Son basis: 246 ms - Gig: %55 - Gorsel: %63 - ilk kare: 50ms
+hud_a/h_0577.png|Son basis: 246 ms - Gig: %55 - Gorsel: %63 - ilk kare: 50ms
+hud_a/h_0578.png|Son basis: 246 ms - Gilg: %55 - Gérsel: %63 - ilk kare: 50ms
+hud_a/h_0579.png|Son basis: 287 ms - Gilg: %64 - Gorsel: %72 - ilk kare: 58ms
+hud_a/h_0580.png|Son basis: 287 ms - Gilg: %64 - Gorsel: %72 - ilk kare: 58ms
+hud_a/h_0581.png|Son basis: 287 ms - Gilg: %64 - Gorsel: %72 - ilk kare: 58ms
+hud_a/h_0582.png|Son basis: 287 ms - Gilg: %64 - Gorsel: %72 - ilk kare: 58ms
+hud_a/h_0583.png|Son basis: 287 ms - Gilg: %64 - Gorsel: %72 - ilk kare: 58ms
+hud_a/h_0584.png|Son basis: 287 ms - Gilg: %64 - Gorsel: %72 - ilk kare: 58ms
+hud_a/h_0585.png|Son basis: 287 ms - Gilg: %64 - Gorsel: %72 - ilk kare: 58ms
+hud_a/h_0586.png|Son basis: 287 ms - Giic: %64 - Gorsel: %72 - ilk kare: 58ms
+hud_a/h_0587.png||
+hud_a/h_0588.png|
+hud_a/h_0589.png|
+hud_a/h_0590.png|_ Taw ree
+hud_a/h_0591.png|- _ nee
+hud_a/h_0592.png|| a
+hud_a/h_0593.png|| j
+hud_a/h_0594.png||
+hud_a/h_0595.png|| )
+hud_a/h_0596.png|| )
+hud_b/h_0001.png|
+hud_b/h_0002.png|ipa
+hud_b/h_0003.png|
+hud_b/h_0004.png|
+hud_b/h_0005.png|
+hud_b/h_0006.png|
+hud_b/h_0007.png|
+hud_b/h_0008.png|
+hud_b/h_0009.png|
+hud_b/h_0010.png|
+hud_b/h_0011.png|
+hud_b/h_0012.png|
+hud_b/h_0013.png|os ‘ ae >
+hud_b/h_0014.png|—ipteaaing
+hud_b/h_0015.png|—ipteaaing
+hud_b/h_0016.png|—ipteaaing
+hud_b/h_0017.png|—ipteaaing
+hud_b/h_0018.png|—ipteaaing
+hud_b/h_0019.png|—iptaaing
+hud_b/h_0020.png|Son basis: 121 ms - Giig: %27 - Gorsel: %36 - ilk kare: 46ms
+hud_b/h_0021.png|Son basis: 121 ms - Gig: %27 - Gorsel: %36 - ilk kare: 46ms
+hud_b/h_0022.png|2 Son basis: 121 ms - Giig: %27 - Gorsel: %36 - ilk kare: 46ms
+hud_b/h_0023.png|> Son basis: 121 ms - Giig: %27 - Gorsel: %36 - ilk kare: 46ms
+hud_b/h_0024.png|_ Son basis: 121 ms - Gig: %27 - Gorsel: %36 - Ilk kare: 46ms
+hud_b/h_0025.png|Son basis: 121 ms - Giig: %27 - Gorsel: %36 - ilk kare: 46ms
+hud_b/h_0026.png|- Son basis: 121 ms - Giig: %27 - Gorsel: %36 - ilk kare: 46ms
+hud_b/h_0027.png|asl basis: 121 ms - Glig: %27 - Gérsel: %36 - Ilk kare: 46ms
+hud_b/h_0028.png|oe basis: 121 ms - Gilg: %27 - Gorsel: %36 - ilk kare: 46ms
+hud_b/h_0029.png|—ipteaing
+hud_b/h_0030.png|—ipteeaing
+hud_b/h_0031.png|—ipteeaing
+hud_b/h_0032.png|—ipteeaing
+hud_b/h_0033.png|—ipteeaing
+hud_b/h_0034.png|Son basis: 271 ms - Giig: %60 - Gérsel: %69 - ilk kare: 46ms
+hud_b/h_0035.png|Son basis: 271 ms - Giig: %60 - Gérsel: %69 - ilk kare: 46ms
+hud_b/h_0036.png|Son basis: 271 ms - Giig: %60 - Gérsel: %69 - ilk kare: 46ms
+hud_b/h_0037.png|Son basis: 271 ms - Giig: %60 - Gérsel: %69 - ilk kare: 46ms
+hud_b/h_0038.png|Son basis: 271 ms - Giig: %60 - Gérsel: %69 - ilk kare: 46ms
+hud_b/h_0039.png|Son basis: 271 ms - Giig: %60 - Gérsel: %69 - ilk kare: 46ms
+hud_b/h_0040.png|Son basis: 271 ms - Giig: %60 - Gérsel: %69 - ilk kare: 46ms
+hud_b/h_0041.png|Son basis: 271 ms - Gig: %60 - Gérsel: %69 - ilk kare: 46ms
+hud_b/h_0042.png|Son basis: 271 ms - Giig: %60 - Gérsel: %69 - ilk kare: 46ms
+hud_b/h_0043.png|Son basis: 288 ms - Gilg: %64 - Gorsel: %71 - ilk kare: 54ms
+hud_b/h_0044.png|Son basis: 288 ms - Gilg: %64 - Gorsel: %71 - ilk kare: 54ms
+hud_b/h_0045.png|Son basis: 288 ms - Gilg: %64 - Gorsel: %71 - ilk kare: 54ms
+hud_b/h_0046.png|Son basis: 288 ms - Gilg: %64 - Gorsel: %71 - ilk kare: 54ms
+hud_b/h_0047.png|Son basis: 288 ms - Gilg: %64 - Gorsel: %71 - ilk kare: 54ms
+hud_b/h_0048.png|Son basis: 288 ms - Gilg: %64 - Gorsel: %71 - ilk kare: 54ms
+hud_b/h_0049.png|Son basis: 288 ms - Gilg: %64 - Gorsel: %71 - ilk kare: 54ms
+hud_b/h_0050.png|Son basis: 288 ms - Gilg: %64 - Gorsel: %71 - ilk kare: 54ms
+hud_b/h_0051.png|Son basis: 288 ms - Gig: %64 - Gorsel: %71 - ilk kare: 54ms
+hud_b/h_0052.png|Son basis: 288 ms - Gilg: %64 - Gorsel: %71 - ilk kare: 54ms
+hud_b/h_0053.png|Son basis: 288 ms - Gilg: %64 - Gorsel: %71 - ilk kare: 54ms
+hud_b/h_0054.png|os ‘ ae: as
+hud_b/h_0055.png|os ‘ ae: as
+hud_b/h_0056.png|os ‘ ae: as
+hud_b/h_0057.png|os ‘ ae: as
+hud_b/h_0058.png|Son basis: 204 ms - Gii¢: %45 - Gorsel: %55 - ilk kare: 46ms
+hud_b/h_0059.png|Son basis: 204 ms - Gii¢: %45 - Gorsel: %55 - ilk kare: 46ms
+hud_b/h_0060.png|Son basis: 204 ms - Gii¢: %45 - Gorsel: %55 - ilk kare: 46ms
+hud_b/h_0061.png|Son basis: 204 ms - Gilg: %45 - Gorsel: %55 - ilk kare: 46ms
+hud_b/h_0062.png|Son basis: 204 ms - Gii¢: %45 - Gorsel: %55 - ilk kare: 46ms
+hud_b/h_0063.png|Son basis: 204 ms - Gii¢: %45 - Gorsel: %55 - ilk kare: 46ms
+hud_b/h_0064.png|Son basis: 204 ms - Gii¢: %45 - Gorsel: %55 - ilk kare: 46ms
+hud_b/h_0065.png|Son basis: 204 ms - Gii¢: %45 - Gorsel: %55 - ilk kare: 46ms
+hud_b/h_0066.png|Son basis: 204 ms - Gii¢: %45 - Gorsel: %55 - ilk kare: 46ms
+hud_b/h_0067.png|Son basis: 204 ms - Gii¢: %45 - Gorsel: %55 - ilk kare: 46ms
+hud_b/h_0068.png|os ‘ ae: as
+hud_b/h_0069.png|os ‘ a: as
+hud_b/h_0070.png|os ‘ ae as
+hud_b/h_0071.png|os ‘ ae as
+hud_b/h_0072.png|os ‘ ae as
+hud_b/h_0073.png|Son basis: 296 ms - bea %66 - Gorsel: %73 - ilk kare: 46ms
+hud_b/h_0074.png|Son basis: 296 ms - Cus: %66 - Gorsel: %73 - ilk kare: 46ms
+hud_b/h_0075.png|Son basis: 296 ms - Gus: %66 - Gorsel: %73 - ilk kare: 46ms
+hud_b/h_0076.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %73 - ilk kare: 46ms
+hud_b/h_0077.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %73 - ilk kare: 46ms
+hud_b/h_0078.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %73 - ilk kare: 46ms
+hud_b/h_0079.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %73 - ilk kare: 46ms
+hud_b/h_0080.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %73 - ilk kare: 46ms
+hud_b/h_0081.png|Son basis: 296 ms - Gii¢: %66 - Gérsel: %73 - ilk kare: 46ms
+hud_b/h_0082.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %73 - ilk kare: 46ms
+hud_b/h_0083.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %73 - ilk kare: 46ms
+hud_b/h_0084.png|os ‘ ae: a ms
+hud_b/h_0085.png|os ‘ ae: as
+hud_b/h_0086.png|os ‘ ae: as
+hud_b/h_0087.png|os ‘ ae: as
+hud_b/h_0088.png|Son basis: 204 ms - Gig: %45 - Gorsel: %55 - ilk kare: 46ms
+hud_b/h_0089.png|Son basis: 204 ms - Gii¢: %45 - Gorsel: %55 - ilk kare: 46ms
+hud_b/h_0090.png|Son basis: 204 ms - Gig: %45 - Gorsel: %55 - ilk kare: 46ms
+hud_b/h_0091.png|Son basis: 204 ms - Gii¢: %45 - Gorsel: %55 - ilk kare: 46ms
+hud_b/h_0092.png|Son basis: 204 ms - Gig: %45 - Gorsel: %55 - ilk kare: 46ms
+hud_b/h_0093.png|Son basis: 204 ms - Gilg: %45 - Gorsel: %55 - ilk kare: 46ms
+hud_b/h_0094.png|Son basis: 204 ms - Gig: %45 - Gorsel: %55 - ilk kare: 46ms
+hud_b/h_0095.png|Son basis: 204 ms - Gii¢: %45 - Gorsel: %55 - ilk kare: 46ms
+hud_b/h_0096.png|Son basis: 179 ms - Gilg: %40 - Gorsel: %49 - ilk kare: 54ms
+hud_b/h_0097.png|Son basis: 179 ms - Gig: %40 - Gorsel: %49 - ilk kare: 54ms
+hud_b/h_0098.png|Son basis: 179 ms - Gig: %40 - Gorsel: %49 - ilk kare: 54ms
+hud_b/h_0099.png|Son basis: 179 ms - Gig: %40 - Gorsel: %49 - ilk kare: 54ms
+hud_b/h_0100.png|Son basis: 179 ms - Gig: %40 - Gérsel: %49 - ilk kare: 54ms
+hud_b/h_0101.png|Son basis: 179 ms - Gilg: %40 - Gorsel: %49 - ilk kare: 54ms
+hud_b/h_0102.png|Son basis: 179 ms - Gilg: %40 - Gorsel: %49 - ilk kare: 54ms
+hud_b/h_0103.png|Son basis: 179 ms - Gig: %40 - Gorsel: %49 - ilk kare: 54ms
+hud_b/h_0104.png|Son basis: 254 ms - Gii¢: %56 - Gorsel: %66 - ilk kare: 46ms
+hud_b/h_0105.png|Son basis: 254 ms - Gii¢: %56 - Gorsel: %66 - ilk kare: 46ms
+hud_b/h_0106.png|Son basis: 254 ms - Gii¢: %56 - Gorsel: %66 - ilk kare: 46ms
+hud_b/h_0107.png|Son basis: 254 ms - Gii¢: %56 - Gorsel: %66 - ilk kare: 46ms
+hud_b/h_0108.png|Son basis: 254 ms - Gig: %56 - Gorsel: %66 - ilk kare: 46ms
+hud_b/h_0109.png|Son basis: 254 ms - Gig: %56 - Gorsel: %66 - ilk kare: 46ms
+hud_b/h_0110.png|Son basis: 254 ms - Gii¢: %56 - Gorsel: %66 - ilk kare: 46ms
+hud_b/h_0111.png|Son basis: 254 ms - Gii¢: %56 - Gorsel: %66 - ilk kare: 46ms
+hud_b/h_0112.png|Son basis: 254 ms - Gii¢: %56 - Gorsel: %66 - ilk kare: 46ms
+hud_b/h_0113.png|Son basis: 254 ms - Gii¢: %56 - Gorsel: %66 - ilk kare: 46ms
+hud_b/h_0114.png|Son basis: 254 ms - Gii¢: %56 - Gorsel: %66 - ilk kare: 46ms
+hud_b/h_0115.png|Son basis: 254 ms - Gii¢: %56 - Gorsel: %66 - ilk kare: 46ms
+hud_b/h_0116.png|Son basis: 246 ms - Gig: %55 - Gérsel: %62 - ilk kare: 62ms
+hud_b/h_0117.png|Son basis: 246 ms - Gug: %55 - Gorsel: ‘ini - ilk kare: 62ms
+hud_b/h_0118.png|Son basis: 246 ms - Gug: %55 - Gorsel: ‘iia - ilk kare: 62ms
+hud_b/h_0119.png|Son basis: 246 ms - Gug: %55 - Gorsel: ‘alain ilk kare: 62ms
+hud_b/h_0120.png|Son basis: 246 ms - Gug: %55 - Gorsel: ao ilk kare: 62ms
+hud_b/h_0121.png|Son basis: 246 ms - Gug: %55 - Gorsel: ‘aaa ilk kare: 62ms
+hud_b/h_0122.png|Son basis: 246 ms - Gug: %55 - Gorsel: ila kare: 62ms
+hud_b/h_0123.png|Son basis: 246 ms - Gug: %55 - Gorsel: ila kare: 62ms
+hud_b/h_0124.png|Son basis: 246 ms - Gilg: %55 - Gérsel: %62 - ilk kare: 62ms
+hud_b/h_0125.png|Son basis: 271 ms - Gig: %60 - Gérsel: %68 - ilk kare: 54ms
+hud_b/h_0126.png|Son basis: 271 ms - Gig: %60 - Gorsel: %68 - ilk kare: 54ms
+hud_b/h_0127.png|Son basis: 271 ms - Gig: %60 - Gérsel: %68 - ilk kare: 54ms
+hud_b/h_0128.png|Son basis: 271 ms - Gig: %60 - Gérsel: %68 - ilk kare: 54ms
+hud_b/h_0129.png|Son basis: 271 ms - Gig: %60 - Gérsel: %68 - ilk kare: 54ms
+hud_b/h_0130.png|Son basis: 271 ms - Gii¢: %60 - Gérsel: %68 - ilk kare: 54ms
+hud_b/h_0131.png|Son basis: 271 ms - Gig: %60 - Gérsel: %68 - ilk kare: 54ms
+hud_b/h_0132.png|Son basis: 271 ms - Gig: %60 - Gérsel: %68 - ilk kare: 54ms
+hud_b/h_0133.png|Son basis: 271 ms - Gig: %60 - Gérsel: %68 - ilk kare: 54ms
+hud_b/h_0134.png|Son basis: 271 ms - Gig: %60 - Gérsel: %68 - ilk kare: 54ms
+hud_b/h_0135.png|Son basis: 271 ms - Gig: %60 - Gérsel: %68 - ilk kare: 54ms
+hud_b/h_0136.png|os ‘ ae: as
+hud_b/h_0137.png|os ‘ ae: as
+hud_b/h_0138.png|os ‘ ae: as
+hud_b/h_0139.png|os ‘ ae: as
+hud_b/h_0140.png|Son basis: 171 ms - Gig: %38 - Gorsel: %47 - ilk kare: 46ms
+hud_b/h_0141.png|Son basis: 171 ms - Giig: %38 - Gorsel: %47 - ilk kare: 46ms
+hud_b/h_0142.png|Son basis: 171 ms - Giig: %38 - Gorsel: %47 - ilk kare: 46ms
+hud_b/h_0143.png|Son basis: 171 ms - Gig: %38 - Gorsel: %47 - ilk kare: 46ms
+hud_b/h_0144.png|Son basis: 171 ms - Gig: %38 - Gorsel: %47 - ilk kare: 46ms
+hud_b/h_0145.png|Son basis: 171 ms - Gig: %38 - Gorsel: %47 - ilk kare: 46ms
+hud_b/h_0146.png|Son basis: 171 ms - Giig: %38 - Gorsel: %47 - ilk kare: 46ms
+hud_b/h_0147.png|Son basis: 171 ms - Giig: %38 - Gorsel: %47 - ilk kare: 46ms
+hud_b/h_0148.png|Son basis: 171 ms - Gig: %38 - Gorsel: %47 - ilk kare: 46ms
+hud_b/h_0149.png|Son basis: 229 ms - Gig: %51- Gorsel: %60 - ilk kare: 54ms
+hud_b/h_0150.png|Son basis: 229 ms - Gig: %51- Gorsel: %60 - ilk kare: 54ms
+hud_b/h_0151.png|Son basis: 229 ms - Gig: %51 - Gorsel: %60 - ilk kare: 54ms
+hud_b/h_0152.png|Son basis: 229 ms - Gig: %51 - Gorsel: %60 - ilk kare: 54ms
+hud_b/h_0153.png|Son basis: 229 ms - Gig: %51- Gorsel: %60 - ilk kare: 54ms
+hud_b/h_0154.png|Son basis: 229 ms - Gig: %51- Gorsel: %60 - ilk kare: 54ms
+hud_b/h_0155.png|Son basis: 229 ms - Gig: %51- Gorsel: %60 - ilk kare: 54ms
+hud_b/h_0156.png|Son basis: 229 ms - Gig: %51- Gorsel: %60 - ilk kare: 54ms
+hud_b/h_0157.png|Son basis: 229 ms - Gig: %51- Gorsel: %60 - ilk kare: 54ms
+hud_b/h_0158.png|Son basis: 229 ms - Gig: %51 - Gorsel: %60 - ilk kare: 54ms
+hud_b/h_0159.png|Son basis: 229 ms - Gig: %51 - Gorsel: %60 - ilk kare: 54ms
+hud_b/h_0160.png|Son basis: 188 ms - Gig: %42 - Gorsel: %51 - ilk kare: 46ms
+hud_b/h_0161.png|Son basis: 188 ms - Gig: %42 - Gorsel: %51 - ilk kare: 46ms
+hud_b/h_0162.png|Son basis: 188 ms - Gig: %42 - Gorsel: %51 - ilk kare: 46ms
+hud_b/h_0163.png|Son basis: 188 ms - Gig: %42 - Gorsel: %51 - ilk kare: 46ms
+hud_b/h_0164.png|Son basis: 188 ms - Gig: %42 - Gorsel: %51 - ilk kare: 46ms
+hud_b/h_0165.png|Son basis: 188 ms - Gig: %42 - Gorsel: %51 - ilk kare: 46ms
+hud_b/h_0166.png|Son basis: 188 ms - Gig: %42 - Gorsel: %51 - ilk kare: 46ms
+hud_b/h_0167.png|Son basis: 188 ms - Gig: %42 - Gorsel: %51 - ilk kare: 46ms
+hud_b/h_0168.png|Son basis: 188 ms - Gig: %42 - Gorsel: %51 - ilk kare: 46ms
+hud_b/h_0169.png|Son basis: 188 ms - Gig: %42 - Gorsel: %51 - ilk kare: 46ms
+hud_b/h_0170.png|Son basis: 379 ms - Gilg: %84 - Gérsel: %92 - ilk kare: 46ms
+hud_b/h_0171.png|Son basis: 379 ms - Gilg: %84 - Gérsel: %92 - ilk kare: 46ms
+hud_b/h_0172.png|Son basis: 379 ms - Gilg: %84 - Gérsel: %92 - ilk kare: 46ms
+hud_b/h_0173.png|Son basis: 379 ms - Gilg: %84 - Gérsel: %92 - ilk kare: 46ms
+hud_b/h_0174.png|Son basis: 379 ms - Gilg: %84 - Gérsel: %92 - ilk kare: 46ms
+hud_b/h_0175.png|Son basis: 379 ms - Gilg: %84 - Gérsel: %92 - ilk kare: 46ms
+hud_b/h_0176.png|Son basis: 379 ms - Gilg: %84 - Gérsel: %92 - ilk kare: 46ms
+hud_b/h_0177.png|Son basis: 379 ms - Gilg: %84 - Gérsel: %92 - ilk kare: 46ms
+hud_b/h_0178.png|Son basis: 379 ms - Gilg: %84 - Gérsel: %92 - ilk kare: 46ms
+hud_b/h_0179.png|Son basis: 379 ms - Gilg: %84 - Gérsel: %92 - ilk kare: 46ms
+hud_b/h_0180.png|Son basis: 379 ms - Gilg: %84 - Gérsel: %92 - ilk kare: 46ms
+hud_b/h_0181.png|Son basis: 379 ms - Gilg: %84 - Gérsel: %92 - ilk kare: 46ms
+hud_b/h_0182.png|oe
+hud_b/h_0183.png|oe
+hud_b/h_0184.png|oe
+hud_b/h_0185.png|oe
+hud_b/h_0186.png|oe
+hud_b/h_0187.png|oe
+hud_b/h_0188.png|Son basis: 338 ms - Gilg: %75 - Gorsel: %84 - ilk kare: 46ms
+hud_b/h_0189.png|Son basis: 338 ms - Gilg: %75 - Gorsel: %84 - ilk kare: 46ms
+hud_b/h_0190.png|Son basis: 338 ms - Gilg: %75 - Gorsel: %84 - ilk kare: 46ms
+hud_b/h_0191.png|Son basis: 338 ms - Gilg: %75 - Gorsel: %84 - ilk kare: 46ms
+hud_b/h_0192.png|Son basis: 338 ms - Gilg: %75 - Gorsel: %84 - ilk kare: 46ms
+hud_b/h_0193.png|Son basis: 338 ms - Gilg: %75 - Gorsel: %84 - ilk kare: 46ms
+hud_b/h_0194.png|Son basis: 338 ms - Gig: %75 - Gorsel: %84 - ilk kare: 46ms
+hud_b/h_0195.png|Son basis: 338 ms - Gilg: %75 - Gorsel: %84 - ilk kare: 46ms
+hud_b/h_0196.png|Son basis: 338 ms - Gilg: %75 - Gorsel: %84 - ilk kare: 46ms
+hud_b/h_0197.png|Son basis: 338 ms - Gilg: %75 - Gorsel: %84 - ilk kare: 46ms
+hud_b/h_0198.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %75 - ilk kare: 54ms
+hud_b/h_0199.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %75 - ilk kare: 54ms
+hud_b/h_0200.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %75 - ilk kare: 54ms
+hud_b/h_0201.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %75 - ilk kare: 54ms
+hud_b/h_0202.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %75 - ilk kare: 54ms
+hud_b/h_0203.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %75 - ilk kare: 54ms
+hud_b/h_0204.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %75 - ilk kare: 54ms
+hud_b/h_0205.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %75 - ilk kare: 54ms
+hud_b/h_0206.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %75 - ilk kare: 54ms
+hud_b/h_0207.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %75 - ilk kare: 54ms
+hud_b/h_0208.png|Son basis: 296 ms - Gii¢: %66 - Gorsel: %75 - ilk kare: 54ms
+hud_b/h_0209.png|Son basis: 221 ms - Gilg: %49 - Gorsel: %56 - ilk kare: 54ms
+hud_b/h_0210.png|Son basis: 221 ms - Giig: %49 - Gorsel: %56 - ilk kare: 54ms
+hud_b/h_0211.png|Son basis: 221 ms - Gig: %49 - Gorsel: %56 - ilk kare: 54ms
+hud_b/h_0212.png|Son basis: 221 ms - Gig: %49 - Gorsel: %56 - ilk kare: 54ms
+hud_b/h_0213.png|Son basis: 221 ms - Gig: %49 - Gorsel: %56 - ilk kare: 54ms
+hud_b/h_0214.png|Son basis: 221 ms - Gig: %49 - Gorsel: %56 - ilk kare: 54ms
+hud_b/h_0215.png|Son basis: 221 ms - Gig: %49 - Gorsel: %56 - ilk kare: 54ms
+hud_b/h_0216.png|Son basis: 221 ms - Gilg: %49 - Gorsel: %56 - ilk kare: 54ms
+hud_b/h_0217.png|Son basis: 221 ms - Gilg: %49 - Gorsel: %56 - ilk kare: 54ms
+hud_b/h_0218.png|Son basis: 221 ms - Gig: %49 - Gorsel: %58 - ilk kare: 46ms
+hud_b/h_0219.png|Son basis: 221 ms - Gilg: %49 - Gorsel: %58 - ilk kare: 46ms
+hud_b/h_0220.png|Son basis: 221 ms - Gilg: %49 - Gorsel: %58 - ilk kare: 46ms
+hud_b/h_0221.png|Son basis: 221 ms - Gilg: %49 - Gorsel: %58 - ilk kare: 46ms
+hud_b/h_0222.png|Son basis: 221 ms - Gilg: %49 - Gorsel: %58 - ilk kare: 46ms
+hud_b/h_0223.png|Son basis: 221 ms - Gig: %49 - Gorsel: %58 - ilk kare: 46ms
+hud_b/h_0224.png|Son basis: 221 ms - Gig: %49 - Gorsel: %58 - ilk kare: 46ms
+hud_b/h_0225.png|Son basis: 221 ms - Gig: %49 - Gorsel: %58 - ilk kare: 46ms
+hud_b/h_0226.png|Son basis: 221 ms - Gig: %49 - Gorsel: %58 - ilk kare: 46ms
+hud_b/h_0227.png|Son basis: 221 ms - Gig: %49 - Gorsel: %58 - ilk kare: 46ms
+hud_b/h_0228.png|Son basis: 304 ms - Gii¢: %68 - Gorsel: %77 - ilk kare: 46ms
+hud_b/h_0229.png|Son basis: 304 ms - Gii¢: %68 - Gorsel: %77 - ilk kare: 46ms
+hud_b/h_0230.png|Son basis: 304 ms - Gii¢: %68 - Gorsel: %77 - ilk kare: 46ms
+hud_b/h_0231.png|Son basis: 304 ms - Gii¢: %68 - Gorsel: %77 - ilk kare: 46ms
+hud_b/h_0232.png|Son basis: 304 ms - Gii¢: %68 - Gorsel: %77 - ilk kare: 46ms
+hud_b/h_0233.png|Son basis: 304 ms - Gii¢: %68 - Gorsel: %77 - ilk kare: 46ms
+hud_b/h_0234.png|Son basis: 304 ms - Gii¢: %68 - Gorsel: %77 - ilk kare: 46ms
+hud_b/h_0235.png|Son basis: 304 ms - Gii¢: %68 - Gorsel: %77 - ilk kare: 46ms
+hud_b/h_0236.png|Son basis: 304 ms - Gii¢: %68 - Gorsel: %77 - ilk kare: 46ms
+hud_b/h_0237.png|Son basis: 304 ms - Gii¢: %68 - Gorsel: %77 - ilk kare: 46ms
+hud_b/h_0238.png|Son basis: 304 ms - Gii¢: %68 - Gorsel: %77 - ilk kare: 46ms
+hud_b/h_0239.png|Son basis: 338 ms - Gii¢: %75 - Gorsel: %92 - ilk kare: 46ms
+hud_b/h_0240.png|Son basis: 338 ms - Gii¢: %75 - Gorsel: %92 - ilk kare: 46ms
+hud_b/h_0241.png|Son basis: 338 ms - Gii¢: %75 - Gorsel: %92 - ilk kare: 46ms
+hud_b/h_0242.png|Son basis: 338 ms - Gilg: %75 - Gorsel: %92 - ilk kare: 46ms
+hud_b/h_0243.png|Son basis: 338 ms - Gii¢: %75 - Gorsel: %92 - ilk kare: 46ms
+hud_b/h_0244.png|Son basis: 338 ms - Gii¢: %75 - Gorsel: %92 - ilk kare: 46ms
+hud_b/h_0245.png|Son basis: 338 ms - Gii¢: %75 - Gorsel: %92 - ilk kare: 46ms
+hud_b/h_0246.png|Son basis: 338 ms - Gii¢: %75 - Gorsel: %92 - ilk kare: 46ms
+hud_b/h_0247.png|Son basis: 338 ms - Gilg: %75 - Gorsel: %92 - ilk kare: 46ms
+hud_b/h_0248.png|Son basis: 338 ms - Gii¢: %75 - Gorsel: %92 - ilk kare: 46ms
+hud_b/h_0249.png|Son basis: 338 ms - Gilg: %75 - Gorsel: %92 - ilk kare: 46ms
+hud_b/h_0250.png|os ‘ ae: a ms
+hud_b/h_0251.png|os ‘ ae: as
+hud_b/h_0252.png|os ‘ ae: as
+hud_b/h_0253.png|os ‘ ae: as
+hud_b/h_0254.png|—ipteaaing
+hud_b/h_0255.png|Son basis: 271 ms - Gig: %60 - Gérsel: %68 - ilk kare: 54ms
+hud_b/h_0256.png|Son basis: 271 ms - Gig: %60 - Gorsel: %68 - ilk kare: 54ms
+hud_b/h_0257.png|Son basis: 271 ms - Gig: %60 - Gorsel: %68 - ilk kare: 54ms
+hud_b/h_0258.png|Son basis: 271 ms - Gig: %60 - Gorsel: %68 - ilk kare: 54ms
+hud_b/h_0259.png|Son basis: 271 ms - Gig: %60 - Gérsel: %68 - ilk kare: 54ms
+hud_b/h_0260.png|Son basis: 271 ms - Gig: %60 - Gérsel: %68 - ilk kare: 54ms
+hud_b/h_0261.png|Son basis: 271 ms - Gig: %60 - Gorsel: %68 - ilk kare: 54ms
+hud_b/h_0262.png|Son me 271 ms - Gilg: %60 - Gorsel: %68 - ilk kare: 54ms
+hud_b/h_0263.png|Son ame ms - Gig: %64 - Gorsel: %73 - ilk kare: 46ms
+hud_b/h_0264.png|Son ame ms - Gig: %64 - Gorsel: %73 - ilk kare: 46ms
+hud_b/h_0265.png|Son ame ms - Gig: %64 - Gorsel: %73 - ilk kare: 46ms
+hud_b/h_0266.png|Son ames ms - Gig: %64 - Gorsel: %73 - ilk kare: 46ms
+hud_b/h_0267.png|Son ames ms - Gig: %64 - Gorsel: %73 - ilk kare: 46ms
+hud_b/h_0268.png|Son basis: 288 ms - Gig: %64 - Gorsel: %73 - ilk kare: 46ms
+hud_b/h_0269.png|Son basis: 288 ms - Gilg: %64 - Gorsel: %73 - ilk kare: 46ms
+hud_b/h_0270.png|Son basis: 288 ms - Gilg: %64 - Gorsel: %73 - ilk kare: 46ms
+hud_b/h_0271.png|Son basis: 288 ms - Gilg: %64 - Gorsel: %73 - ilk kare: 46ms
+hud_b/h_0272.png|Son basis: 288 ms - Gii¢: %64 - Gorsel: %73 - ilk kare: 46ms
+hud_b/h_0273.png|Son basis: 288 ms - Gii¢: %64 - Gorsel: %73 - ilk kare: 46ms
+hud_b/h_0274.png|os ‘ ae: a ms
+hud_b/h_0275.png|os ‘ ae: as
+hud_b/h_0276.png|os ‘ ae: as
+hud_b/h_0277.png|os ‘ ae: as
+hud_b/h_0278.png|os ‘ ae: as
+hud_b/h_0279.png|Son basis: 254 ms - Gig: %56 - Gorsel: %66 - ilk kare: 46ms
+hud_b/h_0280.png|Son basis: 254 ms - Gig: %56 - Gorsel: %66 - ilk kare: 46ms
+hud_b/h_0281.png|Son basis: 254 ms - Gig: %56 - Gorsel: %66 - ilk kare: 46ms
+hud_b/h_0282.png|Son basis: 254 ms - Gii¢: %56 - Gorsel: %66 - ilk kare: 46ms
+hud_b/h_0283.png|Son basis: 254 ms - Gii¢: %56 - Gorsel: %66 - ilk kare: 46ms
+hud_b/h_0284.png|Son basis: 254 ms - Gii¢: %56 - Gorsel: %66 - ilk kare: 46ms
+hud_b/h_0285.png|Son basis: 254 ms - Gii¢: %56 - Gorsel: %66 - ilk kare: 46ms
+hud_b/h_0286.png|Son basis: 254 ms - Gig: %56 - Gorsel: %66 - ilk kare: 46ms
+hud_b/h_0287.png|Son basis: 254 ms - Gii¢: %56 - Gorsel: %66 - ilk kare: 46ms
+hud_b/h_0288.png|Son basis: 254 ms - Gii¢: %56 - Gorsel: %66 - ilk kare: 46ms
+hud_b/h_0289.png|Son basis: 404 ms - Gilg: %90 - Gorsel: %97 - ilk kare: 54ms
+hud_b/h_0290.png|Son basis: 404 ms - Gilg: %90 - Gorsel: %97 - ilk kare: 54ms
+hud_b/h_0291.png|Son basis: 404 ms - Gilg: %90 - Gorsel: %97 - ilk kare: 54ms
+hud_b/h_0292.png|Son basis: 404 ms - Gilg: %90 - Gorsel: %97 - ilk kare: 54ms
+hud_b/h_0293.png|Son basis: 404 ms - Gilg: %90 - Gorsel: %97 - ilk kare: 54ms
+hud_b/h_0294.png|Son basis: 404 ms - Gilg: %90 - Gorsel: %97 - ilk kare: 54ms
+hud_b/h_0295.png|Son basis: 404 ms - Gilg: %90 - Gorsel: %97 - ilk kare: 54ms
+hud_b/h_0296.png|Son basis: 404 ms - Gilg: %90 - Gorsel: %97 - ilk kare: 54ms
+hud_b/h_0297.png|Son basis: 404 ms - Gilg: %90 - Gorsel: %97 - ilk kare: 54ms
+hud_b/h_0298.png|Son basis: 404 ms - Gilg: %90 - Gorsel: %97 - ilk kare: 54ms
+hud_b/h_0299.png|Son basis: 404 ms - Gilg: %90 - Gorsel: %97 - ilk kare: 54ms
+hud_b/h_0300.png|Son basis: 404 ms - Gilg: %90 - Gorsel: %97 - ilk kare: 54ms
+hud_b/h_0301.png|Son basis: 404 ms - Gilg: %90 - Gorsel: %97 - ilk kare: 54ms
+hud_b/h_0302.png|os ‘ ae: as
+hud_b/h_0303.png|os ‘ ae: as
+hud_b/h_0304.png|os ‘ ae: as
+hud_b/h_0305.png|os ‘ ae: as
+hud_b/h_0306.png|Son basis: 279 ms - Gilg: %62 - Gorsel: %69 - ilk kare: 46ms
+hud_b/h_0307.png|Son basis: 279 ms - Gilg: %62 - Gorsel: %69 - ilk kare: 46ms
+hud_b/h_0308.png|Son basis: 279 ms - Gilg: %62 - Gorsel: %69 - ilk kare: 46ms
+hud_b/h_0309.png|Son basis: 279 ms - Gug: %62 os %69 - ilk kare: 46ms
+hud_b/h_0310.png|Son basis: 279 ms - Gug: %62 as %69 - ilk kare: 46ms
+hud_b/h_0311.png|Son basis: 279 ms - Gug: %62 - ae %69 - ilk kare: 46ms
+hud_b/h_0312.png|Son basis: 279 ms - Gug: %62 - as %69Q - ilk kare: 46ms
+hud_b/h_0313.png|Son basis: 279 ms - Gug: %62 - ae %69 - ilk kare: 46ms
+hud_b/h_0314.png|Son basis: 279 ms - Gug: %62 - a %69 - ilk kare: 46ms
+hud_b/h_0315.png|Son basis: 279 ms - Gug: %62 - a %69 - ilk kare: 46ms
+hud_b/h_0316.png|Son basis: 363 ms - Gilg: %81 - Gorsel: %88 - ilk kare: 46ms
+hud_b/h_0317.png|Son basis: 363 ms - Gilg: %81 - Gorsel: %88 - ilk kare: 46ms
+hud_b/h_0318.png|Son basis: 363 ms - Gilg: %81 - Gorsel: %88 - ilk kare: 46ms
+hud_b/h_0319.png|Son basis: 363 ms - Gilg: %81 - Gorsel: %88 - ilk kare: 46ms
+hud_b/h_0320.png|Son basis: 363 ms - Gilg: %81 - Gorsel: %88 - ilk kare: 46ms
+hud_b/h_0321.png|Son basis: 363 ms - Gilg: %81 - Gorsel: %88 - ilk kare: 46ms
+hud_b/h_0322.png|Son basis: 363 ms - Gilg: %81 - Gorsel: %88 - ilk kare: 46ms
+hud_b/h_0323.png|Son basis: 363 ms - Gilg: %81 - Gorsel: %88 - ilk kare: 46ms
+hud_b/h_0324.png|Son basis: 363 ms - Gilg: %81 - Gorsel: %88 - ilk kare: 46ms
+hud_b/h_0325.png|Son basis: 363 ms - Gilg: %81 - Gorsel: %88 - ilk kare: 46ms
+hud_b/h_0326.png|Son basis: 363 ms - Gilg: %81 - Gorsel: %88 - ilk kare: 46ms
+hud_b/h_0327.png|Son basis: 363 ms - Gilg: %81 - Gorsel: %88 - ilk kare: 46ms
+hud_b/h_0328.png|Son basis: 363 ms - Gilg: %81 - Gorsel: %88 - ilk kare: 46ms
+hud_b/h_0329.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %90 - ilk kare: 54ms
+hud_b/h_0330.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %90 - ilk kare: 54ms
+hud_b/h_0331.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %90 - ilk kare: 54ms
+hud_b/h_0332.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %90 - ilk kare: 54ms
+hud_b/h_0333.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %90 - ilk kare: 54ms
+hud_b/h_0334.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %90 - ilk kare: 54ms
+hud_b/h_0335.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %90 - ilk kare: 54ms
+hud_b/h_0336.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %90 - ilk kare: 54ms
+hud_b/h_0337.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %90 - ilk kare: 54ms
+hud_b/h_0338.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %90 - ilk kare: 54ms
+hud_b/h_0339.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %90 - ilk kare: 54ms
+hud_b/h_0340.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %84 - ilk kare: 46ms
+hud_b/h_0341.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %84 - ilk kare: 46ms
+hud_b/h_0342.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %84 - ilk kare: 46ms
+hud_b/h_0343.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %84 - ilk kare: 46ms
+hud_b/h_0344.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %84 - ilk kare: 46ms
+hud_b/h_0345.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %84 - ilk kare: 46ms
+hud_b/h_0346.png|Son basis: 346 ms - Gilg: %77 - Gorsel: %84 - ilk kare: 46ms
+hud_b/h_0347.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %84 - ilk kare: 46ms
+hud_b/h_0348.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %84 - ilk kare: 46ms
+hud_b/h_0349.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %84 - ilk kare: 46ms
+hud_b/h_0350.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %84 - ilk kare: 46ms
+hud_b/h_0351.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %84 - ilk kare: 46ms
+hud_b/h_0352.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %84 - ilk kare: 46ms
+hud_b/h_0353.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %84 - ilk kare: 46ms
+hud_b/h_0354.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %84 - ilk kare: 46ms
+hud_b/h_0355.png|os ‘ ae: a ms
+hud_b/h_0356.png|os ‘ ae: as
+hud_b/h_0357.png|os ‘ ae: as
+hud_b/h_0358.png|os ‘ ae: as
+hud_b/h_0359.png|os ‘ ae: as
+hud_b/h_0360.png|os ‘ ae: as
+hud_b/h_0361.png|Son basis: 329 ms - Gig: %73 - Gérsel: %81 - ilk kare: “ems
+hud_b/h_0362.png|Son basis: 329 ms - Gii¢: %73 - Gorsel: %81 - ilk kare: soms
+hud_b/h_0363.png|Son basis: 329 ms - Gii¢: %73 - Gorsel: %81 - ilk kare: sems
+hud_b/h_0364.png|Son basis: 329 ms - Gii¢: %73 - Gérsel: %81 - ilk kare: sems
+hud_b/h_0365.png|Son basis: 329 ms - Gig: %73 - Gérsel: %81 - ilk kare: soms
+hud_b/h_0366.png|Son basis: 329 ms - Gii¢: %73 - Gorsel: %81 - ilk kare: 46ms
+hud_b/h_0367.png|Son basis: 329 ms - Gii¢: %73 - Gorsel: %81 - ilk kare: 46ms
+hud_b/h_0368.png|Son basis: 329 ms - Gilg: %73 - Gorsel: %81 - ilk kare: 46ms
+hud_b/h_0369.png|Son basis: 329 ms - Gii¢: %73 - Gorsel: %81 - ilk kare: 46ms
+hud_b/h_0370.png|Son basis: 329 ms - Gii¢: %73 - Gorsel: %81 - ilk kare: 46ms
+hud_b/h_0371.png|Son basis: 329 ms - Gilg: %73 - Gorsel: %81 - ilk kare: 46ms
+hud_b/h_0372.png|Son basis: 313 ms - Glig: %69 - Gorsel: %84 - ilk kare: 46ms
+hud_b/h_0373.png|Son basis: 313 ms - Gig: %69 - Gorsel: %84 - ilk kare: 46ms
+hud_b/h_0374.png|Son basis: 313 ms - Gig: %69 - Gérsel: %84 - ilk kare: 46ms
+hud_b/h_0375.png|Son basis: 313 ms - Gig: %69 - Gérsel: %84 - ilk kare: 46ms
+hud_b/h_0376.png|Son basis: 313 ms - Gig: %69 - Gérsel: %84 - ilk kare: 46ms
+hud_b/h_0377.png|Son basis: 313 ms - Gig: %69 - Gérsel: %84 - ilk kare: 46ms
+hud_b/h_0378.png|Son basis: 313 ms - Gig: %69 - Gorsel: %84 - ilk kare: 46ms
+hud_b/h_0379.png|Son basis: 313 ms - Gig: %69 - Gorsel: %84 - ilk kare: 46ms
+hud_b/h_0380.png|Son basis: 313 ms - Glig: %69 - Gérsel: %84 - ilk kare: 46ms
+hud_b/h_0381.png|Son basis: 313 ms - Glic: %69 - Gérsel: %84 - ilk kare: 46ms
+hud_b/h_0382.png|Son basis: 313 ms - Gig: %69 - Gorsel: %84 - ilk kare: 46ms
+hud_b/h_0383.png|Son basis: 371 ms - Gilg: %82 - Gorsel: %100 - ilk kare: 46ms
+hud_b/h_0384.png|Son basis: 371 ms - Gilg: %82 - Gorsel: %100 - ilk kare: 46ms
+hud_b/h_0385.png|Son basis: 371 ms - Gig: %82 - Gorsel: %100 - ilk kare: 46ms
+hud_b/h_0386.png|Son basis: 371 ms - Gig: %82 - Gorsel: %100 - ilk kare: 46ms
+hud_b/h_0387.png|Son basis: 371 ms - Gig: %82 - Gorsel: %100 - ilk kare: 46ms
+hud_b/h_0388.png|Son basis: 371 ms - Gig: %82 - Gorsel: %100 - ilk kare: 46ms
+hud_b/h_0389.png|Son basis: 371 ms - Gig: %82 - Gorsel: %100 - ilk kare: 46ms
+hud_b/h_0390.png|Son basis: 371 ms - Gilg: %82 - Gorsel: %100 - ilk kare: 46ms
+hud_b/h_0391.png|Son basis: 371 ms - Gilg: %82 - Gorsel: %100 - ilk kare: 46ms
+hud_b/h_0392.png|Son basis: 371 ms - Gilg: %82 - Gorsel: %100 - ilk kare: 46ms
+hud_b/h_0393.png|Son basis: 371 ms - Gig: %82 - Gorsel: %100 - ilk kare: 46ms
+hud_b/h_0394.png|Son basis: 371 ms - Gig: %82 - Gorsel: %100 - ilk kare: 46ms
+hud_b/h_0395.png|Son basis: 404 ms - Gilg: %90 - Gorsel: %99 - ilk kare: 46ms
+hud_b/h_0396.png|Son basis: 404 ms - Gilg: %90 - Gorsel: %99 - ilk kare: 46ms
+hud_b/h_0397.png|Son basis: 404 ms - Gilg: %90 - Gorsel: %99 - ilk kare: 46ms
+hud_b/h_0398.png|Son basis: 404 ms - Gilg: %90 - Gorsel: %99 - ilk kare: 46ms
+hud_b/h_0399.png|Son basis: 404 ms - Gilg: %90 - Gorsel: %99 - ilk kare: 46ms
+hud_b/h_0400.png|Son basis: 404 ms - Gilg: %90 - Gorsel: %99 - ilk kare: 46ms
+hud_b/h_0401.png|Son basis: 404 ms - Gilg: %90 - Gorsel: %99 - ilk kare: 46ms
+hud_b/h_0402.png|Son basis: 404 ms - Gilg: %90 - Gorsel: %99 - ilk kare: 46ms
+hud_b/h_0403.png|Son basis: 404 ms - Gilg: %90 - Gorsel: %99 - ilk kare: 46ms
+hud_b/h_0404.png|Son basis: 404 ms - Gilg: %90 - Gorsel: %99 - ilk kare: 46ms
+hud_b/h_0405.png|Son basis: 404 ms - Gilg: %90 - Gorsel: %99 - ilk kare: 46ms
+hud_b/h_0406.png|Son basis: 404 ms - Gilg: %90 - Gorsel: %99 - ilk kare: 46ms
+hud_b/h_0407.png|Son basis: 388 ms - Gii¢: %86 - Gorsel: %100 - ilk kare: 54ms
+hud_b/h_0408.png|Son basis: 388 ms - Gii¢: %86 - Gorsel: %100 - ilk kare: 54ms
+hud_b/h_0409.png|Son basis: 388 ms - Gii¢: %86 - Gorsel: %100 - ilk kare: 54ms
+hud_b/h_0410.png|Son basis: 388 ms - Gii¢: %86 - Gorsel: %100 - ilk kare: 54ms
+hud_b/h_0411.png|Son basis: 388 ms - Gii¢: %86 - Gorsel: %100 - ilk kare: 54ms
+hud_b/h_0412.png|Son basis: 388 ms - Gii¢: %86 - Gorsel: %100 - ilk kare: 54ms
+hud_b/h_0413.png|Son basis: 388 ms - Gii¢: %86 - Gorsel: %100 - ilk kare: 54ms
+hud_b/h_0414.png|Son basis: 388 ms - Gii¢: %86 - Gorsel: %100 - ilk kare: 54ms
+hud_b/h_0415.png|Son basis: 388 ms - Gii¢: %86 - Gorsel: %100 - ilk kare: 54ms
+hud_b/h_0416.png|Son basis: 388 ms - Gii¢: %86 - Gorsel: %100 - ilk kare: 54ms
+hud_b/h_0417.png|Son basis: 388 ms - Gii¢: %86 - Gorsel: %100 - ilk kare: 54ms
+hud_b/h_0418.png|Son basis: 388 ms - Gii¢: %86 - Gorsel: %100 - ilk kare: 54ms
+hud_b/h_0419.png|Son basis: 388 ms - Gii¢: %86 - Gorsel: %100 - ilk kare: 54ms
+hud_b/h_0420.png|Son basis: 696 ms - Giic: %100 - Gérsel: %100 - ilk kare: 46ms
+hud_b/h_0421.png|Son basis: 696 ms - Gig: %100 - Gorsel: %100 - ilk kare: 46ms
+hud_b/h_0422.png|Son pacts GOERS Glig: %100 - Gérsel: %100 - ilk kare: 46ms
+hud_b/h_0423.png|Son wi ay. ms Buc: %100 - Gérsel: %100 - ilk kare: 46ms
+hud_b/h_0424.png|Son bas 696 -m al %100 - Gérsel: %100 - ilk kare: 46ms
+hud_b/h_0425.png|Son basis: eS - Gig: %100 - Gorsel: %100 - ilk kare: 46ms
+hud_b/h_0426.png|Son basis: 696 ms - Gilg: %100 - Gérsel: %100 - ilk kare: 46ms
+hud_b/h_0427.png|Son basis: 696 ms - Giic: %100 - Gérsel: %100 - ilk kare: 46ms
+hud_b/h_0428.png|Son basis: 696 ms - Gilg: %100 - Gérsel: %100 - ilk kare: 46ms
+hud_b/h_0429.png|Son basis: 696 ms - Giic: %100 - Gérsel: %100 - ilk kare: 46ms
+hud_b/h_0430.png|Son basis: 696 ms - Gilg: %100 - Gérsel: %100 - ilk kare: 46ms
+hud_b/h_0431.png|Son basis: 696 ms - Gilg: %100 - Gérsel: %100 - ilk kare: 46ms
+hud_b/h_0432.png|Son basis: 696 ms - Gilg: %100 - Gérsel: %100 - ilk kare: 46ms
+hud_b/h_0433.png|oe
+hud_b/h_0434.png|—ipteaiag
+hud_b/h_0435.png|—ipteaiag
+hud_b/h_0436.png|—ipteaiag
+hud_b/h_0437.png|—ipteaiag
+hud_b/h_0438.png|Son basis: 329 ms - Gig: %73 - Gorsel: %82 - ilk kare: 54ms
+hud_b/h_0439.png|Son basis: 329 ms - Gig: %73 - Gorsel: %82 - ilk kare: 54ms
+hud_b/h_0440.png|Son basis: 329 ms - Gilg: %73 - Gorsel: %82 - ilk kare: 54ms
+hud_b/h_0441.png|Son basis: 329 ms - Gig: %73 - Gorsel: %82 - ilk kare: 54ms
+hud_b/h_0442.png|Son basis: 329 ms - Gilg: %73 - Gorsel: %82 - ilk kare: 54ms
+hud_b/h_0443.png|Son basis: 329 ms - Gilg: %73 - Gorsel: %82 - ilk kare: 54ms
+hud_b/h_0444.png|Son basis: 329 ms - Gilg: %73 - Gorsel: %82 - ilk kare: 54ms
+hud_b/h_0445.png|Son basis: 329 ms - Gig: %73 - Gorsel: %82 - ilk kare: 54ms
+hud_b/h_0446.png|Son basis: 329 ms - Gig: %73 - Gorsel: %82 - ilk kare: 54ms
+hud_b/h_0447.png|Son basis: 329 ms - Gig: %73 - Gorsel: %82 - ilk kare: 54ms
+hud_b/h_0448.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %86 - ilk kare: 54ms
+hud_b/h_0449.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %86 - ilk kare: 54ms
+hud_b/h_0450.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %86 - ilk kare: 54ms
+hud_b/h_0451.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %86 - ilk kare: 54ms
+hud_b/h_0452.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %86 - ilk kare: 54ms
+hud_b/h_0453.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %86 - ilk kare: 54ms
+hud_b/h_0454.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %86 - ilk kare: 54ms
+hud_b/h_0455.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %86 - ilk kare: 54ms
+hud_b/h_0456.png|ua basis: 346 ms - Gilg: %77 - Gérsel: %86 - ilk kare: 54ms
+hud_b/h_0457.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %86 - ilk kare: 54ms
+hud_b/h_0458.png|a basis: 329 ms - Gii¢: %73 - Gorsel: %82 - ilk kare: 54ms
+hud_b/h_0459.png|Son basis: 329 ms - Gilg: %73 - Gorsel: %82 - ilk kare: 54ms
+hud_b/h_0460.png|aa basis: 329 ms - Gii¢: %73 - Gorsel: %82 - ilk kare: 54ms
+hud_b/h_0461.png|Son basis: 329 ms - Gig: %73 - Gorsel: %82 - ilk kare: 54ms
+hud_b/h_0462.png|Son basis: 329 ms - Gig: %73 - Gorsel: %82 - ilk kare: 54ms
+hud_b/h_0463.png|Son basis: 329 ms - Gii¢: %73 - Gorsel: %82 - ilk kare: 54ms
+hud_b/h_0464.png|Son basis: 329 ms - Gig: %73 - Gorsel: %82 - ilk kare: 54ms
+hud_b/h_0465.png|Son basis: 329 ms - Gig: %73 - Gorsel: %82 - ilk kare: 54ms
+hud_b/h_0466.png|Son basis: 329 ms - Gig: %73 - Gorsel: %82 - ilk kare: 54ms
+hud_b/h_0467.png|Son basis: 212 ms - Gig: %47 - Gorsel: %55 - ilk kare: 46ms
+hud_b/h_0468.png|Son basis: 212 ms - Gig: %47 - Gorsel: %55 - ilk kare: 46ms
+hud_b/h_0469.png|Son basis: 212 ms - Gilg: %47 - Gorsel: %55 - ilk kare: 46ms
+hud_b/h_0470.png|Son basis: 212 ms - Gig: %47 - Gorsel: %55 - ilk kare: 46ms
+hud_b/h_0471.png|Son basis: 212 ms - Gig: %47 - Gérsel: %55 - ilk kare: 46ms
+hud_b/h_0472.png|Son basis: 212 ms - Gilg: %47 - Gérsel: %55 - ilk kare: 46ms
+hud_b/h_0473.png|Son basis: 212 ms - Gig: %47 - Gorsel: %55 - ilk kare: 46ms
+hud_b/h_0474.png|Son basis: 212 ms - Gig: %47 - Gorsel: %55 - ilk kare: 46ms
+hud_b/h_0475.png|Son basis: 212 ms - Gig: %47 - Gorsel: %55 - ilk kare: 46ms
+hud_b/h_0476.png|Son basis: 237 ms - Gilg: %53 - Gorsel: %60 - ilk kare: 54ms
+hud_b/h_0477.png|Son basis: 237 ms - Gilg: %53 - Gorsel: %60 - ilk kare: 54ms
+hud_b/h_0478.png|Son basis: 237 ms - Gilg: %53 - Gorsel: %60 - ilk kare: 54ms
+hud_b/h_0479.png|Son basis: 237 ms - Gilg: %53 - Gorsel: %60 - ilk kare: 54ms
+hud_b/h_0480.png|Son basis: 237 ms - Gilg: %53 - Gorsel: %60 - ilk kare: 54ms
+hud_b/h_0481.png|Son basis: 237 ms - Gilg: %53 - Gorsel: %60 - ilk kare: 54ms
+hud_b/h_0482.png|Son basis: 237 ms - Gilg: %53 - Gorsel: %60 - ilk kare: 54ms
+hud_b/h_0483.png|Son basis: 237 ms - Gilg: %53 - Gorsel: %60 - ilk kare: 54ms
+hud_b/h_0484.png|Son basis: 237 ms - Gilg: %53 - Gorsel: %60 - ilk kare: 54ms
+hud_b/h_0485.png|Son basis: 304 ms - Gilg: %68 - Gorsel: %75 - ilk kare: 54ms
+hud_b/h_0486.png|Son basis: 304 ms - Gii¢: %68 - Gorsel: %75 - ilk kare: 54ms
+hud_b/h_0487.png|Son pasig: 304 ms - Gig: %68 - Gorsel: %75 - ilk kare: 54ms
+hud_b/h_0488.png|Son basis a ms - Gig: %68 - Gorsel: %75 - ilk kare: 54ms
+hud_b/h_0489.png|Son basis: 304 ms - Gilg: %68 - Gorsel: %75 - ilk kare: 54ms
+hud_b/h_0490.png|Son basis: 304 ms - Gilg: %68 - Gorsel: %75 - ilk kare: 54ms
+hud_b/h_0491.png|Son basis: 304 ms - Gilg: %68 - Gorsel: %75 - ilk kare: 54ms
+hud_b/h_0492.png|Son basis: 304 ms - Gilg: %68 - Gorsel: %75 - ilk kare: 54ms
+hud_b/h_0493.png|Son basis: 304 ms - Gilg: %68 - Gorsel: %75 - ilk kare: 54ms
+hud_b/h_0494.png|Son basis: 304 ms - Gilg: %68 - Gorsel: %75 - ilk kare: 54ms
+hud_b/h_0495.png|Son basis: 304 ms - Gilg: %68 - Gorsel: %75 - ilk kare: 54ms
+hud_b/h_0496.png|Son basis: 329 ms - Gilg: %73 - Gorsel: %81 - ilk kare: 46ms
+hud_b/h_0497.png|Son basis: 329 ms - Gii¢: %73 - Gorsel: %81 - ilk kare: 46ms
+hud_b/h_0498.png|Son basis: 329 ms - Gilg: %73 - Gorsel: %81 - ilk kare: 46ms
+hud_b/h_0499.png|Son basis: 329 ms - Gii¢: %73 - Gorsel: %81 - ilk kare: 46ms
+hud_b/h_0500.png|Son basis: 329 ms - Gig: %73 - Gorsel: %81 - ilk kare: 46ms
+hud_b/h_0501.png|Son basis: 329 ms - Gig: %73 - Gorsel: %81 - ilk kare: 46ms
+hud_b/h_0502.png|Son basis: 329 ms - cas %73 - Gorsel: %81 - ilk kare: 46ms
+hud_b/h_0503.png|Son basis: 329 ms - cas %73 - Gorsel: %81 - ilk kare: 46ms
+hud_b/h_0504.png|Son basis: 329 ms - cas %73 - Gorsel: %81 - ilk kare: 46ms
+hud_b/h_0505.png|Son basis: 329 ms - eis %73 - Gorsel: %81 - ilk kare: 46ms
+hud_b/h_0506.png|Son basis: 329 ms - ens %73 - Gorsel: %81 - ilk kare: 46ms
+hud_b/h_0507.png|Son basis: 329 ms - sla oe - Gorsel: %81 - ilk kare: 46ms
+hud_b/h_0508.png|Son basis: 329 ms - sla oe - Gorsel: %81 - ilk kare: 46ms
+hud_b/h_0509.png|Son basis: 329 ms - Gii¢: %73 - Gorsel: %81 - ilk kare: 46ms
+hud_b/h_0510.png|Son basis: 329 ms - Gii¢: %73 - Gorsel: %81 - ilk kare: 46ms
+hud_b/h_0511.png|Son basis: 329 ms - Gii¢: %73 - Gorsel: %81 - ilk kare: 46ms
+hud_b/h_0512.png|Son basis: 329 ms - Gii¢: %73 - Gorsel: %81 - ilk kare: 46ms
+hud_b/h_0513.png|Son basis: 329 ms - Gii¢: %73 - Gorsel: %81 - ilk kare: 46ms
+hud_b/h_0514.png|Son basis: 329 ms - Gii¢: %73 - Gorsel: %81 - ilk kare: 46ms
+hud_b/h_0515.png|Son basis: 329 ms - Gii¢: %73 - Gorsel: %81 - ilk kare: 46ms
+hud_b/h_0516.png|Son basis: 329 ms - Gii¢: %73 - Gorsel: %81 - ilk kare: 46ms
+hud_b/h_0517.png|Son basis: 329 ms - Gii¢: %73 - Gorsel: %81 - ilk kare: 46ms
+hud_b/h_0518.png|
+hud_b/h_0519.png|
+hud_b/h_0520.png|
+hud_b/h_0521.png|
+hud_b/h_0522.png|Son basis: 196 ms - Gig: %44 - Gérsel: %53 - ilk kare: 54ms
+hud_b/h_0523.png|Son basis: 196 ms - Gig: %44 - Gérsel: %53 - ilk kare: 54ms
+hud_b/h_0524.png|Son basis: 196 ms - Gig: %44 - Gorsel: %53 - ilk kare: 54ms
+hud_b/h_0525.png|Son basis: 196 ms - Gig: %44 - Gorsel: %53 - ilk kare: 54ms
+hud_b/h_0526.png|Son basis: 196 ms - Gig: %44 - Gorsel: %53 - ilk kare: 54ms
+hud_b/h_0527.png|Son basis: 196 ms - Gig: %44 - Gérsel: %53 - ilk kare: 54ms
+hud_b/h_0528.png|Son basis: 196 ms - Gig: %44 - Gorsel: %53 - ilk kare: 54ms
+hud_b/h_0529.png|Son basis: 196 ms - Gig: %44 - Gorsel: %53 - ilk kare: 54ms
+hud_b/h_0530.png|Son basis: 229 ms - Gig: %51 - Gorsel: %60 - ilk kare: 54ms
+hud_b/h_0531.png|Son basis: 229 ms - Gig: %51- Gorsel: %60 - ilk kare: 54ms
+hud_b/h_0532.png|Son basis: 229 ms - Gig: %51 - Gorsel: %60 - ilk kare: 54ms
+hud_b/h_0533.png|Son basis: 229 ms - Gig: %51- Gorsel: %60 - ilk kare: 54ms
+hud_b/h_0534.png|Son basis: 229 ms - Gig: %51 - Gorsel: %60 - ilk kare: 54ms
+hud_b/h_0535.png|Son basis: 229 ms - Gig: %51- Gorsel: %60 - ilk kare: 54ms
+hud_b/h_0536.png|Son basis: 229 ms - Gig: %51- Gorsel: %60 - ilk kare: 54ms
+hud_b/h_0537.png|Son basis: 229 ms - Gig: %51- Gorsel: %60 - ilk kare: 54ms
+hud_b/h_0538.png|Son basis: 229 ms - Gig: %51 - Gorsel: %60 - ilk kare: 54ms
+hud_b/h_0539.png|Son basis: 338 ms - Gilg: %75 - Gorsel: %84 - ilk kare: 46ms
+hud_b/h_0540.png|Son basis: 338 ms - Gilg: %75 - Gorsel: %84 - ilk kare: 46ms
+hud_b/h_0541.png|Son basis: 338 ms - Gilg: %75 - Gorsel: %84 - ilk kare: 46ms
+hud_b/h_0542.png|Son basis: 338 ms - Gii¢: %75 - Gorsel: %84 - ilk kare: 46ms
+hud_b/h_0543.png|Son basis: 338 ms - Gilg: %75 - Gorsel: %84 - ilk kare: 46ms
+hud_b/h_0544.png|Son basis: 338 ms - Gii¢: %75 - Gorsel: %84 - ilk kare: 46ms
+hud_b/h_0545.png|Son basis: 338 ms - Gilg: %75 - Gorsel: %84 - ilk kare: 46ms
+hud_b/h_0546.png|Son basis: 338 ms - Gilg: %75 - Gorsel: %84 - ilk kare: 46ms
+hud_b/h_0547.png|Son basis: 338 ms - Gii¢: %75 - Gorsel: %84 - ilk kare: 46ms
+hud_b/h_0548.png|Son basis: 338 ms - Gilg: %75 - Gorsel: %84 - ilk kare: 46ms
+hud_b/h_0549.png|Son basis: 204 ms - Gilg: %45 - Gorsel: %55 - ilk kare: 46ms
+hud_b/h_0550.png|Son basis: 204 ms - Gug: %45 - Gorsel: eae kare: 46ms
+hud_b/h_0551.png|Son basis: 204 ms - Gug: %45 - Gorsel: geo Ora kare: 46ms
+hud_b/h_0552.png|Son basis: 204 ms - Gug: %45 - Gorsel: eae kare: 46ms
+hud_b/h_0553.png|Son basis: 204 ms - Gug: %45 - Gorsel: %55 oi kare: 46ms
+hud_b/h_0554.png|Son basis: 204 ms - Gug: %45 - Gorsel: %55 zu kare: 46ms
+hud_b/h_0555.png|Son basis: 204 ms - Gug: %45 - Gorsel: %55 ce kare: 46ms
+hud_b/h_0556.png|Son basis: 271 ms - Gug: %60 - Gorsel: %68 - Ustsus 54ms
+hud_b/h_0557.png|Son basis: 271 ms - Gig: %60 - Gorsel: %68 - ilk kare: 54ms
+hud_b/h_0558.png|Son basis: 271 ms - Gug: %60 - Gorsel: %68 - Ustsus 54ms
+hud_b/h_0559.png|Son basis: 271 ms - Gug: %60 - Gorsel: %68 - Uses 54ms
+hud_b/h_0560.png|Son basis: 271 ms - Gig: %60 - Gérsel: %68 - ilk kare: 54ms
+hud_b/h_0561.png|Son basis: 271 ms - Gig: %60 - Gorsel: %68 - ilk kare: 54ms
+hud_b/h_0562.png|Son basis: 271 ms - Gig: %60 - Gorsel: %68 - ilk kare: 54ms
+hud_b/h_0563.png|Son basis: 271 ms - Gig: %60 - Gorsel: %68 - ilk kare: 54ms
+hud_b/h_0564.png|Son basis: 271 ms - Gig: %60 - Gorsel: %68 - ilk kare: 54ms
+hud_b/h_0565.png|Son basis: 213 ms - Gilg: %47 - Gorsel: %55 - ilk kare: 46ms
+hud_b/h_0566.png|Son basis: 213 ms - Gilg: %47 - Gorsel: %55 - ilk kare: 46ms
+hud_b/h_0567.png|Son basis: 213 ms - Gilg: %47 - Gorsel: %55 - ilk kare: 46ms
+hud_b/h_0568.png|Son basis: 213 ms - Gilg: %47 - Gorsel: %55 - ilk kare: 46ms
+hud_b/h_0569.png|Son basis: 213 ms - Gilg: %47 - Gorsel: %55 - ilk kare: 46ms
+hud_b/h_0570.png|Son basis: 213 ms - Gilg: %47 - Gorsel: %55 - ilk kare: 46ms
+hud_b/h_0571.png|Son basis: 213 ms - Gilg: %47 - Gorsel: %55 - ilk kare: 46ms
+hud_b/h_0572.png|Son basis: 213 ms - Gilg: %47 - Gorsel: %55 - ilk kare: 46ms
+hud_b/h_0573.png|Son basis: 229 ms - Gig: %51- Gorsel: %60 - ilk kare: 54ms
+hud_b/h_0574.png|Son basis: 229 ms - Gig: %51- Gorsel: %60 - ilk kare: 54ms
+hud_b/h_0575.png|Son basis: 229 ms - Gig: %51 - Gorsel: %60 - ilk kare: 54ms
+hud_b/h_0576.png|Son basis: 229 ms - Gig: %51- Gorsel: %60 - ilk kare: 54ms
+hud_b/h_0577.png|Son basis: 229 ms - Gig: %51- Gorsel: %60 - ilk kare: 54ms
+hud_b/h_0578.png|Son basis: 229 ms - Gig: %51- Gorsel: %60 - ilk kare: 54ms
+hud_b/h_0579.png|Son basis: 229 ms - Gig: %51- Gorsel: %60 - ilk kare: 54ms
+hud_b/h_0580.png|Son basis: 229 ms - Gig: %51 - Gorsel: %60 - ilk kare: 54ms
+hud_b/h_0581.png|Son basis: 229 ms - Gig: %51- Gorsel: %60 - ilk kare: 54ms
+hud_b/h_0582.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %86 - ilk kare: 54ms
+hud_b/h_0583.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %86 - ilk kare: 54ms
+hud_b/h_0584.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %86 - ilk kare: 54ms
+hud_b/h_0585.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %86 - ilk kare: 54ms
+hud_b/h_0586.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %86 - ilk kare: 54ms
+hud_b/h_0587.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %86 - ilk kare: 54ms
+hud_b/h_0588.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %86 - ilk kare: 54ms
+hud_b/h_0589.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %86 - ilk kare: 54ms
+hud_b/h_0590.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %86 - ilk kare: 54ms
+hud_b/h_0591.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %86 - ilk kare: 54ms
+hud_b/h_0592.png|Son basis: 346 ms - Gii¢: %77 - Gorsel: %86 - ilk kare: 54ms
+hud_b/h_0593.png|Son basis: 329 ms - Gii¢: %73 - Gorsel: %82 - ilk kare: 54ms
+hud_b/h_0594.png|Son basis: 329 ms - Gig: %73 - Gorsel: %82 - ilk kare: 54ms
+hud_b/h_0595.png|Son basis: 329 ms - Gig: %73 - Gorsel: %82 - ilk kare: 54ms
+hud_b/h_0596.png|Son basis: 329 ms - Gig: %73 - Gorsel: %82 - ilk kare: 54ms
+hud_b/h_0597.png|Son basis: 329 ms - Gig: %73 - Gorsel: %82 - ilk kare: 54ms
+hud_b/h_0598.png|Son basis: 329 ms - Gig: %73 - Gorsel: %82 - ilk kare: 54ms
+hud_b/h_0599.png|Son basis: 329 ms - Gig: %73 - Gorsel: %82 - ilk kare: 54ms
+hud_b/h_0600.png|Son basis: 329 ms - Gig: %73 - Gorsel: %82 - ilk kare: 54ms
+hud_b/h_0601.png|Son basis: 329 ms - Gig: %73 - Gorsel: %82 - ilk kare: 54ms
+hud_b/h_0602.png|Son basis: 329 ms - Gig: %73 - Gorsel: %82 - ilk kare: 54ms
+hud_b/h_0603.png|Son basis: 329 ms - Gig: %73 - Gorsel: %82 - ilk kare: 54ms
+hud_b/h_0604.png|Son basis: 329 ms - Gig: %73 - Gorsel: %82 - ilk kare: 54ms
+hud_b/h_0605.png|Son basis: 329 ms - Gig: %73 - Gorsel: %82 - ilk kare: 54ms
