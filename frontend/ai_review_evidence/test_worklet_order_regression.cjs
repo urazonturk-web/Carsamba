@@ -96,7 +96,26 @@ function transformAndInspect(tsSource, label) {
     if (typeof fn !== "function") {
       return { stage: "inspect", error: new Error("generateProceduralPlatform was not exported as a function") };
     }
-    const closure = fn.__closure;
+    const rawClosure = fn.__closure;
+    // react-native-worklets >= 0.13 (Expo SDK 58) emits `__closure` as an
+    // ARRAY of captured values in source order instead of a {name: value}
+    // object. A captured helper that is read before its const binding exists
+    // shows up as an `undefined` slot; there is no name to look up then.
+    if (Array.isArray(rawClosure)) {
+      const undefinedSlots = rawClosure.map((v, i) => (v === undefined ? i : -1)).filter((i) => i >= 0);
+      if (undefinedSlots.length > 0) {
+        return {
+          stage: "inspect",
+          error: new Error(
+            `generateProceduralPlatform.__closure (array) captured slot(s) ${undefinedSlots.join(",")} as undefined -- a helper such as lerp was read before its declaration`
+          ),
+          expectedMissingHelperSymptom: true,
+        };
+      }
+    }
+    const closure = Array.isArray(rawClosure)
+      ? { lerp: rawClosure.find((v) => typeof v === "function" && v.name === "lerp") }
+      : rawClosure;
     if (!closure || typeof closure !== "object") {
       return { stage: "inspect", error: new Error("generateProceduralPlatform.__closure is missing -- not a worklet-transformed function") };
     }

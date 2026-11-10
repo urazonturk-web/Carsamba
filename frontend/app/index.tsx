@@ -3,10 +3,9 @@ import { Asset } from "expo-asset";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Haptics from "expo-haptics";
 import { StatusBar } from "expo-status-bar";
-import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import { Fragment, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   type GestureResponderEvent,
-  Image,
   Platform,
   Pressable,
   Text,
@@ -16,6 +15,7 @@ import {
 import Animated, {
   runOnJS,
   runOnUI,
+  useAnimatedReaction,
   useAnimatedStyle,
   useDerivedValue,
   useFrameCallback,
@@ -23,10 +23,13 @@ import Animated, {
   withTiming,
   withSpring,
   withSequence,
+  withRepeat,
+  Easing,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { AmbientBirds } from "../src/game/AmbientBirds";
+import { NO_IMAGE_CLIP, NoClipImage as Image } from "../src/game/NoClipImage";
 import { ChargePoses } from "../src/game/ChargePoses";
 import { CHARGE_POSES } from "../src/game/character-pose";
 import { ANCHOR_SHIFT_PX, GLOBAL_VISUAL_SCALE, POSE_FEET_SPAN_PX } from "../src/game/character-pose";
@@ -34,7 +37,7 @@ import { GAME_OVER_LINE } from "../src/game/copy";
 import { jumpVelocity, advanceFlight } from "../src/game/jump";
 import { findFootLanding } from "../src/game/landing";
 import { referencePlatform, referenceTowerWidth } from "../src/game/reference-course";
-import { generateProceduralPlatform, mulberry32Step, classifyPlatformVisualType, ROOFTOP_ASSET_GEOMETRY, ROOFTOP_GROUND_Y, type PlatformVisualType } from "../src/game/procedural-course";
+import { generateProceduralPlatform, mulberry32Step, classifyPlatformVisualType, ROOFTOP_GROUND_Y, type PlatformVisualType } from "../src/game/procedural-course";
 import { FIXED_PANEL_PLATFORMS, PANEL_SOURCES, PANEL_WORLD_WIDTH, PANEL_WORLD_HEIGHT, PANEL_FILL_STRIP_HEIGHT, PANEL_TOP_EDGE_SOURCES, PANEL_BOTTOM_EDGE_SOURCES, PANEL_SEAM_OVERLAP } from "../src/game/panel-course";
 import { CONFIG, DEBUG_MODE, EXPERIMENTAL_COURSE, PHASE, REFERENCE_TRIAL } from "@/src/game/config";
 import { makeStyles, useTheme } from "@/src/theme";
@@ -52,17 +55,11 @@ const BRICK_SOURCE = require("@/assets/environment/brick-inline.json");
 // not a long shaft -- no per-platform tiling/repeat, no procedural art, no
 // separate "floating chimney" overlay disconnected from a roof base. Picked
 // per platform from `p.cat` (0=wide,1=medium,2=narrow -- an EXISTING,
-// already-generated field, not a new hash). Geometry (ROOFTOP_ASSET_GEOMETRY)
+// already-generated field, not a new hash). Platform geometry
 // now lives in procedural-course.ts, the SAME table `rootedTopY` uses to
 // derive the platform's physical Y (see OYUN_AKISI-002 below) -- imported,
 // not duplicated, so the visual cap and the physical landing surface can
 // never drift apart.
-const ROOFTOP_SOURCES = [
-  require("@/assets/environment/rooftop-long-v1.png"),
-  require("@/assets/environment/rooftop-medium-v1.png"),
-  require("@/assets/environment/rooftop-short-v1.png"),
-] as const;
-const ROOFTOP_ASSET = ROOFTOP_ASSET_GEOMETRY;
 // GORSEL-020 RooftopDistrict: ONE decorative, world-anchored, horizontally
 // repeating (mirror-tiled, seamless) low-rooftop strip. Drawn in the world
 // container (camera transform 1:1 with platforms, no parallax) AFTER the
@@ -70,7 +67,13 @@ const ROOFTOP_ASSET = ROOFTOP_ASSET_GEOMETRY;
 // the district and only the shaft + cap rise out of it. DISTRICT_TOP_Y is
 // below every possible landing cap (rootedTopY max ~80.6) so no landing
 // surface is ever covered. Never read by physics/collision/camera.
-const DISTRICT_SOURCE = require("@/assets/environment/district/rooftop-district-v1.png");
+// REVIZYON-030: graded (cooler, slightly desaturated/darker) copies of the same
+// district art so the warm chimney bodies separate from the roof behind them by
+// colour/value. TOP = top rows feathered to alpha 0 (soft blend into the
+// master's own painted roofs, no hard band); BODY = same grade, no feather,
+// used vertically flipped below the TOP tile to extend the roof downward.
+const DISTRICT_SOURCE = require("@/assets/environment/district/rooftop-district-v2.png");
+const DISTRICT_BODY_SOURCE = require("@/assets/environment/district/rooftop-district-v2-body.png");
 const DISTRICT_IMG_W = 826;
 const DISTRICT_IMG_H = 252;
 const DISTRICT_SCALE = 1.9; // world units per source px
@@ -83,8 +86,178 @@ const DISTRICT_TILE_H = DISTRICT_IMG_H * DISTRICT_SCALE;
 // while the platform layer slid.) It draws BEHIND the platform sprites so caps
 // lower than the roofline (random topY up to +320) stay visible.
 const DISTRICT_TOP_Y = 92;
-// World Y the chimney bodies are rooted to (a constant, no camera term).
-const DISTRICT_ROOT_Y = DISTRICT_TOP_Y + 40;
+// REVIZYON-054: the fixed district is the BACK row of the same neighbourhood
+// (same art, same material) -- slightly smaller and slower in X so it reads
+// one row behind the playable houses instead of a second roofline at their
+// depth. Y stays world-locked (the far master layer is anchored to it).
+// REVIZYON-056 A/B switch: true = R055 look (repeating back rooftop row +
+// its extension/haze layers); false = only the far Istanbul skyline, sea, sky
+// and the playable houses.
+const SHOW_BACK_DISTRICT = false as boolean;
+const BACK_DISTRICT_SCALE = 0.78;
+const BACK_DISTRICT_PARALLAX = 0.8; // fraction of camera X motion it follows
+const BACK_TILE_W = DISTRICT_TILE_W * BACK_DISTRICT_SCALE;
+const BACK_TILE_H = DISTRICT_TILE_H * BACK_DISTRICT_SCALE;
+// Source rows 0..48 of the district fade to alpha 0; haze only the opaque part.
+const BACK_HAZE_TOP = 48 * DISTRICT_SCALE * BACK_DISTRICT_SCALE;
+
+// REVIZYON-054: every playable platform is a house built from the district
+// art's OWN pixels at the district's OWN scale (1 source px = DISTRICT_SCALE
+// world units, never stretched): roof tiles, the district's hip slope, its
+// gutter, its plaster and real window/balcony/laundry slices
+// (assets/environment/district/house/*, generated from rooftop-district-v2.png
+// -- see AI_REVIEW.md REVIZYON-054). The landing ridge is the existing cap at
+// exactly p.x/p.topY/p.width; hips fall away from it, the house widens to the
+// neighbour gaps (always leaving an alley) and its facade runs off-screen.
+const HOUSE_ROOF_SOURCE = require("@/assets/environment/district/house/house-roof-tiles.png");
+const HOUSE_GUTTER_SOURCE = require("@/assets/environment/district/house/house-gutter.png");
+const HOUSE_FACADE_SOURCE = require("@/assets/environment/district/house/house-facade-column.png");
+const HOUSE_K = DISTRICT_SCALE;
+const HOUSE_ROOF_W = 486 * HOUSE_K;
+const HOUSE_ROOF_H = 47 * HOUSE_K;
+const HOUSE_ROOF_TEX_PERIOD = 86 * HOUSE_K;
+const HOUSE_HIP_W = 40 * HOUSE_K;
+const HOUSE_HIP_SLOPE = 47 / 40; // the district's own hip: 47 px drop over 40 px run
+// The front roof face is ONE continuous tile image cut along both hip lines by
+// two rotated clip boxes (fixed angle = the district's hip angle), so the
+// tiles never restart at the landing edges.
+const HOUSE_HIP_ANGLE = Math.atan(40 / 47);
+const HOUSE_HIP_DEG = `${(HOUSE_HIP_ANGLE * 180) / Math.PI}deg`;
+const HOUSE_HIP_NEG_DEG = `${(-HOUSE_HIP_ANGLE * 180) / Math.PI}deg`;
+const HOUSE_SIN = Math.sin(HOUSE_HIP_ANGLE);
+const HOUSE_COS = Math.cos(HOUSE_HIP_ANGLE);
+const HOUSE_CLIP_L = 600; // distance of each clip box corner from its hip apex
+const HOUSE_CLIP_S = 1200; // clip box side (covers any roof face)
+const HOUSE_GUTTER_W = 584 * HOUSE_K;
+const HOUSE_GUTTER_H = 16 * HOUSE_K;
+const HOUSE_GUTTER_OVERLAP = 6;
+const HOUSE_COL_W = 140 * HOUSE_K;
+const HOUSE_PERIOD = 560 * HOUSE_K;
+// Facade phase always starts at a floor boundary of the column asset.
+const HOUSE_FLOOR_STARTS = [0, 163, 309, 407].map((v) => v * HOUSE_K);
+const HOUSE_ALLEY = 30;
+const HOUSE_R_MIN = 38;
+// Deep enough to stay below the screen even while the dead-fall camera sinks.
+const HOUSE_FACADE_H = 2200;
+const HOUSE_DEFAULT_GAP = 220;
+
+// Deterministic 0..1 from the platform's stable id; never reads the course RNG.
+function houseHash(id: number, salt: number) {
+  "worklet";
+  const h = Math.imul((id * 31 + salt) ^ 0x27d4eb2d, 0x165667b1) >>> 0;
+  return h / 4294967296;
+}
+// Hip run (world units) from the gaps to the neighbouring platforms.
+function houseRun(p: any, left: any, right: any) {
+  "worklet";
+  const gl = left ? p.x - (left.x + left.width) : HOUSE_DEFAULT_GAP;
+  const gr = right ? right.x - (p.x + p.width) : HOUSE_DEFAULT_GAP;
+  return Math.max(HOUSE_R_MIN, Math.min(HOUSE_HIP_W, Math.min(gl, gr) / 2 - HOUSE_ALLEY / 2));
+}
+
+// POPUP-001: developer switch for the scene art only. "istanbul" renders the
+// REVIZYON-054 tree unchanged; "popup" renders the Silgi Kacisi pop-up book
+// page. Physics, course, camera and HUD are shared and untouched by this.
+// REVIZYON-064 device diagnostics (both MUST stay false in normal play).
+// PERF_PROBE: small on-screen counter of UI-thread frame intervals (from the
+// game's own frame callback) and JS-thread rAF gaps, split by phase and by
+// "a platform-list change happened this/previous frame".
+// HOUSE_AB_FROZEN: one-variable A/B for the R062 hypothesis -- houses read a
+// SharedValue that is set once per life (R061 behaviour: houses do NOT follow
+// spawn/cleanup, visuals are wrong on purpose). Only for a timed comparison.
+const PERF_PROBE = false as boolean;
+// REVIZYON-067 one-variable device A/B: A = PERF_PROBE true (R066 overlay,
+// 500 ms setTxt + JS rAF loop + UI-thread counters), B = PERF_PROBE false.
+// B shows only this static tag (rendered once, never updated) so the phone's
+// bundle can be identified. Empty string = no tag (final game).
+// REVIZYON-068 diagnostic (R067-B otherwise unchanged): in the existing frame
+// callback, airborne frame intervals are bucketed (<=12 / 12-20 / 20-25 / >25 ms)
+// and the "held one frame, then a big jump" pattern is caught from the render
+// camera's and the character's own per-frame screen steps. UI thread writes a
+// few SharedValues only; JS reads them once, when Game Over appears.
+const FRAME_DIAG = true as boolean;
+// REVIZYON-069 one-variable device A/B (measurement only, NOT a design): true
+// turns off ONLY the two rotated overflow clips of each roof face (houseRoofClipL/R),
+// so the roof face is cut by the outer band rectangle instead -- the hip corners
+// look wrong on purpose. false = R068 (masks on). Everything else is unchanged.
+const HOUSE_ROOF_MASK_DIAG = false as boolean;
+const ROOF_MASK_OFF = HOUSE_ROOF_MASK_DIAG ? { overflow: "visible" as const } : null;
+// REVIZYON-071-A one-variable device A/B (render cost): true removes ONLY the
+// overflow clip of the two rounded-corner per-platform boxes -- the
+// transparent tall `tower` box and the thin `playableChimneyCap` rim. Their
+// corner radius stays; nothing they contain reaches outside the rounded
+// shape, so the picture should not change. A rounded-corner clip with
+// children forces a Core Animation offscreen pass per box per frame
+// (Instruments B0: 17-86 offscreen passes/frame, render p90 11.3 ms).
+// Roof clips (houseRoofClipL/R) are NOT touched. false = R068 layout.
+const ROUNDED_CLIP_OFF = true as boolean;
+const NO_CLIP = ROUNDED_CLIP_OFF ? { overflow: "visible" as const } : null;
+// REVIZYON-072/075: the live-scene far background uses the game's NoClipImage
+// (React Native Image + overflow "visible") instead of expo-image. expo-image's
+// ImageView always clips, and under Fabric a clipping image wrapper gets a
+// CAShapeLayer mask -> one full-screen offscreen pass per frame (Xcode "Color
+// Offscreen-Rendered", R071-E/R074; see src/game/NoClipImage.tsx).
+// Same source, resizeMode "stretch" == contentFit "fill". false = expo-image.
+const LIVE_RN_IMAGE = true as boolean;
+const AnimatedImage = Animated.createAnimatedComponent(Image);
+const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
+const DIAG_MAX_EXAMPLES = 6;
+const HOUSE_AB_FROZEN = false as boolean;
+// REVIZYON-066 experiment (one variable): expo-linear-gradient's iOS layer
+// re-renders its whole bitmap on the CPU (UIGraphicsBeginImageContext at screen
+// scale, needsDisplayOnBoundsChange) every time its bounds change. The two
+// 2200-pt facade gradients sized 18%/28% of the house were re-drawn on every
+// house appear/resize. true = the three facade gradients keep a fixed small
+// box and get the house width as a scaleX transform (a horizontal stretch of a
+// linear gradient looks the same), so their layers never change bounds.
+// false = the R065 percentage-width layout.
+const HOUSE_GRAD_FIXED = true as boolean;
+const HOUSE_GRAD_W = 16;
+const VISUAL_MODE = "istanbul" as "popup" | "istanbul";
+const POPUP = VISUAL_MODE === "popup";
+// Pop-up assets are drawn at 2 px per world unit (assets/popup/*, generated by
+// code -- see AI_REVIEW.md POPUP-001), sky/back page at 1 px per world unit.
+const PU_ROOF_MID_SOURCE = require("@/assets/popup/popup-roof-mid.png");
+const PU_ROOF_HIP_L_SOURCE = require("@/assets/popup/popup-roof-hip-L.png");
+const PU_ROOF_HIP_R_SOURCE = require("@/assets/popup/popup-roof-hip-R.png");
+const PU_WALL_SOURCE = require("@/assets/popup/popup-wall.png");
+const PU_SUN_SOURCE = require("@/assets/popup/popup-sun.png");
+// POPUP-002: approved paper-sky backdrop, used as ONE screen-fixed matte (never
+// tiled -> no repeated landmarks/clone seams); its embedded clouds/birds were
+// removed so the moving clouds below (cut from the same art) and AmbientBirds
+// are the only ones. Top 120 rows are a mirrored sky pad for camera lift.
+const PU_BACKDROP_SOURCE = require("@/assets/popup/popup2-backdrop-full.jpg");
+const PU_BACKDROP_W = 850;
+const PU_BACKDROP_H = 1620;
+const PU_BACKDROP_PAD = 120;
+const PU_BACKDROP_YPAR = 0.10;
+const PU_BACKDROP_YMAX = 56;
+const PU_SKY_TOP = "#0075b7";
+const PU_PAPER = "#f2d2a9";
+const PU_CLOUD_A_SOURCE = require("@/assets/popup/popup2-cloud-a.png");
+const PU_CLOUD_B_SOURCE = require("@/assets/popup/popup2-cloud-b.png");
+const PU_CLOUD_C_SOURCE = require("@/assets/popup/popup2-cloud-c.png");
+const PU_ERASER_SOURCE = require("@/assets/popup/popup-eraser.png");
+const PU_ERASED_SOURCE = require("@/assets/popup/popup-erased-strip.png");
+const PU_ROOF_H = 40;
+const PU_HIP = 22;
+const PU_ROOF_TILE_W = 240; // popup-roof-mid.png width / 2
+const PU_ROOF_TILE_PERIOD = 20;
+const PU_WALL_INSET = 7;
+const PU_WALL_TEX_W = 140;
+const PU_WALL_TEX_H = 300; // two floors; repeats vertically
+const PU_SIDE = 14; // folded card side face
+const PU_SHADOW_X = 18;
+// The open book's page floor every house is glued to (below every possible
+// cap: platformMaxTopY 320). Houses end in paper tabs on it.
+const PAGE_FLOOR_Y = 640;
+const PU_HOUSE_H = PAGE_FLOOR_Y + 330; // container height from the highest cap
+const PU_ERASED_W = 84; // screen px; drawn BEHIND the world layer
+// The master's sea->painted-roof row (1298) is world-locked just above the
+// district roofline, so sea, its own roofs and the district move as ONE scene.
+const BG_SEA_END_ROW = 1298;
+const BG_SEA_END_WORLD_Y = DISTRICT_TOP_Y - 10;
+const BG_SKY_TOP_COLOR = "#3EB8F2"; // measured top rows of the master (62,184,242)
 
 // GORSEL-016 / OYUN_AKISI-003 (2026-09-23, user-authorized): new approved
 // master scene, replacing the GORSEL-014/015 istanbul-parallax-portrait-v1
@@ -98,11 +271,16 @@ const DISTRICT_ROOT_Y = DISTRICT_TOP_Y + 40;
 // via row-average RGB: sea (blue, B>R) transitions to warm rooftop tones
 // (R>B) starting row ~1298, fully warm by row ~1320.
 const MASTER_NEIGHBORHOOD_SOURCE = require("@/assets/environment/bosphorus-rooftop-day-master-v1.png");
+// REVIZYON-056: hazed continuation of the master's bottom roof band (941x748).
+const BG_LOW_SIL_SOURCE = require("@/assets/environment/bosphorus-low-silhouette.jpg");
+const BG_LOW_SIL_H = 748;
 // REVIZYON-023: start decoding every first-scene bitmap at module load (before
 // the component mounts) into expo-image's memory cache, so the live scene and
 // the start cover mount from cache instead of decoding on first render.
 const PRELOAD_MODULES: number[] = [
-  MASTER_NEIGHBORHOOD_SOURCE, DISTRICT_SOURCE, ...ROOFTOP_SOURCES, ...CHARGE_POSES.map((p) => p.source),
+  MASTER_NEIGHBORHOOD_SOURCE, DISTRICT_SOURCE, DISTRICT_BODY_SOURCE, HOUSE_ROOF_SOURCE, HOUSE_GUTTER_SOURCE, HOUSE_FACADE_SOURCE, BG_LOW_SIL_SOURCE,
+  PU_ROOF_MID_SOURCE, PU_ROOF_HIP_L_SOURCE, PU_ROOF_HIP_R_SOURCE, PU_WALL_SOURCE, PU_BACKDROP_SOURCE, PU_SUN_SOURCE, PU_CLOUD_A_SOURCE, PU_CLOUD_B_SOURCE, PU_CLOUD_C_SOURCE, PU_ERASER_SOURCE, PU_ERASED_SOURCE,
+  ...CHARGE_POSES.map((p) => p.source),
 ];
 (async () => {
   try {
@@ -114,7 +292,7 @@ const PRELOAD_MODULES: number[] = [
 
 const BG_IMG_W = 941;
 const BG_IMG_H = 1672;
-const BG_FAR_OVERSCAN = 1.4;
+const BG_FAR_OVERSCAN = 1.19; // REVIZYON-030: was 1.4 (bg is now Y-world-locked; smaller scale keeps the skyline off the HUD)
 const BG_FAR_PARALLAX_RATIO = 0.06;
 
 // GORSEL-015 iPhone-reddi fix (2026-09-22), "GERÇEK ÇATI TABANI": every
@@ -212,6 +390,26 @@ const SOLE_CENTER_OFFSET = ((SOLE_LEFT + SOLE_RIGHT) / 2 - 0.5) * SOLE_BODY_WIDT
 const SPRITE_SCALE = ((SOLE_RIGHT - SOLE_LEFT) * SOLE_BODY_WIDTH) / POSE_FEET_SPAN_PX;
 const POOL = 14; // fixed pool of platform views (only ~5 are visible at once)
 const POOL_IDX = Array.from({ length: POOL }, (_, i) => i);
+// REVIZYON-060: a pool slot shows the platform whose id % POOL equals the
+// slot, NOT the platform at that array index. Array-index slots re-targeted
+// every slot (all their layout props) whenever cleanup sliced the list -- a
+// mid-flight UI-thread layout burst measured as the iPhone freezes. With id
+// slots a cleanup changes no slot and a spawn changes exactly one. The live
+// list never exceeds 10 platforms (sim, zoom 0.40), so ids never collide.
+function slotPlatform(list: any[], slot: number) {
+  "worklet";
+  for (let i = 0; i < list.length; i++) {
+    if (list[i].id % POOL === slot) return list[i];
+  }
+  return undefined;
+}
+function platformById(list: any[], id: number) {
+  "worklet";
+  for (let i = 0; i < list.length; i++) {
+    if (list[i].id === id) return list[i];
+  }
+  return undefined;
+}
 
 // tiny helper to avoid repeating absolute-fill spread
 function absoluteFill() {
@@ -274,7 +472,16 @@ export default function Game() {
   // REVIZYON-022 (2026-09-24): first playable frame waits for the three
   // visible layers (background, RooftopDistrict, character idle) so nothing
   // pops in late; an asset error releases the gate instead of soft-locking.
-  const assetsReady = gameReady && ((loadedArt.background && loadedArt.district && loadedArt.character && loadedArt.rooftop && loadedArt.rooftop1 && loadedArt.rooftop2) || artError);
+  // REVIZYON-038A: R038 deliberately reduced the three category-specific
+  // rooftop render trees to one shared rooftop image. Waiting for the removed
+  // rooftop1/rooftop2 onLoad callbacks kept the cover mounted forever and
+  // disabled the responder, so the game appeared not to start on iPhone.
+  // REVIZYON-042: the shaft is synchronous View/gradient art and has no asset
+  // gate. Background + district + character are the only visible bitmaps that
+  // must decode before input is enabled.
+  // REVIZYON-056: with the back row switched off nothing loads the district image.
+  const districtReady = loadedArt.district || (!POPUP && !SHOW_BACK_DISTRICT);
+  const assetsReady = gameReady && ((loadedArt.background && districtReady && loadedArt.character) || artError);
 
   useEffect(() => {
     if (assetsReady) coverOpacity.value = withTiming(0, { duration: 220 }, (done) => { if (done) runOnJS(setCoverMounted)(false); });
@@ -322,11 +529,65 @@ export default function Game() {
   const headTilt = useSharedValue(0);
   const headVelocity = useSharedValue(0);
   const camX = useSharedValue(0);
-  const camY = useSharedValue(0);
-  const camVY = useSharedValue(0);
+  // Render Y is fixed at the spawn composition for the entire life.
+  const camYR = useSharedValue(0);
+  // Spring Ninja's measured horizontal player anchor stays at 422/1320 px
+  // through ordinary and long flights. X follows the player's world position.
+  const camXR = useSharedValue(0);
   const baseY = useSharedValue(0);
   const landPulse = useSharedValue(0);
   const platforms = useSharedValue<any[]>([]);
+  const housePlatformsFrozen = useSharedValue<any[]>([]);
+  // REVIZYON-064 PERF_PROBE counters (UI thread writes, JS reads twice a second).
+  const pFrames = useSharedValue(0);
+  const pHitch = useSharedValue(0); // > 25 ms
+  const pHitchBig = useSharedValue(0); // > 40 ms
+  const pAirFrames = useSharedValue(0);
+  const pAirHitch = useSharedValue(0);
+  const pListAir = useSharedValue(0); // platform-list changes while airborne
+  const pHitchNearList = useSharedValue(0); // hitch on the frame of / after a list change
+  const pMaxMs = useSharedValue(0);
+  const pListFrame = useSharedValue(-10);
+  // REVIZYON-065 attribution (PERF_PROBE only): hitches by phase, and each
+  // in-flight hitch tied to what happened on the frame before it -- a house
+  // appearing (slot null -> geometry), disappearing, or moving/resizing; a
+  // list change that wrote no house; or nothing. Event counts give the rate.
+  const pHitchIdle = useSharedValue(0);
+  const pHitchCharge = useSharedValue(0);
+  const pHitchDead = useSharedValue(0);
+  const pHouseFrame = useSharedValue(-10); // last frame a house wrote houseGeom
+  const pHouseKind = useSharedValue(0); // bitmask of that frame: 1 appear, 2 gone, 4 move
+  const pEvAppear = useSharedValue(0); // in-flight house writes by kind
+  const pEvGone = useSharedValue(0);
+  const pEvMove = useSharedValue(0);
+  const pListNoHouse = useSharedValue(0); // in-flight list changes with no house write
+  const pHitchAppear = useSharedValue(0);
+  const pHitchGone = useSharedValue(0);
+  const pHitchMove = useSharedValue(0);
+  const pHitchListOnly = useSharedValue(0);
+  const pHitchNoEvent = useSharedValue(0);
+  const pListPending = useSharedValue(0); // 1 = previous frame changed the list while airborne
+  const houseProbe = useMemo(
+    () => (PERF_PROBE ? { pFrames, phase, pHouseFrame, pHouseKind, pEvAppear, pEvGone, pEvMove } : null),
+    // SharedValues are stable for the screen's lifetime.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+  // R068 FRAME_DIAG (cumulative since the app opened; Play Again does not reset).
+  const dB12 = useSharedValue(0);
+  const dB20 = useSharedValue(0);
+  const dB25 = useSharedValue(0);
+  const dBOver = useSharedValue(0);
+  const dHold = useSharedValue(0); // frames: tiny step after a normal one, then a big step
+  const dShortLong = useSharedValue(0); // airborne interval pairs: <=12 ms followed by >=20 ms
+  const dPrevCam = useSharedValue(0);
+  const dPrevPy = useSharedValue(0);
+  const dPrevChX = useSharedValue(0);
+  const dPrevStep = useSharedValue(-1); // previous airborne |camera screen step| px, -1 = none
+  const dPrevRaw = useSharedValue(0);
+  const dEma = useSharedValue(0); // airborne mean |camera screen step| px per frame
+  const dExamples = useSharedValue<any[]>([]);
+  const [diagText, setDiagText] = useState("");
   const idCounter = useSharedValue(1);
   const lastLandedId = useSharedValue(0);
   // Visual-only, unrelated to score: which platform the character is
@@ -485,6 +746,7 @@ export default function Game() {
       standingPlatformId.value = first.id;
       standingPlatformIsChimney.value = first.visualType === "chimney";
       platforms.value = list;
+      housePlatformsFrozen.value = list;
 
       // OYUN_AKISI-002: snap camera to the START fraction (no initial
       // slide) -- distinct from cameraDeadZoneRight, which only governs the
@@ -495,8 +757,9 @@ export default function Game() {
       // 81px blank strip on a 390px screen before the panel began).
       const camXStart = px.value - (CONFIG.cameraStartFraction * W) / s;
       camX.value = USE_FIXED_PANEL_COURSE ? Math.max(0, camXStart) : camXStart;
-      camY.value = baseY.value - (CONFIG.cameraPlayerAnchorY * H) / s;
-      camVY.value = 0;
+      // Restart/start is the only time the visible vertical plane can change.
+      camYR.value = baseY.value - (CONFIG.cameraPlayerAnchorY * H) / s;
+      camXR.value = camX.value;
       running.value = 1;
       runOnJS(setGameReady)(true);
     })(seedVal);
@@ -536,6 +799,15 @@ export default function Game() {
 
   const onGameOver = useCallback(() => {
     setGameOver(true);
+    if (FRAME_DIAG) {
+      // One read of the UI-thread counters per Game Over (no per-frame JS work).
+      const n = dB12.value + dB20.value + dB25.value + dBOver.value;
+      const ex = dExamples.value.map((e: any) => `t${e.t} ${e.aPrev}/${e.a}ms kam ${e.camPrev}->${e.cam}px (ort ${e.ema}) krk X ${e.chX} Y ${e.chY}`).join("\n");
+      const txt = `R068 ucus ${n} kare: <=12ms ${dB12.value} | 12-20 ${dB20.value} | 20-25 ${dB25.value} | >25 ${dBOver.value}\n` +
+        `bekle+sicra ${dHold.value} | kisa->uzun cift ${dShortLong.value}${ex ? "\n" + ex : ""}`;
+      setDiagText(txt);
+      console.log("[R068-DIAG]", txt);
+    }
     if (scoreRef.current > bestRef.current) {
       bestRef.current = scoreRef.current;
       setBest(scoreRef.current);
@@ -634,6 +906,37 @@ export default function Game() {
     let dt = (frame.timeSincePreviousFrame ?? 16.7) / 1000;
     if (dt > 1 / 30) dt = 1 / 30; // clamp big hitches so physics stays stable
     if (dt <= 0) return;
+
+    if (PERF_PROBE) {
+      const raw = frame.timeSincePreviousFrame ?? 16.7;
+      // close the previous frame: did its airborne list change write any house?
+      if (pListPending.value === 1) {
+        if (pHouseFrame.value !== pFrames.value) pListNoHouse.value += 1;
+        pListPending.value = 0;
+      }
+      pFrames.value += 1;
+      const air = phase.value === PHASE.AIRBORNE;
+      if (air) pAirFrames.value += 1;
+      if (raw > 25) {
+        pHitch.value += 1;
+        if (air) pAirHitch.value += 1;
+        else if (phase.value === PHASE.IDLE) pHitchIdle.value += 1;
+        else if (phase.value === PHASE.CHARGING) pHitchCharge.value += 1;
+        else pHitchDead.value += 1;
+        if (pFrames.value - pListFrame.value <= 1) pHitchNearList.value += 1;
+        if (air) {
+          if (pFrames.value - pHouseFrame.value <= 1) {
+            const k = pHouseKind.value;
+            if (k & 1) pHitchAppear.value += 1;
+            else if (k & 2) pHitchGone.value += 1;
+            else pHitchMove.value += 1;
+          } else if (pFrames.value - pListFrame.value <= 1) pHitchListOnly.value += 1;
+          else pHitchNoEvent.value += 1;
+        }
+      }
+      if (raw > 40) pHitchBig.value += 1;
+      if (raw > pMaxMs.value) pMaxMs.value = raw;
+    }
 
     if (DEBUG_MODE) {
       const rawMs = frame.timeSincePreviousFrame ?? 16.7;
@@ -753,7 +1056,9 @@ export default function Game() {
       }
 
       // --- fall -> game over ---
-      if ((py.value - camY.value) * CONFIG.cameraZoom > H + 60) {
+      // End a missed jump after the player has left the VISIBLE fixed-Y
+      // camera, not after crossing the now-independent physics camera.
+      if ((py.value - camYR.value) * CONFIG.cameraZoom > H + 60) {
         phase.value = PHASE.DEAD;
         running.value = 0;
         runOnJS(onGameOver)();
@@ -797,7 +1102,13 @@ export default function Game() {
       working = working.slice(startIdx);
       changed = true;
     }
-    if (changed) platforms.value = working;
+    if (changed) {
+      platforms.value = working;
+      if (PERF_PROBE) {
+        pListFrame.value = pFrames.value;
+        if (phase.value === PHASE.AIRBORNE) { pListAir.value += 1; pListPending.value = 1; }
+      }
+    }
 
     // --- camera: dead-zone follow (OYUN_AKISI-002, 2026-09-22) --------------
     // Player is free anywhere left of cameraDeadZoneRight -- camera target
@@ -811,33 +1122,56 @@ export default function Game() {
     const ctx = Math.max(camX.value, deadZoneX);
     camX.value += (ctx - camX.value) * CONFIG.cameraSmoothingX;
 
-    // GORSEL-015 iPhone-reddi fix (2026-09-22): vertical follow target must
-    // track the CURRENT standing platform (baseY, updated on every landing
-    // a few lines above), not a fixed world-Y-zero. The old `let focusY = 0`
-    // ignored baseY entirely, so camY drifted toward a platform-height-
-    // independent reference every frame -- on a tall/long first chimney
-    // (very negative topY) this pushed the character near the top of the
-    // screen and left the next target below/off the visible area.
-    let focusY = baseY.value;
-    if (phase.value === PHASE.DEAD) focusY = py.value;
-    const tY = focusY - (CONFIG.cameraPlayerAnchorY * H) / s;
-    if (phase.value === PHASE.DEAD) {
-      camY.value += (tY - camY.value) * CONFIG.cameraFallSmoothing;
-      camVY.value = 0;
-    } else {
-      // REVIZYON-022: critically damped follow (same tY target as before) --
-      // zero start velocity so low<->high chimney transitions ease in, no
-      // overshoot (clamped below), settles in roughly the old ~0.2s.
-      const omega = 2 / CONFIG.cameraSmoothTimeY;
-      const x = omega * dt;
-      const decay = 1 / (1 + x + 0.48 * x * x + 0.235 * x * x * x);
-      const change = camY.value - tY;
-      const temp = (camVY.value + omega * change) * dt;
-      camVY.value = (camVY.value - omega * temp) * decay;
-      let out = tY + (change + temp) * decay;
-      if ((camY.value - tY > 0) !== (out - tY > 0) && camY.value !== tY) { out = tY; camVY.value = 0; }
-      camY.value = out;
+    // Spring Ninja keeps the player at 422/1320 = 32% of the screen through
+    // sampled flights. Keep X tied to the player rather than predicting a
+    // landing and later catching up to it.
+    if (phase.value !== PHASE.DEAD) {
+      const anchorX = px.value - (CONFIG.cameraStartFraction * W) / s;
+      camXR.value = Math.max(camXR.value, anchorX);
     }
+    if (FRAME_DIAG) {
+      // Screen-space steps this frame: the scenery moves by the render camera,
+      // the character by its own world motion minus the camera's (render Y is fixed).
+      const raw = frame.timeSincePreviousFrame ?? 16.7;
+      const camStep = Math.abs(camXR.value - dPrevCam.value) * s;
+      const chXNow = px.value - camXR.value;
+      const chXStep = Math.abs(chXNow - dPrevChX.value) * s;
+      const chYStep = Math.abs(py.value - dPrevPy.value) * s;
+      if (phase.value === PHASE.AIRBORNE) {
+        if (raw <= 12) dB12.value += 1;
+        else if (raw <= 20) dB20.value += 1;
+        else if (raw <= 25) dB25.value += 1;
+        else dBOver.value += 1;
+        const prev = dPrevStep.value;
+        if (prev >= 0 && dPrevRaw.value <= 12 && raw >= 20) dShortLong.value += 1;
+        if (prev >= 0 && dEma.value > 1) {
+          if (prev < 0.35 * dEma.value && camStep > 1.6 * dEma.value) {
+            dHold.value += 1;
+            if (dExamples.value.length < DIAG_MAX_EXAMPLES) {
+              dExamples.value = dExamples.value.concat([{
+                t: Math.round(frame.timestamp), aPrev: Math.round(dPrevRaw.value * 10) / 10, a: Math.round(raw * 10) / 10,
+                camPrev: Math.round(prev * 10) / 10, cam: Math.round(camStep * 10) / 10, ema: Math.round(dEma.value * 10) / 10,
+                chX: Math.round(chXStep * 10) / 10, chY: Math.round(chYStep * 10) / 10,
+              }]);
+            }
+          }
+        }
+        dEma.value = dEma.value === 0 ? camStep : dEma.value * 0.9 + camStep * 0.1;
+        dPrevStep.value = camStep;
+      } else {
+        dPrevStep.value = -1;
+        dEma.value = 0;
+      }
+      dPrevCam.value = camXR.value;
+      dPrevPy.value = py.value;
+      dPrevChX.value = chXNow;
+      dPrevRaw.value = raw;
+    }
+    // REVIZYON-059: the same video shows Spring Ninja's scenery staying on
+    // one vertical plane, while our background moved by 5-26 native px in
+    // 0.2 s during jumps. Render Y is set by initWorld at spawn/restart and
+    // stays fixed for the whole life. Spawn/cleanup still use camX and are
+    // independent of this vertical render transform.
 
     // --- debug telemetry (throttled to ~10hz) ---
     if (DEBUG_MODE) {
@@ -911,14 +1245,16 @@ export default function Game() {
     const renderedW = BG_IMG_W * scale;
     const renderedH = BG_IMG_H * scale;
     const maxShiftX = Math.max(0, (renderedW - W) / 2);
-    const desired = -camX.value * CONFIG.cameraZoom * BG_FAR_PARALLAX_RATIO;
+    const desired = -camXR.value * CONFIG.cameraZoom * BG_FAR_PARALLAX_RATIO;
     const shiftX = Math.min(maxShiftX, Math.max(-maxShiftX, desired));
     return {
       width: renderedW,
       height: renderedH,
       transform: [
         { translateX: (W - renderedW) / 2 + shiftX },
-        { translateY: (H - renderedH) / 2 },
+        // REVIZYON-030: world-locked in Y (1:1 with the world, same speed as the
+        // district) so the sea/roof transition never slides between layers.
+        { translateY: (BG_SEA_END_WORLD_Y - camYR.value) * CONFIG.cameraZoom - BG_SEA_END_ROW * scale },
       ],
     };
   });
@@ -931,7 +1267,7 @@ export default function Game() {
   const groundBandStyle = useAnimatedStyle(() => {
     const viewWWorld = W / CONFIG.cameraZoom;
     return {
-      left: camX.value - ROOFTOP_BAND_MARGIN_X,
+      left: camXR.value - ROOFTOP_BAND_MARGIN_X,
       width: viewWWorld + ROOFTOP_BAND_MARGIN_X * 2,
     };
   });
@@ -949,21 +1285,55 @@ export default function Game() {
   // World camera: maps world coords -> screen as (world - cam) * zoom, with a
   // top-left transform origin (see styles.world). This keeps the player in the
   // left band while the zoom reveals the upcoming route on the right.
+  // REVIZYON-054: back row -- follows BACK_DISTRICT_PARALLAX of the camera's X.
   const districtStyle0 = useAnimatedStyle(() => {
-    const base = Math.floor(camX.value / DISTRICT_TILE_W);
-    return { transform: [{ translateX: base * DISTRICT_TILE_W }, { translateY: DISTRICT_TOP_Y }] };
+    const offX = camXR.value * (1 - BACK_DISTRICT_PARALLAX);
+    const base = Math.floor((camXR.value * BACK_DISTRICT_PARALLAX) / BACK_TILE_W);
+    return { transform: [{ translateX: offX + base * BACK_TILE_W }, { translateY: DISTRICT_TOP_Y }] };
   });
   const districtStyle1 = useAnimatedStyle(() => {
-    const base = Math.floor(camX.value / DISTRICT_TILE_W) + 1;
+    const offX = camXR.value * (1 - BACK_DISTRICT_PARALLAX);
+    const base = Math.floor((camXR.value * BACK_DISTRICT_PARALLAX) / BACK_TILE_W) + 1;
     // 1.5 world-unit overlap: hides the sub-pixel hairline (edge columns of mirrored tiles are identical)
-    return { transform: [{ translateX: base * DISTRICT_TILE_W - 1.5 }, { translateY: DISTRICT_TOP_Y }] };
+    return { transform: [{ translateX: offX + base * BACK_TILE_W - 1.5 }, { translateY: DISTRICT_TOP_Y }] };
   });
+  // POPUP-002 scene layers (screen space, behind the world container).
+  // Backdrop: fixed horizontally; a small clamped vertical drift with the
+  // render camera (camera rises -> backdrop sinks a little), never tiled.
+  const puLift = () => {
+    "worklet";
+    const ref = -(CONFIG.cameraPlayerAnchorY * H) / CONFIG.cameraZoom;
+    return Math.max(0, Math.min(PU_BACKDROP_YMAX, (ref - camYR.value) * CONFIG.cameraZoom * PU_BACKDROP_YPAR));
+  };
+  const puBackdropStyle = useAnimatedStyle(() => ({ transform: [{ translateY: puLift() }] }));
+  const puCloudStyle = (x0: number, y: number, par: number, cw: number) => {
+    "worklet";
+    const span = W + cw + 40;
+    const x = (((x0 - camXR.value * CONFIG.cameraZoom * par) % span) + span) % span - cw - 20;
+    return { transform: [{ translateX: x }, { translateY: y + puLift() }] };
+  };
+  const puCloud0 = useAnimatedStyle(() => puCloudStyle(40, 300, 0.05, 131));
+  const puCloud1 = useAnimatedStyle(() => puCloudStyle(200, 222, 0.08, 74));
+  const puCloud2 = useAnimatedStyle(() => puCloudStyle(300, 372, 0.035, 59));
+  const puSunStyle = useAnimatedStyle(() => ({ transform: [{ translateY: puLift() }] }));
+  const eraserWobble = useSharedValue(0);
+  useEffect(() => {
+    if (!POPUP) return;
+    eraserWobble.value = withRepeat(withTiming(1, { duration: 1300, easing: Easing.inOut(Easing.sin) }), -1, true);
+  }, [eraserWobble]);
+  const puEraserStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: -6 + 12 * eraserWobble.value }, { rotate: `${-8 + 14 * eraserWobble.value}deg` }],
+  }));
+  const puFloorStyle = useAnimatedStyle(() => ({
+    left: camXR.value - ROOFTOP_BAND_MARGIN_X,
+    width: W / CONFIG.cameraZoom + ROOFTOP_BAND_MARGIN_X * 2,
+  }));
   const worldStyle = useAnimatedStyle(() => {
     const s = CONFIG.cameraZoom;
     return {
       transform: [
-        { translateX: -camX.value * s },
-        { translateY: -camY.value * s },
+        { translateX: -camXR.value * s },
+        { translateY: -camYR.value * s },
         { scale: s },
       ],
     };
@@ -973,7 +1343,7 @@ export default function Game() {
     <View style={styles.root} testID="game-root">
       <StatusBar style="dark" />
       <LinearGradient
-        colors={[colors.gameSky, colors.gameSkyFar]}
+        colors={POPUP ? [PU_SKY_TOP, PU_SKY_TOP] : [BG_SKY_TOP_COLOR, BG_SKY_TOP_COLOR]}
         style={styles.fill}
       />
 
@@ -983,20 +1353,74 @@ export default function Game() {
           full scene (sky/sea/skyline + foreground rooftops in one image), so
           there is no separate far/near split to draw -- see the panel
           rendering inside the world container below. */}
-      {!USE_FIXED_PANEL_COURSE && (
+      {!USE_FIXED_PANEL_COURSE && !POPUP && (
         <Animated.View style={[{ position: "absolute", left: 0, top: 0 }, bgFarStyle]} pointerEvents="none">
-          <CachedImage cachePolicy="memory-disk" priority="high" transition={0}
-            source={MASTER_NEIGHBORHOOD_SOURCE}
-            onLoadStart={() => markArtStarted("background")}
-            onLoad={() => markArtLoaded("background")}
-            onError={failArt}
-            style={{ width: "100%", height: "100%" }}
-            contentFit="fill"
-          />
+          {LIVE_RN_IMAGE ? (
+            <Image source={MASTER_NEIGHBORHOOD_SOURCE} resizeMode="stretch" fadeDuration={0}
+              onLoadStart={() => markArtStarted("background")}
+              onLoad={() => markArtLoaded("background")}
+              onError={failArt}
+              style={{ width: "100%", height: "100%" }}
+            />
+          ) : (
+            <CachedImage cachePolicy="memory-disk" priority="high" transition={0}
+              source={MASTER_NEIGHBORHOOD_SOURCE}
+              onLoadStart={() => markArtStarted("background")}
+              onLoad={() => markArtLoaded("background")}
+              onError={failArt}
+              style={{ width: "100%", height: "100%" }}
+              contentFit="fill"
+            />
+          )}
+          {/* REVIZYON-056: back row off -> the far image's own painted roof band,
+              mirrored + hazed (no windows read), continues below its bottom so
+              a low camera never shows bare sky under the houses. */}
+          {!SHOW_BACK_DISTRICT && (
+            <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: "100%", marginTop: -1, aspectRatio: BG_IMG_W / BG_LOW_SIL_H }}>
+              <Image source={BG_LOW_SIL_SOURCE} style={{ width: "100%", height: "100%" }} resizeMode="stretch" fadeDuration={0} />
+            </View>
+          )}
         </Animated.View>
       )}
-      <View style={styles.backgroundWash} pointerEvents="none" />
+      {!POPUP && <View style={styles.backgroundWash} pointerEvents="none" />}
+      {/* REVIZYON-034: very light depth/colour: warm glow toward the horizon,
+          deeper blue at the top. Screen-space, under the world + HUD. */}
+      {!POPUP && <LinearGradient pointerEvents="none" colors={["rgba(30,120,230,0.10)", "rgba(255,190,120,0)", "rgba(255,170,100,0.10)"]}
+        locations={[0, 0.5, 1]} style={styles.fill} />}
+      {POPUP && (
+        <>
+          {/* POPUP-002: approved backdrop as one screen-fixed matte (height = screen,
+              centred, wider than the screen), then sun and moving clouds. */}
+          <Animated.View pointerEvents="none" style={[{ position: "absolute", top: -Math.round((PU_BACKDROP_PAD * H) / (PU_BACKDROP_H - PU_BACKDROP_PAD)),
+            left: Math.round((W - (H * PU_BACKDROP_W) / (PU_BACKDROP_H - PU_BACKDROP_PAD)) / 2),
+            width: Math.round((H * PU_BACKDROP_W) / (PU_BACKDROP_H - PU_BACKDROP_PAD)), height: Math.round((H * PU_BACKDROP_H) / (PU_BACKDROP_H - PU_BACKDROP_PAD)) }, puBackdropStyle]}>
+            <Image source={PU_BACKDROP_SOURCE} style={{ width: "100%", height: "100%" }} resizeMode="stretch" fadeDuration={0}
+              onLoadStart={() => markArtStarted("background")} onLoad={() => markArtLoaded("background")} onError={failArt} />
+          </Animated.View>
+          <Animated.View pointerEvents="none" style={[{ position: "absolute", right: 22, top: 86, width: 108, height: 108 }, puSunStyle]}>
+            <Image source={PU_SUN_SOURCE} style={{ width: "100%", height: "100%" }} fadeDuration={0} />
+          </Animated.View>
+          {[[puCloud0, PU_CLOUD_A_SOURCE, 131, 57], [puCloud1, PU_CLOUD_B_SOURCE, 74, 33], [puCloud2, PU_CLOUD_C_SOURCE, 59, 29]].map(([st, src, cw, ch]: any, k) => (
+            <Animated.View key={`pu-cloud-${k}`} pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, width: cw, height: ch }, st]}>
+              <Image source={src} style={{ width: "100%", height: "100%" }} fadeDuration={0} />
+            </Animated.View>
+          ))}
+        </>
+      )}
       <AmbientBirds width={W} height={H} />
+      {POPUP && (
+        <>
+          {/* POPUP-001: the eraser's story on the left -- drawn BEHIND the world
+              layer, so it can never cover the character, a platform or a gap. */}
+          <View pointerEvents="none" style={{ position: "absolute", left: 0, top: 0, width: PU_ERASED_W, height: H }}>
+            <Image source={PU_ERASED_SOURCE} resizeMode="stretch" fadeDuration={0}
+              onLoad={() => markArtLoaded("district")} onError={failArt} style={{ width: "100%", height: "100%" }} />
+          </View>
+          <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 8, top: Math.round(H * 0.17), width: 74, height: 87 }, puEraserStyle]}>
+            <Image source={PU_ERASER_SOURCE} style={{ width: "100%", height: "100%" }} fadeDuration={0} />
+          </Animated.View>
+        </>
+      )}
 
       {gameReady && (
         <>
@@ -1170,14 +1594,61 @@ export default function Game() {
             </View>
           </Fragment>
         ))}
-        {/* GORSEL-020 RooftopDistrict (see DISTRICT_* consts): BEHIND the
-            platform sprites (REVIZYON-027), under the character. */}
-        {[districtStyle0, districtStyle1].map((st, k) => (
+        {/* GORSEL-020 RooftopDistrict, REVIZYON-054: the BACK row (see BACK_* consts). */}
+        {!POPUP && SHOW_BACK_DISTRICT && [districtStyle0, districtStyle1].map((st, k) => (
           <Animated.View key={`district-${k}`} pointerEvents="none"
-            style={[{ position: "absolute", left: 0, top: 0, width: DISTRICT_TILE_W, height: DISTRICT_TILE_H }, st]}>
+            style={[{ position: "absolute", left: 0, top: 0, width: BACK_TILE_W, height: BACK_TILE_H }, st]}>
             <Image source={DISTRICT_SOURCE} style={{ width: "100%", height: "100%" }} resizeMode="stretch"
               onLoad={k === 0 ? () => markArtLoaded("district") : undefined} onError={k === 0 ? failArt : undefined} />
           </Animated.View>
+        ))}
+        {/* REVIZYON-033: thinner, low-opacity two-layer haze (offset heights, soft
+            peaks) - still softens the sea->roof seam without a flat brown band. */}
+        {!POPUP && SHOW_BACK_DISTRICT && [districtStyle0, districtStyle1].map((st, k) => (
+          <Animated.View key={`haze-${k}`} pointerEvents="none"
+            style={[{ position: "absolute", left: 0, top: -26, width: BACK_TILE_W, height: 54 }, st]}>
+            <LinearGradient colors={["rgba(165,210,235,0)", "rgba(165,210,235,0.13)", "rgba(165,210,235,0)"]}
+              locations={[0, 0.4, 1]} style={{ width: "100%", height: "100%" }} />
+          </Animated.View>
+        ))}
+        {!POPUP && SHOW_BACK_DISTRICT && [districtStyle0, districtStyle1].map((st, k) => (
+          <Animated.View key={`haze2-${k}`} pointerEvents="none"
+            style={[{ position: "absolute", left: 0, top: -8, width: BACK_TILE_W, height: 30 }, st]}>
+            <LinearGradient colors={["rgba(190,220,235,0)", "rgba(190,220,235,0.08)", "rgba(190,220,235,0)"]}
+              locations={[0, 0.55, 1]} style={{ width: "100%", height: "100%" }} />
+          </Animated.View>
+        ))}
+        {/* REVIZYON-030: same roof continued downward (vertical mirror, seamless
+            at the join) so a low camera never reaches the bare background.
+            REVIZYON-054: a second, unflipped copy below it for the dead-fall camera. */}
+        {!POPUP && SHOW_BACK_DISTRICT && [districtStyle0, districtStyle1].map((st, k) => (
+          <Fragment key={`district-low-${k}`}>
+            <Animated.View pointerEvents="none"
+              style={[{ position: "absolute", left: 0, top: 0, width: BACK_TILE_W, height: BACK_TILE_H }, st,
+                { marginTop: BACK_TILE_H - 1 }]}>
+              <Image source={DISTRICT_BODY_SOURCE} style={{ width: "100%", height: "100%", transform: [{ scaleY: -1 }] }} resizeMode="stretch" />
+            </Animated.View>
+            <Animated.View pointerEvents="none"
+              style={[{ position: "absolute", left: 0, top: 0, width: BACK_TILE_W, height: BACK_TILE_H }, st,
+                { marginTop: 2 * (BACK_TILE_H - 1) }]}>
+              <Image source={DISTRICT_BODY_SOURCE} style={{ width: "100%", height: "100%" }} resizeMode="stretch" />
+            </Animated.View>
+            {/* REVIZYON-054: aerial-perspective haze on the opaque part only -- one row behind the houses. */}
+            <Animated.View pointerEvents="none"
+              style={[{ position: "absolute", left: 0, top: BACK_HAZE_TOP, width: BACK_TILE_W, height: 3 * BACK_TILE_H - BACK_HAZE_TOP,
+                backgroundColor: "rgba(180,208,226,0.30)" }, st]} />
+          </Fragment>
+        ))}
+
+        {/* REVIZYON-054: playable houses in front of the back row. */}
+        {POPUP && !USE_FIXED_PANEL_COURSE && (
+          <Animated.View pointerEvents="none" style={[styles.puPageFloor, puFloorStyle]}>
+            <View style={styles.puPageFold} />
+          </Animated.View>
+        )}
+        {!USE_FIXED_PANEL_COURSE && POOL_IDX.map((i) => (POPUP
+          ? <PopupHouseView key={`pu-house-${i}`} index={i} platforms={platforms} styles={styles} />
+          : <PlatformHouseView key={`house-${i}`} index={i} platforms={HOUSE_AB_FROZEN ? housePlatformsFrozen : platforms} styles={styles} probe={houseProbe} />
         ))}
 
         {/* Platforms (fixed pool, positioned by the worklet) */}
@@ -1252,12 +1723,18 @@ export default function Game() {
         onResponderTerminate={cancelCharge}
       />
 
+      {BUILD_TAG !== "" && (
+        <View pointerEvents="none" style={{ position: "absolute", left: 6, top: insets.top + 4, paddingHorizontal: 4, backgroundColor: "rgba(0,0,0,0.45)", borderRadius: 4, zIndex: 50 }}>
+          <Text style={{ color: "#fff", fontSize: 10 }}>{BUILD_TAG}</Text>
+        </View>
+      )}
+      {PERF_PROBE && <PerfProbeOverlay top={insets.top + 4} sv={{ pFrames, pHitch, pHitchBig, pAirFrames, pAirHitch, pListAir, pHitchNearList, pMaxMs, pHitchIdle, pHitchCharge, pHitchDead, pEvAppear, pEvGone, pEvMove, pListNoHouse, pHitchAppear, pHitchGone, pHitchMove, pHitchListOnly, pHitchNoEvent }} />}
       {/* Score HUD */}
       {!gameOver && assetsReady && <View style={[styles.hud, { top: insets.top + 24 }]}>
-        <Text style={styles.scoreText} testID="score-value">
+        <Text style={[styles.scoreText, POPUP && styles.puScoreText]} testID="score-value">
           {score}
         </Text>
-        <Text style={styles.bestText} testID="best-value">
+        <Text style={[styles.bestText, POPUP && styles.puBestText]} testID="best-value">
           BEST {best}
         </Text>
       </View>}
@@ -1276,7 +1753,7 @@ export default function Game() {
       {/* Hint (only before first jump) */}
       {score === 0 && !gameOver && assetsReady && (
         <View style={styles.hint}>
-          <Text style={styles.hintText}>Hold to charge · Release to jump</Text>
+          <Text style={[styles.hintText, POPUP && styles.puHintText]}>Hold to charge · Release to jump</Text>
         </View>
       )}
 
@@ -1321,6 +1798,9 @@ export default function Game() {
             <Text style={styles.gameOverLine} testID="game-over-line">
               {GAME_OVER_LINE}
             </Text>
+            {FRAME_DIAG && diagText !== "" && (
+              <Text testID="r068-diag" style={{ fontSize: 9, color: "#333", marginBottom: 8 }}>{diagText}</Text>
+            )}
             <Pressable
               testID="play-again-button"
               style={({ pressed }) => [
@@ -1385,29 +1865,302 @@ export default function Game() {
 // the live scene (already preloaded/cached), no character, no input.
 function StartCover({ W, H }: { W: number; H: number }) {
   const s = CONFIG.cameraZoom;
+  if (POPUP) {
+    const bh = (H * PU_BACKDROP_H) / (PU_BACKDROP_H - PU_BACKDROP_PAD);
+    const bw = (bh * PU_BACKDROP_W) / PU_BACKDROP_H;
+    return (
+      <>
+        <View style={{ position: "absolute", left: 0, top: 0, width: W, height: H, backgroundColor: PU_SKY_TOP }} />
+        <CachedImage source={PU_BACKDROP_SOURCE} cachePolicy="memory-disk" priority="high" transition={0} blurRadius={3}
+          contentFit="fill" style={{ position: "absolute", left: (W - bw) / 2, top: -(bh - H), width: bw, height: bh }} />
+      </>
+    );
+  }
   const camX0 = CONFIG.widthWide.max / 2 - (CONFIG.cameraStartFraction * W) / s;
   const bgScale = Math.max(W / BG_IMG_W, H / BG_IMG_H) * BG_FAR_OVERSCAN;
   const bgW = BG_IMG_W * bgScale;
   const bgH = BG_IMG_H * bgScale;
   const maxShift = Math.max(0, (bgW - W) / 2);
   const shift = Math.min(maxShift, Math.max(-maxShift, -camX0 * s * BG_FAR_PARALLAX_RATIO));
-  const base = Math.floor(camX0 / DISTRICT_TILE_W);
+  const offX = camX0 * (1 - BACK_DISTRICT_PARALLAX);
+  const base = Math.floor((camX0 * BACK_DISTRICT_PARALLAX) / BACK_TILE_W);
   const top = (DISTRICT_TOP_Y + (CONFIG.cameraPlayerAnchorY * H) / s) * s;
   return (
     <>
       <CachedImage source={MASTER_NEIGHBORHOOD_SOURCE} cachePolicy="memory-disk" priority="high" transition={0} blurRadius={6}
-        contentFit="fill" style={{ position: "absolute", left: (W - bgW) / 2 + shift, top: (H - bgH) / 2, width: bgW, height: bgH }} />
-      {[0, 1].map((k) => (
+        contentFit="fill" style={{ position: "absolute", left: (W - bgW) / 2 + shift, top: (BG_SEA_END_WORLD_Y + (CONFIG.cameraPlayerAnchorY * H) / s) * s - BG_SEA_END_ROW * bgScale, width: bgW, height: bgH }} />
+      {SHOW_BACK_DISTRICT && [0, 1].map((k) => (
         <CachedImage key={k} source={DISTRICT_SOURCE} cachePolicy="memory-disk" priority="high" transition={0} blurRadius={4}
-          contentFit="fill" style={{ position: "absolute", left: ((base + k) * DISTRICT_TILE_W - (k ? 1.5 : 0) - camX0) * s, top, width: DISTRICT_TILE_W * s, height: DISTRICT_TILE_H * s }} />
+          contentFit="fill" style={{ position: "absolute", left: (offX + (base + k) * BACK_TILE_W - (k ? 1.5 : 0) - camX0) * s, top, width: BACK_TILE_W * s, height: BACK_TILE_H * s }} />
       ))}
     </>
   );
 }
 
-function PlatformView({ index, platforms, styles, onArtLoad, onArtStart, onArtError }: any) {
+// REVIZYON-054: one house per pool slot (see HOUSE_* constants). Every View
+// and Image is always mounted; only continuous geometry (position/width/
+// crop offsets) follows the slot's current platform, so a recycled slot never
+// swaps native surfaces (the R037/R038 iOS ghost-surface lesson). Pure render:
+// reads p.x/p.topY/p.width/p.id and the neighbours' x/width, writes nothing.
+// REVIZYON-061: the pool views are memo()'d. Every GameScreen re-render
+// (setScore on each landing, setLastJump on each release in dev builds) used
+// to re-render all 14 houses; their animated styles close over functions
+// re-created per render (geom/colPos), so Reanimated stopped and restarted
+// ~13 mappers per house on the UI thread at takeoff and landing. Props here
+// are a SharedValue, the memoized StyleSheet and stable callbacks.
+const PlatformHouseView = memo(function PlatformHouseView({ index, platforms, styles, probe }: any) {
+  // REVIZYON-062: every updater passes its SharedValue's .value itself. Reanimated
+  // only subscribes a mapper to SharedValues found directly in the updater's
+  // closure (extractInputs does not look inside nested worklet functions), so
+  // reading platforms inside geom(platforms.value) alone left these mappers with no inputs:
+  // they ran once and froze. Before R061 every parent re-render restarted
+  // them (hiding it); after memo() the houses stayed put while the caps moved.
+  const geom = (list: any[]) => {
+    "worklet";
+    const p = slotPlatform(list, index);
+    if (!p) return null;
+    const r = houseRun(p, platformById(list, p.id - 1), platformById(list, p.id + 1));
+    return { p, r, rise: r * HOUSE_HIP_SLOPE, fw: p.width + 2 * r };
+  };
+  // REVIZYON-064: per-slot change gate. The iPhone A/B (R064 A vs B) tied the
+  // in-flight UI hitches to every platform-list change re-running all 14x13
+  // house styles and pushing their layout props (houseStyle's transform array
+  // never passes shallowEqual, so all 14 houses re-laid out per spawn/cleanup).
+  // Only this one cheap reaction follows platforms; it publishes the slot's
+  // geometry to houseGeom when id/x/topY/width/hip run actually changed, so a
+  // list change re-styles just the spawned slot and its neighbours. The styles
+  // read houseGeom.value directly (R062 rule: a SharedValue in the updater's own
+  // closure), and the reaction is declared first so its mapper runs before them
+  // in the same frame -- the cap (PlatformView, unchanged) and house stay aligned.
+  const houseGeom = useSharedValue<any>(null);
+  useAnimatedReaction(
+    () => geom(platforms.value),
+    (g, prev) => {
+      const old = houseGeom.value;
+      const same = g === null ? old === null
+        : old !== null && g.p.id === old.p.id && g.p.x === old.p.x && g.p.topY === old.p.topY && g.p.width === old.p.width && g.r === old.r;
+      if (!same && probe) {
+        // R065 probe only (react closure, not a mapper input): tag this frame's house write.
+        const kind = old === null ? 1 : g === null ? 2 : 4;
+        if (probe.pHouseFrame.value !== probe.pFrames.value) { probe.pHouseFrame.value = probe.pFrames.value; probe.pHouseKind.value = 0; }
+        probe.pHouseKind.value = probe.pHouseKind.value | kind;
+        if (probe.phase.value === PHASE.AIRBORNE) {
+          if (kind === 1) probe.pEvAppear.value += 1;
+          else if (kind === 2) probe.pEvGone.value += 1;
+          else probe.pEvMove.value += 1;
+        }
+      }
+      // primitive copy: never alias a platform object the course code may reuse
+      if (!same) houseGeom.value = g === null ? null : { p: { id: g.p.id, x: g.p.x, topY: g.p.topY, width: g.p.width }, r: g.r, rise: g.rise, fw: g.fw };
+    }
+  );
+  const houseStyle = useAnimatedStyle(() => {
+    const g = houseGeom.value;
+    if (!g) return { opacity: 0, width: 0, transform: [{ translateX: -99999 }, { translateY: -99999 }] };
+    return { opacity: 1, width: g.fw, transform: [{ translateX: g.p.x - g.r }, { translateY: g.p.topY }] };
+  });
+  const facadeStyle = useAnimatedStyle(() => {
+    const g = houseGeom.value;
+    return { top: g ? g.rise + HOUSE_GUTTER_H - HOUSE_GUTTER_OVERLAP : 0 };
+  });
+  const colPos = (k: number, g: any) => {
+    "worklet";
+    if (!g) return { left: 0, top: 0 };
+    const phase = HOUSE_FLOOR_STARTS[Math.floor(houseHash(g.p.id, 1) * 4) % 4];
+    return { left: (g.fw - HOUSE_COL_W) / 2, top: k * HOUSE_PERIOD - phase };
+  };
+  const col0 = useAnimatedStyle(() => colPos(0, houseGeom.value));
+  const col1 = useAnimatedStyle(() => colPos(1, houseGeom.value));
+  const col2 = useAnimatedStyle(() => colPos(2, houseGeom.value));
+  // Roof face: band (house width x rise) > clip L (rot +a, interior right of
+  // the left hip line) > unrotate > clip R (rot -a, interior left of the right
+  // hip line) > unrotate > tile image placed in house coordinates.
+  const roofBandStyle = useAnimatedStyle(() => {
+    const g = houseGeom.value;
+    return g ? { width: g.fw, height: g.rise } : { width: 0, height: 0 };
+  });
+  const clipLStyle = useAnimatedStyle(() => {
+    const g = houseGeom.value;
+    return { left: g ? g.r + HOUSE_CLIP_L * HOUSE_SIN : 0, top: -HOUSE_CLIP_L * HOUSE_COS };
+  });
+  // Inside the un-rotated wrapper, coordinates are band coordinates minus O1.
+  const clipRStyle = useAnimatedStyle(() => {
+    const g = houseGeom.value;
+    if (!g) return { left: 0, top: 0 };
+    const o1x = g.r + HOUSE_CLIP_L * HOUSE_SIN;
+    const o2x = g.r + g.p.width - HOUSE_CLIP_L * HOUSE_SIN;
+    return { left: o2x - HOUSE_CLIP_S - o1x, top: 0 };
+  });
+  const roofImgStyle = useAnimatedStyle(() => {
+    const g = houseGeom.value;
+    if (!g) return { left: 0, top: 0 };
+    const o2x = g.r + g.p.width - HOUSE_CLIP_L * HOUSE_SIN;
+    // one period further left so the image always covers the whole band (hip run < period)
+    return { left: g.r - houseHash(g.p.id, 2) * HOUSE_ROOF_TEX_PERIOD - HOUSE_ROOF_TEX_PERIOD - (o2x - HOUSE_CLIP_S), top: HOUSE_CLIP_L * HOUSE_COS };
+  });
+  const hipLineL = useAnimatedStyle(() => {
+    const g = houseGeom.value;
+    return g ? { left: g.r, height: Math.hypot(g.r, g.rise) } : { height: 0 };
+  });
+  const hipLineR = useAnimatedStyle(() => {
+    const g = houseGeom.value;
+    return g ? { left: g.r + g.p.width - 3, height: Math.hypot(g.r, g.rise) } : { height: 0 };
+  });
+  const gutterStyle = useAnimatedStyle(() => {
+    const g = houseGeom.value;
+    return g ? { top: g.rise - HOUSE_GUTTER_OVERLAP, width: g.fw + 6 } : { width: 0 };
+  });
+  const gutterImgStyle = useAnimatedStyle(() => {
+    const g = houseGeom.value;
+    return { left: g ? -houseHash(g.p.id, 3) * 100 * HOUSE_K : 0 };
+  });
+  // R066: house width reaches the fixed-box gradients only as scaleX (non-layout).
+  const lightStyle = useAnimatedStyle(() => {
+    const g = houseGeom.value;
+    return { transform: [{ scaleX: g ? (0.18 * g.fw) / HOUSE_GRAD_W : 1 }] };
+  });
+  const shadeStyle = useAnimatedStyle(() => {
+    const g = houseGeom.value;
+    return { transform: [{ scaleX: g ? (0.28 * g.fw) / HOUSE_GRAD_W : 1 }] };
+  });
+  const eaveStyle = useAnimatedStyle(() => {
+    const g = houseGeom.value;
+    return { transform: [{ scaleX: g ? g.fw / HOUSE_GRAD_W : 1 }] };
+  });
+  return (
+    <Animated.View pointerEvents="none" style={[styles.house, houseStyle]}>
+      <Animated.View style={[styles.houseFacade, facadeStyle]}>
+        <Animated.View style={[styles.houseCol, col0]}><Image source={HOUSE_FACADE_SOURCE} style={styles.houseFill} resizeMode="stretch" fadeDuration={0} /></Animated.View>
+        <Animated.View style={[styles.houseCol, col1]}><Image source={HOUSE_FACADE_SOURCE} style={styles.houseFill} resizeMode="stretch" fadeDuration={0} /></Animated.View>
+        <Animated.View style={[styles.houseCol, col2]}><Image source={HOUSE_FACADE_SOURCE} style={styles.houseFill} resizeMode="stretch" fadeDuration={0} /></Animated.View>
+        {HOUSE_GRAD_FIXED ? (
+          <>
+            <Animated.View pointerEvents="none" style={[styles.houseLightFixed, lightStyle]}>
+              <LinearGradient pointerEvents="none" colors={["rgba(255,240,214,0.10)", "rgba(255,240,214,0)"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.houseGradFill} />
+            </Animated.View>
+            <Animated.View pointerEvents="none" style={[styles.houseShadeFixed, shadeStyle]}>
+              <LinearGradient pointerEvents="none" colors={["rgba(52,30,18,0)", "rgba(52,30,18,0.30)"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.houseGradFill} />
+            </Animated.View>
+            <Animated.View pointerEvents="none" style={[styles.houseEaveFixed, eaveStyle]}>
+              <LinearGradient pointerEvents="none" colors={["rgba(30,18,10,0.43)", "rgba(30,18,10,0)"]} style={styles.houseGradFill} />
+            </Animated.View>
+          </>
+        ) : (
+          <>
+            <LinearGradient pointerEvents="none" colors={["rgba(255,240,214,0.10)", "rgba(255,240,214,0)"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.houseLight} />
+            <LinearGradient pointerEvents="none" colors={["rgba(52,30,18,0)", "rgba(52,30,18,0.30)"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.houseShade} />
+            <LinearGradient pointerEvents="none" colors={["rgba(30,18,10,0.43)", "rgba(30,18,10,0)"]} style={styles.houseEaveShadow} />
+          </>
+        )}
+        <View style={styles.houseEdgeL} />
+        <View style={styles.houseEdgeR} />
+      </Animated.View>
+      <Animated.View style={[styles.houseClip, { left: 0 }, roofBandStyle]}>
+        <Animated.View style={[styles.houseRoofClipL, ROOF_MASK_OFF, clipLStyle]}>
+          <View style={styles.houseRoofUnL}>
+            <Animated.View style={[styles.houseRoofClipR, ROOF_MASK_OFF, clipRStyle]}>
+              <View style={styles.houseRoofUnR}>
+                <AnimatedImage source={HOUSE_ROOF_SOURCE} style={[styles.houseRoofImg, roofImgStyle]} resizeMode="stretch" fadeDuration={0} />
+              </View>
+            </Animated.View>
+          </View>
+        </Animated.View>
+        <Animated.View style={[styles.houseHipLine, styles.houseHipLineL, hipLineL]} />
+        <Animated.View style={[styles.houseHipLine, styles.houseHipLineR, hipLineR]} />
+      </Animated.View>
+      <Animated.View style={[styles.houseClip, { left: -3, height: HOUSE_GUTTER_H }, gutterStyle]}>
+        <AnimatedImage source={HOUSE_GUTTER_SOURCE} style={[styles.houseGutterImg, gutterImgStyle]} resizeMode="stretch" fadeDuration={0} />
+      </Animated.View>
+    </Animated.View>
+  );
+});
+
+// POPUP-001: one cardboard pop-up house per pool slot (always mounted, only
+// continuous geometry follows the slot's platform -- R037/R038 rule). The cap
+// (PlatformView, exactly p.x/p.topY/p.width) stays the landing edge; the roof
+// below it is the house's own: hip | tiles exactly p.width | hip. The card
+// wall, its folded side face, white cut edges, the shadow it casts on the page
+// and its glue tabs on the page floor all come from p.x/p.topY/p.width/p.id.
+const PopupHouseView = memo(function PopupHouseView({ index, platforms, styles }: any) {
+  const houseStyle = useAnimatedStyle(() => {
+    const p = slotPlatform(platforms.value, index);
+    if (!p) return { opacity: 0, width: 0, transform: [{ translateX: -99999 }, { translateY: -99999 }] };
+    return { opacity: 1, width: p.width + 2 * PU_HIP, height: PAGE_FLOOR_Y - p.topY + 14, transform: [{ translateX: p.x - PU_HIP }, { translateY: p.topY }] };
+  });
+  const wallW = (p: any) => {
+    "worklet";
+    return p.width + 2 * PU_HIP - 2 * PU_WALL_INSET;
+  };
+  const shadowStyle = useAnimatedStyle(() => {
+    const p = slotPlatform(platforms.value, index);
+    return p ? { left: PU_WALL_INSET + PU_SHADOW_X, width: wallW(p) + PU_SIDE } : { width: 0 };
+  });
+  const wallStyle = useAnimatedStyle(() => {
+    const p = slotPlatform(platforms.value, index);
+    return p ? { width: wallW(p) } : { width: 0 };
+  });
+  const wallEdgeStyle = useAnimatedStyle(() => {
+    const p = slotPlatform(platforms.value, index);
+    return p ? { width: wallW(p) + 5 } : { width: 0 };
+  });
+  const wallTexStyle = useAnimatedStyle(() => {
+    const p = slotPlatform(platforms.value, index);
+    if (!p) return { left: 0, top: 0 };
+    const phase = houseHash(p.id, 5) < 0.5 ? 0 : PU_WALL_TEX_H / 2;
+    return { left: (wallW(p) - PU_WALL_TEX_W) / 2, top: -phase };
+  });
+  const sideStyle = useAnimatedStyle(() => {
+    const p = slotPlatform(platforms.value, index);
+    return p ? { left: PU_WALL_INSET + wallW(p) } : { left: 0 };
+  });
+  const roofMidStyle = useAnimatedStyle(() => {
+    const p = slotPlatform(platforms.value, index);
+    return p ? { width: p.width } : { width: 0 };
+  });
+  const roofMidImgStyle = useAnimatedStyle(() => {
+    const p = slotPlatform(platforms.value, index);
+    return { left: p ? -Math.floor(houseHash(p.id, 6) * 4) * PU_ROOF_TILE_PERIOD : 0 };
+  });
+  const hipRStyle = useAnimatedStyle(() => {
+    const p = slotPlatform(platforms.value, index);
+    return p ? { left: PU_HIP + p.width } : { left: 0 };
+  });
+  const tabRStyle = useAnimatedStyle(() => {
+    const p = slotPlatform(platforms.value, index);
+    return p ? { left: PU_WALL_INSET + wallW(p) - 18 } : { left: 0 };
+  });
+  return (
+    <Animated.View pointerEvents="none" style={[styles.puHouse, houseStyle]}>
+      <Animated.View style={[styles.puShadow, shadowStyle]} />
+      <Animated.View style={[styles.puWallEdge, wallEdgeStyle]} />
+      <Animated.View style={[styles.puWall, wallStyle]}>
+        {[0, 1, 2, 3].map((k) => (
+          <Animated.View key={k} style={[styles.puWallTex, { marginTop: k * PU_WALL_TEX_H }, wallTexStyle]}>
+            <Image source={PU_WALL_SOURCE} style={styles.houseFill} resizeMode="stretch" fadeDuration={0} />
+          </Animated.View>
+        ))}
+        <LinearGradient pointerEvents="none" colors={["rgba(40,22,12,0.30)", "rgba(40,22,12,0)"]} style={styles.puEaveShadow} />
+        <View style={styles.puFold} />
+      </Animated.View>
+      <Animated.View style={[styles.puSide, sideStyle]}>
+        <LinearGradient pointerEvents="none" colors={["#c9a473", "#a57d4f"]} style={styles.houseFill} />
+      </Animated.View>
+      <View style={[styles.puTab, { left: PU_WALL_INSET + 4 }]} />
+      <Animated.View style={[styles.puTab, tabRStyle]} />
+      <Image source={PU_ROOF_HIP_L_SOURCE} style={styles.puHip} resizeMode="stretch" fadeDuration={0} />
+      <Animated.View style={[styles.puRoofMid, roofMidStyle]}>
+        <AnimatedImage source={PU_ROOF_MID_SOURCE} style={[styles.puRoofMidImg, roofMidImgStyle]} resizeMode="stretch" fadeDuration={0} />
+      </Animated.View>
+      <Animated.View style={[styles.puHipRWrap, hipRStyle]}>
+        <Image source={PU_ROOF_HIP_R_SOURCE} style={styles.houseFill} resizeMode="stretch" fadeDuration={0} />
+      </Animated.View>
+    </Animated.View>
+  );
+});
+
+const PlatformView = memo(function PlatformView({ index, platforms, styles, onArtLoad, onArtStart, onArtError }: any) {
   const style = useAnimatedStyle(() => {
-    const p = platforms.value[index];
+    const p = slotPlatform(platforms.value, index);
     if (!p) {
       return {
         opacity: 0,
@@ -1421,7 +2174,7 @@ function PlatformView({ index, platforms, styles, onArtLoad, onArtStart, onArtEr
     };
   });
   const centerStyle = useAnimatedStyle(() => {
-    const p = platforms.value[index];
+    const p = slotPlatform(platforms.value, index);
     return {
       opacity: p ? 0.55 : 0,
       left: (p ? p.width : 0) / 2 - CONFIG.perfectTolerance,
@@ -1433,64 +2186,30 @@ function PlatformView({ index, platforms, styles, onArtLoad, onArtStart, onArtEr
   // reasoning. `visualType` ("chimney"/"normal") is untouched in the data
   // (procedural-course.ts is not part of THAT change) even though both
   // render identically now.
-  // GORSEL-014/OYUN_AKISI-001 (2026-09-22): a bounded rooftop-chimney piece
-  // is now drawn per platform (see ROOFTOP_SOURCES/ROOFTOP_ASSET above),
-  // picked by the platform's own `cat` (0/1/2 = wide/medium/narrow), scaled
-  // by capWidthPx (its flat stone cap's own width) so `scale = p.width /
-  // capWidthPx` and centred; cap top row (capTopPx) lands exactly on
-  // p.topY, the SAME physical landing surface as before -- identical
-  // alignment formula to every earlier per-platform overlay round.
-  const rooftopStyle0 = useAnimatedStyle(() => {
-    const p = platforms.value[index];
-    if (!p || p.cat !== 0) return { opacity: 0, transform: [{ translateX: -99999 }, { translateY: -99999 }] };
-    const asset = ROOFTOP_ASSET[0];
-    const scale = p.width / asset.capWidthPx;
-    const renderedWidth = asset.w * scale;
-    return {
-      opacity: 1,
-      width: renderedWidth,
-      height: Math.max(asset.h * scale, Math.min(asset.h * scale * 2.2, DISTRICT_ROOT_Y - (p.topY - asset.capTopPx * scale))),
-      transform: [
-        { translateX: p.x + (p.width - renderedWidth) / 2 },
-        { translateY: p.topY - asset.capTopPx * scale },
-      ],
-    };
-  });
-  const rooftopStyle1 = useAnimatedStyle(() => {
-    const p = platforms.value[index];
-    if (!p || p.cat !== 1) return { opacity: 0, transform: [{ translateX: -99999 }, { translateY: -99999 }] };
-    const asset = ROOFTOP_ASSET[1];
-    const scale = p.width / asset.capWidthPx;
-    const renderedWidth = asset.w * scale;
-    return {
-      opacity: 1,
-      width: renderedWidth,
-      height: Math.max(asset.h * scale, Math.min(asset.h * scale * 2.2, DISTRICT_ROOT_Y - (p.topY - asset.capTopPx * scale))),
-      transform: [
-        { translateX: p.x + (p.width - renderedWidth) / 2 },
-        { translateY: p.topY - asset.capTopPx * scale },
-      ],
-    };
-  });
-  const rooftopStyle2 = useAnimatedStyle(() => {
-    const p = platforms.value[index];
-    if (!p || p.cat !== 2) return { opacity: 0, transform: [{ translateX: -99999 }, { translateY: -99999 }] };
-    const asset = ROOFTOP_ASSET[2];
-    const scale = p.width / asset.capWidthPx;
-    const renderedWidth = asset.w * scale;
-    return {
-      opacity: 1,
-      width: renderedWidth,
-      height: Math.max(asset.h * scale, Math.min(asset.h * scale * 2.2, DISTRICT_ROOT_Y - (p.topY - asset.capTopPx * scale))),
-      transform: [
-        { translateX: p.x + (p.width - renderedWidth) / 2 },
-        { translateY: p.topY - asset.capTopPx * scale },
-      ],
-    };
+  // Historical rooftop-island sprites were retired in REVIZYON-041. The
+  // collision surface remains p.x/p.width/p.topY; only its thin rim is drawn
+  // here, while PlatformHouseView supplies the house under it.
+  // REVIZYON-037: the free-standing baseShadow/baseTint rectangles (View +
+  // LinearGradient, not derived from the sprite's own alpha) that used to sit
+  // under/over that edge are gone -- the iPhone video showed them as loose
+  // brown/ghost rectangles next to or independent of real chimneys, on top of
+  // the R036 connector's own ghosts. Pure render: reads p.x/p.width/p.topY/p.cat.
+  // REVIZYON-038: one native image layer per pool slot. R037 retained three
+  // mutually-hidden animated trees (cat 0/1/2); when a recycled slot changed
+  // category, iOS occasionally retained the old clipped surface as a brown
+  // rectangular ghost. A single shared medium roof-island silhouette removes
+  // category switching and cuts the native image surfaces from 42 to 14.
+  // REVIZYON-031: landing-cap rim (light top edge over a dark under-edge) on
+  // top of the sprite: legible on sky, sea and roof. Visual only; reads
+  // p.x/p.width/p.topY, writes nothing.
+  const capRimStyle = useAnimatedStyle(() => {
+    const p = slotPlatform(platforms.value, index);
+    if (!p) return { opacity: 0, transform: [{ translateX: -99999 }, { translateY: -99999 }] };
+    return { opacity: 1, width: p.width, transform: [{ translateX: p.x }, { translateY: p.topY }] };
   });
   return (
     <>
-      <Animated.View style={[styles.tower, style]}>
+      <Animated.View style={[styles.tower, NO_CLIP, style]}>
         {/* GORSEL-012: raster brick tile permanently hidden (see
             `towerBrick`'s own style, opacity 0) -- the flat colour accents
             below it (shade/cap/highlight) are NOT a repeating texture and
@@ -1526,26 +2245,17 @@ function PlatformView({ index, platforms, styles, onArtLoad, onArtStart, onArtEr
           mode (only styles.towerCenter's perfect-zone hint stripe shows). */}
       {!USE_FIXED_PANEL_COURSE && (
         <>
-          <Animated.View style={[styles.rooftopImage, rooftopStyle0]} pointerEvents="none">
-            <Image source={ROOFTOP_SOURCES[0]} style={styles.rooftopImageFill} resizeMode="stretch"
-              onLoadStart={index === 0 ? () => onArtStart("rooftop") : undefined}
-              onLoad={index === 0 ? () => onArtLoad("rooftop") : undefined}
-              onError={index === 0 ? onArtError : undefined}
-            />
-          </Animated.View>
-          <Animated.View style={[styles.rooftopImage, rooftopStyle1]} pointerEvents="none">
-            <Image source={ROOFTOP_SOURCES[1]} style={styles.rooftopImageFill} resizeMode="stretch"
-              onLoad={index === 0 ? () => onArtLoad("rooftop1") : undefined} />
-          </Animated.View>
-          <Animated.View style={[styles.rooftopImage, rooftopStyle2]} pointerEvents="none">
-            <Image source={ROOFTOP_SOURCES[2]} style={styles.rooftopImageFill} resizeMode="stretch"
-              onLoad={index === 0 ? () => onArtLoad("rooftop2") : undefined} />
+          {/* REVIZYON-041: the separate roof-island sprite is deliberately
+              gone. The landing surface is now one masonry shaft emerging
+              from behind the painted district, with only this thin cap rim. */}
+          <Animated.View pointerEvents="none" style={[styles.playableChimneyCap, NO_CLIP, capRimStyle]}>
+            <View style={styles.playableChimneyCapHighlight} />
           </Animated.View>
         </>
       )}
     </>
   );
-}
+});
 
 // PERFECT! pop with a quick scale-in.
 function PerfectPop({ styles, label }: any) {
@@ -1562,6 +2272,39 @@ function PerfectPop({ styles, label }: any) {
     <Animated.View style={st} testID="perfect-label">
       <Text style={styles.perfectText}>{label}</Text>
     </Animated.View>
+  );
+}
+
+// REVIZYON-064: diagnostics overlay (PERF_PROBE only). JS reads the UI-thread
+// counters every 500 ms and also measures its own rAF gaps (JS-thread stalls).
+function PerfProbeOverlay({ top, sv }: any) {
+  const [txt, setTxt] = useState("");
+  const js = useRef({ n: 0, h: 0, max: 0, last: 0 });
+  useEffect(() => {
+    let raf = 0;
+    const loop = (t: number) => {
+      const j = js.current;
+      if (j.last) { const d = t - j.last; j.n += 1; if (d > 25) j.h += 1; if (d > j.max) j.max = d; }
+      j.last = t;
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+    const id = setInterval(() => {
+      const j = js.current;
+      setTxt(`UI ${sv.pFrames.value} kare | >25ms ${sv.pHitch.value} (>40 ${sv.pHitchBig.value}) max ${Math.round(sv.pMaxMs.value)}\n` +
+        `ucus ${sv.pAirFrames.value} kare, >25ms ${sv.pAirHitch.value} | liste degisimi(ucus) ${sv.pListAir.value}, liste+1 kare icinde takilma ${sv.pHitchNearList.value}\n` +
+        `JS ${j.n} kare | >25ms ${j.h} max ${Math.round(j.max)}${HOUSE_AB_FROZEN ? "  [AB: EVLER DONDURULMUS]" : (HOUSE_GRAD_FIXED ? "  [R066: GRADYAN SABIT KUTU]" : "  [R065: FAZ/EV OLAY SAYACI]")}\n` +
+        `faz >25ms: bekle ${sv.pHitchIdle.value} / sarj ${sv.pHitchCharge.value} / ucus ${sv.pAirHitch.value} / olu ${sv.pHitchDead.value}\n` +
+        `ucus takilma/olay: ev-gorun ${sv.pHitchAppear.value}/${sv.pEvAppear.value}  ev-kaybol ${sv.pHitchGone.value}/${sv.pEvGone.value}  ev-kay/boy ${sv.pHitchMove.value}/${sv.pEvMove.value}  liste-evsiz ${sv.pHitchListOnly.value}/${sv.pListNoHouse.value}  olaysiz ${sv.pHitchNoEvent.value}`);
+    }, 500);
+    return () => { cancelAnimationFrame(raf); clearInterval(id); };
+    // SharedValues are stable for the screen's lifetime.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  return (
+    <View pointerEvents="none" style={{ position: "absolute", left: 4, right: 4, top, padding: 4, backgroundColor: "rgba(0,0,0,0.6)", borderRadius: 6, zIndex: 50 }}>
+      <Text style={{ color: "#fff", fontSize: 10 }}>{txt}</Text>
+    </View>
   );
 }
 
@@ -1591,7 +2334,7 @@ const useStyles = makeStyles((colors) => ({
   backgroundWash: {
     ...absoluteFill(),
     backgroundColor: colors.gameSky,
-    opacity: 0.26,
+    opacity: 0.14, // REVIZYON-034: 0.26 -> 0.14 (less desaturation of the master)
   },
   brickImage: { width: "100%", height: "100%" },
   // GORSEL-013 (2026-09-22, device rejection of the GORSEL-012 fix round):
@@ -1677,6 +2420,49 @@ const useStyles = makeStyles((colors) => ({
   // rooftopStyle0/1/2 (width/height/transform); this is just the base.
   rooftopImage: { position: "absolute", left: 0, top: 0, pointerEvents: "none" },
   rooftopImageFill: { width: "100%", height: "100%" },
+  house: { position: "absolute", left: 0, top: 0, height: HOUSE_FACADE_H, pointerEvents: "none" },
+  puHouse: { position: "absolute", left: 0, top: 0, pointerEvents: "none" },
+  puShadow: { position: "absolute", top: PU_ROOF_H + 10, bottom: 6, backgroundColor: "rgba(40,24,40,0.26)", borderRadius: 4 },
+  puWallEdge: { position: "absolute", left: PU_WALL_INSET - 2.5, top: PU_ROOF_H - 3, bottom: 4, backgroundColor: "#fffaf0" },
+  puWall: { position: "absolute", left: PU_WALL_INSET, top: PU_ROOF_H - 3, bottom: 6, overflow: "hidden", backgroundColor: "#f6e9cc",
+    borderLeftWidth: 2, borderRightWidth: 2, borderBottomWidth: 2, borderColor: "#2a1c16" },
+  puWallTex: { position: "absolute", width: PU_WALL_TEX_W, height: PU_WALL_TEX_H },
+  puEaveShadow: { position: "absolute", left: 0, right: 0, top: 0, height: 12 },
+  puFold: { position: "absolute", left: 0, right: 0, bottom: 10, height: 1.5, backgroundColor: "rgba(42,28,22,0.45)" },
+  puSide: { position: "absolute", top: PU_ROOF_H, bottom: 9, width: PU_SIDE, overflow: "hidden", borderRightWidth: 2, borderBottomWidth: 2, borderColor: "#2a1c16",
+    transform: [{ skewY: "-24deg" }], transformOrigin: "0% 0%" },
+  puTab: { position: "absolute", bottom: 0, width: 14, height: 8, backgroundColor: "#ecdab4", borderWidth: 1.5, borderColor: "#2a1c16",
+    borderBottomLeftRadius: 3, borderBottomRightRadius: 3 },
+  puHip: { position: "absolute", left: 0, top: 0, width: PU_HIP, height: PU_ROOF_H },
+  puHipRWrap: { position: "absolute", top: 0, width: PU_HIP, height: PU_ROOF_H },
+  puRoofMid: { position: "absolute", left: PU_HIP, top: 0, height: PU_ROOF_H, overflow: "hidden" },
+  puRoofMidImg: { position: "absolute", top: 0, width: PU_ROOF_TILE_W, height: PU_ROOF_H },
+  puPageFloor: { position: "absolute", top: PAGE_FLOOR_Y, height: 2200, backgroundColor: PU_PAPER, borderTopWidth: 3, borderColor: "#2a1c16" },
+  puPageFold: { position: "absolute", left: 0, right: 0, top: 26, height: 2, backgroundColor: "rgba(120,86,60,0.45)" },
+  houseFacade: { position: "absolute", left: 0, right: 0, height: HOUSE_FACADE_H, overflow: "hidden" },
+  houseCol: { position: "absolute", width: HOUSE_COL_W, height: HOUSE_PERIOD },
+  houseFill: { width: "100%", height: "100%" },
+  houseLight: { position: "absolute", left: 0, top: 0, bottom: 0, width: "18%" },
+  houseShade: { position: "absolute", right: 0, top: 0, bottom: 0, width: "28%" },
+  houseEaveShadow: { position: "absolute", left: 0, right: 0, top: 0, height: 14 },
+  houseLightFixed: { position: "absolute", left: 0, top: 0, bottom: 0, width: HOUSE_GRAD_W, transformOrigin: "0% 0%" },
+  houseShadeFixed: { position: "absolute", right: 0, top: 0, bottom: 0, width: HOUSE_GRAD_W, transformOrigin: "100% 0%" },
+  houseEaveFixed: { position: "absolute", left: 0, top: 0, height: 14, width: HOUSE_GRAD_W, transformOrigin: "0% 0%" },
+  houseGradFill: { position: "absolute", left: 0, top: 0, right: 0, bottom: 0 },
+  houseEdgeL: { position: "absolute", left: 0, top: 0, bottom: 0, width: 1.8, backgroundColor: "#3a281c" },
+  houseEdgeR: { position: "absolute", right: 0, top: 0, bottom: 0, width: 1.8, backgroundColor: "#3a281c" },
+  houseClip: { position: "absolute", top: 0, overflow: "hidden" },
+  houseRoofImg: { position: "absolute", top: 0, width: HOUSE_ROOF_W, height: HOUSE_ROOF_H },
+  houseRoofClipL: { position: "absolute", width: HOUSE_CLIP_S, height: HOUSE_CLIP_S, overflow: "hidden", transformOrigin: "0% 0%", transform: [{ rotate: HOUSE_HIP_DEG }] },
+  houseRoofUnL: { position: "absolute", left: 0, top: 0, width: 0, height: 0, transformOrigin: "0% 0%", transform: [{ rotate: HOUSE_HIP_NEG_DEG }] },
+  houseRoofClipR: { position: "absolute", width: HOUSE_CLIP_S, height: HOUSE_CLIP_S, overflow: "hidden", transformOrigin: "100% 0%", transform: [{ rotate: HOUSE_HIP_NEG_DEG }] },
+  houseRoofUnR: { position: "absolute", left: 0, top: 0, width: HOUSE_CLIP_S, height: HOUSE_CLIP_S, transformOrigin: "100% 0%", transform: [{ rotate: HOUSE_HIP_DEG }] },
+  houseHipLine: { position: "absolute", top: 0, width: 3, backgroundColor: "#3a2218", borderColor: "rgba(226,150,108,0.65)" },
+  houseHipLineL: { transformOrigin: "0% 0%", transform: [{ rotate: HOUSE_HIP_DEG }], borderRightWidth: 1 },
+  houseHipLineR: { transformOrigin: "100% 0%", transform: [{ rotate: HOUSE_HIP_NEG_DEG }], borderLeftWidth: 1 },
+  houseGutterImg: { position: "absolute", top: 0, width: HOUSE_GUTTER_W, height: HOUSE_GUTTER_H },
+  playableChimneyCap: { position: "absolute", left: 0, top: 0, height: 8, borderTopLeftRadius: 3, borderTopRightRadius: 3, backgroundColor: "#9f573d", borderWidth: 1.25, borderColor: "rgba(74,42,34,0.78)", overflow: "hidden" },
+  playableChimneyCapHighlight: { position: "absolute", left: 2, right: 2, top: 1, height: 2, backgroundColor: "rgba(239,171,121,0.76)" },
 
   // GORSEL-006 sprite box: square, same aspect as the 1024x1024 canvas, sized
   // from the physical sole span (SPRITE_SCALE) -- never from device pixels.
@@ -1696,13 +2482,19 @@ const useStyles = makeStyles((colors) => ({
     fontWeight: "800",
     color: colors.hudText,
     letterSpacing: -1,
+    textShadowColor: "rgba(255,255,255,0.55)",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 4,
   },
   bestText: {
     fontSize: 13,
     fontWeight: "700",
-    color: colors.muted,
+    color: colors.hudText,
     letterSpacing: 1,
     marginTop: -4,
+    textShadowColor: "rgba(255,255,255,0.55)",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
   },
 
   hint: {
@@ -1714,6 +2506,11 @@ const useStyles = makeStyles((colors) => ({
     pointerEvents: "none",
   },
   hintText: { fontSize: 14, fontWeight: "600", color: colors.muted },
+  // POPUP-002: the paper sky is dark blue, so the Popup HUD is light text with a
+  // firm dark shadow (same size/position); the hint sits on a small dark pill.
+  puScoreText: { color: "#ffffff", textShadowColor: "rgba(16,24,40,0.85)", textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 3 },
+  puBestText: { color: "#ffffff", textShadowColor: "rgba(16,24,40,0.9)", textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2 },
+  puHintText: { color: "#ffffff", backgroundColor: "rgba(20,28,44,0.62)", paddingHorizontal: 12, paddingVertical: 5, borderRadius: 12, overflow: "hidden" },
 
   perfectWrap: {
     position: "absolute",

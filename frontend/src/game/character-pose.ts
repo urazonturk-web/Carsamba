@@ -35,6 +35,9 @@
 // applies scale around pose.pivotX/Y, see ChargePoses.tsx) -- physical foot
 // pivot, collision box (PW/PH), footSoles, jump/landing math and procedural
 // reachability are all untouched; this is a render-only multiplier.
+// REVIZYON-058: these 11% figures describe the former cameraZoom=0.62.
+// With the same sprite scale at cameraZoom=0.40, visible idle height is
+// about 0.11 * 0.40 / 0.62 = 7.1% of H, near the measured Spring Ninja 7%.
 export const GLOBAL_VISUAL_SCALE = 0.6625;
 
 export const POSE_FEET_SPAN_PX = 271;

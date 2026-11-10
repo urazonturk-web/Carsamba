@@ -83,28 +83,19 @@ const PREVIOUS_CONFIG = {
   scorePerfectBonus: 2,
 
   // --- Camera --------------------------------------------------------------
-  cameraZoom: 0.62, // world -> screen scale. Kept moderate (not far out).
-  // OYUN_AKISI-002 (2026-09-22, user-authorized, replaces the GORSEL-014
-  // anchorMin/anchorMax/revealRight model entirely -- that model recomputed
-  // an "ideal" camX target from the NEXT/NEXT+1 tower's position every
-  // frame, which jumps discontinuously the instant the player's nearest
-  // platform changes identity, producing a visible kink even with a smooth
-  // lerp on top of it; suspected contributor to the device-reported "kare
-  // kare atlama / ani kamera kilidi"). Replaced with a plain DEAD ZONE: the
-  // player can move freely anywhere left of cameraDeadZoneRight (no camera
-  // reaction at all -- true corridor, not just a narrow anchor band); only
-  // once the player's OWN screen fraction would exceed this threshold does
-  // the camera start interpolating forward, by just enough to hold the
-  // player at the threshold. Never depends on platform pool contents.
-  // KAMERA-021 (2026-09-24): was 0.64. Spring Ninja device video keeps the character in the left-middle 30-40% band while the camera only ever moves right; lower threshold shows the next 2-3 landing surfaces before the jump.
-  cameraDeadZoneRight: 0.30,
+  // Camera-only framing: 0.40/0.62 makes the existing ~11%-screen-tall
+  // character ~7.1%, matching the measured Spring Ninja character scale.
+  // World-space jump, collision, and course dimensions stay unchanged.
+  cameraZoom: 0.40,
+  // The underlying camX still manages world generation/cleanup. The visible
+  // camXR follows the player at cameraStartFraction every frame, independent
+  // of this older camX dead-zone follower.
+  cameraDeadZoneRight: 0.32,
   cameraSmoothTimeY: 0.16, // REVIZYON-022: critically damped vertical follow time (s)
-  cameraStartFraction: 0.30, // where the player sits on screen at the very start/restart snap only
+  cameraStartFraction: 0.32, // also the render camera's fixed X anchor, measured at 422/1320 in Spring Ninja
   cameraPlayerAnchorY: 0.67, // vertical resting anchor for the standing level
-  // Was 1 (instant snap, "no follow lag"). User asked for smooth follow;
-  // 0.18 is a gentle lerp (same order of magnitude as cameraSmoothingY
-  // below) -- purely a camera-transform easing constant, does not touch
-  // px/py, physics, or collision.
+  // Smoothing for the underlying camX used by generation/cleanup; the visible
+  // horizontal camera does not use this lag.
   cameraSmoothingX: 0.18,
   cameraSmoothingY: 0.08, // vertical follow lerp
   cameraFallSmoothing: 0.1, // vertical follow while falling to Game Over

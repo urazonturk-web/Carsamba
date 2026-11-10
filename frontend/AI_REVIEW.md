@@ -1555,3 +1555,1516 @@ District dunya-uzayina donduruldu (027'de ekrana sabitti): goreli kayma 6.23px -
 
 ## ESKI INIS HISSI (2026-09-24)
 landing.ts snapshot/7b8bd6b ile birebir (%55 kalkti); config'ten yalniz landingMinSoleOverlap silindi. Tablo+canli kenar testi. iPhone kabulu yok.
+
+## REVIZYON-030 (2026-09-25) — deniz/cati gecisi, kolon okunurlugu, render kamera yumusatma
+- Dosya: yalniz `app/index.tsx` (render) + yeni `assets/environment/district/rooftop-district-v2.png` (ust 52px alfa feather) ve `rooftop-district-v2-body.png` (feathersiz), ikisi de v1'den PIL ile uretildi (%22 desatürasyon, %20 soguk ton, hafif dusuk deger). v1 diskte duruyor, kullanilmiyor.
+- Kok neden: (1) FAR bg ekranda Y'de sabitti, district dunya Y'sinde kayiyordu; district PNG'si opak, ustu duz kesikti -> iki resim. (2) district sicak/doygun, kolonlarla ayni tonda -> kolon kayboluyordu. (3) camY hedef adim degisince hizi aninda yuksek.
+- Cozum: bg Y'de dunyaya kilitli 1:1 (master'in deniz->cati satiri 1298, dunya Y=82'de); district ustu feather ile bg'nin kendi boyali catilarina karisir. BG_FAR_OVERSCAN 1.4->1.19 (skyline HUD'dan uzak). Ek asagi ayna district (kamera asagida ciplak zemin gormesin). Kolon govdesi arkasina yumusak koyu kontur (boxShadow). Render-only ikinci kritik sondurmeli asama `camYR` (0.14s; camY/hedef/fizik degismez; camY'de >200 sicrama = start/restart snap).
+- Olcum (390x844 Chrome, 8 inis, district ust kenari kare basi): en buyuk adim 6.23->4.05 px, en buyuk ivme 2.29->0.50 px/kare; toplam kaydirma ayni (81.6/81.5 vb.) -> hedef konum degismedi. 8/8 inis.
+- Katman: FAR bg (Y-kilitli) < haze yok < district(feather) < district-alt(ayna) < kontur < kolon sprite < karakter.
+- Risk: iPhone'da dogrulanmadi (Android da dogrulanmadi). Uzun bacada skyline HUD skoruna hafif bindirebilir. Alt ayna district ters camasir/pencere gosterir, yalniz cok alcak kamerada gorunur. boxShadow native'de web'den farkli render olabilir. Kamera gorsel gecikmesi ~0.14s eklendi.
+- Kanit: ~/Documents/Codex/carsamba-revizyon030/ (once/, sonra/, hareket/montaj-hareket.png). iOS export OK; tsc yalniz onceden var theme.ts; DEBUG_MODE=false.
+
+## REVIZYON-030A (2026-09-25) — restart render kamera guvenligi
+- Sorun: initWorld yalniz camY'yi resetliyordu; kucuk camY farkinda (<200) camYR eski noktadan kayarak geliyordu.
+- Cozum: app/index.tsx initWorld UI worklet'inde camY atamasindan hemen sonra camYR=camY, camVYR=0, camYSeen=camY, camYRReady=1. Baska degisiklik yok.
+- Kontrol: 5 ardisik Game Over -> Play Again = 5 initWorld cagrisi; her biri ayni deterministik resetle camYR==camY baslatir, dolayisiyla baslangic farki 0 (kod incelemesi). Canli/cihazda 5 dongu calistirilmadi. iOS export OK; DEBUG_MODE=false.
+TESLIM_HAZIR: REVIZYON-030A
+
+## REVIZYON-031 (2026-09-25) — TESLIM_HAZIR
+- Dosya: yalniz `app/index.tsx`. Ufuk pusu (world-locked gradient, DISTRICT_TOP_Y-34, 90 birim), baca kok temas golgesi (DISTRICT_ROOT_Y-7), yalniz inis kapagina hafif kenar seridi (3px, dusuk opaklik, sprite ustunde), `RENDER_CAM_SMOOTH_Y` 0.05. Fizik/jump/charge/landing/footSoles/skor/collision/kamera hedefi+anchor/kurs/RNG/visualType/smoke/restart degismedi; camYR yalniz render.
+- Test: tsc ve expo export (ios/web) calistirma onayi alinamadigi icin CALISTIRILMADI. Kod incelemesi: yeni stiller platforms.value'dan yalniz okur.
+- Risk: native boxShadow/gradient farki; hizli kamerada kucuk sarsinti; kapak seridi fazla belirgin olabilir.
+- iPhone testi: 5+ inis oyna; kapak/baca/ufuk/kamera koridorunu gozle kontrol et.
+- Code review duzeltmesi: tam kolon boxShadow konturu (contourStyle) kaldirildi, yalniz cati-duzlemi temas golgesi kaldi; ufuk pusu camX telafisi olmadan dunyada sabit X'e alindi. Mobil guvenlik: tek dev pus View'i (left -2000, width 30000) kaldirildi; districtStyle0/1 ile eslesen iki DISTRICT_TILE_W genisliginde tekrarlayan pus karosu (ayni translateX/Y, DISTRICT_TOP_Y-34, ayni gradient) kondu. Kamera hedefi/anchor, fizik, jump/charge/landing, skor, collision, kurs, RNG, visualType, smoke, restart, asset degismedi.
+- Test (onceki tur, dev pus ile): tsc yalniz onceden var olan theme.ts hatalarini veriyor; iOS Expo export geciyor. Karolu pus icin tsc/export CALISTIRILMADI. Risk (karolu pus): karo birlesiminde 1.5 birimlik ortusme nedeniyle pus opakligi orada hafif artabilir; iPhone'da dikis gorunuyorsa kontrol et. iPhone testi bekliyor.
+TESLIM_HAZIR: REVIZYON-031
+
+## REVIZYON-032 (2026-09-25) — TESLIM_HAZIR
+- Dosya: yalniz `app/index.tsx`. Render-only baca sacak (eave) kirpmasi + cati-temas islemi (baca cati duzlemiyle birlesir, collision tasinmadi/boyutlanmadi); render-only koridor kadrajlama ofseti (CHARGING/AIRBORNE'da oyuncu + sonraki 1-2 kapak; camY'ye yazmaz, camYR restart snap'i korunur, idle/inista duzeltme yok). R031 parlak kapak kenari korundu.
+- Invariants dokunulmadi: jump, charge, landing/footSoles, collision, skor, kamera hedef/anchor/config, olum esigi, restart, procedural geometri, RNG sirasi, visualType, smoke, asset.
+- Test: iOS Expo export gecti; tsc yalniz onceden var olan `src/theme.ts` hatalari (116,31 / 126,9 / 126,41). Cihaz dogrulamasi bekliyor.
+- Risk: sprite-ozgu kirpma farkli yukseklikte dikis gosterebilir; yuksek ziplamada kamera erken kayabilir.
+- iPhone kabul adimi: 10+ inis oyna, en az 3 tam sarjli yuksek ziplama yap; bacalar catiya oturuyor mu ve karakter + sonraki kapaklar ayni ekranda okunuyor mu bak.
+TESLIM_HAZIR: REVIZYON-032 — commit/push/deploy yok.
+
+## REVIZYON-033 (2026-09-26) — haze inceltme + koridor hedef gorunurlugu
+- Dosya: yalniz `app/index.tsx`. (A) Deniz-cati haze: tek 90px/0.34 opak bant yerine iki ince katman (54px/0.13 ve 30px/0.08, acik mavi-gri, yumusak tepe); cati ortuluyor hissi azaltildi. (B) Koridor: oyuncu + ilk hedef zorunlu, ikinci hedef yalniz tum aralik 24%-80% koridora sigiyorsa dahil (eskiden sigmayinca ilk hedefi de kadraj disina cekebiliyordu); ofset yumusatma 0.09s -> 0.07s.
+- Invariants dokunulmadi: camY/hedefi, fizik, jump, charge, collision, skor, olum esigi, procedural geometri, RNG, R032 reset snap'i, baca eave kirpmasi/taban golgesi. Hedef yoksa ofset 0 (mevcut davranis).
+- Test: iOS Expo export GECTI. tsc: yalniz onceden var olan `src/theme.ts` hatalari (116,31 / 126,9 / 126,41); yeni hata yok. Cihaz dogrulamasi BEKLIYOR (Android dogrulanmadi).
+- Risk: haze degerleri goz kararı; cok incelmis olabilir. Ikinci hedef sigmadiginda dislandigi icin cok yuksek ziplamada yalniz ilk hedef garanti. Daha hizli ofset kamerayi biraz daha atak gosterebilir.
+- iPhone kabul adimi: 10+ inis, en az 3 tam sarjli yuksek ziplama; deniz-cati birlesimi bulanik kahverengi bant gibi gorunmuyor mu, cati kapaklari yaklasirken erken gorunuyor mu, oyuncu 24%-80% icinde mi kontrol et.
+
+## REVIZYON-034 (2026-09-26) — yatay kadraj + arka plan canlilik + baca uyumu
+- Dosya: yalniz `app/index.tsx`. (1) Render-only X koridoru: `camXOff`/`camXR` (camXR = camX + eased offset, tau 0.12s), FRAME_XL 0.14 / FRAME_XR 0.88; CHARGING/AIRBORNE'da oyuncu + ilk hedef kapagi (x..x+width) sigdirilir, ikinci hedef yalniz butun aralik sigarsa eklenir, sigmazsa merkezleme. Yalniz render (worldStyle, district, bgFar, groundBand) camXR okur; oyun camX'e yazilmaz. Start/restart ve >200 camY sicramasinda offset 0'a snap. (2) Canlilik: backgroundWash opakligi 0.26 -> 0.14 (desature nedeni buydu) + cok hafif mavi-ust/sicak-ufuk ekran gradyani. (3) Baca alt %32'sine cati paletinde (92,104,132) en fazla 0.2 alfa yerel tint; R032 eave kirpma/kapak hizasi ve olculer degismedi. (4) Kahverengi lekeler: ColumnSmoke hicbir yerde render edilmiyor (GORSEL-016'dan beri kapali; yalniz yorum kaldi) -> smoke DEGIL. Gercek kaynak PlatformView `baseShadowStyle` eave golgesi: rgba(30,16,10,0.62) koyu kahve, b.w*0.94 genis, sert yan kenarli dikdortgen. Duzeltme: genislik 0.72, mavi-gri rgba(38,34,48) 0.34 ust alfa, 24px radius (yuvarlak uclar), asagi dogru soner.
+- Invariants dokunulmadi: fizik, jump, charge, collision/footSoles, landing, skor, olum esigi, camX/camY oyun hedefleri, procedural geometri, RNG, platform verisi, visualType, smoke aktivasyonu, asset.
+- Test: iOS Expo export GECTI; `git diff --check` temiz; tsc yalniz onceden var olan `src/theme.ts` hatalari (116,31 / 126,9 / 126,41), app/ altinda yeni hata yok. Cihaz dogrulamasi YOK (Android dogrulanmadi).
+- Risk: X offset hedef cok uzaksa oyuncuyu sol %14'e yaklastirir; tau 0.12s cihazda atak/yavas gelebilir. Tint/gradyan/golge degerleri goz karari. Yatay offset spawn (camX) tabanli oldugundan 500 birim spawnAhead payi yeterli varsayildi.
+- iPhone kabul adimi: ~25s, ~33s, ~44s benzeri yuksek/uzun ziplamalari tekrarla; hedef kolon kapagi + karakter hep ekranda mi, kamera sicramiyor mu, kahverengi dikdortgen leke ve yapisik baca gorunumu gitti mi bak.
+TESLIM_HAZIR: REVIZYON-034 — commit/push/deploy yok.
+
+## REVIZYON-035 (2026-09-26) — review notu
+- Kod review: R034 phase-degisiminde hizli offset donusu kamera geri tepmesi yaratiyordu; asimetrik dt-tabanli easing + camXR ratchet ile giderildi. Baska render regresyonu bulunmadi (ek duzeltme yok).
+- Degisen: yalniz `app/index.tsx` (camFrameOff/camXOff tau, camXR ratchet, baseTint %20/alfa 0.07, HUD textShadow + best rengi).
+- Invariants: fizik/jump/charge/collision/landing/skor/olum/camX-camY hedefleri/procedural/RNG/restart/smoke degismedi; restart snap korundu.
+- Test: iOS export gecti; git diff --check temiz; tsc yalniz eski theme.ts (116,126) hatalari.
+- Risk: ratchet kamerayi sola gitmekten alikoyar; yavas birakma kadraji gecikmeli birakabilir; tint/gölge degerleri goz karari.
+- iPhone kabul: 10+ inis, 3+ yuksek ziplama; kamera sicramasi, kolon okunurlugu, HUD kontrastı, restart snap kontrol et.
+TESLIM_HAZIR: REVIZYON-035 — commit/push/deploy yok.
+
+## REVIZYON-036 (2026-09-26) — tek render kamerasi + cati-baca konnektoru (teknik kanit)
+- Kaynak: iPhone videosu ScreenRecording_09-26-2026 14-46-34_1.MP4 + kod review. Video ve kod: (1) kamera giris/cikis sert, (2) bazi kolonlar catiya bagli, bazilari havada.
+- Kok neden 1 (olculdu): R035 yalniz cikisi yavaslatmisti; giris Y 0.1s / X 0.14s + ikinci 0.05s katman (RENDER_CAM_SMOOTH_Y) hedefe agresif gidiyordu; X ratchet ivmeyi sinirlamiyordu; 400 birimlik guvenlik snap'i vardi.
+- Kok neden 2 (olculdu, /tmp/gap.cjs mantigi ile rooftopBox formulu): eave = top + h*ROOFTOP_EAVE_FRAC, sprite gerilmesi 2.2x ile sinirli. Eave-cati (DISTRICT_ROOT_Y=132) boslugu, orta genislikte: cat0 topY -320: 43, -200: 32; cat1 -320: 161, -200: 45, -100: 31; cat2 -320: 299, -200: 179, -100: 79, 0: 12. topY >= ~0/+80 icin bosluk yok. Yani yuksek/dar kolonlar havada kaliyordu.
+- Degisiklik 1 (kamera): yeni `src/game/render-camera.ts` (saf, worklet): `stepRenderAxis` (kritik sonumlu + hiz 780 u/s + ivme 5200 u/s2 siniri, smoothTime 0.13), `corridorTarget`, `includeSecondTarget` (histerezis: ikinci hedef girerken sigmali, cikarken 1.15x). app/index.tsx: camFrameOff/camXOff/RENDER_CAM_SMOOTH_Y/asimetrik tau/X ratchet snap(400) SILINDI. Her eksen icin TEK takipci; koridor yalniz HEDEFI belirler (oyuncu + ilk hedef zorunlu, ikinci yalniz sigarsa; DEAD haric tum fazlarda, faz gecisinde hedef sicramasi yok). X hedefi hayat icinde monoton (geri gitmez); geri overshoot'ta konum durur. Snap yalniz start/restart init'inde ve camY>200 kesintisinde. camX/camY'ye yazilmaz.
+- Olcum (`node ai_review_evidence/sim_render_camera.cjs`, ayni modul kodu): adim yaniti 60/150/300 birim: yerlesme %2 = 0.40 / 0.45 / 0.60s (300'de hiz siniri), overshoot 0, geri hareket 0, tepe hiz 204/444/484 px/s, ivme <= 5200 u/s2; 60 ve 30 fps ayni. Senaryo (25 ziplama, rastgele kurs): X geri kare 0, Y yon degisimi 0, havada oyuncu guvenli alan disi 0/1224, ilk hedef kadraj disi 0/1224 (30fps: 0/624). Tepe render hizi X 584 / Y 368 u/s (362/228 px/s). 30fps'te sonlu fark ivmesi X icin 5853 u/s2 (konum fark yaklasimi; kontrol edilen hiz degisimi <= maxAccel*dt).
+- Degisiklik 2 (konnektor): `connectorSeg`/`ConnectorSegment` (app/index.tsx). Eave alti (b.top+cropH-3) ile DISTRICT_ROOT_Y arasi gercek bosluk >= 7 birimse, sprite ailesinin kendi govde dokusundan (rooftop-long-v1, x183..389, satir 100..330: sıva+catlak, tugla dizisi yok, kontur kenarli) tek tip olcekli (genislik surucu, distorsiyon yok) en fazla 3 dikey aynalanmis dilim; sprite konnektorun ustune cizilir (dikis saklanir). Ayak ucu icin 20 birimlik yumusak temas golgesi (roof plane). Yakin platformlarda (bosluk < 7) hicbir sey cizilmez. p.x/p.width/p.topY/collision okunur, yazilmaz; R032 cap/eave hizasi ve sprite kutusu degismedi. Yeni asset yok (mevcut PNG kirpilir).
+- 3 cat dogrulamasi: ai_review_evidence/r036/connector_mockup.png (PIL, ayni formuller; cat0/1/2, topY -300 ve -120). Kolon govdesi eave altindan catiya kesintisiz iniyor; aynali dikis gorunmuyor. Cihaz gorseli dogrulanmadi (mockup Python, RN degil).
+- Flu dikdortgenler: render agacinda tarandi. ColumnSmoke render edilmiyor (dokunulmadi). towerBrick/towerShade/capShadow/capHighlight/towerCap opacity 0 (gorunmez). Zemin bandi `false &&` ile kapali. Gorunen adaylar: R033 haze (dusuk opak., korundu), R034 eave golgesi (rgba 0.34, 20 birim). Bulgu: eave golgesi bosluk varken havada yuzen koyu bant olusturuyordu (hizli kamerada kahverengi flu dikdortgen); artik konnektorun ustunde oturuyor. Baska kok neden bulunmadi.
+- HUD (R035) ve arka plan canliligi (R033/R034) degismedi. Kucuk gozlem (yeni ozellik eklenmedi): baseTint (lower %20, alfa .07) konnektor gelince dokuda kalan tek mavimsi tint; onemsiz.
+- Invariants: fizik, jump, charge, collision, landing/footSoles, skor, olum esigi, camX/camY hedef+config, procedural geometri/RNG, platform verisi/visualType, restart mantigi degismedi.
+- Test: `npx expo export --platform ios` GECTI; `git diff --check` temiz; `npx tsc --noEmit` yalniz eski src/theme.ts (116,126) hatalari; test_worklet_order_regression PASS. Cihaz/Android dogrulanmadi.
+- Risk: (a) koridor artik IDLE'da da aktif: baslangic/restart sonrasi ilk karelerde hafif kayma olabilir. (b) 42 ek Animated.Image (POOL 14 x 3) eski cihazlarda maliyet; gerekirse slot 2'ye indirilir. (c) Konnektor dokusu long sprite govdesi; pedestal tugla dokusundan biraz duz. (d) Sabit hiz siniri cok uzak hedeflerde 0.6s'ye uzatir. (e) Sprite dikey gerilmesi (max 2.2x) bilerek degismedi.
+- iPhone kabul: 10+ inis, 3+ tam sarjli yuksek ziplama; kamera girisi/cikisi yumusak mi, geri tepme/yon degisimi var mi, ilk hedef kadrajda mi; ust ve dar kolonlar catiya baglanmis mi (3 cat), hizli harekette kahverengi flu dikdortgen kaldi mi; skor HUD okunuyor mu; restart'ta kamera anında oturuyor mu.
+TESLIM_HAZIR: REVIZYON-036 — render-only tek kamera takipcisi + cati-baca konnektoru; export gecti, cihaz kabulu bekliyor; commit/push yok.
+
+## REVIZYON-037 (2026-09-28) — R036 REDDEDILDI, konnektor kaldirildi + kamera kilitleme + tek-parca ada (teknik kanit)
+
+### Red
+Kaynak: gercek iPhone videosu `ScreenRecording_09-26-2026 15-16-14_1.MP4` incelemesi, kullanici tarafindan onaylandi. R036'nin ConnectorSegment sistemi kahverengi yari saydam/hayalet dikdortgenleri COZMEDI -- video boyunca gercek bacalarin yaninda veya tek basina havada cok sayida dikdortgen goruluyor. Ayrica: kamera hala inisten sonra suruklendi, bazi gecislerde hiz degisimi goz yordu, kadraj oyuncuyu kenarlara farkli bicimde itti; bazi bacalar catiya bagli, yuksek/dar olanlar hala bagimsiz/floating gorundu; uzatilmis govde dokusu boru gibiydi.
+
+### Kok neden (kod okunarak, tahmin edilmeden)
+1. **Hayalet dikdortgenler**: `baseShadowStyle` ve `baseTintStyle` (PlatformView) HER platformda, sprite'in alfa siluetinden bagimsiz, `rooftopBox()`'tan turetilen ama kendi sabit boyutlu (`b.w*0.72` / `b.w x cropH*0.2`) duz renkli/gradyanli `Animated.View` dikdortgenleriydi -- connector olsun olmasin HER ZAMAN cizildi. `ConnectorSegment` (3 slot x havuz) ayrica govdeyi DISTRICT_ROOT_Y'ye kadar uzatmaya calisirken kendi ayri dikdortgenlerini ekliyordu. Ucu birlikte, gercek bacadan bagimsiz, kamera hareket ettikce farkli hizlarda/konumlarda beliren cok sayida kahverengi/mavimsi dikdortgen uretiyordu -- video tam olarak budur.
+2. **Govde "boru" gorunumu**: `rooftopBox()` govdeyi dogal yuksekliginin **2.2 katina kadar** (`Math.min(asset.h*scale*2.2, DISTRICT_ROOT_Y - top)`) diklemesine geriyordu, ardindan connector bu gerilmis govdenin ALTINA baglaniyordu. Sonuc: tek sprite'in kendi dokusu defalarca gerilmis/tekrarlanmis gorunuyordu.
+3. **Kamera surumesi**: `tY2 = corridorTarget(camY.value, yMin, yMax, loW, hiW)` her karede TUM platform havuzunu tarayip (1. + varsa 2. hedef, histerezisli) yeniden hesapliyordu; 2. hedef dahil/haric histerezisi (`camSecY`) inisten sonra bile kare kare degisebiliyordu, bu da `stepRenderAxis`'e surekli hareket eden bir hedef veriyordu -- takipci hicbir zaman gercekten "otur"muyordu (suruklenme). Ayni sekilde X'te 2. hedef histerezisi ani hedef sicramalarina (dolayisiyla ivme/hiz degisimine) yol aciyordu.
+
+### Degisiklik 1 -- connector + hayalet dikdortgenler TAMAMEN kaldirildi
+`app/index.tsx`: `ConnectorSegment`, `connectorSeg`, tum `CONN_*` sabitleri (`CONN_SRC_W/H`, `CONN_SLICE_*`, `CONN_SLOTS`, `CONN_MIN_GAP`, `CONN_OVERLAP`, `CONN_LEFT_FRAC`, `CONN_WIDTH_FRAC`), `CONN_SLOT_IDX`, `connectorFootStyle`, `HIDDEN_STYLE`, `baseShadowStyle`, `baseTintStyle` ve bunlarin JSX kullanimlari (3 slot x havuz = **42 ek `Animated.Image`**, artik 0) silindi. `rooftopBox()`'ta 2.2x govde gerilmesi kaldirildi; `h = asset.h * scale` (dogal olcek). `cropH = h * ROOFTOP_EAVE_FRAC[cat]` aynen korundu -- bu deger zaten 3 PNG'nin eave/gutter cizgisine denk geliyor (rooftop-long-v1 icin ~0.905 = tam catl kiremit bandinin alt kenari), yani dogal yukseklikte kirpilinca sonuc **kendiliginden opak ve temiz** bir alt kenarda bitiyor -- ayri bir "temel/pedestal" veya sahte baglanti gerekmiyor. Her platform artik kendi TEK rooftop sprite'i (cat 0/1/2) + cap rim ile ciziliyor, tutarli bicimde kucuk bagimsiz bir "cati adasi" gibi gorunuyor (yuksek/dar olan da, alcak/genis olan da AYNI kurala gore kirpiliyor -- bazisi bagli bazisi havada degil).
+
+### Degisiklik 2 -- kamera: kilitleme + statik istisna, histerezis yok
+`app/index.tsx` + `src/game/render-camera.ts`:
+- **X (yatay)**: her karede TEK ilk-hedef koridoru (`corridorTarget(camX, xMin, xMax, xLoW, xHiW)`, sadece standingPlatformId'den sonraki ILK platform) -- 2. hedef/histerezis (`camSecX/camSecY`, `includeSecondTarget` cagrisi) tamamen kaldirildi. Monoton kelepce (`tX < camXRTarget ? camXRTarget : tX`) ve asim koruyucusu (geri gitmeyip duruyor) aynen korundu. `RENDER_CAM.smoothTime=0.13` ile `stepRenderAxis` (hiz/ivme sinirli).
+- **Y (dikey)**: `onPressOut` (fiili ucus baslangici) aninda `flightLockY.value = camYR.value` (o anki render kompozisyonu DONDURULUR) ve `flightTargetY.value` = ucusun hedefledigi platformun (standingPlatformId'den sonraki ilk platform) `topY`'si TEK SEFERLIK kaydedilir. AIRBORNE boyunca hedef, DEGISMEZ -- yalniz oyuncu VEYA bu hedef gercekten yumusak sinir (`FRAME_LO/HI`) disina cikarsa, `want = corridorTarget(flightLockY, min(py,flightTargetY), max(...), loW, hiW)` hesaplanip `flightLockY += (want-flightLockY) * min(1, dt/0.6)` ile COK YAVAS (tau=0.6s) duzeltilir -- "yalniz gercek ihlalde yavas nudge", ani yeniden kilitleme degil. AIRBORNE disinda (IDLE/CHARGING/DEAD) render-Y artik `camY.value`'yu (zaten bir kez yumusatilmis fizik degeri) DEGIL, fizigin kendisinin hedefledigi HAM `tY` degerini (`focusY - anchor*H/s`, ayni degisken, ayni satirda zaten hesapli) TEK bir kendi kritik-sonumlu takipcisiyle (`RENDER_CAM.smoothTimeYStand=0.21`, yeni sabit) kovalar -- boylece inis sonrasi kompozisyon TEK bir kritik sonumlu gecisle oturuyor, fizigin kendi 0.16s'lik takipcisinin USTUNE bir de render takipcisi (cift filtre kaskadi = gereginden uzun surukleme) binmiyor. camX/camY/config, jump/charge/collision/landing/footSoles/skor/olum esigi/procedural/RNG/platform verisi/restart mantigina HICBIR YAZMA yok (yalniz okunuyor).
+
+### Olcum (`node ai_review_evidence/sim_render_camera_r037.cjs`, gercek `render-camera.ts` kodu + `app/index.tsx`'teki AYNI formuller elle tekrar uretilerek 60/30fps'de kosturuldu)
+24 atlayislik rastgele kurs (biri kasitli asiri buyuk/yuksek, n=3, T=1.4s, apex 420 birim daha yuksek -- kilitleme + yavas duzeltmeyi zorlamak icin):
+- **Surekli hiz/ivme**: tepe render hizi X 237 / Y ~411 u/s; tepe ivme X 897 / Y ~5200-5459 u/s2 (Y icin ivme siniri -- 5200 -- bazi inislerde fiilen devreye giriyor, bu KASITLI: buyuk adimda hizli-ama-sinirli tepki). 60fps ve 30fps sonuclari pratikte ayni.
+- **Geri hareket/yon degisimi**: X geri kare = 0 (60 ve 30fps), Y yon degisimi (reversal) = 0 -- sert geri tepme yok.
+- **Ucus icinde kompozisyon surukleme**: `max |camYR - ucusBaslangicYsi|` AIRBORNE boyunca = **0.0 dunya birimi** (60 ve 30fps) -- kompozisyon fiilen kilitli kaliyor (bu 24 atlayislik kursta hicbir ucus gercek ihlal esigine ulasmadi; yavas-duzeltme mekanizmasi ayri, kasitli asiri (dy=-2000 birim) bir senaryo ile DOGRULANDI: `flightLockY` 0.6s zaman sabitiyle `want` degerine yavasca yaklasiyor -- 200 karede/~3.3s'de %99 yakinsiyor, anlik sicrama yok).
+- **Airborne kadraj**: genis guvenlik alaninin (ekran %5-97 x, %10-92 y -- FRAME_LO/HI/XL/XR'den daha gevsek) disina cikan kare = 0/1257 (60fps) ve 0/640 (30fps).
+- **Inis oturma suresi (settle-to-2%)**: gercek bir adimi olan (>5 dunya birimi) inislerde 60fps'te **0.62-0.63s**, 30fps'te **0.63s** -- istenen 0.45-0.65s araliginin ICINDE. (Adimi ~0 olan inislerde -- kasitli buyuk atlayistan hemen sonraki 3 inis -- 0.02-0.03s, zaten oturmus sayiliyor.) Karsilastirma: `camY.value`'yu (fizigin KENDI zaten yumusatilmis degeri) kovalayan ONCEKI tasarimla ayni senaryo **0.67s** olculdu (spec disi, cift-filtre kaskadindan); ham `tY` hedefini `smoothTimeYStand=0.21` ile TEK filtreyle kovalamaya gecince 0.62-0.63s'e dustu.
+
+### Statik render-agaci kontrolu
+`app/index.tsx` `PlatformView` icinde grep ile dogrulandi: `ConnectorSegment`/`connectorSeg`/`CONN_*`/`connectorFootStyle`/`CONN_SLOT_IDX`/`baseShadowStyle`/`baseTintStyle`/`HIDDEN_STYLE` -- SIFIR esleme (yalniz kod-yorumu icinde tarihsel bir cumlede geciyor). Havuzdaki her platform icin tam **3** `<Image source={ROOFTOP_SOURCES[cat]}>` (yalniz p.cat'e esit olan opaklik=1, digerleri opaklik=0/ekran-disi) + 1 cap-rim `Animated.View` (duz renk, Image degil) render ediliyor; `ColumnSmoke` hala render edilmiyor (dokunulmadi). Ek `Animated.Image` sayisi: R036'da 42 (havuz x 3 connector slotu) idi, simdi **0**.
+
+### Invariants
+Dokunulmayan: fizik, jump, charge, collision, landing/footSoles, skor, olum esigi, camX/camY OYUN hedefleri/config (`src/game/config.ts` degismedi), procedural course/RNG (`procedural-course.ts` degismedi -- yalniz `ROOFTOP_ASSET_GEOMETRY`/`ROOFTOP_GROUND_Y` okunuyor, yaziolmiyor), platform verisi, restart mantigi. R033/R034 arka plan+haze, R035 HUD render dallarina dokunulmadi (kod incelendi, degismedi).
+
+### Test
+- `npx tsc --noEmit`: yalniz onceden var olan `src/theme.ts` hatalari (116,31 / 126,9 / 126,41); `app/index.tsx` ve `src/game/render-camera.ts` icin sifir yeni hata.
+- `git diff --check`: temiz.
+- `node ai_review_evidence/test_worklet_order_regression.cjs`: PASS.
+- `npx expo export --platform ios`: basarili (iki kez, degisikliklerin oncesi/sonrasi).
+- `node ai_review_evidence/sim_render_camera_r037.cjs`: yukaridaki tum sayilar buradan.
+
+### Bilinen sinirlamalar / risk (seffafca belirtiliyor)
+1. **Web/DOM canli oynanis kaniti bu turda ALINMADI** -- bu oturumda tarayici/Playwright araci mevcut degil (onceki turlarda kullanilan arac bu oturumda baglanmiyor). Kanit yalniz gercek kod uzerinde kosan sayisal simulasyon + statik render-agaci taramasi + derleme/export testleridir; ekran goruntusu/DOM olcumu yok.
+2. Yatay kamera icin "%30-40 bant" ve "hedef gorunur" matematiksel olarak GARANTI EDILMIYOR (fizik camX zaten %30'da dead-zone uyguluyor, render X hafifce geriden takip ettigi icin oyuncu tipik olarak %30'un biraz sagina duser -- ama her uretilebilir gap/yukseklik kombinasyonu icin kanitlanmis degil; bu, R033'ten beri her turda ayni sekilde raporlanan, cozulmemis bir sinirlamadir).
+3. Ivme siniri (`maxAccel=5200`) bazi buyuk/yuksek atlayislarda fiilen devreye giriyor (olculdu) -- bu TASARLANMIS bir sinirdir (jerk'i sinirlamak icin) ama cok siklikla tetiklenirse kamera "agir/gecikmeli" hissedebilir; cihazda kontrol edilmeli.
+4. `ROOFTOP_EAVE_FRAC` (0.905/0.865/0.91) ve dogal-olcek kirpma, PNG'lerin gercek RGB pikselinden degil onceki turlarin (R032) olcumunden geliyor -- bu turda yeniden olculmedi, sadece 2.2x gerilme kaldirilip ayni kirpma oranina donuldu. Sprite ailesi degisirse bu oranlar gecersiz olur.
+5. `RENDER_CAM.smoothTimeYStand=0.21` degeri bu simulasyona gore secildi (spec'in ortasina yakin); cihazda "agir/hizli" hissederse ince ayar gerekebilir.
+
+### iPhone kabul adimi
+`ScreenRecording_09-26-2026 15-16-14_1.MP4`'teki AYNI sahneleri/gecisleri tekrar oyna: (1) kahverengi hayalet/yari-saydam dikdortgenler kayboldu mu (bacanin yaninda veya havada tek basina); (2) yuksek/dar bacalar da dahil TUM bacalar tutarli, kucuk bagimsiz "cati adasi" gibi mi gorunuyor (bazisi bagli bazisi havada degil); (3) govde artik boru gibi uzamis gorunmuyor mu; (4) inis sonrasi kamera/arka plan uzun sure surukleniyor mu, gecislerde ani hiz degisimi/goz yorma var mi; (5) yatay kamera monoton/yumusak, hedef ekranda okunur kaliyor mu; (6) kolon govdesi ekstra golge/sticker konturu olmadan kendi renginde okunur mu, cap rim hala goruluyor mu; (7) HUD (R035) ve deniz-cati birlesimi (R033/R034) bozulmadi mi.
+
+TESLIM_HAZIR: REVIZYON-037 — connector + hayalet baseShadow/baseTint dikdortgenleri kaldirildi (0 ek Animated.Image), rooftopBox 2.2x gerilme kaldirildi (tek-parca bagimsiz rooftop ada), kamera Y ucus-baslangicinda kilitlenip yalniz gercek ihlalde yavas duzeltiliyor + inis TEK kritik-sonumlu gecisle 0.62-0.63s'de oturuyor, yatay kamera 2.hedef histerezisi kaldirilarak sadelesti (app/index.tsx, src/game/render-camera.ts, ai_review_evidence/sim_render_camera_r037.cjs); rapor AI_REVIEW.md 2026-09-28 REVIZYON-037, iPhone cihaz kabulu bekliyor (bu turda web/DOM canli kanit da yok, arac erisimi yok). Commit/push/deploy yapilmadi.
+
+## REVIZYON-038 (2026-09-28) — R037 cihaz videosu bulgu ve duzeltme
+- Kanit: `ScreenRecording_09-28-2026 10-41-12_1.MP4` (60.15s, 1320x2868, ~54.69fps). 26-34s ve sonraki kosularda cok sayida yari saydam kahverengi dikdortgen; 53-59s uzun dususte karakterin ekranin alt bolgesine kadar kaymasi acikca goruluyor.
+- R037'de dogru olanlar: R036 konnektoru ve serbest shadow/tint katmanlari gercekten kaldirildi; sprite 2.2x gerilmesi bitti; iOS bundle/worklet yolu saglamdi. Bunlar tek basina goruntu kusurunu gidermedi.
+- R037'de yanlis olanlar: (1) dikdortgenlerin tek kaynagini R036 konnektor/overlay sanmak; PlatformView'da cat0/1/2 icin platform basina uc ayri nested Animated.Image agaci kalmisti. Recycle edilen slot kategori degistirirken iOS eski kirpilmis native yuzeyi gosterebiliyor. (2) Ucus Y'sini neredeyse tamamen kilitlemek; sentetik test yalniz hedefe inen ilimli parabolleri kapsiyordu, gercek uzun dusus/iskalama yolunu kapsamiyordu.
+- Duzeltme A: platform basina tek `rooftop-medium-v1` render agaci; cat'e gore gizli agac gecisi yok, bos slot width/height=0. Native image yuzeyi 42'den 14'e dustu. Collision cap genisligi yine `p.width`; gorsel cap ayni formulle ona olceklenir.
+- Duzeltme B: AIRBORNE Y hedefi kalkis kompozisyonunu base alarak oyuncu + ilk hedef koridorundan her kare surekli hesaplanir; tek `stepRenderAxis` takipcisi `smoothTimeYFlight=0.30`, mevcut hiz/ivme limitleriyle izler. Inis `smoothTimeYStand=0.21`; ikinci hedef/histerezis/offset zinciri yok.
+- Test: iOS Expo export PASS; worklet regression PASS; diff check temiz. TSC'de R038 hatasi giderildi, yalniz eski `src/theme.ts` 116/126 hatalari bekleniyor.
+- Cihazda kalan soru: tek image agaci iOS hayaletlerini tamamen kaldiriyor mu ve 0.30s ucus takibi kullaniciya yeterince yumusak mi? Yeni kabul kaydi gerekir.
+TESLIM_HAZIR: REVIZYON-038 — R037 kok-neden duzeltmesi; tek native baca katmani ve uzun dusus koridor takibi, cihaz testi bekliyor; commit/push/deploy yok.
+
+## REVIZYON-038A (2026-09-28) — oyun baslamiyor regresyonu
+- Cihaz videosundaki acilmama nedeni dogrudan kodda dogrulandi: `assetsReady`, R038'de JSX'ten kaldirilan `rooftop1`/`rooftop2` callback'lerini bekliyordu. Kosul hic true olmuyor; asset cover ekranda ve responder kapali kaliyordu.
+- Duzeltme tek satirlik yukleme-kapisi kapsaminda: background + district + character + gercekte kullanilan tek `rooftop`. ArtError fallback korundu.
+- iOS export PASS, worklet regresyon PASS, diff check temiz; tsc yalniz eski theme.ts hatalari. Fizik/kamera/course/render ayarlari degismedi.
+TESLIM_HAZIR: REVIZYON-038A — kaldirilan asset callback'lerine bagli sonsuz bekleme giderildi; cihaz acilis testi bekliyor.
+
+## REVIZYON-039 (2026-09-28) — havada duran kolon duzeltmesi
+- Kanit: `ScreenRecording_09-28-2026 11-38-38_1.MP4` (84.24s, 1320x2868, ~59.9fps). Atlama dinamigi ve R038 kamera takibi kabul edilebilir; cok sayida platform cati bandindan ayri, suyun ustunde ada gibi gorunuyor.
+- Web/arastirma: React Native resmi Layout Props, `overflow:hidden` cocuklari native view sinirinda kirpar; iOS'ta zIndex davranisi icin ilgili View'larin sibling olmasi gerekebilecegini belirtiyor. Bu nedenle R036 gibi tekrar nested/kirpilmis image connector kullanilmadi. Kaynak: https://reactnative.dev/docs/0.83/layout-props
+- Uygulama: `rooftopSupportStyle`, tek opak sibling Animated.View. Baslangic `rooftopBox(...).cropH-4`, bitis ayni dunya koordinat sistemindeki `DISTRICT_ROOT_Y+12`; genislik `max(18,p.width*0.72)`, platform merkezinde. Render sirasi support sonra sprite, dolayisiyla ek zIndex yok.
+- Tasarim siniri: destek yalniz gercek bosluk >=8 world-unit ise cizilir; zaten cati bandina oturan alcak platformlara ek parca koymaz. Doku yerine opak siva rengi + iki koyu yan kenar kullanilir; hayalet alpha yuzeyi olusturmaz.
+- Invariants: fizik/jump/charge/collision/landing/skor/topY/width/course/RNG/camX/camY ve R038 render kamera degismedi.
+- Test: iOS export PASS, worklet regression PASS, diff check temiz; tsc yalniz eski theme.ts 116/126 hatalari.
+- Cihaz riski: sabit siva rengi farkli arka plan bolgelerinde fazla duz gorunebilir; once baglanti geometrisi kabul edilecek, renk/doku ayri gorsel turda ayarlanabilir.
+TESLIM_HAZIR: REVIZYON-039 — cati adalarini dunya cati hattina baglayan tek opak destek; iPhone kabul testi bekliyor.
+
+## REVIZYON-040 (2026-09-28) — cihaz videosu sonrasi gorsel butunluk ve kamera
+- Video bulgusu: R039 geometrik boslugu kapatti fakat duz bej kolon govdesi, uzerindeki boyali baca ve catiyla ayni malzeme ailesinde degildi. Yukseklerde iki ayri parca, orta/alcaklarda havada ada veya cok ince cubuk algisi surdu. R038'in kahverengi native-image hayaletleri bu kayitta belirgin degil; bu nedenle tek-image agaci korunuyor.
+- Render duzeltmesi: yeni opak `chimney-masonry-support-v1.png`, support sibling'in icinde dikey tekrar edilir. Her platform icin minimum 26u boyun ve %84 govde genisligi kullanilir. Fizik cap'i ve platform koordinatlari degismez.
+- Kamera duzeltmesi: tek kritik-sonumlu follower korunarak yalniz render tuning'i yumusatildi (`0.20/0.32/0.38s`, `maxSpeed=520`, `maxAccel=2600`). Simulasyon 60/30 FPS'te ters hareket ve Y yon degisimi uretmedi; inis yerlesmesi ~0.95s.
+- React Native resmi Layout Props rehberi `overflow:hidden` kirpmasini ve iOS zIndex icin sibling iliskisini aciklar. Bu nedenle eski nested/fragmented connector yapisina donulmedi: https://reactnative.dev/docs/0.83/layout-props
+- Test: iOS export, worklet siralama testi ve camera sim PASS; `git diff --check` temiz. `tsc`te yalniz eski `src/theme.ts` hatalari var.
+- Cihaz kabul: 10+ inis; en az bir yuksek, orta ve alcak platformda duvar deseni baca/catiyla kesintisiz algilaniyor mu; kalkis-apeks-inis kamera hizinda ani degisim var mi; kahverengi hayalet yuzey geri geldi mi; ziplama hissi ayni mi.
+TESLIM_HAZIR: REVIZYON-040 — kod ve asset hazir, cihaz gorsel kabulu bekliyor; commit/push/deploy yok.
+
+## REVIZYON-041 (2026-09-28) — R040 cihaz reddi ve ikinci testli duzeltme
+- Korunan kabuller: kahverengi ghost yuzey giderildi; jump/charge hissi iyi. Bu kod yollarina dokunulmadi.
+- Kok neden A: R040 support, per-platform rooftop-island ile birlikte ciziliyordu; iki farkli malzeme/siluet arka plan district'inden sonra bindirildigi icin tek bina olamazdi. Cozum: roof-island renderi ve bundle girdileri kaldirildi; support, district'in arkasina tasindi. District alt birlesimi dogal olarak orter; PlatformView'da yalniz gercek collision cap konumundaki 3px rim kalir.
+- Kok neden B: `SUPPORT_TEXTURE_SOURCE` preload listesinde ve assetsReady kosulunda yoktu. Cozum: ikisine de `support` sinyali eklendi, fade=0; asset 2.7MB -> 206KB optimize edildi.
+- Kamera: asiri yumusak ilk aday testte cogu gercek adim icin settle=-1 uretti ve uygulanmadi. Nihai aday `smooth 0.24`, `stand 0.36`, `flight 0.43`, speed 470, accel 1800: 60/30 FPS'te geri/salinim/guvenli-alan ihlali yok; settle 1.07-1.10s.
+- Test: iOS export PASS, worklet regression PASS, camera sim PASS, diff-check temiz. TSC yalniz onceden var olan theme.ts hatalari.
+- Cihaz kabul: soguk reload sonrasi texture sonradan pop ediyor mu; yuksek/orta/alcak en az 3 kolonda govde district catisinin icinden cikiyor mu; ayrik cati adasi kaldi mi; kalkis/apeks/inis hiz degisimi yumusak mi; ghost ve jump hissi korunuyor mu.
+TESLIM_HAZIR: REVIZYON-041 — cihaz kabulu bekliyor; commit/push/deploy yok.
+
+## REVIZYON-042 (2026-09-28) — R041 cihaz reddi
+- R041'de geometrik katman sirasi dogruydu fakat malzeme yanlisti: ayri sari bitmap, district cephesinden bagimsiz okundu ve pool elemanlari acilirken gecici kahverengi kutu uretti. Bitmap kaynagi, preload/gate ve per-slot Image tamamen kaldirildi. PlatformSupportView simdi senkron View/LinearGradient ile district'in krem-siva/kiremit paletini kullanir; alt ek yeri district tarafindan ortulur.
+- Tam sarj kamera sertliginin kok nedeni charge/fizik degil, daha yuksek apeksin AIRBORNE corridorTarget'a buyuk ve ani hedef adimi vermesiydi. Ucus soft frame %24-%80 -> %12-%90; hedef stepRenderAxis'ten once 0.08s `smoothRenderTarget` ramp'ina girer. X hedefi de ayni ramp'i kullanir.
+- Deneme kaydi: 0.18s ramp fazla gecikmeli oldugu icin reddedildi; 0.08s nihai. Simulasyon 60/30 FPS: ters X 0, Y reversal 0, airborne unsafe 0, landing settle 1.17s, peak Y accel onceki 1800 limitten ~1298'e dustu.
+- Test: iOS export/worklet/camera sim/diff-check PASS; TypeScript yalniz eski theme.ts hatalari.
+- Cihaz kabul: yeni kolon ilk gorundugu karede tam malzemeli mi; sari/kahverengi gecici kutu yok mu; kolonlar district cephesinin paletinde mi; normal ve tam sarjda kamera benzer sakinlikte mi; jump hissi ve ghost duzeltmesi korundu mu.
+TESLIM_HAZIR: REVIZYON-042 — cihaz kaydi bekliyor; commit/push/deploy yok.
+
+## REVIZYON-043 (2026-09-29) — R042 cihaz reddi ve canli render QA
+- Koku: rastgele topY ile sabit roofline beraberken support'u district arkasinda cizmek dusuk platformu saklar; onde yalniz sabit-genislik shaft cizmek yuksegi cubuklastirir. Cozum katman + siluet birlikte: district ustunde shaft, genis lower pedestal, terracotta roof collar, ayni malzemede top cap; uzunlarda cephe penceresi.
+- Collision dogrulugu: top cap `p.x/p.width/p.topY` ile birebir; yalniz alt kaide/collar collision disinda genisler, landing yuzeyi yaniltici bicimde genislemez.
+- Kamera: cihaz videosunda sertlik landing/phase cevresinde; render follower accel 1800->1100, speed 470->400, target ramp 0.08->0.18, time constants 0.30/0.44/0.50. Oyun kamerasi ve fizik degismedi.
+- Iterasyon: canli web render ilk ekran goruntusu baglantiyi dogruladi ama yuksek silueti reddetti; top cap/pedestal/window eklenerek ikinci renderda tekrar kontrol edildi. Dusuk/orta/yuksek pool elemanlari gorunur, asset pop yolu yok.
+- Test: iOS/web export + worklet + camera sim + diff-check PASS. Camera: unsafe 0, reversal 0, peak Y accel ~629, settle ~1.6s. TSC sadece eski theme.ts.
+- iPhone kabul: 10+ inis ve en az 3 tam sarj; kayip alcak platform var mi, uzunlar direk mi bina/baca kulesi mi, collar catiya oturuyor mu, tam sarj kamera normal sarj kadar sakin mi, jump/ghost durumu korundu mu.
+TESLIM_HAZIR: REVIZYON-043 — cihaz videosu bekliyor; commit/push/deploy yok.
+
+## Claude: REVIZYON-044 (2026-09-29) — onaylı mimari görsel sistemi + kamera yumuşatma
+
+### Kapsam ve yedek
+- Görev başında `find app src/game -type f | sort | xargs shasum -a 256` alındı (`/tmp/scope_start_044.txt`), görev sonunda tekrar alınıp (`/tmp/scope_end_044.txt`) `diff` edildi: yalnız `app/index.tsx` ve `src/game/render-camera.ts` değişti. `~/Documents/Codex/carsamba-revizyon044/yedek/` altına önceki `app/index.tsx`, `config.ts`, `procedural-course.ts`, `landing.ts` kopyalandı.
+- Kilitli alanlar (kullanıcının bu görevde açıkça belirttiği): jump/charge/uçuş fiziği, landing/collision/footSoles, score/restart/kamera HEDEF mantığının oyun kuralları, procedural course geometrisi/genişlik/yükseklik/gap/RNG sırası, karakter animasyonu. Hiçbiri dokunulmadı (kod diff'i yalnız PlatformSupportView'in render'ı ve RENDER_CAM sabitlerinde).
+
+### Kök neden notu (kısa)
+Sabit resim çatı sanatı (district PNG) rastgele bir çizim üzerinde sabit bir çizgidir; oynanabilir platformların topY'si ise procedural üretimden gelen ve her koşuda değişen sürekli bir değerdir (±320 dünya birimi aralığı). İkisi arasında piksel-hassasiyetinde "kaynaşma" iddia edilemez -- hangi platform hangi çatı eğimine denk geleceği önceden bilinmez. R039-R043'ün asıl hatası, tek bir generic "collar" (düz, tek renkli, tek boyutlu terracotta şerit) ile bu kaynaşmayı TAKLİT etmeye çalışmasıydı: düz bir şerit hem yüksekliğe göre ölçeklenmiyordu (aynı görünüyordu) hem de içine yeterli kontrast/hacim eklenmemişti, bu yüzden "yapıştırılmış çubuk" okunuyordu. REVIZYON-044'ün çözümü farklı: pixel-perfect kaynaşma iddiasından vazgeçip, HER yüksekliğin kendi içinde tutarlı, kademeli/yumuşak bir taban (3 kademeli flare + temas gölgesi) ile "tamamlanmış" görünmesini sağlamak -- gölge/flare, arkadaki içeriğin ne olduğuna (gökyüzü/deniz/çatı/cephe) bakmaksızın "toprağa değme" hissini veriyor, sahte piksel-eşleşme iddiası kurmuyor.
+
+### Uygulama (yalnız render, en küçük kapsam)
+1. **PlatformSupportView yeniden tasarımı** (`app/index.tsx`): eski düz `supportLowerPedestal` (kiremit rafı), `supportRoofCollar` (tek renkli düz şerit) ve `supportWindow`/`supportWindowShine` (küçük mavi pencere) TAMAMEN kaldırıldı.
+2. **Üç sürekli siluet (short/medium/long)**: `p.x`/`p.width`/`p.topY` (collision/landing) DEĞİŞMEDİ; yalnız görsel gövde, platformun kendi görsel yüksekliğinden (`h = bottom-top`, zaten var olan hesap) türeyen SÜREKLİ fonksiyonlarla şekilleniyor:
+   - `silhShaftFrac(h)`: gövde genişliği kısa için %92 (kapağa yakın, tıknaz), uzun için %60 (ince, kule gibi) -- smoothstep ile sürekli.
+   - `silhSkirtScale(h)`: taban flare'i kısa için büyük (neredeyse tüm gövde taban), uzun için küçük (orantılı).
+   - `silhCorniceOpacity(h,k)`: 4 sabit "kat çizgisi" View'i HER ZAMAN monte edilir, yalnız opaklıkları yüksekliğe göre 0..1 arası sürekli değişir (kısa ~1 çizgi görünür, uzun ~4).
+   - `silhFluteOpacity(h)`: yalnız uzun gövdelerde (h>~170) beliren, minare/kule hissi veren ince dikey vurgu çifti -- pencere değil, düz renk highlight.
+   - **Neden kategori-swap değil, sürekli fonksiyon**: R037/R038'in GAME_STUDIO.md notları, aynı havuz slotunun farklı kategoriye geçtiği anlarda iOS'un eski kırpılmış native yüzeyi "hayalet dikdörtgen" olarak koruduğunu belgeliyor (üç ayrı, karşılıklı gizli render ağacı arasında geçiş yapmak). REVIZYON-044 bunu TEKRARLAMADI: tek View ağacı hep monte kalır, yalnız opacity/width/height animasyonlanır -- kategori değişimi/mount-unmount yok.
+3. **Kontrast/hacim**: shaft dolgusu artık koyu, sıcak kahverengi-kızıl bir LinearGradient (`#8a5a42→#734a37→#54372a`), sol kenar açık rim-light (%18 rgba(224,186,142,0.30)), sağ kenar koyu shade (%16 rgba(28,15,9,0.32)), ortada hafif çökük panel (rgba(20,10,6,0.16)) -- eski düz `#d9c7a5..#bfa37a` (cepheyle neredeyse aynı ton) yerine geldi. Bu, "kısa/orta kolonlar cephe ile aynı değerde kayboluyor" şikayetinin doğrudan düzeltmesi.
+4. **Taban**: 3 kademeli, üst-üste binmeyen, aşağıya doğru genişleyen 3 "çatı kiremidi" bandı (`supportSkirtTileA/B/C`, üstten alta koyu→açık kızıl-kahve) + altında yumuşak, bulanık-görünümlü bir temas gölgesi (`supportContactShadow`, rgba(18,10,5,0.34), borderRadius 9). Hiçbir gövde artık "yarıda kesilmiş çubuk" gibi bitmiyor; taban her zaman doldurulmuş/gölgeli.
+5. **Kamera (yalnız `src/game/render-camera.ts` + `app/index.tsx`'te Y eksenine ait 2 satır)**: Y ekseni artık KENDİ hız/ivme tavanına sahip (`maxSpeedY=250`, `maxAccelY=620`; X'in `maxSpeed=400`/`maxAccel=1100`'ü DEĞİŞMEDİ). `smoothTimeYStand` 0.44→0.60 (iniş sonrası daha uzun/yumuşak yerleşme), `smoothTimeYFlight` 0.50→0.58, hedefin kendisi artık `targetSmoothTimeY=0.24` (X'in `targetSmoothTime=0.18`'i DEĞİŞMEDİ) ile ayrıca yumuşatılıyor -- faz değişiminde (şarj→hava→iniş) hedefin ANİ basamak yapmasını önlüyor. `camX`/`camY` (fizik kamerası, hedefleri) HİÇ değişmedi; yalnız render takipçisinin Y ekseni.
+
+### Ölçüm -- gerçek koddan (physics-evidence yöntemi)
+Yeni betik: `ai_review_evidence/sim_render_camera_r044.cjs` -- gerçek `src/game/jump.ts` (`jumpVelocity`/`advanceFlight`/`flightGravity`) ile GERÇEK bir uçuş hesaplanıyor (elle yazılmış parabol yok), gerçek `src/game/render-camera.ts` (`stepRenderAxis`/`corridorTarget`/`smoothRenderTarget`) ile hem ÖNCE (R043 sabitleri, dosyanın bu görevden hemen önceki hali) hem SONRA (R044) karşılaştırılıyor. Bu turda çalıştırıldı, çıktı aşağıda birebir:
+
+```
+-- normal jump (charge=0.50, rise=-40u), dt=16.67ms --
+  ONCE (R043): landing-step=28u settle2%=1.57s peakYSpeed=36u/s(22px/s) peakYAccel=148u/s2 peakXSpeed=259u/s Xbackward=0 Yreversals=0
+  SONRA (R044): landing-step=28u settle2%=2.12s peakYSpeed=27u/s(17px/s) peakYAccel=81u/s2 peakXSpeed=259u/s Xbackward=0 Yreversals=0
+-- full-charge jump (charge=1.00, rise=-200u), dt=16.67ms --
+  ONCE (R043): landing-step=193u settle2%=1.57s peakYSpeed=249u/s(154px/s) peakYAccel=1015u/s2 peakXSpeed=400u/s Xbackward=0 Yreversals=0
+  SONRA (R044): landing-step=193u settle2%=2.12s peakYSpeed=185u/s(114px/s) peakYAccel=558u/s2 peakXSpeed=400u/s Xbackward=0 Yreversals=0
+```
+(dt=33.3ms satırları da benzer; tam çıktı `node ai_review_evidence/sim_render_camera_r044.cjs` ile tekrar üretilebilir.) Yorum: **tam şarj** senaryosunda peak dikey ivme 1015→558 u/s2 (%45 azalma), peak dikey hız 249→185 u/s (%26 azalma) -- "havadayken/tam şarjda dikey hedef değişimini sınırlı" maddesinin sayısal kanıtı. Normal zıplamada da aynı yönde küçük bir iyileşme var. X ekseni (peakXSpeed 259/400, Xbackward=0) HER İKİ senaryoda ve HER İKİ sürümde birebir aynı -- yatay takibin değişmediğinin kanıtı. Yreversals=0 her durumda (yön değişimi/sarsıntı yok, sürekli hareket).
+**Dürüst sınır/ödünleşim**: iniş-sonrası %2 yerleşme süresi 1.57s→2.12s'e UZADI. Bu, görevin "uzun, yumuşak" talebiyle KASITLI bir ödünleşim (daha az ivme = daha uzun süre); eğer 2.1s oyun temposu için fazla yavaş hissedilirse `smoothTimeYStand`/`maxAccelY` birlikte ayarlanarak kısaltılabilir -- bu turda kullanıcının "uzun/yumuşak" talebini önceliklendirdim.
+
+### Gerçek render doğrulaması (yalnız sayısal sim değil)
+- Playwright/Chrome, 390×844, gerçek çalışan uygulama: idle/normal-jump/full-charge-jump'ta rAF frame-time ölçümü: **p50 16.7ms, 0 düşen kare** üçünde de (fark yok -- kamera değişikliği render maliyetini artırmadı).
+- Play Again: 5/5 restart temiz (skor 0'a döndü, asset-ready-cover restart sonrası tekrar açılmadı) -- restart worklet güvenliği (önceki ACIL RESTART düzeltmesi) bozulmadı.
+- Worklet sırası regresyonu: `node ai_review_evidence/test_worklet_order_regression.cjs` PASS.
+- **Yeni worklet güvenliği doğrulaması** (önceki "ACIL iPHONE RESTART HATASI"nın AYNI hata sınıfını tekrarlamamak için): gerçek `babel-preset-expo` + iOS/Metro `caller` ile derlenen `app/index.tsx` çıktısında, PlatformSupportView'e eklenen TÜM yeni yardımcılar (`silhClamp01`, `silhSmooth`, `silhShaftFrac`, `silhFluteOpacity`, `silhCorniceOpacity`, `silhSkirtScale`, ve component-içi `heightOf`) `.__workletHash` ile doğru şekilde worklet'e derlendiği ve `useAnimatedStyle` worklet'lerinin `__closure`'ında worklet nesnesi olarak taşındığı doğrulandı -- UI thread'de "non-worklet function" çağrısı riski YOK.
+- `npx tsc --noEmit`: yalnız önceden var olan `src/theme.ts` hataları; yeni hata yok.
+- `npx expo export --platform ios`: PASS.
+- `DEBUG_MODE`: `false` (değişmedi).
+
+### Görsel kanıt
+- Önce/sonra tek kolon karşılaştırması: `~/Documents/Codex/carsamba-revizyon044/once-sonra-kolon.png` (aynı seed, aynı platform -- eski düz bej kutu vs yeni koyu tonlu, panelli, kademeli taban).
+- Kısa/orta/uzun üç siluet bir arada: `~/Documents/Codex/carsamba-revizyon044/kisa-orta-uzun-siluet.png` -- uzun silüette görünür fluted vurgu + 3+ kat çizgisi, kısa silüette baskın flare taban, orta silüette dengeli gövde+panel.
+- İki farklı seed, tam oyun akışı: `montaj-v2_seedA.png`, `montaj-v2_seedB.png` (8'er kare, skor ilerlerken farklı yükseklikte platformlar).
+- Geniş tarama (18 iniş, karışık hold süreleri): `scan1-grid.png`.
+
+### Kalan riskler
+- **Android/Expo uyumluluğu doğrulanmadı** (platform sırası kuralı: önce iPhone, sonra Android). `LinearGradient` (expo-linear-gradient) ve çok sayıda küçük `View`+`borderRadius`+yarı saydam katman Android'de iOS'tan biraz farklı anti-aliasing/gölge render edebilir -- yeni bir bitmap asset veya zIndex değişikliği YOK, mevcut render yığınıyla aynı teknik, ama gerçek cihazda görülmedi.
+- İniş-sonrası yerleşme süresi 2.1s'e uzadı (yukarıdaki ödünleşim); iPhone'da "hâlâ göz yoruyor" ya da "şimdi çok yavaş" gelirse ince ayar gerekebilir.
+- Kısa silüette (minimum yükseklik ~54 birim) gövde payı çok az kalıyor, görsel neredeyse tamamen taban flare'inden oluşuyor -- ekran görüntülerinde kabul edilebilir okundu ama en uç düşük platformlarda gözden geçirilmeli.
+- Cornice/flute opaklıkları göz kararı seçilen eşiklerle (55/97/139/181 birim) ayarlandı; gerçek cihazda farklı DPI/parlaklıkta ince ayar isteyebilir.
+
+### iPhone'da kullanıcının yapacağı TEK kısa doğrulama adımı
+390×844 ölçekte (gerçek cihaz) en az 8-10 iniş oyna, en az 2 tanesi tam şarjlı (yüksek) atlayış olsun: (1) platformlar artık üç farklı boyda okunuyor mu (kısa tıknaz / orta kule / uzun ince) ve hiçbiri "yapıştırılmış açık bej çubuk" gibi durmuyor mu, (2) taban her platformda toprağa/çatıya değmiş görünüyor mu (yarıda kesik/havada asılı yok), (3) yüksek/tam şarj atlayışında ve iniş sonrasında kamera daha yumuşak/az sarsıcı hissediliyor mu. Gerçek iPhone kabulü bu oturumda iddia edilmiyor.
+
+## Claude: REVIZYON-045 (2026-09-29) — İstanbul mimari uyumu + tam şarj kamera tepe sınırı
+
+### Kapsam ve yedek
+- Görev başında `find app src/game -type f | sort | xargs shasum -a 256` alındı (`/tmp/scope_start_045.txt`), görev sonunda tekrar alınıp `diff` edildi: yalnız `app/index.tsx` ve `src/game/render-camera.ts` değişti. `~/Documents/Codex/carsamba-revizyon045/yedek/` altına önceki hallerinin kopyası alındı.
+- Kilitli alanlar (jump/charge, landing/collision/footSoles, score/restart, procedural course geometrisi/RNG sırası, karakter/animasyon, kamera X ekseni ve hedef mantığı, R044'te iyi çalışan normal zıplama hissi) hiçbiri değişmedi -- kod diff'i yalnız PlatformSupportView'in stil değerlerinde ve RENDER_CAM'in Y-ekseni iniş-öncesi harmanlamasında.
+
+## A) Kolonları İstanbul mimarisine uydurma
+
+### Kök neden (kısa)
+R044'ün paleti (`#8a5a42→#54372a`, koyu doymuş kahverengi) İstanbul suluboya sahnesindeki HİÇBİR yüzeyle (açık ocre sıva, kırmızı kiremit, gök/deniz mavisi) aynı renk ailesinde değildi -- kontrast doğruydu ama malzeme dili yanlıştı, bu yüzden "endüstriyel boru" okunuyordu. Ayrıca gövde genişliği (`silhShaftFrac`) yalnızca YÜKSEKLİĞE bağlıydı, PLATFORM GENİŞLİĞİNE değil: dar bir platform (cat=2, 38-46 birim) uzun bir platformla (cat=0, 76-96 birim) AYNI yüzde daralmayı alıyordu, bu da dar+uzun kombinasyonunu mutlak olarak saç teline yakın bir genişliğe düşürüyordu. Son olarak, iki flüt çizgisi + cornice şeridi HER uzun platformda birebir aynı konum/opaklıkla tekrarlandığı için -- yükseklik dışında hiçbir değişken kullanılmadığı için -- göz bunu "tek bir tekrarlayan motif" (anten/boru) olarak okuyordu.
+
+### Uygulama (yalnız `app/index.tsx`, render-only, yeni asset yok)
+1. **Palet**: `assets/environment/district/rooftop-district-v1.png`'den gerçek renkler örneklendi (ekran görüntüsü ile göz kararı doğrulandı: sıva ocre ~#dcae74-#e0b47a, kiremit terracotta ~#b5502e-#c96a3e). Shaft gradyanı `#dcb27c→#c99b64→#a97c49` (facade sıva tonu), rim-light `rgba(255,239,208,0.34)`, rim-shade `rgba(64,38,18,0.30)`, cornice `rgba(120,60,22,0.62)` (ilk denemede 0.45 opaklık/2px çok soluk kaldı -- çok uzun bir platformda tamamen kaybolduğu gözlemlendi, kalınlık 3px + opaklık 0.62'ye çıkarıldı, ikinci ekran testinde net görüldü), skirt kademeleri kiremit tonlarına (`#b3673a/#c17a45/#a6522a`) çekildi. Üst yüzey/hitbox (`p.x`/`p.width`/`p.topY`) DEĞİŞMEDİ.
+2. **Dar-uzun "saç teli" düzeltmesi**: yeni `SILH_MIN_SHAFT_WORLD=32` sabiti -- gövde genişliği artık `Math.max(32, outerWidth*silhShaftFrac(h))` ile hesaplanıyor, yani hiçbir platformun görsel gövdesi bu mutlak dünya-birimi genişliğinin altına inmiyor (collision genişliği etkilenmiyor, yalnız görsel inset yüzdesi buna göre yeniden hesaplanıyor).
+3. **Tekrar kırma**: yeni `silhIdHash(id)` (aynı `classifyPlatformVisualType` tarzı deterministik hash, RNG'ye dokunmuyor) her platforma 0..1 arası SABİT bir değer veriyor. Bununla: (a) cornice eşikleri platform başına ±16 birim kayıyor (`silhCorniceOpacity`'ye üçüncü parametre eklendi) böylece komşu aynı-yükseklikteki platformlar birebir aynı hizada çizgi almıyor, (b) flüt çifti artık HER uzun platformda değil, id'ye göre 3 sürekli görünüme bölünüyor: ~%33 flütsüz, ~%33 tek flüt, ~%33 eski çift flüt -- hiçbiri ağaç değişimi gerektirmiyor (yalnız opaklık), R037/R038'in "kategori değişince iOS eski yüzeyi hayalet olarak koruyor" riskini tekrarlamıyor (aşağıda gerçek derleme ile ayrıca doğrulandı).
+4. **Taban geçişi**: R044'ün kademeli flare/temas gölgesi ilkesi korundu, yalnız renk ailesi kiremit tonuna çekildi -- taban artık çatının KENDİ malzemesinin devamı gibi okunuyor (bkz. görsel kanıt), kama gibi ayrı durmuyor.
+5. Kısa/orta/uzun ayrımı, ayrı çatı adası/düz raf/mavi pencere/geç açılan doku/kahverengi hayalet yüzeyinin GERİ GELMEMESİ -- hiçbiri dokunulmadı (R044'ün render ağacı yapısı aynen korundu, yalnız stil değerleri değişti).
+
+### Yeni worklet güvenliği doğrulaması (R037/R038 hata sınıfı tekrarlanmadı mı?)
+Gerçek `babel-preset-expo` + iOS/Metro `caller` ile derlenen `app/index.tsx` çıktısında: `silhIdHash`, `silhCorniceOpacity`, `silhShaftFrac` hepsi `.__workletHash` ile doğru worklet'e derlendi (`node -e` çıktısı: "WORKLET OK" üçünde de). Yeni eklenen `silhIdHash` çağrıları (fluteStyle0/1, corniceStyle0-3 içinde) hiçbir yeni View ağacı MONTE/UNMOUNT etmiyor -- yalnız opaklık değerleri değişiyor, bu yüzden R037/R038'in gerçek hata kaynağı (kategori değişince iOS'un eski kırpılmış native yüzeyi koruması) yapısal olarak mümkün değil.
+
+### Görsel kanıt (2 farklı seed + genişlik taraması)
+- Önce/sonra tek kolon: `~/Documents/Codex/carsamba-revizyon045/once-sonra-kolon-r045.png` (R044'ün koyu kahverengi kutusu vs R045'in ocre/kiremit paletli, kademeli tabanlı hali).
+- Kısa/orta/uzun-dar/uzun-geniş dörtlü: `~/Documents/Codex/carsamba-revizyon045/kisa-orta-uzun-dar-genis.png` -- "uzun+dar" ile "uzun+geniş" YAN YANA, minimum gövde genişliği sayesinde dar olan hâlâ okunabilir bir gövde koruyor (hairline değil).
+- İlk cornice-kontrast denemesi (0.45 opaklık) çok uzun bir platformda düz/özellikSİZ bir "boru" gibi kaldığı GÖZLEMLENDİ (`sonra/zoom-tall.png`) -- bu nedenle kontrast artırıldı ve YENİDEN test edildi (`sonra/zoom-tall-v2.png`, segment çizgileri net görünüyor). Bu iki round arası fark raporda dürüstçe belirtiliyor: ilk deneme kendi içinde yetersiz bulunup revize edildi.
+- İki farklı seed, tam oyun akışı: `sonra/montaj-final_seedA.png`, `sonra/montaj-final_seedB.png`; geniş tarama: `sonra/scan2-*.png`.
+
+## B) Tam şarj kamera tepe sınırı
+
+### Kök neden (ölçümle bulundu, varsayılmadı)
+R044'ün peak Y hızı/ivmesinin NEREDE oluştuğunu doğrudan ölçtüm (log'a faz etiketi eklenip maksimum ivmenin hangi karede/fazda gerçekleştiği yazdırıldı): tam şarj senaryosunda peak ivme (558 u/s²) uçuş SIRASINDA değil, **inişten SONRA** (IDLE/stand fazında, dokunuştan ~0.65s sonra) gerçekleşiyor. Sebep: R044'ün uçuş koridoru geniş bir güvenli pencereye (%12-%90) kilitlendiği için büyük bir yükseklik farkında bile neredeyse hiç hareket etmiyor; TÜM büyük düzeltme dokunma anına birikip tek seferde stand-fazı filtresine devrediliyor. Bu yüzden ilk denediğim "uçuş fazının zaman sabitini büyüt" yaklaşımı (aşağıda REDDEDİLDİ olarak işaretli) hiçbir şey değiştirmedi -- düzeltme yanlış yerdeydi.
+
+### Denenen ve REDDEDİLEN yaklaşım
+`dynamicSmoothTimeYFlight`: uçuş büyüklüğüne göre `smoothTimeYFlight`'ı 0.58'den 0.95'e kadar büyüten bir fonksiyon eklendi. Ölçüm: tam şarjda peak ivme ve ayarına göre 558'den DAHA KÖTÜYE gitti (620'ye, yani `maxAccelY` tavanına çarptı) -- çünkü uçuş takipçisi daha da geride kalıp inişe daha büyük bir kalan bırakıyordu. Bu deneme koddan ÇIKARILDI; `render-camera.ts`'teki yorum bu reddi ve nedenini kaydediyor.
+
+### Uygulanan çözüm: iniş-öncesi harmanlama (`preLandBlend`)
+Oyuncu tepe noktasını geçip DÜŞMEYE başladığı anda (`vy.value > 0`), render kamerası uçuş hedefini sürekli (asla ani sıçramasız) GERÇEK iniş kompozisyonuna (`flightTargetY`, zaten bilinen değer) doğru harmanlıyor -- `RENDER_CAM.preLandTau=0.9` saniyelik bir zaman sabitiyle. Büyük/yüksek bir zıplamanın düşüş süresi UZUN olduğu için, bu harmanlama inişten ÖNCE büyük ölçüde tamamlanıyor, stand-fazı filtresine bırakılan kalan küçülüyor. Küçük/normal bir zıplamanın düşüşü zaten kısa olduğu için harmanlama fazla ilerlemiyor AMA zaten küçük olan iniş adımı (28 birim) üzerinde ölçülebilir bir olumsuz etki yok (aşağıdaki tabloda görülüyor). `smoothTimeYFlight`, `maxSpeedY`, `maxAccelY`, `targetSmoothTimeY` ve X ekseninin HİÇBİRİ değişmedi.
+
+### Ölçüm -- gerçek koddan (physics-evidence yöntemi), R044 vs R045
+Yeni betik: `ai_review_evidence/sim_render_camera_r045.cjs` -- gerçek `jump.ts` fiziğiyle üretilen 6 farklı büyüklükte gerçek uçuş + gerçek `render-camera.ts` fonksiyonları. Bu turda çalıştırıldı, çıktı:
+
+```
+-- normal jump (charge=0.50, rise=-40u), dt=16.67ms --
+  R044: landing-step=28u settle2%=2.12s peakYSpeed=27u/s(17px/s) peakYAccel=81u/s2
+  R045: landing-step=28u settle2%=2.07s peakYSpeed=26u/s(16px/s) peakYAccel=70u/s2
+-- mid jump (charge=0.65, rise=-90u), dt=16.67ms --
+  R044: landing-step=90u settle2%=2.12s peakYSpeed=86u/s(53px/s) peakYAccel=260u/s2
+  R045: landing-step=88u settle2%=2.07s peakYSpeed=83u/s(51px/s) peakYAccel=216u/s2
+-- full-charge jump (charge=1.00, rise=-200u), dt=16.67ms --
+  R044: landing-step=193u settle2%=2.12s peakYSpeed=185u/s(114px/s) peakYAccel=558u/s2
+  R045: landing-step=182u settle2%=2.03s peakYSpeed=170u/s(105px/s) peakYAccel=381u/s2   (-32%)
+-- full-charge DROP (charge=1.00, drop=+180u), dt=16.67ms --
+  R044: landing-step=203u settle2%=2.12s peakYSpeed=194u/s(121px/s) peakYAccel=587u/s2
+  R045: landing-step=171u settle2%=2.00s peakYSpeed=159u/s(99px/s) peakYAccel=250u/s2    (-57%)
+```
+(30fps satırları ve tüm 6 senaryo `node ai_review_evidence/sim_render_camera_r045.cjs` ile tekrar üretilebilir.) Tüm senaryolarda `Xbackward=0`, `Yreversals=0` (yatay geri gitme/dikey yön sıçraması yok, sürekli hareket, hiçbiri hedefe "snap" yapmıyor).
+
+**p90/p99/max dikey render-kamera hızı proxy'si** (60 karışık büyüklükte zıplama, kullanıcının 29 Eylül 13:27 incelemesindeki percentile karşılaştırmasının aynı yöntemle tekrarı):
+```
+R044: p90=87.0u/s(54.0px/s)  p99=180.9u/s(112.2px/s) max=209.3u/s(129.8px/s)
+R045: p90=83.5u/s(51.8px/s)  p99=162.2u/s(100.5px/s) max=182.7u/s(113.3px/s)
+```
+p99 %10, max %13 azaldı -- iyileşme özellikle üst yüzdeliklerde (yani büyük zıplamalarda), p90'da (tipik/normal zıplamalar) neredeyse değişim yok -- talep edilen "yalnız tam şarj/büyük farktaki tepe düşsün, normal korunsun" hedefiyle örtüşüyor.
+
+**Yerleşme süresi**: her senaryoda R045, R044'e eşit veya KISA (2.03-2.10s vs R044'ün sabit 2.12-2.13s'i) -- "2.12s'yi uzatma, mümkünse aynı/daha kısa tut" şartı karşılandı, UZAMADI.
+
+### Gerçek render doğrulaması (yalnız sayısal sim değil)
+- Playwright/Chrome, 390×844, gerçek çalışan uygulama: idle/normal-jump/full-charge-jump'ta rAF frame-time -- 3 tekrarda **p50 16.7ms, 0 düşen kare** (bir ilk ölçümde 300 örnekte 1 tekil 33ms sıçraması görüldü, 3 kez tekrarlanan ölçümde tekrar etmedi -- host kaynaklı tekil bir gecikme, kod regresyonu değil).
+- Play Again: 5/5 restart temiz.
+- Worklet sırası regresyonu: PASS.
+- `npx tsc --noEmit`: yalnız önceden var olan `src/theme.ts` hataları.
+- `npx expo export --platform ios`: PASS.
+- `DEBUG_MODE`: `false` (değişmedi).
+
+### Kalan riskler
+- Kolon paleti artık facade'e daha yakın; çok açık gökyüzü arka planında (bulutsuz, en parlak an) kontrastın yine de yeterli olduğu yalnızca masaüstü web'de görüldü, iPhone'un gerçek ekran parlaklığında doğrulanmadı.
+- Cornice/flüt eşikleri (id-hash tabanlı ±16 birim kayma, %33/%33/%33 flüt dağılımı) göz kararı seçildi; gerçek cihazda ince ayar isteyebilir.
+- `preLandTau=0.9` yalnızca senaryo bazlı sim + web render ile doğrulandı; iPhone'un gerçek 60Hz ekranında "iniş öncesi erken hareket" hissi farklı algılanabilir.
+- Android doğrulanmadı (platform sırası: önce iPhone).
+
+### iPhone'da kullanıcının yapacağı TEK kısa doğrulama adımı
+390×844 gerçek cihazda 10+ iniş oyna, en az 3'ü tam şarjlı (yüksek/büyük fark) atlayış olsun: (1) kolonlar artık boru/anten değil, çatı/cephe malzemesiyle aynı sıcak palette mi okunuyor, dar-uzun olanlar hâlâ ince bir gövde koruyor mu (saç teli değil), (2) tam şarj/büyük yükseklik farkındaki iniş öncesi ve sonrası kamera hareketi öncekine göre daha yumuşak/az sarsıcı mı hissediliyor. Gerçek iPhone kabulü bu oturumda iddia edilmiyor.
+
+## Claude: REVIZYON-046 (2026-09-29) — tam şarj yatay kadraj + kolon/çatı gerçek mimari birleşim
+
+### Video incelemesi (doğrudan, rapora güvenilmedi)
+`ScreenRecording_09-29-2026 14-15-45_1.MP4` (59.47s, 1320×2868, ~59.88fps -- `cv2.VideoCapture` ile doğrulandı) `opencv-python-headless` kurulup Python ile 0.2s aralıklarla karelere ayrıldı (`~/Documents/Codex/carsamba-revizyon046/video-frames/`), 4 şüpheli aralık (19.8-20.6, 22.3-23.1, 25.4-26.2, 28.5-29.2) tek tek görsel olarak incelendi.
+- **t=22.30s** (apex, skor 6→12 arası bir atlayış): karakter kafası ekranın **~90%**'ında, dikey olarak üstte; ekranda görünen tek 2 kolon karakterin ÇOK GERİSİNDE (solda), ilerisinde HİÇBİR platform yok.
+- **t=23.10s**: karakter iniş anında ekranın **~95%**'inde, sağ kenara neredeyse bitişik bir kolona iniyor.
+- **t=20.60s**: kolon paleti sıcak ocre'ye dönmüş (R045 doğrulandı) ama taban hâlâ ayrı, dikdörtgen bir "kama" gibi çatının önünde duruyor (zoom: `zoom-column-video.png`).
+Bu üç gözlem, kullanıcının raporunu ve Codex'in bulgularını doğrudan video karesi üzerinden doğruladı; rapora güvenilmedi, kendim inceledim.
+
+### Kapsam ve yedek
+Bu görev başlarken önce yedek almam gerekirken yanlışlıkla doğrudan düzenlemeye başladım. Bunu düzelttim: bu oturumun `.claude/file-history` klasöründeki otomatik dosya-versiyon kayıtlarından (her `Edit` çağrısından sonra tutulan ham kopyalar) R045'in TAM olarak bittiği andaki `app/index.tsx` (2210 satır, `5a6f6c7242c58434@v23`) ve `src/game/render-camera.ts` (122 satır, `08fa5ad0e15345ef@v3`) sürümlerini buldum -- her ikisi de "R046'nın ilk düzenlemesinden hemen önceki hal" ile `diff`'siz eşleşiyor (import satırındaki `xFlightBlend` eklentisi ve `PlatformSupportView`'daki değişiklikler bu iki sürümde YOK). Bunlar `~/Documents/Codex/carsamba-revizyon046/yedek/` altına kopyalandı ve görev sonunda gerçek `app/index.tsx`/`render-camera.ts` ile scope SHA-256 karşılaştırması BUNLARLA yapıldı (aşağıda). Bu, dürüst bir süreç notu: ilk adımı atlamıştım, geriye dönük olarak doğru kaynaktan telafi ettim.
+Kilitli alanlar (jump/charge, landing/footSoles, score/restart, procedural course geometrisi/RNG sırası, karakter/animasyon, dünya koordinatları/zorluk) hiçbiri değişmedi -- diff yalnız X kamera bloğunda ve `PlatformSupportView`'da.
+
+## A) Tam şarj yatay kadraj
+
+### Kök neden (ölçümle bulundu)
+Render kamerasının X koridoru, `standingPlatformId`'den sonraki **İLK** platformu ("nearest next") hedefliyor -- bu normal/tek-atlamalı zıplamalarda doğru davranış. Ama bu oyun çoklu-kule atlayışını destekliyor (`scoreMultiTowerBonus`): tam şarjda oyuncu 6-8 kule birden atlayabiliyor (video: skor 12→20, "+8"). Bu durumda "ilk platform" oyuncunun GERÇEKTEN ineceği yerin ÇOK gerisinde kalıyor, koridor mantığı asla gerçek iniş noktasına bakmıyor, kamera hiç ileri gitmiyor, oyuncu ekranın sağına doğru sürüklenip kalıyor.
+
+### Uygulanan çözüm: sürekli vx-tabanlı lead (yalnız `app/index.tsx` X bloğu + `render-camera.ts`)
+Yeni `xFlightBlend(vx)`: oyuncunun KENDİ gerçek fiziksel yatay hızından (`vx.value`, zıplama anında zaten bilinen gerçek değer -- hiçbir platform/hedef tahmini YOK) sürekli bir 0..1 harman katsayısı üretir, `xLeadVxLo=400` altında (charge ~0.68 ve altı -- kısa/normal/orta basışlar) TAM SIFIR, `xLeadVxHi=520`'de (charge ~0.96+) TAM 1. Bu katsayı: (1) koridorun `xMax`'ını oyuncunun kendi hızıyla orantılı ekstra bir mesafeye (`xLeadMax=520` dünya birimi tavanlı) genişletir -- HERHANGİ bir kuleyi hedef almadan, yalnız "bu hızda gidiyorsan muhtemelen bu kadar ileri bakman gerekir" mantığıyla; (2) render X takipçisinin `smoothTime`/`maxSpeed`/`maxAccel` değerlerini de aynı katsayıyla R045'in temel değerlerinden daha hızlı bir "uçuş" tavanına doğru harmanlar (`smoothTimeXFlight=0.20`, `maxSpeedXFlight=900`, `maxAccelXFlight=3400`), böylece kamera hedefi genişlese bile ona GERÇEKTEN yetişebilir. `xLeadVxLo` altında (kısa/normal/orta basış) bu iki harman da tam 0 olduğu için X ekseni R045 ile BİREBİR aynı kalır -- eşikli sert bir dal değil, sürekli bir rampa. "X asla geriye gitmez" kısıtı (`if (tX < camXRTarget.value) tX = camXRTarget.value;`) DOKUNULMADAN korundu.
+
+### Ölçüm -- gerçek koddan (physics-evidence yöntemi)
+Yeni betik: `ai_review_evidence/sim_render_camera_x_r046.cjs` -- gerçek `jump.ts` fiziğiyle üretilen flightler, gerçek `render-camera.ts` fonksiyonları, ve videodaki asıl hatayı doğru modelleyen bir senaryo (koridorun bulduğu "en yakın sonraki platform" oyuncunun GERÇEK iniş noktasından ayrı, ~180 birim mesafede -- çoklu-kule atlayışını taklit ediyor). Bu turda çalıştırıldı (tam çıktı `~/Documents/Codex/carsamba-revizyon046/x-sim-output.txt`):
+```
+-- full-charge (dyFraction=0), dt=16.67ms --
+  R045: 35-65% bandında 26/82 kare, %75 üstünde 1.50s, apex-ortası ekran%=71
+  R046: 35-65% bandında 71/82 kare, %75 üstünde 0.00s, apex-ortası ekran%=45
+```
+Tüm 5 dyFraction (0.9 rise .. -0.6 drop) için `maxTimeAbove75%` R045'te 0.00-1.68s aralığında, R046'da HEP 0.00s. `camXbackward=0` her durumda (geri gitme yok). **Kısa/normal/mid basışlarda R045 ile R046 SAYISAL OLARAK BİREBİR AYNI** (short/normal/mid: aynı `frames-in-band`, aynı `apex-mid-screenFrac`, sim'de gösterildiği gibi) -- mid-high (0.75-0.92) kademeli olarak iyileşiyor, ani bir sıçrama yok.
+
+### Gerçek render doğrulaması (yalnız sim değil) -- gerçek Chrome'da 390×844
+Yeni Playwright betiği (`/tmp/xcam.py`) karakterin GERÇEK DOM konumunu (`getBoundingClientRect`) her 20ms'de örnekleyerek tam şarj (440ms basış) ve normal (200ms) zıplamaları 3'er kez oynattı, R045 (yedekten geçici olarak geri yüklenerek) ve R046 için ayrı ayrı:
+```
+R045 (yedek, gerçek render), tam şarj, 3 deneme:
+  trial 0: max ekran-x=104.2%  (EKRANIN DIŞINA ÇIKIYOR)  %75 üstü kare=45/90
+  trial 1: max ekran-x=105.2%                             %75 üstü kare=42/85
+  trial 2: max ekran-x=105.4%                             %75 üstü kare=29/58
+R046 (gerçek render), tam şarj, 3 deneme:
+  trial 0: max ekran-x=71.1%   %75 üstü kare=0
+  trial 1: max ekran-x=73.7%   %75 üstü kare=0
+  trial 2: max ekran-x=71.3%   %75 üstü kare=0
+```
+R045'in gerçek render'daki %104-105 sonucu, videodaki "karakter kadrajdan çıkıyor" şikayetini BİREBİR doğruluyor (ölçülen değer görsel gözlemle örtüşüyor). R046 hiçbir denemede %75'i geçmedi. Normal zıplamada (200ms basış) R045 ve R046 ilk ~800ms'de %0.3'ten az farkla örtüşüyor (`x-r045-normal.json` vs `x-r046-normal.json`); **dürüst sınır**: bu iki canlı test farklı (seed'siz) rastgele kurs üzerinde ayrı ayrı çalıştı, bu yüzden birebir aynı zıplama mesafesi garanti değil -- kısa/normal basış için KESİN "0 fark" kanıtı yukarıdaki sim'den geliyor (aynı charge/dy ile deterministik), bu canlı test yalnız destekleyici.
+
+**Apex görsel kanıtı**: `~/Documents/Codex/carsamba-revizyon046/apex-video-vs-render.png` -- solda gerçek iPhone videosunun apex karesi (t=22.30s, karakter %90, ileride platform yok), sağda R046'nın web render'ındaki apex karesi (karakter merkeze yakın, İKİ kolon ileride net görünüyor -- "apeks civarında en az iki platform üstü görünür olsun" şartı sağlandı).
+
+**Arka plan/parallax katman senkronu**: Kod incelemesiyle doğrulandı (deneysel ölçüm gerektirmedi) -- deniz/gökyüzü (`BG_FAR_PARALLAX_RATIO` ile `camXR.value`'nin sabit bir oranı), district (`camXR.value` ile 1:1) ve dünya/platform katmanı (`camXR.value`/`camYR.value` ile 1:1) HEPSİ AYNI tek `camXR`/`camYR` shared value'sunu okuyor -- X lead bu değeri değiştiriyor ama TEK bir hesaplama noktasından, her katman aynı anda aynı değeri görüyor. Yapısal olarak katman sıçraması/ayrışması mümkün değil (ayrı bir kamera değişkeni eklenmedi).
+
+## B) Kolon/çatı gerçek mimari birleşim
+
+### Değişiklik (yalnız `PlatformSupportView`, `app/index.tsx`)
+R044/R045'in üç kademeli, çatının ÖNÜNE yerleştirilmiş "flare" fayans grubu (`supportSkirtGroup/TileA/B/C`) ve altındaki ayrı "contact shadow" pili TAMAMEN kaldırıldı. Yerine:
+1. **`supportRoofMerge`**: şaftın KENDİ (zaten `overflow:hidden` ile kırpılan) dikdörtgeninin İÇİNE, alt %42'lik bölümünü district çatısının koyu gutter tonuna (`rgba(30,22,15,0.88)`) doğru karartan bir LinearGradient overlay -- yeni bir ŞEKİL değil, aynı dikdörtgenin kendi rengi değişiyor. Bu, "ayrı kama/pill" okumasının doğrudan kaynağını ortadan kaldırıyor.
+2. **`supportOcclusionLine`**: tam çatı hattında ince (3 birim) koyu bir temas gölgesi çizgisi -- geniş bir taban şekli değil, yalnız bir gölge.
+3. **`supportFlashingCollar`**: şaftın kendi genişliğine yakın (yalnız +10 birim), gri-metal tonunda (`#5b5646`) dar bir "çatı geçiş bileziği" -- district sanatındaki gutter borularıyla aynı malzeme dilinde, geniş bir ikinci taban katmanı değil.
+4. Cornice çizgileri 4'ten 2'ye indirildi (daha "kat çizgisi" gibi, daha az "tekrarlayan boru yivi" gibi okunuyor) ve id-hash tabanlı bir "hava alma/leke" yaması (`supportWeatherPatch`, konumu `silhIdHash(id)`'den, RNG'ye dokunmuyor) eklendi -- 2-3 mimari yüzey detayı (leke + kat çizgisi + flüt) kuralı korundu.
+5. Üst yüzey (`playableChimneyCap`, terracotta kapak) ve fiziksel `p.x`/`p.width`/`p.topY` HİÇ değişmedi.
+
+### R037/R038 hayalet-yüzey riski tekrarlanmadı mı?
+Gerçek `babel-preset-expo` + iOS/Metro `caller` ile derlenen `app/index.tsx` ve `src/game/render-camera.ts` çıktısında `xFlightBlend`, `smooth01`, `clamp01` (render-camera.ts, kendi modülünde derlenip import ediliyor -- `stepRenderAxis`/`corridorTarget` ile AYNI, halihazırda kanıtlanmış desen) hepsi `.__workletHash` ile doğru worklet'e derlendi. `PlatformSupportView` içinde HİÇBİR yeni View ağacı monte/unmount edilmiyor -- yalnız opaklık/renk/genişlik stil değerleri değişiyor (collar/occlusion/roof-merge hep monte kalan View'lar).
+
+### Görsel kanıt (2 seed + yakın plan çatı teması)
+- `~/Documents/Codex/carsamba-revizyon046/sonra/scan-grid.png` -- 18 karelik genel tarama (karışık basış süreleri, tek seed).
+- `zoom-tall.png`: uzun kolon, taban artık çatı gutter tonuna karışıyor, ayrı kama yok.
+- `zoom-short2.png`, `zoom-base.png`: kısa/orta kolonlarda aynı birleşim.
+- Video karesiyle doğrudan karşılaştırma: `zoom-column-video.png` (ESKİ, gerçek cihaz) vs yukarıdaki yakın planlar (YENİ, web render).
+
+### Testler
+- `npx tsc --noEmit`: yalnız önceden var olan `src/theme.ts` hataları.
+- `node ai_review_evidence/test_worklet_order_regression.cjs`: PASS.
+- `npx expo export --platform ios`: PASS.
+- FPS (idle/normal/tam-şarj, gerçek render): p50 16.7ms, 0 düşen kare, üçünde de.
+- Play Again: 5/5 temiz (skor 0'a döndü, cover tekrar açılmadı).
+- `DEBUG_MODE`: `false` (değişmedi).
+- Y ekseni (`preLandBlend`, REVIZYON-045) bu görevde DEĞİŞMEDİ; `sim_render_camera_r045.cjs` yeniden çalıştırıldı, sayılar birebir aynı (regresyon yok).
+
+### Kalan riskler
+- X lead eşikleri (`xLeadVxLo=400`, `xLeadVxHi=520`) ve tavanlar (`xLeadMax=520`, `maxSpeedXFlight=900`) gerçek kod + gerçek render ile doğrulandı ama yalnız masaüstü Chrome'da; iPhone'un gerçek dokunma zamanlamasında/60Hz ekranında farklı hissedilebilir.
+- Kolon taban birleşimi (`supportRoofMerge`/`supportFlashingCollar`) yalnız web render'da görüldü; kullanıcının video kaydındaki hafif mavi-gri "haze" (muhtemelen ekran kaydı/ışık koşulu, kod kaynaklı değil) altında kontrastın nasıl okunduğu iPhone'da yeniden doğrulanmalı.
+- Kullanıcının önerdiği Spring Ninja referans videosu bu turda YOK -- kamera akış/parallax oranları yalnızca kendi içinde tutarlı ve ölçülebilir şekilde düzeltildi, "Spring Ninja ile birebir" iddiası kurulmadı; referans geldiğinde ikinci bir kalibrasyon turu gerekecek.
+- Android doğrulanmadı (platform sırası: önce iPhone).
+
+### iPhone'da kullanıcının yapacağı TEK kısa doğrulama adımı
+390×844 gerçek cihazda en az 3 tam şarjlı (uzun basış) atlayış yap, tercihen çoklu-kule atlayan (büyük skor artışlı) olsun: (1) apex civarında ekranda en az 1-2 kule/platform ileride görünüyor mu, karakter sağ kenara yapışıp kadraj dışına çıkmıyor mu, (2) inişte kolonun tabanı çatıya gömülü/kaynaşmış mı görünüyor, yoksa hâlâ ayrı bir kama/pill gibi mi duruyor. Gerçek iPhone kabulü bu oturumda iddia edilmiyor.
+
+## Claude: REVIZYON-047 (2026-09-30) — kolonların çatıya mimari birleşimi
+
+### Video incelemesi (doğrudan, rapora güvenilmedi)
+`ScreenRecording_09-30-2026 10-40-51_1.MP4` (95.1s, 1320×2868, ~57.8fps -- `cv2.VideoCapture` ile doğrulandı) `opencv-python-headless` ile 0.2s aralıklarla 3 şüpheli pencerede (31.2-34.2, 47.6-51.2, 88.8-91.2) karelere ayrıldı (`~/Documents/Codex/carsamba-revizyon047/video-frames/grid1.png`).
+- **t=32.00** (`zoom-long1.png`): uzun kolon tek tonlu açık bej, tabanın hemen altında hafif bir karartma var ama neredeyse görünmüyor -- kullanıcının "boyalı bina/çatıdan bağımsız düz bej boru" tarifiyle birebir örtüşüyor.
+- **t=89.20** (`zoom-short1.png`): kısa/orta kolonlar da aynı tek-tonlu, çatı üstüne bırakılmış kutu gibi.
+- Genel gözlem: bu kayıttaki ekran/ışık koşulu R046'da test ettiğim masaüstü Chrome'a göre BELİRGİN ŞEKİLDE daha soluk/düşük kontrastlı (mavi-gri bir örtü hissi) -- R046'nın orta-tonlu detayları (korniş `rgba(120,60,22,0.62)`, leke `rgba(70,48,28,0.16)`) bu koşulda pratik olarak kayboluyor.
+
+### Kapsam ve yedek
+Görev başında `app/index.tsx` ve `src/game/render-camera.ts` R046'nın bittiği haliyle `~/Documents/Codex/carsamba-revizyon047/yedek/` altına kopyalandı (bu kez -- R046'daki süreç hatasının tekrarı önlendi -- İLK ADIM olarak yapıldı). Kilitli alanlar (jump/charge, landing/footSoles, score/restart, procedural course geometrisi/RNG sırası, karakter/animasyon, dünya koordinatları/zorluk, X kamera/`xFlightBlend`/çoklu kule kadrajı) hiçbiri değişmedi -- görev sonunda scope SHA-256 karşılaştırması bunu doğruladı: `src/game/render-camera.ts` R046 ile BAYT BAYT AYNI; yalnız `app/index.tsx` değişti (`PlatformSupportView`).
+
+## Kolon/çatı birleşimi -- neden R046 yetmedi, ne değişti
+
+### Kök neden
+R046'nın çözümü doğru YÖNDEYDİ (ayrı flare/kama şekli yerine şaftın kendi renginin çatıya doğru karartılması, ince bir bilezik) ama tüm değerler masaüstü Chrome'un yüksek kontrastlı/parlak ekranında göz kararı ayarlanmıştı. Gerçek cihazın bu kaydındaki daha soluk/düşük kontrastlı görüntüleme koşulunda (muhtemelen ekran parlaklığı/renk yönetimi -- kod kaynaklı değil) orta-tonlu, düşük opaklıklı detaylar pratik olarak silinip gidiyor; yalnızca YÜKSEK DEĞER KONTRASTLI (koyu-açık) ve SERT KENARLI (border) öğeler bu koşulda hayatta kalıyor.
+
+### Uygulanan değişiklikler (yalnız `app/index.tsx`, `PlatformSupportView`)
+1. **Korniş çizgileri**: `rgba(120,60,22,0.62)` / 3 birim → `rgba(48,28,14,0.78)` / 4 birim -- daha koyu, daha kalın, daha az saturasyona bağımlı.
+2. **"Leke" → "tamir izi"**: R046'nın yumuşak, kenarsız blob'u (`borderRadius:10, rgba(70,48,28,0.16)`) gerçek cihazda görünmez kaldı. Yerine kenarlıklı (`borderWidth:1`) dikey bir şerit -- sert kenar, düşük kontrast koşulunda değer farkından daha güvenilir bir sinyal.
+3. **Taban-çatı geçiş gradyanı**: `top:"58%"` başlangıç → `top:"45%"`; son durak rengi `rgba(30,22,15,0.88)` → `rgba(16,12,8,0.94)` (neredeyse siyah). Taban artık şaftın çok daha büyük bir bölümünde belirgin şekilde koyulaşıyor.
+4. **Metal geçiş bileziği**: yükseklik 6→10 birim, `borderWidth:1` koyu kenarlık eklendi, ton `#5b5646`→`#4a4638` (biraz daha koyu/doygun).
+5. **Temas gölgesi çizgisi**: 3→5 birim, opaklık 0.45→0.62.
+6. **`ROOF_PLANT_DEPTH=7`**: görsel kutunun (yalnız `PlatformSupportView`'ın kendi render alanı -- collision'a giren `p.topY`/`p.width` DEĞİL) alt sınırı, district çatı hattının birkaç birim ALTINA gömülüyor; bilezik/gölge artık çatı çizgisinin tam üzerinde durmak yerine ona gömülü görünüyor.
+Hiçbiri yeni bir View ağacı monte/unmount etmiyor (R037/R038 hayalet-yüzey riski tekrarlanmadı); tüm konum/opaklık değerleri zaten var olan `silhIdHash`/yükseklik fonksiyonlarından türüyor, yeni RNG tüketimi yok.
+
+### Y render kamerası -- ölçüldü, DOKUNULMADI (gerekçe)
+Kullanıcının belirttiği 47.8-50.3s penceresi, orijinal videodan `cv2.phaseCorrelate` ile (skyline bandı, karakter/HUD dışı bir bölge) kare-kare ölçüldü. Sonuç: bu pencerede arka plan dikey kayması **0.5 pikselin altında** (ölçüm gürültüsü seviyesinde) -- net, ayırt edilebilir bir "hızlan-sonra-aniden-dur" artefaktı YOK. (Skor bu pencerede 19→20→21 gibi küçük, tek-kule inişleri içeriyor; büyük bir yükseklik farkı/pompalamaya yetecek bir dikey hareket zaten beklenmiyor.) Görevin kendi kuralı ("yalnız net fayda gösterirsen düzelt") gereği Y render kamerası (`src/game/render-camera.ts`) bu turda DEĞİŞTİRİLMEDİ -- scope hash'i R046 ile bayt bayt aynı olarak doğrulandı.
+
+### Gerçek render doğrulaması (390×844, 2 seed)
+- `~/Documents/Codex/carsamba-revizyon047/sonra-grid.png` (seed A, 18 kare) ve `sonra-grid-seedB.png` (seed B, 18 kare) -- karışık basış süreleriyle genel tarama.
+- Önce/sonra (gerçek video karesi vs yeni web render) yan yana: `once-sonra-uzun-kolon.png`, `once-sonra-kisa-kolon.png` -- uzun kolonda artık net, koyu, kenarlıklı bir taban/bilezik/korniş sistemi var; kısa kolonda da aynı aile.
+- İkinci seed'de genişçe bir "uzun" kolon: `zoom-narrow-seedB.png` -- aynı tasarım ailesi korunuyor. Dar+uzun kombinasyonu için minimum şaft genişliği (`SILH_MIN_SHAFT_WORLD`) bu turda değişmedi; R046'nın o kanıtı (`~/Documents/Codex/carsamba-revizyon046/zoom-tall2-v2.png`) hâlâ geçerli.
+
+### X kamera regresyon kontrolü (gerçek render, DOM ölçümü)
+`xcam.py` ile 3 tam şarj (440ms) + 1 normal (200ms) basış yeniden ölçüldü:
+```
+R047 tam şarj: trial 0 max=75.9% (3/90 kare >75%, ~60ms) | trial 1 max=56.1% (0) | trial 2 max=75.3% (1/65 kare)
+R047 normal basış: peak=56.3% (R046'da 56.4% idi -- pratikte aynı)
+```
+Hiçbir denemede R045'in gerçek render'daki %104-105 durumuna dönüş yok; %75 üstünde kalınan süre her denemede ~60ms'nin altında (100ms sınırının içinde). X kamera/`xFlightBlend` kodu bu turda hiç değişmedi (yalnız `PlatformSupportView` değişti), bu sonuç beklenen bir regresyon-yokluğu doğrulaması.
+
+### Testler
+- `npx tsc --noEmit`: yalnız önceden var olan `src/theme.ts` hataları.
+- `node ai_review_evidence/test_worklet_order_regression.cjs`: PASS.
+- Worklet güvenliği: `silhIdHash`, `silhCorniceOpacity`, `silhShaftFrac` (app/index.tsx, aynı dosyada derleniyor) ve `xFlightBlend` (render-camera.ts, kendi modülünde) hepsi gerçek babel-preset-expo/iOS derlemesinde `.__workletHash` ile doğru worklet'e derlendi -- yeni View ağacı monte/unmount edilmediği için R037/R038 sınıfı risk yok.
+- FPS (idle/normal/tam-şarj, gerçek render): p50 16.7ms, 0 düşen kare, üçünde de.
+- Play Again: 5/5 temiz.
+- `git diff --check`: temiz (boşluk/EOL hatası yok).
+- `npx expo export --platform ios`: PASS.
+- `DEBUG_MODE`: `false` (değişmedi).
+- Scope SHA-256: yalnız `app/index.tsx` değişti; `src/game/render-camera.ts` R046 ile bayt bayt aynı.
+
+### Kalan riskler
+- Yalnız masaüstü Chrome'da doğrulandı; bu turun asıl motivasyonu olan "gerçek cihazın düşük kontrastlı görüntüleme koşulu" başka bir gerçek iPhone'da/ortamda farklı olabilir -- yeni değerler yine de yetersiz kontrast bırakabilir.
+- `ROOF_PLANT_DEPTH=7` göz kararı seçildi; district sanatının gerçek çizilmiş çatı hattıyla piksel-hassasiyetinde eşleşme iddia edilmiyor (yalnızca görsel gömülme hissi).
+- Y kamera "pompalama" şikayeti bu ölçümle doğrulanamadı -- ya çok küçük/algısal bir etki ya da ölçtüğüm pencere/bölge dışında bir anda oluyor; kullanıcı ısrar ederse daha kesin bir zaman damgası/kare numarası ile yeniden ölçülmeli.
+- Android doğrulanmadı (platform sırası: önce iPhone).
+
+### iPhone'da kullanıcının yapacağı TEK kısa doğrulama adımı
+390×844 gerçek cihazda en az 5-6 iniş yap, en az biri uzun/tam şarj olsun: kolonun tabanı artık çatı hattına gömülü/koyulaşmış mı görünüyor (düz tek renkli boru değil), yoksa hâlâ aynı sorunlu mu. Gerçek iPhone kabulü bu oturumda iddia edilmiyor.
+
+## Claude: REVIZYON-048 (2026-10-01) — çatı ve oynanabilir kolonları tek yapı haline getirme
+
+### Video incelemesi (doğrudan, rapora güvenilmedi)
+`ScreenRecording_10-01-2026 10-35-42_1.MP4` (1320×2868, ~54.4fps -- `cv2.VideoCapture` ile doğrulandı) 18/34/62. saniyelerde doğrudan karelere ayrılıp incelendi (`~/Documents/Codex/carsamba-revizyon048/video-frames/`).
+- **t=18s**: iki kolon çatı üzerinde yakın ama en soldaki üçüncü kolon tabanı ile çatı tiles arasında net bir mavi-deniz boşluğu var.
+- **t=34s, t=62s**: yüksek zıplamalar sonucu kolonlar çok uzun; tabanları çatı çizgisinden BELİRGİN ŞEKİLDE yukarıda, açık denizin/gökyüzünün ortasında asılı kalıyor -- kullanıcının "boru suyun üstünde" tarifiyle birebir örtüşüyor.
+
+### Kapsam ve yedek
+Görev başında `app/index.tsx` ve `src/game/render-camera.ts` R047'nin bittiği haliyle `~/Documents/Codex/carsamba-revizyon048/yedek/` altına kopyalandı, `git status` ayrıca kaydedildi (`git-status-start.txt`). Kilitli alanlar (jump/charge, landing/footSoles, score/restart, procedural course geometrisi/RNG sırası, karakter/animasyon, R046/R047 kamera davranışı) hiçbiri değişmedi -- görev sonunda scope SHA-256 karşılaştırması bunu doğruladı: `src/game/render-camera.ts` R047 ile BAYT BAYT AYNI, X kamera kod bloğu (`app/index.tsx` içindeki `corridorTarget(camX.value...)` çevresi) metin olarak DEĞİŞMEDİ (yalnız dosyadaki satır numarası kaydı); yalnız `PlatformSupportView` ve ona bitişik `DISTRICT_ROOT_Y` sabiti değişti.
+
+## Kopukluğun 4 nedeni (ayrı ayrı, istendiği gibi)
+
+1. **Koordinat**: `DISTRICT_ROOT_Y` (= `DISTRICT_TOP_Y+40` = 132) `rooftop-district-v2.png` asset'i için HİÇ yeniden ölçülmemiş bir sabitti -- muhtemelen önceki bir asset revizyonundan kalma. Gerçek asset `python3 -c "... np.array(Image.open(...))..."` ile piksel piksel tarandı (x=10/150/300/500/650/800, hepsi tutarlı): roof ridge y≈48'de opak oluyor, gerçek saçak/gutter çizgisi (kiremidin bittiği, cephenin başladığı koyu gri şerit) y≈71-81 (orta 78) aralığında. Dünya birimine çevirince: 92+78×1.9 = **240**, kodun varsaydığı 132 DEĞİL. ~108 birimlik (zoom 0.62'de ~67px) sistematik hata.
+2. **Siluet**: Kolonun kendisi (R047'den beri) düzgün bir mimari siluet taşıyordu ama altında HİÇBİR siluet yoktu -- tek bir dikdörtgen boru, hiçbir taban genişlemesi/çatı siluetiyle bitmiyordu.
+3. **Malzeme**: Kolonun sıcak ocre/terracotta paleti ile arkasındaki tekrarlayan district görselinin KENDİ malzemesi arasında doğrudan bir bağlantı YOKTU -- ikisi aynı sahneye ait görünse de aralarında hiçbir ortak eleman (çatı/cephe parçası) paylaşılmıyordu.
+4. **Katman**: `PlatformSupportView` district'in ÖNÜNE çiziliyordu (R043'ten beri, doğru bir karar -- alçak platformların district arkasında kaybolmaması için) ama bu, kolonun ALTINDAKI tam o noktadaki district dokusuyla hizalı bitmesini hiçbir şekilde garanti etmiyordu -- iki ayrı katman, ayrı konumlandırma mantığı.
+
+## Uygulanan çözüm
+
+### 1) Koordinat düzeltmesi (`app/index.tsx`)
+```
+const DISTRICT_ROOT_Y = DISTRICT_TOP_Y + 148; // (ölçüldü: 92+148=240)
+```
+Yalnız bu TEK sabit değişti; `DISTRICT_TOP_Y` (görselin kendi üst/sönümlenme konumu, `BG_SEA_END_WORLD_Y` ve `StartCover` tarafından da kullanılıyor) dokunulmadı -- o zaten doğruydu.
+
+### 2) Mimari çözüm (yalnız gölge/kontrastla yetinmedi -- yeni "bina" bileşeni)
+`PlatformSupportView` içine, şaftın (kolonun) kendisinden ÖNCE (z-sırasında ARKASINDA) iki yeni öğe eklendi, ikisi de yalnızca `p.x`/`p.width`/`p.id`'den (hiç RNG tüketmeden, `silhIdHash` ile deterministik) türüyor:
+- `buildingRoof`: `DISTRICT_ROOT_Y`'ye (artık doğru ölçülmüş saçak çizgisi) tam oturan, yuvarlak üst köşeli, terracotta gradyanlı bir çatı başlığı. Genişlik `p.width*(2.0..2.7)` (id-hash'ten sürekli çeşitlilik).
+- `buildingFacade`: çatı başlığının hemen altından başlayıp 520 birim aşağı uzanan (kamera hiçbir zaman altını göremez), tan/ocre gradyanlı bir cephe duvarı, id-hash'ten konumlanan tek bir pencere aksanıyla.
+Bu iki öğe TAMAMEN platformun kendi geometrisinden geliyor -- tekrarlayan district görselinin hangi karesi arkada olursa olsun, kolonun hemen altındaki birleşim noktası HER ZAMAN doğru hizalı ve tutarlı bir malzemeyle bitiyor. Büyük district görseli arka planda (artık doğru hizalanmış haliyle) kalıyor, kaldırılmadı.
+
+### R037/R038 hayalet-yüzey riski tekrarlanmadı mı?
+Hiçbir yeni View ağacı monte/unmount edilmiyor -- `buildingRoof`/`buildingFacade` her platform için HER ZAMAN monte, yalnız boyut/konum/opaklık `useAnimatedStyle` ile sürekli değişiyor (R044'ten beri kurulan desenin aynısı). `silhIdHash` zaten gerçek babel-preset-expo derlemesinde worklet olarak doğrulanmıştı (R045-047); bu turda yeniden kontrol edildi, hâlâ `.__workletHash` ile doğru derleniyor.
+
+## Gerçek render doğrulaması (aynı seed, önce/sonra -- istenen prova sırası)
+
+### Prova 1: yalnız koordinat düzeltmesi (bina eklenmeden önce)
+Bu TEK satırlık değişiklik bile zaten büyük bir iyileşme verdi (`prova1-grid.png`) -- kolonlar artık çatı/cephe dokusuna gömülüyor. Ama görev metninin "yalnız gölge/kontrastla yetinme" talebi gereği buna durmadım, adım 2'ye geçtim.
+
+### Prova 2 (final): + modüler bina
+`~/Documents/Codex/carsamba-revizyon048/once-sonra-ucgen.png` -- AYNI seed'de (1700001200000), AYNI 3 iniş (kısa/skor4, uzun/skor8, uzun-dar/skor10) ÖNCE (R047 yedeği) ve SONRA (bu teslim) yan yana: öncekinde kolon tabanı ile çatı arasında net bir deniz/gökyüzü boşluğu var, sonrakinde kolon kendi çatı başlığı+cephesinden çıkıyor, taban hiçbir zaman boşlukta durmuyor.
+İkinci seed (1700009900000, `sonra-grid-seedB.png`) ve genel 18 kareli tarama (`prova2-grid.png`) ile kısa/orta/uzun/dar kombinasyonları ayrıca kontrol edildi -- hepsi aynı aileden (çatı başlığı+cephe+kolon).
+
+### İniş yüzeyi / çarpışma etkilenmedi mi?
+`p.x`/`p.width`/`p.topY` ve `findFootLanding`'in okuduğu platform dizisi bu görevde HİÇ değişmedi (yalnız `DISTRICT_ROOT_Y`, salt render sabiti, ve yeni render-only `buildingRoof/Facade` eklendi). Ekran görüntülerinde iniş kapağının (açık üst kenar) her zaman net göründüğü doğrulandı -- yeni bina öğeleri `DISTRICT_ROOT_Y` civarında (platformun ÇOK ALTINDA) konumlandığı için kapağa hiçbir zaman değmiyor/örtmüyor.
+
+## X/Y kamera regresyon kontrolü (gerçek render)
+Bu görev kamera koduna dokunmadı; yine de doğrulandı:
+```
+R048 tam şarj: trial0 max=77.1%(8 kare >75%) | trial1 max=61.0%(0) | trial2 max=74.7%(0)
+R048 normal basış: peak=53.6% (R047: 56.3%)
+```
+İlk denemedeki 77.1%/8-kare sonucu, X kamera kodunun (satır-satır karşılaştırıldı, metinsel olarak DEĞİŞMEDİ) kendisinden değil, her koşunun kendi (seed'siz) rastgele kursundaki doğal varyanstan geliyor -- bazı koşularda daha büyük bir çoklu-kule atlayışı rastgelemiş olabilir. Normal basış R047'ye çok yakın (56.3→53.6, ölçüm/kurs varyansı içinde).
+
+## Testler
+- `npx tsc --noEmit`: yalnız önceden var olan `src/theme.ts` hataları.
+- `node ai_review_evidence/test_worklet_order_regression.cjs`: PASS.
+- Worklet güvenliği: `silhIdHash`/`silhCorniceOpacity`/`silhShaftFrac` gerçek babel-preset-expo/iOS derlemesinde `.__workletHash` ile doğru worklet'e derlendi.
+- FPS (idle/normal/tam-şarj, gerçek render, 3 tekrar): p50 16.7ms her seferinde; bir koşuda tekil 33ms sıçraması (host kaynaklı, 2/3 tekrarda yok) -- sistemik değil.
+- Play Again: 5/5 temiz.
+- `git diff --check`: temiz.
+- `npx expo export --platform ios`: PASS.
+- `DEBUG_MODE`: `false` (değişmedi).
+- Scope SHA-256: yalnız `app/index.tsx` değişti; `src/game/render-camera.ts` R047 ile bayt bayt aynı.
+
+## Kalan riskler
+- Yalnız masaüstü Chrome'da doğrulandı; gerçek iPhone'un görüntüleme koşulunda (R047'nin ortaya çıkardığı düşük kontrast deneyimi) yeni bina renklerinin okunabilirliği tekrar görülmeli.
+- Yeni bina genişliği/yüksekliği göz kararı (id-hash'ten sürekli varyasyon) seçildi; district'in GERÇEK mimarisiyle (pencere/balkon konumları) piksel-hassasiyetinde eşleşme iddia edilmiyor -- yalnızca aynı malzeme ailesinden, platforma bağlı bir yapı.
+- Spring Ninja referans videosu hâlâ gelmedi; kamera akışı/kalibrasyonu bu turda değişmedi ve "referansla birebir" iddiası kurulmadı.
+- Android doğrulanmadı (platform sırası: önce iPhone).
+
+## iPhone'da kullanıcının yapacağı TEK kısa doğrulama adımı
+390×844 gerçek cihazda en az 5-6 iniş yap, en az biri yüksek/tam şarj olsun: kolonun tabanı artık kendi küçük çatı+cephe yapısından çıkıyor mu ve hiçbir zaman açık denizin/gökyüzünün ortasında asılı kalmıyor mu (18/34/62 saniyedeki gibi). Gerçek iPhone kabulü bu oturumda iddia edilmiyor.
+
+TESLIM_HAZIR: REVIZYON-048 — DISTRICT_ROOT_Y ölçülerek düzeltildi (132→240) ve her platforma p.x/width/id'den türeyen kendi çatı-başlığı+cepheli "bina" eklendi; kolon artık çatıya gömülü/bağlı, suyun üstünde asılı değil; tsc/worklet/FPS/Play Again x5/git diff --check/iOS export geçti; iPhone görsel kabul testi bekliyor; commit/push/deploy yok.
+
+> [GEÇERSİZ/PROVISIONAL — 2026-10-01] Codex görsel incelemesi: `once-sonra-ucgen.png` ve `prova2-grid.png`'nin SONRA tarafında yeni eklenen 520 birimlik opak bej `buildingFacade` blokları district görselinin pencere/balkon/çamaşır ipi detaylarını geniş düz dikdörtgenlerle örtüyor; `buildingRoof`'un turuncu yuvarlak başlığı da ayrı, yapıştırılmış bir şekil gibi okunuyor. Kolon-deniz boşluğu azaldı ama görsel bütünlük bu eklemeyle İYİLEŞMEDİ, KÖTÜLEŞTİ. Yukarıdaki TESLIM_HAZIR bu nedenle GEÇERSİZ -- düzeltme/yeniden çalışma bu bölümün devamında (aşağıda, yeni tarihli alt başlık altında) raporlanıyor.
+
+## Claude: REVIZYON-048 — yeniden çalışma (2026-10-01, Codex reddi sonrası)
+
+### Codex'in bulgusu doğrulandı
+`once-sonra-ucgen.png` ve `prova2-grid.png`'nin SONRA tarafını yeniden inceledim: Codex haklıydı. `buildingFacade` (520 birim, opak, `#c7a883→#ad8a66` gradyan) district görselinin GERÇEK pencere/panjur/balkon/çamaşır ipi detaylarının üzerini geniş düz bir dikdörtgenle kapatıyordu; `buildingRoof`'un yuvarlak turuncu başlığı da şaftla/cepheyle organik bir birleşim değil, ayrı yapıştırılmış bir şekil gibi okunuyordu. Kolon-deniz boşluğu azalmıştı ama bu, district'in kendi sanatını yok ederek elde edilmişti -- net bir kayıp, ilan edilen "tek yapı" kazancı değil.
+
+### Yapılan düzeltme: opak binayı tamamen geri al
+`PlatformSupportView` içinden `buildingRoofStyle`, `buildingFacadeStyle`, `buildingWindowStyle` ve bunların JSX kullanımı ile `buildingFacade`/`buildingWindow`/`buildingRoof` static stilleri TAMAMEN kaldırıldı (kod artık R047'nin `PlatformSupportView`'ı ile -- yalnız `DISTRICT_ROOT_Y` sabiti hariç -- aynı). Geriye kalan TEK değişiklik, bu bölümün ilk REVIZYON-048 girişinde ölçülerek bulunan `DISTRICT_ROOT_Y = DISTRICT_TOP_Y + 148` (240) düzeltmesi.
+
+### Neden bu yeterli (ve neden "tek yapı" iddiası kurulmuyor)
+R047'nin mevcut tasarımı zaten şaftın kendi altını koyu bir gradyanla (`supportRoofMerge`) çatı tonuna karartıyor ve dar bir metal bilezikle (`supportFlashingCollar`) çatıya "giriyormuş" hissi veriyordu -- yalnız YANLIŞ bir dünya-Y referansına (132) oturduğu için bu birleşim her zaman gerçek çatı çizgisinin ~108 birim YUKARISINDA kalıyordu. `DISTRICT_ROOT_Y`'yi ölçülen gerçek değere (240) düzeltmek, BU MEVCUT (ve pencere/balkonları örtmeyen) dar tasarımın zaten doğru yere oturmasını sağlıyor -- yeni bir geniş yapı eklemeden. Bu, görevin "modüler ön plan bina" hedefinin TAM karşılığı değil (öyle iddia etmiyorum) ama ölçülerek doğrulanmış, gerçek görsel bütünlüğü BOZMAYAN tek geçerli iyileştirme budur.
+
+### Yeni görsel kanıt (aynı seed, Codex'in istediği gibi)
+`~/Documents/Codex/carsamba-revizyon048/once-sonra-duzeltme.png` -- AYNI seed (1700001200000), AYNI 3 iniş (kısa/skor4, uzun/skor8, uzun-dar/skor10), ÖNCE (R047 yedeği, yanlış DISTRICT_ROOT_Y) ve SONRA (yalnız düzeltilmiş sabit) yan yana: pencere/panjur/çamaşır ipi her iki tarafta da AYNI şekilde görünür kalıyor (örtülmüyor); kolon tabanı SONRA tarafında artık çatı/cepheye kadar uzanıyor, ÖNCE'deki gibi boşlukta asılı kalmıyor.
+İki seed'lik yeniden tarama: `sonra2_seedA-grid.png`, `sonra2_seedB-grid.png`. Yakın plan: `final-zoom-tall.png`, `final-zoom-tall2.png` -- kolon çatı/cephe alanına net şekilde giriyor, hiçbir pencere/balkon kapanmıyor.
+
+### Testler (yeniden çalıştırıldı)
+- `npx tsc --noEmit`: temiz (theme.ts hariç).
+- `node ai_review_evidence/test_worklet_order_regression.cjs`: PASS.
+- Worklet güvenliği: `silhIdHash`/`silhCorniceOpacity`/`silhShaftFrac` hâlâ `.__workletHash` ile doğru derleniyor (bu turda yeni worklet fonksiyonu eklenmedi, çıkarıldı).
+- FPS (2 tekrar): p50 16.7ms, 0 düşen kare, her ikisinde de.
+- Play Again: 5/5 temiz.
+- `git diff --check`: temiz.
+- `npx expo export --platform ios`: PASS.
+- `DEBUG_MODE`: `false`.
+- Scope SHA-256: yalnız `app/index.tsx` değişti (tek satır: `DISTRICT_ROOT_Y`); `src/game/render-camera.ts` R047 ile bayt bayt aynı.
+
+### Kalan riskler / açık durum
+- "Çatı, cephe ve kolon tek modüler yapı" hedefi bu turda TAM karşılanmadı -- yalnızca ölçülmüş bir koordinat hatası düzeltildi. Gerçek bir modüler ön plan mimarisi (district'in kendi detaylarını örtmeden) ayrı, daha dikkatli bir tasarım turu gerektirir.
+- Yalnız masaüstü Chrome'da doğrulandı; gerçek iPhone'da henüz görülmedi.
+- Spring Ninja referansı gelmedi; kamera değişmedi.
+- Android doğrulanmadı.
+
+### iPhone'da kullanıcının yapacağı TEK kısa doğrulama adımı
+390×844 gerçek cihazda birkaç iniş yap: (1) kolon tabanı artık çatıya/cepheye ulaşıyor mu (boşlukta asılı değil), (2) district'in kendi pencere/balkon/çamaşır detayları hâlâ görünüyor mu (yeni hiçbir opak blok onları örtmüyor). Gerçek iPhone kabulü bu oturumda iddia edilmiyor.
+
+TESLIM_HAZIR: REVIZYON-048 (düzeltilmiş) — opak "bina" eklentisi tamamen geri alındı; tek geçerli/doğrulanmış değişiklik ölçülmüş `DISTRICT_ROOT_Y` düzeltmesi (132→240); district'in pencere/balkon/çamaşır detayları korunuyor; "tek yapı" mimarisi bu turda tam başarılamadı, iddia edilmiyor; tsc/worklet/FPS/Play Again x5/git diff --check/iOS export geçti; iPhone görsel kabul testi bekliyor; commit/push/deploy yok.
+
+## Claude: REVIZYON-049 (2026-10-01) — kolonu çatının doğal parçası gibi gösterme
+
+### Video incelemesi (doğrudan)
+`ScreenRecording_10-01-2026 12-10-59_1.MP4` (1320×2868, ~59.8fps) 10/18/34. saniyelerde karelere ayrılıp incelendi (`~/Documents/Codex/carsamba-revizyon049/video-frames/`).
+- **t=10s**: kısa platform çatının hemen önünde, pencerenin solunda ayrı bir kutu gibi duruyor -- R048'in düzeltmesi sayesinde artık suda asılı değil ama hâlâ "yapıştırılmış" okunuyor.
+- **t=18s**: uzun kolon doğrudan iki pencere arasındaki boşluktan geçiyor, ayrı bir direk gibi.
+- **t=34s**: hem kısa hem uzun kolonun altında sert, düz, koyu bir bitiş + ince gri metal şerit var -- ayrı bir donanım parçası gibi.
+Bu üçü de R048'in `DISTRICT_ROOT_Y` düzeltmesinin ÇÖZMEDİĞİ, prep doc'un da önceden belirttiği sorunu doğruluyor: yalnız bir Y sabiti, kolonu çatının malzeme/şekil diline bağlamaz.
+
+### Kapsam ve yedek
+Görev başında `app/index.tsx`/`render-camera.ts` (R048-fixed hali) `~/Documents/Codex/carsamba-revizyon049/yedek/` altına kopyalandı, `git status` kaydedildi. Kilitli alanlar (jump/charge/collision/score/kamera/procedural geometri/RNG sırası) hiçbiri değişmedi -- scope SHA-256 karşılaştırması bunu doğruladı: yalnız `app/index.tsx` değişti, `src/game/render-camera.ts` R048-fixed ile BAYT BAYT AYNI.
+
+### Önce A/B görsel taslak (koda dokunmadan, istendiği gibi)
+Gerçek bir ekran görüntüsü (`crop-low2.png`, kısa platform, saçak çizgisi net görünür) üzerine PIL ile doğrudan piksel düzenleme yapıldı, kod DEĞİŞTİRİLMEDİ:
+- **A: dar yerel çatı yaması** -- 3 örtüşen renkli "blob" (daire), district'ten örneklenen terracotta tonlarında (`mockupA-low.png`). Sonuç: bir küme balon/sabun köpüğü gibi okunuyor, ikna edici DEĞİL.
+- **B: modüler kiremit kümesi** -- district'in KENDİ fıçı-kiremit şekline (yuvarlak üstlü, hafif örtüşen) ve rengine (örneklendi: açık ~RGB(196-216,110-135,70-105), koyu ~RGB(130-170,80-100,55-75)) uyan 3 küçük kiremit (`mockupB2-low.png`). Sonuç: komşu gerçek kiremitlerle aynı aileden okunuyor, İKNA EDİCİ.
+- Karşılaştırma: `~/Documents/Codex/carsamba-revizyon049/ab-mockup-karsilastirma.png` (önce/A/B yan yana).
+- Karar: B uygulandı (prep doc'un eşiği: en az alçak/orta/yüksek + 2 seed'de pencere/balkon/çamaşır korunumu ve iniş yüzeyi okunurluğu birlikte gösterilmeli -- aşağıda).
+
+### Uygulama (yalnız `app/index.tsx`, `PlatformSupportView`)
+- `collarStyle`/`supportFlashingCollar` (düz, gri, metal görünümlü bar) TAMAMEN kaldırıldı.
+- Yerine `tileGeom`/`tileStyle0/1/2` + `supportTile`/`A`/`B`/`C`: şaftın ZATEN hesaplanan genişliğinden (`silhShaftFrac`, id/RNG değil) türeyen, mutlak dünya-birimi aralığına (20-32) kelepçelenmiş 3 kiremit-kubbe. Hep monte (R037/R038 hayalet-yüzey riski yok), yalnız boyut/konum sürekli değişiyor.
+
+### Uygulama sırasında yakalanan ve DÜZELTİLEN 2 hata (teslimden önce)
+1. **Boyut hatası**: ilk deneme `tileW = shaftW*0.62` (tamamen orantılı) kullandı; GENİŞ bir platformda bu, gerçek ölçülen çatı-kiremit bandından (~30-57 dünya birimi, `DISTRICT_ROOT_Y` yorumundaki piksel ölçümüne bakın) çok daha büyük kiremitler üretti, kümem pencere/panjur sırasına kadar uzadı (`impl-low3.png`'de yakalandı). Düzeltme: `tileW = clamp(20, 32, shaftW*0.42)` -- mutlak aralık.
+2. **Konum hatası**: `DISTRICT_ROOT_Y` R048'de doğru ölçülmüştü (240, gerçek saçak satırı) ama kutunun alt sınırı hâlâ eski `+26` ve `ROOF_PLANT_DEPTH(7)` tamponlarını (toplam +33 birim) taşıyordu -- bunlar YANLIŞ sabit (132) döneminden kalma telafi tamponlarıydı. Doğru sabitle birleşince kiremitleri saçağın 33 birim ALTINA, pencere/korniş bandına itiyorlardı (`impl2-low3.png`'de yakalandı). Düzeltme: tampon `DISTRICT_ROOT_Y + 26` → `DISTRICT_ROOT_Y + 4`, `ROOF_PLANT_DEPTH` 7 → 2.
+Her iki hata da BU TURUN kendi render kontrolünde (teslimden önce) yakalanıp düzeltildi -- Codex'e veya kullanıcıya hatalı halde gönderilmedi.
+
+### Gerçek render doğrulaması (aynı seed, kabul eşiğinin istediği gibi)
+- Aynı seed (1700001200000), aynı 3 iniş (kısa/skor4, uzun/skor8, uzun-dar/skor10), ÖNCE (R048-fixed)/SONRA (bu teslim): `once-sonra-r049.png`.
+- Yakın plan (kısa, saçak çizgisi net): `impl3-low3.png` -- kiremit kümesi artık gutter/saçak satırında, pencere/panjur altında DEĞİL.
+- Yakın plan (uzun-dar): `impl3-zoom17.png` -- kolon tabanı gutter çizgisinde kiremitlerle bitiyor, pencereler tam görünür.
+- Yakın plan (uzun, geniş): `impl3-zoom02.png`.
+- İkinci seed (1700009900000): `impl3-gridB.png` -- aynı aile, tutarlı.
+- İniş yüzeyinin okunurluğu (açık üst kenar/cap) hiçbir karede etkilenmedi -- kiremitler çok daha aşağıda (saçak hizasında), kapağa hiç değmiyor.
+
+### Testler
+- `npx tsc --noEmit`: temiz (theme.ts hariç).
+- `node ai_review_evidence/test_worklet_order_regression.cjs`: PASS.
+- Worklet güvenliği: `silhIdHash`/`silhCorniceOpacity`/`silhShaftFrac` hâlâ `.__workletHash` ile doğru derleniyor (bu turda yeni worklet fonksiyonu eklenmedi, yalnız mevcut desene uyan yeni `useAnimatedStyle` hook'ları).
+- FPS (3 tekrar): p50 16.7ms her seferinde; iki koşuda tekil 33ms sıçraması (host kaynaklı, üçüncü tekrarda yok) -- sistemik değil.
+- Play Again: 5/5 temiz.
+- `git diff --check`: temiz.
+- `npx expo export --platform ios`: PASS.
+- `DEBUG_MODE`: `false`.
+- Scope SHA-256: yalnız `app/index.tsx` değişti; `src/game/render-camera.ts` R048-fixed ile bayt bayt aynı.
+
+### Açık kalan, dürüstçe raporlanan sınır
+Bu tur yalnız BAZ-ÇATI birleşim noktasına odaklandı (prep doc'un kapsamı buydu). Çok yüksek bir zıplamanın UÇUŞ ORTASINDA (henüz inilmemiş), şaftın uzun orta bölümü hâlâ pencere/balkon bandını düz, kesintisiz bir dikdörtgen olarak kesiyor (`impl3-zoom02.png`'de görülebilir, mid-flight değil ama uzun bir iniş sonrası duruşta bile şaftın üst kısmı hâlâ facade'i geçiyor). Bu, yalnızca taban bağlantısını iyileştiren bir çözümle TAMAMEN çözülemez -- ayrı, daha büyük bir tasarım sorunu. İddia edilmiyor, çözülmedi.
+Ayrıca: yalnız masaüstü Chrome'da doğrulandı, gerçek iPhone'da henüz görülmedi; Spring Ninja referansı gelmedi; Android doğrulanmadı.
+
+### iPhone'da kullanıcının yapacağı TEK kısa doğrulama adımı
+390×844 gerçek cihazda birkaç iniş yap (kısa/orta/uzun karışık): kolonun tabanı artık çatının kiremitleriyle aynı şekil/renk ailesinden küçük bir kümeyle mi bitiyor (düz metal bar değil), pencere/balkon/çamaşır hâlâ tam görünüyor mu. Gerçek iPhone kabulü bu oturumda iddia edilmiyor.
+
+TESLIM_HAZIR: REVIZYON-049 — A/B görsel taslak karşılaştırması sonrası (B kazandı) modüler kiremit kümesi uygulandı; düz metal bilezik kaldırıldı; pencere/balkon/çamaşır detayları korunuyor; uygulama sırasında yakalanan 2 boyut/konum hatası teslimden önce düzeltildi; uçuş-ortası uzun şaftın facade'i kesmesi AÇIK/ÇÖZÜLMEMİŞ olarak raporlanıyor; tsc/worklet/FPS/Play Again x5/git diff --check/iOS export geçti; iPhone görsel kabul testi bekliyor; commit/push/deploy yok.
+
+## REVIZYON-050 (2026-10-01) — iniş kamerası "donma+sıçrama" iddiası: ölçüm turu
+
+### Kaynak ve iddia
+- Video: `ScreenRecording_10-01-2026 12-33-43_1.MP4`. Bu kayıt R049'un son (kiremit kümesi) düzeltmesinden ÖNCE çekilmişti -- görevde açıkça belirtildiği gibi bu kayıt R049'un çatı/kolon sonucunu doğrulamak için kullanılmadı, yalnız kamera davranışı için kullanıldı.
+- Codex'in iddiası: ~39.55sn ve ~84.02sn civarında inişlerde, 1-2 "neredeyse donuk" kare, ardından 24-29px'lik bir kamera "yakalama" (catch-up) sıçraması.
+- Görev açıkça bunu KANITLANMAMIŞ bir HİPOTEZ olarak çerçeveledi: (a) inişte `vx.value`'nun 0'a sıfırlanmasının `xFlightBlend`'i ani düşürmesi, (b) uçuş/iniş takip parametrelerinin (900→400 hız limiti, 0.20→0.30 smoothTime) bu konuda payı olabileceği; ayrıca "görünen kare düşüşü" nün bir ekran kaydı artefaktı olabileceği ihtimali de ayrı tutulması istendi.
+
+### Kod akışı doğrulaması (okuma, değişiklik değil)
+- `app/index.tsx` içinde `vx.value = 0` inişin olduğu AYNI karede, kamera bloğundan ÖNCE set ediliyor (fiziksel blok önce çalışıyor, kamera bloğu aynı `useFrameCallback` içinde sonra). Yani `xFlightBlend(vx.value)` iniş anında gerçekten tek karede 0'a düşüyor -- bu kısım doğru.
+- X kamera bloğu: `xBlend = xFlightBlend(vx.value)`; `xBlend>0` iken `xMax` `xLeadMax` kadar ileri genişletiliyor; `corridorTarget` ile hedef hesaplanıyor; `if (tX < camXRTarget.value) tX = camXRTarget.value;` ile GERİYE gitmesi engelleniyor; `xSmoothTime/xMaxSpeed/xMaxAccel` `xBlend` ile baz değer ↔ uçuş değeri arasında karışıyor, sonra `stepRenderAxis` çağrılıyor.
+
+### Video ölçüm yöntemi
+- Her iki zaman penceresi için (39.55sn ve 84.02sn civarı) video `cv2.VideoCapture` ile NATIVE çözünürlükte, videonun kendi bildirdiği fps'te kare kare çıkarıldı (`~/Documents/Codex/carsamba-revizyon050/video-frames/`, pencere başına 120 kare, `c{center}_t{time}.png` adlandırmasıyla).
+- Karakter/HUD/tekne riskinden kaçınmak için sabit bir ölçüm şeridi seçildi: `gray[200:650, 0:1320]`.
+- Kare-kare arka plan hareketi `cv2.phaseCorrelate` ile ölçüldü (dx, dy, güven/response skoru); kümülatif yer değiştirme, 2. türev (ivme) ile anomali/sıçrama tespiti yapıldı.
+- Ayrı olarak bayt-birebir aynı kare kontrolü yapıldı (`img.tobytes()` eşitliği) -- basit video-seviyesi kare tekrarını (donma) ekarte etmek için.
+- Şüpheli düşük-güven okumaları doğrudan o karenin görüntüsüyle çapraz kontrol edildi.
+
+### Gerçek-kod simülasyonu (hipotez testi)
+- `src/game/render-camera.ts`'in GERÇEK dosyası `ts.transpileModule` + `vm.runInNewContext` ile yüklendi (önceki turlardaki yöntemle aynı, formüller elle yeniden yazılmadı).
+- En kötü senaryo simüle edildi: tam şarjlı uçuş (`vx≈549`, `xFlightBlend≈1`, büyük X lead) 30 kare boyunca, ardından iniş karesi (`vx→0`, `xFlightBlend→0`, yeni duran platformun ilerisindeki bir sonraki platforma hedef kayması).
+- Sonuç (gerçek kod çıktısı):
+  - İnişten hemen önce: `camXR≈311.8`, `target≈408.4`, `vel≈611.1`.
+  - İniş karesi: hız ANINDA `611.1→400.0`'a düşüyor (ivme ≈ -12665/sn² -- bu bir HIZ süreksizliği), ama POZİSYON (`camXR`) o karede yalnızca `311.8→320.21` (+8.4) ilerliyor, sonraki karelerde düzgün `-1100 birim/sn²` ivmeyle yavaşlayarak `+6.5, +6.2, +5.9...` artmaya devam ediyor.
+  - Yani en kötü senaryoda bile POZİSYONDA ne donma (frame freeze) ne de sıçrama (jump) var -- yalnızca HIZDA (ekranda doğrudan görünmeyen bir büyüklük) ani ama düzgün bir yavaşlama var. "1-2 donuk kare + 24-29px sıçrama" paterni bu simülasyonda ÜRETİLEMEDİ.
+
+### Video ölçüm bulguları
+- Her iki pencerede de byte-birebir aynı kare YOK (video-seviyesi basit donma yok).
+- **t≈39.55sn**: X ekseni kümülatif kayması ihmal edilebilir (toplam dx≈0.38px, ~1sn boyunca). Y ekseni kümülatif kayması GERÇEK ve düzgün: ≈21.6px, yaklaşık 1 saniyede, süreksizlik/kink YOK (tek tümsekli, yumuşak ivme eğrisi). Bu profil (tepe hız≈21px/sn, settle≈2.1sn benzeri), `smoothTimeYStand=0.60`/`maxSpeedY=250`/`maxAccelY=620`/`targetSmoothTimeY=0.24` ile R044/045/047'den beri VAR OLAN kasıtlı Y-iniş-yerleşme tasarımının gerçek-kod simülasyonuyla birebir eşleşiyor.
+- **t≈84.02sn**: Y ekseni kümülatif kayması yalnızca ≈1.7px, 2 saniyelik pencerede -- iddia edilen 24-29px büyüklükle UYUŞMUYOR. t=84.058'de düşük güvenirlikli (response≈0.71) tekil bir okuma bulundu; o karenin görüntüsü incelendiğinde karakterin SAKİN DURDUĞU (iniş anı değil) ve ölçüm şeridinde bir MARTININ geçtiği görüldü -- bu, gerçek bir kamera olayı değil, kuş-geçişi kaynaklı ölçüm gürültüsü olarak değerlendirildi.
+- **Genel desen**: her iki 2 saniyelik pencerede de, iniş anlarıyla sınırlı olmayan, YAYGIN bir "sıfıra yakın korelasyon" kare paterni bulundu (ardışık karelerin art arda neredeyse aynı arka plan içeriğine sahip olması) -- bu, kaydın efektif ~30fps güncelleme ritmine sahip olabileceğiyle tutarlı (her 60fps-yakalanmış karede bir, önceki ile neredeyse özdeş). Bu, VAR OLAN düzgün ~1sn'lik kamera yumuşatmasının izlerken "önce donuyor sonra yakalıyor" gibi ALGILANMASINA katkıda bulunabilir -- oyun-kamerası kodunda ayrı bir kusur olmadan.
+
+### X hipotezi değerlendirmesi
+- Kod akışı doğru tespit edilmişti (`vx→0` aynı karede `xFlightBlend→0` yapıyor), AMA: (1) her iki flagged pencerede de ölçülen gerçek X kayması ihmal edilebilir (en kötü senaryo bile değil, gerçek video ölçümü); (2) gerçek kodla simüle edilen en kötü senaryoda bile POZİSYON süreksizliği yok, yalnız hız kinki var; (3) ileri-yönlü kelepçe (`tX < camXRTarget.value` koruması) geriye sıçramayı zaten yapısal olarak engelliyor. Bu üç bulgu birlikte X hipotezini ÇÜRÜTÜYOR -- gözlemlenen (Y-baskın) olayın nedeni olarak X/`vx`/`xFlightBlend` mekanizması KORİELE EDİLMİYOR.
+
+### Canlı web kontrolü
+- `localhost:8081`'deki çalışan Expo web sunucusunda oyun açıldı (R049-son durum, kiremit kümesi dahil); ekran görüntüsünde kolon tabanının çatı/saçak hizasında, kiremit renginde/şeklinde doğru göründüğü teyit edildi (R049 regresyonu yok). Kısa manuel etkileşim ek bir kamera-spesifik kanıt üretmedi; asıl kanıt yukarıdaki native-video ölçümü ve gerçek-kod simülasyonu.
+
+### Karar: KOD DEĞİŞİKLİĞİ YAPILMADI
+- Görevin kendi açık talimatı: "Etki doğrulanmazsa keyfi parametre değiştirme, dürüstçe raporla." X hipotezi ölçümle reddedildi; 39.55sn'deki gerçek Y hareketi yeni bir hata değil, VAR OLAN kasıtlı tasarımla eşleşiyor; 84.02sn'deki iddia edilen büyüklük doğrulanamadı. Bu üç sonuç birlikte, `src/game/render-camera.ts` veya `app/index.tsx` kamera bloklarında HERHANGİ bir parametre değişikliğini haklı çıkaracak bir kanıt sunmuyor -- bu yüzden hiçbiri değiştirilmedi.
+- Scope SHA-256 karşılaştırması (`app/` + `src/game/`, tur başı vs. tur sonu) bunu doğruluyor: fark YOK, yani kod gerçekten değişmedi.
+
+### Testler
+- `npx tsc --noEmit`: temiz (theme.ts hariç).
+- `node ai_review_evidence/test_worklet_order_regression.cjs`: PASS.
+- Worklet güvenliği: bu turda yeni/değişen worklet fonksiyonu yok (kod değişmedi), bu nedenle ayrı bir derleme kontrolüne gerek kalmadı.
+- `npx expo export --platform ios`: PASS ("Exported: dist").
+- `DEBUG_MODE`: `false` (satır 275, `src/game/config.ts`).
+- `git diff --check`: temiz (zaten hiçbir izlenen dosya değişmedi).
+- Scope SHA-256: tur başı/sonu hash'leri `app/` + `src/game/` için birebir aynı.
+
+### Açık risk ve sonraki adım
+- Bu video R049'un son çatı/kolon düzeltmesinden ÖNCE çekildiği için, bu tur R049'un görsel sonucunu AYRICA doğrulamadı/doğrulamaya çalışmadı (görevin kendi kapsamı dışında).
+- Eğer kullanıcı/Codex YENİ (R049 sonrası) bir kayıtta aynı "donma+sıçrama" hissini yine bildirirse: bu artık ölçülebilir bir kod hatası değil, VAR OLAN kasıtlı iniş-yerleşme süresinin (settle≈2.1sn) bir HİS/ürün tercihi sorunu olarak ele alınmalı (örn. settle süresini kısaltmak isteyip istemediğine karar vermek) -- bu, ayrı bir revizyon ve kullanıcının açık onayı gerektirir, bu turun kapsamında DEĞİL.
+- Geri dönüş: gerekmiyor, kod hiç değişmedi; `~/Documents/Codex/carsamba-revizyon050/yedek/` zaten mevcut (R049-son) durumla bayt bayt aynı.
+- Roof/kolon tasarımına (R049) bu turda hiç dokunulmadı, ayrı görsel-revizyon onayı istenmedi çünkü gerekmedi.
+
+TESLIM_HAZIR: REVIZYON-050 — iddia edilen iniş kamerası "donma+sıçrama" olayı native-çözünürlük video ölçümü (phase-correlation) ve gerçek-kod (`render-camera.ts`) simülasyonuyla incelendi; X ekseni (`vx`/`xFlightBlend`) hipotezi ÖLÇÜMLE REDDEDİLDİ (gerçek video dx≈0.38px ihmal edilebilir, en kötü senaryo simülasyonunda bile pozisyon süreksizliği yok, yalnız hız kinki var, ileri-kelepçe geri sıçramayı zaten engelliyor); 39.55sn'deki gerçek ~21.6px Y hareketi VAR OLAN kasıtlı iniş-yerleşme tasarımıyla (R044/045/047) birebir eşleşiyor, yeni hata değil; 84.02sn'deki iddia edilen 24-29px büyüklük ölçümle doğrulanamadı (≈1.7px ölçüldü, muhtemelen martı kaynaklı ölçüm gürültüsü); her iki pencerede de kaydın ~30fps-eşdeğeri güncelleme ritmi "donma" algısına katkıda bulunmuş olabilir; etki doğrulanamadığı için görevin kendi talimatı gereği KEYFİ PARAMETRE DEĞİŞİKLİĞİ YAPILMADI; tsc/worklet/iOS export/git diff --check geçti, scope hash tur başı/sonu birebir aynı; iPhone görsel kabul testi bekliyor, commit/push/deploy yok.
+
+## REVIZYON-051 (2026-10-02) — çatı/kolon tasarım incelemesi: ölçüm ve taslak yöntemi (kod değişikliği YOK)
+
+### Yedek ve kapsam
+- Yedek: `~/Documents/Codex/carsamba-revizyon051/yedek/` (`app/index.tsx`, `src/game/render-camera.ts`), `git-status-start.txt`, `scope_start.txt`. Tur sonu `app/` + `src/game/` SHA-256 farkı: YOK.
+
+### Ölçümler
+- Kolon tepe dağılımı (gerçek `generateProceduralPlatform` + `makeRand`, ts.transpileModule+vm; 8 seed × 120): topY min −320, p10 −220, p25 −120, p50 31, p75 167, p90 251, max 319. topY>111 (district üst kenarı): %36.5; topY>240 (ölçülen saçak): %12.4. Genişlik 38–96 dünya birimi (p50 62).
+- District asset: kaynak satır 24–44'te kiremit rengi oranı sütun sütun ölçüldü; çatısız orta bölüm kaynak x≈318–506 (karonun ~%23'ü), üst kenarı saydamlığa eriyor (net hat yok).
+- Ekran görüntüsü ↔ dünya eşlemesi: R049 `impl3_seedA-00/-17` karelerinde district karosu cv2.matchTemplate ile bulundu (skor 0.969 / 0.993); ölçek 1.9×0.62=1.178 px/kaynak px; saçak ekranı = oy + 78×1.178.
+
+### Taslak yöntemi (PIL montajı, oyun render'ı DEĞİL)
+- Mevcut kolonlar silindi: district alanı gerçek asset pikselleriyle, deniz alanı yatay kaydırılmış komşu şeritle (kenarları yumuşatılmış) dolduruldu. Sweep şeridinde arka plan aynalanarak genişletildi (dikiş izleri taslak artefaktıdır).
+- Gövde dokusu district'in kendi düz sıva bölgesinden (kaynak x264–292, y104–132) örneklendi; pencere/kepenk renkleri district'ten.
+- M3 ayak örtücüsü: aynı district plate'inden kolon genişliği+6px kırpma, occY = max(kiremit eğiminin %36'sındaki koyu sıra arası, capY+34); occY saçağa 28px'ten yakınsa çatı katı modu, capY saçak altındaysa veya çatısız bölümde korkuluk+34 altındaysa cumba modu. Kolonun ≥%50'si çatısız bölümdeyse korkuluk kuralı.
+- Uygulamaya geçilirse beklenen teknik şekil (doğrulanmadı): örtücü her havuz slotunda hep monte, `overflow:hidden` bir View içinde district Image'ı aynı dünya koordinatında; yalnız boyut/konum sürekli değişir (R037/R038 hayalet-yüzey kuralı); kamera ile birlikte aynı dünya katmanında hareket ettiği için piksel kayması olmamalı — 2 karo sarma durumu ve iOS'ta Image sayısı/perf ölçülmeli. RNG/geometri/çarpışma/kamera değişmez; pencere varyantı id'den deterministik.
+
+### Açık riskler / sınırlar
+- Taslaklar statik montaj; hareket sırasında okunurluk, perf ve iOS render doğrulanmadı. Gövde modülleri programatik çizim — son asset Görsel atölyeden gelmeli. Cumba modülü taslakta en zayıf okunan parça. Çatısız bölüm korkuluğu district asset'inde değişiklik gerektirir (onay gerekli). Android doğrulanmadı.
+
+TESLIM_HAZIR: REVIZYON-051 — bağımsız inceleme + M1/M2/M3 karşılaştırması + alçak/orta/yüksek/çeşitlilik taslakları (~/Documents/Codex/carsamba-revizyon051/); kod değişmedi (scope hash aynı); kullanıcı görsel yön seçimi bekleniyor.
+
+## REVIZYON-052 (2026-10-02) — çatı–platform görsel sistemi: ölçüm, doğrulama ve kapsama kanıtı (kod/asset değişikliği YOK)
+
+### Kapsam ve yedek
+- Yedek: `~/Documents/Codex/carsamba-revizyon052/yedek/` (`index.tsx`, `render-camera.ts`, `procedural-course.ts`, `config.ts`), `git-status-start.txt`, `scope_start.txt` (`app/`+`src/game/`+`assets/`, 105 dosya). Tur sonu SHA-256 farkı: YOK. `DEBUG_MODE=false`.
+
+### Veri ve kamera modeli
+- `course_frames.cjs`: gerçek `generateProceduralPlatform`/`makeRand`/`classifyPlatformVisualType` (EXPERIMENTAL_COURSE=true doğrulandı) + gerçek `corridorTarget`; ilk platform `{x:0,topY:0,w:96,cat:0}`. Seed A/B = canlı oyunun `Date.now=1700001200000/Math.random=0.25` ve `1700009900000/0.6` ile açıldığı seed'ler (4027074687, 1239805561) + 8 seed; her biri 160 platform.
+- Gözlem: topY [−320, 320] tam kullanılıyor; boşluk 110–324 dünya; chimney 24/160.
+- Kamera: oturmuş kare (Y hedefi `topY − 0.67H/s`; X dead-zone + render corridor + monoton kelepçe); iniş noktası = platform merkezi (varsayım). Uçuş/geçiş kareleri modellenmedi.
+
+### Yeniden çizici doğruluğu
+- `render.py`, `app/index.tsx` katman sırası/bgFarStyle/district karoları/haze/ayna-alt ve R049 `PlatformSupportView`+`PlatformView` stillerini birebir taklit eder. Canlı oyun (expo web, Chrome, 390×844, 9 sn bekleme) başlangıç karesiyle karşılaştırma: ortalama mutlak fark seed A 5.61, seed B 5.56 (/255, y420–820); %px>40: 1.9%/1.8% (karakter, HUD metni, kenar yumuşatma). Kanıt: `out/7-dogrulama-yeniden-cizici-seed{A,B}.png` (canlı | çevrimdışı | fark×3).
+
+### Spring Ninja ölçümü (38.7 sn karesi, 1320×2868)
+- 3 direkte kapak 110 px / gövde 94 px → oran 0.85 (sabit). Kapak/gök parlaklığı 118/116; RGB mesafesi 38.5/37.2/40.6 (ort. 38.8) → iniş yüzeyi eşiği 38 olarak kullanıldı. Görünen direk sayıları gözle (≈2–4). Kayıt kareleri karartılmış görünüyor; oranlar etkilenmez.
+
+### Eski yöntemin sistematik hatası (1600 platform / 1570 oturmuş kare)
+- Tepe < district kiremit üstü (115): %65.1; kiremit bandı 115–240: %24.5; saçak altı >240: %10.4; ayak çatısız bölümde (kaynak x 318–506): %21.9; karo dikişi: %4.3; ekleme yeri (dünya y 244) ekranda olan kare: %86.4. `out/neden_bozuluyor.json`, `out/6-neden-bozuluyor.png`.
+
+### Kontrol listesi ölçümü (20 otomatik seçilmiş durum, `out/cases.json`, `out/kontrol_listesi.md`)
+- İniş yüzeyi: kapak üst 3 satırı ile hemen üstündeki 6 satırın ort. RGB mesafesi ≥ 38 → ESKİ 20/20 (min 64.4), YENİ 20/20 (min 127.7).
+- Kopuksuz gövde: platform görünen genişliğinin ortasındaki sütunda oynanabilir-görsel maskesinin kapaktan ekran altına kesintisiz sürmesi → ESKİ 2/20 (yalnız kamera çok yüksekte, ekleme ekran dışı), YENİ 20/20. (Ölçüm hatası yakalandı ve düzeltildi: taş/saçak sınırında `floor`/`round` farkı 1 satırlık sahte boşluk üretiyordu; görsel boşluk değildi.)
+- Cephe detayı örtme: district maskesinin dünya y > 240 kısmında platform maskesiyle kesişim oranı ≤ %25 → ESKİ en çok %7.7, YENİ en çok %24.4. İlk turda gövde 0.78·w ile S3/id1 %25.5 (başarısız) → genel oran 0.74 (0.74: en çok 24.4; 0.70: 23.2 ölçüldü). Belirli id yaması yapılmadı.
+- Çakışma: görsel x-uzantıları arası en küçük boşluk YENİ 60.9 px (baca süsü dahil).
+- Katman/kamera: dünya kabı + aynı dönüşüm — tasarım gereği; ölçülmedi.
+
+### Tasarım düzeltmeleri (bu turda kendi kontrolümde yakalanan)
+1. Pencereli gövde: pencere district penceresinin ~1/4 ölçeğinde → "uzak gökdelen" okuması; pencereler kaldırıldı, kâgir dil + district ölçeğinde doku.
+2. Sıva yaması ayna-tekrarında duvar kâğıdı deseni → id-deterministik düşük frekanslı sıva (numpy RandomState(id); oyun RNG'si değil).
+3. Örtme eşiği aşımı → genel gövde oranı (yukarıda).
+
+### A/B
+- R051-M3 kuralının 1600 platformdaki dağılımı: normal %54.9, çatısız bölüm/korkuluk asset'i %19.4, çatı katı %15.2, cumba %10.4. Görsel: `out/5-ab-hibrit-vs-oneri.png` (aynı 7 x/w/topY; M3 satırı R051 ekran-uzayı montajıdır, bu turda yeniden ölçülmedi).
+
+### Açık riskler
+- Önizleme statik/oturmuş kare; uçuş, düşüş, Game Over/Play Again, hızlı kamera, düşük FPS, geç yükleme ve cihaz (iPhone/Android) doğrulanmadı.
+- Cephe örtme %24.4 eşiğe yakın; ödünleşim kullanıcı kararı.
+- Doku/kiremit programatik taslak; son asset Görsel atölyeden.
+- Uygulamada her modül birden çok görüntü katmanı (sıva, saçak, köşe) içerecek — havuz slotu başına native yüzey sayısı ve iOS hayalet-yüzey riski (R037/R038) entegrasyon turunda ölçülmeli.
+
+TESLIM_HAZIR: REVIZYON-052 TASARIM — gerçek EXPERIMENTAL_COURSE verisiyle 20 durumlu kapsama + kontrol listesi, canlı oyunla doğrulanmış yeniden çizici (fark 5.6/255), Spring Ninja ölçümü, eski yöntemin sayısal hata dağılımı, M3 A/B ve modül şartnamesi ~/Documents/Codex/carsamba-revizyon052/ içinde; kod/asset değişmedi (scope hash aynı); kullanıcının görsel yön seçimi bekleniyor.
+
+## REVIZYON-053 TASARIM (2026-10-02) — iki sahne mimarisi: yöntem, ölçüm ve sınırlar (kod/asset değişikliği YOK)
+
+### Kapsam
+- Yedek: `~/Documents/Codex/carsamba-revizyon053/yedek/`, `git-status-start.txt`, `scope_start.txt` (`app/`+`src/game/`+`assets/`). Tur sonu SHA-256 farkı yok.
+- Veri ve çizici: R052'nin `course_frames.json`'u (gerçek EXPERIMENTAL_COURSE, 10 seed × 160) ve canlı oyunla doğrulanmış `render.py` (başlangıç karesi farkı 5.6/255) değiştirilmeden kullanıldı. 20 durum, R052 `analysis.CASES` ile aynı (seed/id/topY/w değerleri `out/cases053.json`).
+
+### D1 kuralı (render053.py `d1_building`)
+- slab 7, eğim 40, oluk 10 birim.
+- `run = clamp(min(sol, sağ boşluk)/2 − 22, 12, 70)`.
+- Cephe `[x−run, x+w+run]`, kadraj altı +30.
+- Kat 118 birim; 5 kat tipi id hash'ten.
+- Modül kırpmaları (district kaynak px): roof (70,8,330,46), gutter (75,44,335,60), win_open (178,78,262,150), win_closed (120,96,166,158), win_arch (4,104,70,232), balcony (314,40,400,168), laundry (0,112,292,246), pipe (298,60,314,250). Ölçek 1.25 dünya/px; kenarlar 4–6 px yumuşatılmış.
+- Orta-plan district: ölçek 0.45, top 175, X parallax 0.8, pus %34 + %25 doygunluk düşüşü; ayna-alt tekrar 3 kez.
+
+### D2 kuralı (`d2_building`)
+- Ana ev (70–335) ya da yan ev (0–116) kesiti id hash ile seçilir.
+- Yatay ölçek `(w+12)/kesit`, dikey ölçek 1.25 (eşit ölçek varyantı `d2u`: dikey = yatay).
+- Cephe 60–252 satırları ayna-tekrar; mahya bandı 6 birim.
+
+### Ölçümler (karar için tek başına kullanılmadı)
+- İniş taşı ile hemen üstü arasındaki RGB mesafesi (min, 20 durum): ESKİ 64, D1 124, D2 65.
+- İniş taşı ile 12–22 satır altı (dekoratif eğim/cephe) arasındaki RGB mesafesi: ESKİ 24–50, D1 127–237, D2 41–170. D1'de dekoratif eğim iniş yüzeyinden belirgin ayrışıyor.
+- Uzak arka planın (deniz/gök/silüet, değişmeden kalan piksel) ekran payı: ESKİ %39.1–64.7, D1 %56.5–81.5, D2 %56.7–92.1.
+- Platform çakışması: D1'de yapısal olarak yok (en az 44 birim sokak).
+
+### Görsel değerlendirme (ayrı)
+- D1: 1x tam ekranda teras, kiremit, oluk ve cephe tek bina okunuyor; iniş hedefi açık teras taşı. Riskler: ardışık binalarda modül tekrarı, kırpma haleleri, alçak kamerada orta-plan ayna-tekrarı, dar sokak.
+- D2: dar ve yüksek durumlarda ezilme ve ayna-tekrar bariz → başarısız. Geniş platformda kabul edilebilir.
+
+### Doğrulanmayanlar
+- Animasyon (`3-ilerleme-animasyonu-seedA.gif`) iki oturmuş kare arası model kameradır; oyunun gerçek uçuş/iniş kamerası değil.
+- Game Over/Play Again, düşük FPS ve geç yükleme görülmedi. iPhone ve Android görülmedi.
+- Entegrasyonda havuz slotu başına görüntü katmanı sayısı (teras, eğim, oluk, cephe, en fazla 6 modül, boru) ve iOS hayalet-yüzey riski (R037/R038) ölçülmeli.
+
+TASARIM_ACIK: REVIZYON-053 TASARIM — D1 önerildi (önizlemede tek bina okunuyor), D2 başarısız; kullanıcı görsel incelemesi ve yeni modüler asset seti bekleniyor; kod/asset değişmedi (scope hash aynı), commit/push yok.
+
+## REVIZYON-054 (2026-10-02) — ev = district malzemesi: uygulama, test ve kanıt
+
+### Kapsam ve yedek
+- Yedek: `~/Documents/Codex/carsamba-revizyon054/yedek/` (`app/`, `src_game/`), `git-status-start.txt`, `git-diff-start.patch`, `scope_start.txt` (`app/`+`src/`+`assets/`, 111 dosya). Kullanıcının mevcut değişiklikleri korundu.
+- Tur sonu kapsam farkı:
+  - değişen: yalnız `app/index.tsx` (+487/−99);
+  - yeni: 3 PNG (`assets/environment/district/house/`);
+  - `src/` altındaki her dosya (fizik, jump, landing, procedural-course, render-camera, config): SHA-256 aynı.
+- `app/index.tsx` içinde kilitli bloklar yedekle metin olarak karşılaştırıldı: `makeNextPlatform`, fall→game over, kamera dead-zone/render kamera bloğu, `worldStyle`, `onPressIn`→ AYNI. `PlatformView` yalnız bir yorum satırı farklı.
+
+### Asset üretimi (`build/build_assets.py`, kaynak: rooftop-district-v2.png)
+1. **Kiremit şeridi:** x104–190 (86 px dönem; en küçük dikiş farkını veren pencere), 6 kopya, 6 px çapraz geçiş, 486×47.
+2. **Oluk:** y44–60, 584×16.
+3. **Cephe sütunu** (140×560, 4 kat):
+   - sıva, district duvarının ölçülen tonuyla (196,164,123) üretildi: düşük frekans leke + ince gren (desen tekrarı yok);
+   - kat dilimleri: A x113–182/y86–246, C x7–68/y104–236 (ip inpaint), B x178–262/y76–147 + taş denizlik, D x323–392/y32–172;
+   - dilim içindeki sıva tonundaki pikseller ortak sıvayla değiştirildi.
+- İlk denemede yakalanıp düzeltilen sorunlar:
+  1. yama-örgü sıva tuğla deseni verdi → istatistiksel sıvaya geçildi;
+  2. dilim kenarlarında açık dikdörtgen hale → sıva-pikseli değiştirme;
+  3. ip maskesi 4–6 px kaymıştı → gerçek ip merkez çizgisi ölçülüp düzeltildi;
+  4. ayrı kalça sprite'ları kiremit desenini iniş kenarında yeniden başlatıyordu → tek kiremit görüntüsü iki döndürülmüş kırpma kutusuyla trapez yapıldı; kalça PNG'leri silindi.
+
+### Render mimarisi (`PlatformHouseView`, havuz slotu başına 1, her zaman monte)
+- Ev kutusu `translateX = p.x − r`, `translateY = p.topY`. `r = clamp(min(boşluk_sol, boşluk_sağ)/2 − 15, 38, 76)`, `rise = r·47/40`.
+- Çatı: bant (fw × rise) > clipL (rotate +40.4°) > geri döndürme > clipR (rotate −40.4°) > geri döndürme > kiremit Image. Doku kayması id hash'inden; kalça çizgileri döndürülmüş 3 px View.
+- Cephe: üç sütun kopyası (dönem 1064), kat fazı `HOUSE_FLOOR_STARTS[hash]`; ışık/gölge gradyanları ve kenar çizgileri.
+- Toplam: slot başına 4 native Image (çatı, oluk, 3 cephe — 5 Image yüzeyi) + View'lar. Kategoriye göre mount/unmount yok.
+- Yeni worklet yardımcıları `houseHash` ve `houseRun`, babel-preset-expo iOS/Metro derlemesinde `.__workletHash` ile doğrulandı. Oyun RNG'si okunmuyor.
+- İniş kapağı (`PlatformView`, `p.x/topY/width`) değişmedi.
+- Arka sıra: district karoları `BACK_TILE_W = 0.9·tile`, `translateX = camXR·0.15 + base·tile`; StartCover aynı formül; ölü düşüş için ikinci gövde kopyası; opak kısma %22 pus.
+- Önyükleme listesine 3 yeni PNG eklendi.
+
+### Testler
+- `npx tsc --noEmit`: 0 hata (theme.ts hariç).
+- `test_worklet_order_regression.cjs`: PASS.
+- `npx expo export --platform ios`: PASS. `git diff --check`: temiz. `DEBUG_MODE=false`.
+- Canlı Expo web (Chrome, 390×844, sabit seed A ve B): başlangıç + 6 basılı tut/bırak; Game Over ve Play Again geçildi; sayfa/konsol hatası yok (`out/live2/`).
+- FPS (rAF): idle / normal / tam şarj p50 16.7 ms, p95 ≤16.8 ms, >33 ms kare 0/2/1. 5× Game Over→Play Again: 5/5, skor 0'a dönüyor (`out/perf_playagain.json`).
+- Çevrimdışı prova ↔ canlı oyun başlangıç karesi: ortalama fark 6.9/255 (`out/0-dogrulama-canli-vs-prova-seedA.png`). Panolar bu doğrulanmış provayla üretildi; durumlar R052'deki 20 durum, her biri gerçek `id/x/topY/width` ile (`out/cases054.json`).
+
+### Açık riskler
+- 4 kat tipi var; kırmızı örtülü kat ardışık evlerde sık görünüyor. Daha fazla kat modülü için Görsel atölyeden temiz set iyi olur.
+- topY ≈ −320'de ev dar ve çok katlı (apartman okuması).
+- `chimney` görsel olarak ayrışmıyor (önceki sürümde de ayrışmıyordu).
+- iOS'ta döndürülmüş `overflow:hidden` kırpma ve slot başına 5 Image yüzeyi gerçek cihazda ölçülmedi (kenar yumuşatma, performans, R037/R038 hayalet yüzey).
+- iPhone/Android görülmedi; uçuş kamerası yalnız web'de görüldü.
+
+TESLIM_HAZIR: REVIZYON-054 — ev/çatı/kolon district'in kendi malzemesi ve ölçeğiyle kodlandı; src/game bayt bayt aynı; tsc/worklet/iOS export/canlı web/FPS/5× Play Again geçti; iPhone kabulü bekleniyor; commit/push yok.
+
+## POPUP-001 (2026-10-02) — Silgi Kaçışı pop-up prova: teknik kanıt
+
+### Yedek / geri dönüş
+- Tur başı: `~/Documents/Codex/carsamba-popup001/yedek/app/`, `scope_start.txt` (`app/`+`src/`+`assets/`). R054 snapshot SHA-256 `7d6aef4c…143e` doğrulandı; arşivdeki `app/index.tsx` tur başı dosyayla aynı (`diff -q`).
+- Hızlı geri dönüş: `app/index.tsx` içinde `const VISUAL_MODE = "istanbul"` (yalnız render; tek satır). Tam geri dönüş: yedekteki `app/index.tsx`'i geri kopyalamak ve `assets/popup/` klasörünü kaldırmak.
+
+### Değişen dosyalar
+- `app/index.tsx`:
+  - `VISUAL_MODE`/`POPUP`, `PU_*` sabitleri;
+  - `PopupHouseView` (havuz slotu başına, her zaman monte; 4 duvar + 3 çatı = 7 Image);
+  - ekran-uzayı popup katmanları: gök gradyanı, güneş, 2 bulut, 3 tepe karosu, silinmiş şerit, silgi (`withRepeat` sallanma);
+  - dünya-uzayı sayfa zemini; `StartCover` popup dalı; önyükleme listesi.
+  - İstanbul katmanları `!POPUP` koşuluna bağlandı.
+- Yeni: `assets/popup/popup-{roof-mid,roof-hip-L,roof-hip-R,wall,back-hills,sun,cloud-1,eraser,erased-strip}.png`. Üretici: `~/Documents/Codex/carsamba-popup001/build/make_popup_assets.py` (PIL; ev parçaları 2 px/dünya birimi, arka sayfa 1 px/dünya birimi).
+- "Hazır" kapısı: popup modunda `background` tepe karosunun, `district` silinmiş şeridin yüklenmesiyle işaretleniyor.
+
+### Değişmeyen (hash/diff)
+- `src/` altındaki tüm dosyalar SHA-256 aynı (fizik, jump, landing, procedural-course, render-camera, config).
+- `app/index.tsx` blokları yedekle metin olarak AYNI: `makeNextPlatform`, `initWorld`, fall→game over, kamera dead-zone + render kamera, `worldStyle`, `onPressIn`, `PlatformView`.
+
+### Testler
+- `npx tsc --noEmit`: 0 hata (theme.ts hariç).
+- `test_worklet_order_regression.cjs`: PASS.
+- `npx expo export --platform ios`: PASS. `git diff --check`: temiz. `DEBUG_MODE=false`.
+- Canlı Expo web (Chrome 390×844), sabit seed A (1700001200000/0.25), B (1700009900000/0.6), C (12345/0):
+  - ilk açılış, basılı tut dizileri ve 1300–1400 ms tam şarj uçuş ortası;
+  - Game Over → Play Again; sayfa/konsol hatası yok.
+- Aynı seed/viewport R054 karşılaştırması: anahtar geçici olarak "istanbul" yapılıp aynı diziler çekildi, sonra "popup"a geri alındı. Skor ve Game Over anları iki modda birebir aynı.
+- FPS (rAF): idle / normal / tam şarj p50 16.7 ms, p95 16.8 ms. 5× Play Again: 5/5, skor 0'a dönüyor.
+
+### Açık riskler
+- iPhone'da görülmedi; slot başına 7 Image (14 slot ≈ 98) + ekran katmanları — düşük-end iPhone bellek/FPS ölçülmeli.
+- `puSide` (skewY) ve `transformOrigin` iOS'ta web'den farklı görünebilir.
+- Silgi ve silinmiş şerit dünya katmanının arkasında olduğu için yapısal olarak hiçbir şeyi örtmüyor; ancak karakter şeridin önünde dururken kontrast düşebilir.
+- Yüksek platformlarda uzun karton kule okunuyor; tek duvar sütunu ve tek tepe karosu tekrar ediyor; asset'ler programatik prova düzeyinde, final değil.
+- Diğer dört dünya ve sayfa geçişleri uygulanmadı (dosyalar korunuyor).
+
+POPUP-001 TESLIM_HAZIR — kanıt `~/Documents/Codex/carsamba-popup001/out/`; commit/push yok.
+
+## POPUP-002 (2026-10-03) — Pop-up arka plan entegrasyonu: teknik kanıt
+
+### Yöntem
+- `build/make_bg_layers.py` (A yolu, bırakıldı):
+  - gök: satır medyanı + gren ile bulut/kuş temizliği, en düşük hatalı dikiş yoluyla dikişsiz karo;
+  - manzara: alt kenara bağlı kara parçası alfası, dikişsiz karo (610 px);
+  - `make_long_strip.py`: Poisson klonla 4 karoluk şerit.
+  - Sonuç: dikişsiz ama yer işaretleri ~343 ekran px'te tekrar ediyor; şeritte silüet/orman 610 px'te tekrarlı, klon lekeleri var. Kanıt: `out/motion/popup2-ardisik-12-ekran.png`, `popup2-hareket-film-seridi.png`.
+- `build/make_backdrop.py` (B yolu, seçildi):
+  - kaynağın 0–1500. satırları (sayfa kâğıdı hariç);
+  - gökteki bulut ve kuşlar temizlendi (gren kaydırmalı doldurma), manzara pikselleri orijinal;
+  - üstte 120 satırlık ayna gök dolgusu → 850×1620 JPEG (q88, 323 KB).
+- `motion_compare.py`: A ile B'yi 3 kamera yüksekliğinde (topY −320/0/+320) ve camX 0–10800 boyunca karşılaştırıyor (`out/motion/popup2-A-vs-B-*.{png,gif}`).
+
+### Render (`app/index.tsx`, yalnız POPUP dalı)
+- Tepe karoları (`puHills*`) ve eski çizgi roman bulutları kaldırıldı.
+- Mat: ekran-uzayı tek `Image`, yükseklik `H·1620/1500`, ortalanmış; `translateY = clamp((ref − camYR)·zoom·0.10, 0, 56)`.
+- Bulutlar: 3 sprite, ayrı yatay parallax (0.035/0.05/0.08), ekran dışında sarılıyor (span = W + genişlik + 40, aynı anda tek kopya), y = 222/300/372 (güneşin altında).
+- Güneş aynı dikey kaymayla hareket ediyor. Kök gök rengi `#0075b7`. Sayfa zemini rengi `#f2d2a9`.
+- `StartCover` popup dalı matı kullanıyor. "Hazır" kapısındaki `background` işareti mat yüklenince veriliyor. Önyükleme listesi güncellendi.
+
+### Değişmeyen
+- `src/` altındaki tüm dosyalar SHA-256 aynı.
+- `app/index.tsx` blokları tur başı yedekle metin olarak AYNI: `makeNextPlatform`, `initWorld`, düşüş/Game Over, kamera, `worldStyle`, `onPressIn`, `PlatformView`, `PopupHouseView`, `PlatformHouseView`.
+
+### Testler
+- `tsc`: 0 hata (theme.ts hariç). Worklet regresyonu: PASS. `expo export --platform ios`: PASS. `git diff --check`: temiz.
+- Canlı Expo web (390×844), seed A, B ve 31337:
+  - başlangıç, alçak (seed B: sayfa zemini görünür), yüksek (seed 31337), tam basış uçuşu (1300–1400 ms) ve Game Over/Play Again;
+  - sayfa/konsol hatası yok; bulut ve güneş çakışması düzeltildi.
+- Asset yükleme: 4 yeni dosya, toplam ≈0.4 MB; mat başlangıç karesinde yüklenmiş geliyor (`live2/*_00_start.png`).
+- FPS: bu oturumda headless Chrome 30 Hz'e kısıtlıydı. Popup p50 33.3 ms; aynı koşulda İstanbul modu da p50 33.3 ms. Fark yeni arka plandan değil, ortamdan. 5× Play Again: 5/5.
+- İstanbul anahtarı: geçici `"istanbul"` → canlı başlangıç karesi alındı (`out/istanbul_switch/`), sonra `"popup"`a geri alındı.
+- Gözle kontrol (motion GIF): dikiş yok, çift bulut yok, gömülü kuş yok. Manzara ile sayfa zemini dikey kamerada kopmuyor: zemin dünyaya bağlı ve manzaranın önünde; manzaranın alt kenarı her zaman ekranın altında.
+
+### Açık riskler
+- HUD skor yazısı koyu gökte düşük kontrastlı.
+- Manzara yatayda sabit; derinlik hissi yalnız bulut ve kuş hareketinden geliyor.
+- Onay panosundaki altı vaka canlıda birebir yeniden üretilmedi; canlıda aynı koşul sınıfları (başlangıç/alçak/yüksek/uçuş/Play Again) üç seed'le doğrulandı.
+- iPhone'da görülmedi; JPEG mat iOS'ta `resizeMode stretch` ile ölçülmedi.
+
+POPUP-002 TESLIM_HAZIR — commit/push yok.
+
+### POPUP-002 kabul düzeltmesi — HUD kontrastı
+- Değişiklik: `scoreText`/`bestText`/`hintText` yerinde kaldı. Yalnız `POPUP` doğruyken eklenen `puScoreText`, `puBestText`, `puHintText`:
+  - beyaz metin;
+  - gölge `rgba(16,24,40,0.85–0.9)`, kayma 1–2 px, yarıçap 2–3;
+  - ipucu zemini `rgba(20,28,44,0.62)`, köşe yarıçapı 12.
+  - Font boyutu ve HUD konumu aynı.
+- Ölçüm (canlı `live3-hud/A_00_start.png`, skor arkasındaki gök medyanı (0,116,181)):
+  - eski koyu skor 2.0:1 → beyaz 5.04:1;
+  - ipucu zemin üzerinde 11.3:1.
+- Canlı Expo web, seed A ve B: başlangıç, tam basış uçuşu, Game Over → Play Again; sayfa hatası yok. Game Over kartı kendi beyaz zemininde, değişmedi.
+- `tsc`: 0 hata. `expo export --platform ios`: PASS. `git diff --check`: temiz. `src/` SHA-256 aynı.
+- Yedek: `~/Documents/Codex/carsamba-popup002/yedek/index-before-hudfix.tsx`.
+- Doğrulanmadı: iPhone'da gerçek parlaklık ve gerçek ekranda gölge görünümü.
+
+## ISTANBUL-GERIDONUS-001 (2026-10-05) — geri dönüş kanıtı
+- Tur başı yedek: `~/Documents/Codex/carsamba-istanbul-geridonus-001/yedek/index-popup-active.tsx`, `scope_start.txt`.
+- Diff: yalnız `app/index.tsx` satır 157 (`VISUAL_MODE` → `"istanbul"`, `as` yazımıyla). Tur sonu kapsam farkı yalnız bu dosya; `src/` ve `assets/` SHA-256 aynı.
+- Not: anahtar düz `"istanbul"` literal'iyle yazılınca `tsc` TS2367 veriyordu (sabit karşılaştırmanın daraltılması). POPUP-002'deki geçici geçişlerde `tsc` çalıştırılmamıştı; şimdi `as` yazımıyla iki değerde de derleniyor.
+- Testler: `tsc` 0 hata (theme.ts hariç); `expo export --platform ios` PASS; `git diff --check` temiz.
+- Canlı Expo web, seed A (1700001200000/0.25): İstanbul başlangıcı, tam basış (1400 ms) uçuş karesi, Game Over → Play Again; sayfa hatası yok.
+- iPhone'da görülmedi.
+
+## REVIZYON-055 (2026-10-05) — teknik kanıt
+
+### Yöntem
+- Video: `cv2` ile 4 pencere (15,6–18,4 / 38,6–41,4 / 25,4–28,6 / 34,0–36,4 s) ve kalkış penceresi 32,4–34,15 s kare kare çıkarıldı (`video/w1..w5_*.png`). Kayıt karartılmış ve HUD okunmuyor; şarj yüzdesi videodan çıkarılamadı.
+- Simülasyonlar (gerçek `procedural-course`, `jump`, `landing`, `config`, `render-camera` modülleri; ts.transpile + vm; 60 fps):
+  - `sim/landing_reach.cjs`: 4800 atlayış; %23,1'i ilk platformu aşıyor; kalkış→iniş evi sonu mesafesi p50 651, en çok 966 dünya birimi (ekran 629).
+  - `sim/camera_target_visibility.cjs`: ilk platformu aşan 1597 başarılı iniş; iniş evinin %60'ı ekrana girdiğinden inişe kadar geçen süre (önce → sonra):
+
+    | Ölçüt | Önce | Sonra |
+    |---|---|---|
+    | p10 | 0,45 s | 0,63 s |
+    | p50 | 0,58 s | 0,72 s |
+    | 0,75 şarj ort. | 0,59 s | 0,81 s |
+    | 1,0 şarj ort. | 0,57 s | 0,67 s |
+
+    Oyuncu ekranın en az %13,5 içinde kalıyor, iki sürümde de aynı.
+  - `sim/fall_coverage.cjs`: 4400 kalkış, X+Y render kamerası, Game Over tetiğine kadar. İlerideki evlerden en az birinin görünen ön yüz payı (önce → sonra): p5 %20,6 → %20,9; ekranın %12'sinin altına inen durum 4 → 0. Kadrajda hiç ev olmayan kare: iki sürümde 0.
+  - Komşu platform düşüşü en çok 203 dünya birimi < ekranın görünen alt payı 449 (`/tmp/r055_delta.cjs` çıktısı rapora işlendi).
+- Ara ret: hedef sığmadığında "oyuncuyu yakın sınırda tut" kuralı tam şarjda hedefi geç gösterdi (1,0 şarj: 0,57 → 0,53 s). Orta nokta korunup R046 ileri bakışı birleştirildi.
+- Denenip bırakılan: uçuş Y koridoru alt sınırı 0,90 → 0,80/0,84. Ek fayda ölçülmedi, uygulanmadı.
+
+### Kod (`app/index.tsx`)
+- `predictLandingTarget` (top-level worklet): kapanışında yalnız `advanceFlight` ve `findFootLanding` var; babel-preset-expo iOS derlemesinde `__workletHash` doğrulandı. En çok 300 adım, yalnız kalkışta bir kez çalışıyor.
+- `flightTgtX0/X1/Valid` SharedValue'ları: yalnız render kamerası okuyor.
+- `onPressOut`: `flightTargetY` artık tahmin edilen evin `topY`'si; ilk ileri platform yalnız tahmin bulunamazsa kullanılıyor.
+- X bloğu: AIRBORNE iken koridor = oyuncu ± 30 ∪ tahmin edilen ev ∪ R046 hız önden bakışı; `xBlend = max(vx-blend, smoothstep((hedefSonu − (camXR + 0.88·görünüm)) / 300))`. Durma, iniş ve DEAD dalları eskisiyle aynı.
+- Arka bant: `BACK_DISTRICT_SCALE` 0.78, `BACK_DISTRICT_PARALLAX` 0.8, pus `rgba(180,208,226,0.30)`.
+- Yedekle metin olarak AYNI bloklar: `makeNextPlatform`, `initWorld`, airborne fizik, fall → game over, fizik kamerası, `PlatformView`, `PlatformHouseView`, `PopupHouseView`. `src/` ve `assets/` SHA-256 aynı.
+
+### Testler
+- `tsc`: 0 hata. Worklet regresyonu: PASS. `expo export --platform ios`: PASS. `git diff --check`: temiz. `VISUAL_MODE` = istanbul.
+- Canlı Expo web (390×844), aynı seed/basış dizileri önce (yedek) ve sonra:
+  - A 1400/400/1400; 31337 1400/1000/1400; B 1400/400; 2026 330×4;
+  - sayfa hatası yok.
+- 5× Play Again: 5/5. Kare süresi p50 33,3 ms: bu tarayıcı ortamı 30 Hz kısıtlı; POPUP-002'de değişmemiş İstanbul modu da aynı değeri vermişti.
+
+### Açık riskler
+- iPhone'da doğrulanmadı.
+- Ardışık hızlı atlayışlarda oturmamış Y kamerası hipotezi test edilmedi.
+- Gerçek kare süresi değişken; tahmin 1/60 adımla yapılıyor. Fizik farklı adımla iner, sapma küçük ve yalnız görsel.
+- Arka bant adayı ölçülü; "tek şehir" kabulü için yeni asset veya cephe tasarımı gerekebilir.
+
+## REVIZYON-056 (2026-10-06) — teknik kanıt
+
+### Video ölçümü
+- `video/flow.json`: 1320×2868 kayıt, alt bölge (y 1900–2700) 660×400'e küçültülüp kareler arası `cv2.phaseCorrelate`; ekran pt/s = dx·2·fps/3,385.
+- 0,1 s ortalamaları:
+  - 13,2–14,4 s: −320, −362, −274, −328, −219, −194, −149, −236, −180, −285;
+  - 39,5–40,8 s: −102, −257, −393, −291, −217, −168, −194, −235, −209, −238, −254.
+- Bölge, arka katmanların parallax'ını da içerdiği için değerler karışık; ama aynı uçuş içinde hızın inip yeniden artması belirgin.
+
+### Kök neden (gerçek kod, `sim/xcam_profile.cjs`)
+- Gerçek `procedural-course` / `jump` / `landing` / `config` / `render-camera`; app/index.tsx R055 X bloğunun birebir kopyası (koridor + `need` harmanı + R046 önden bakış + `smoothRenderTarget` + `stepRenderAxis`).
+- Yeniden hızlanma tanımı: hız tepeden %8 düştükten sonra yerel minimumun %8 + 5 pt/s üstüne çıkması.
+- R055: 1132 inişin %68,2'sinde.
+- Simülasyon hatası yakalandı ve düzeltildi: ilk sürümde oyuncu inişten sonra durmuyordu; iniş sonrası ölçüm ancak düzeltmeden sonra geçerli.
+
+### Değişiklik (`app/index.tsx`)
+- `predictLandingTarget` artık `{ i, x, steps }` döndürüyor; `camEase` (beşinci derece eğri) worklet olarak eklendi.
+- `CAM_PLAN_ARRIVE = 0.62`, `CAM_PLAN_SAFE = 0.12`.
+- `onPressOut`: plan başlangıcı = `camXRTarget`; bitiş = `max(başlangıç, corridorTarget(max(camX, x − DZ·görünüm), min(x − 30, sonraki.x), max(x + 30, sonraki.x + w), 0.14·görünüm, 0.88·görünüm))`; süre = adım/60.
+- X bloğu, AIRBORNE ve tahmin geçerliyken: `tX = min(plan, max(başlangıç, px − 30 − 0.12·görünüm))`, takip parametreleri uçuş değerlerinde sabit, `camXRTarget = tX` (ikinci filtre yok). Duruş, iniş ve DEAD dalları R055 ile aynı.
+- Arka bant: `SHOW_BACK_DISTRICT` (false). District'e ait 4 katman grubu ve StartCover district karoları bu anahtara bağlı. "Hazır" kapısı: band kapalıyken district yüklemesi beklenmiyor.
+- Silüet: master resmin 1298–1672. satırları ayna + düz (941×748), Gauss σ 1,6, %40 doygunluk düşüşü, %38 pus (176,196,206), ilk 24 satırda master'ın son satırından yumuşak geçiş. `bgFarStyle` kabının altına `top: 100%`, yalnız band kapalıyken; önyükleme listesinde.
+- Yedekle metin olarak AYNI: `makeNextPlatform`, `initWorld`, airborne fizik, fall → game over, fizik kamerası, `PlatformView`, `PlatformHouseView`, `PopupHouseView`. `src/` SHA-256 aynı; `assets/` içinde yalnız silüet eklendi.
+
+### Ölçüm ve testler
+- Varış oranı taraması (SAFE 0,12):
+  - 0,62 → p10 0,650 / p50 0,733 s;
+  - 0,75 → 0,617 / 0,700 s;
+  - 0,85 → 0,583 / 0,650 s.
+  - Güvenlik sınırı olmadan 0,62'de oyuncu en sol 0,045'e düşüyordu; sınır 0,179'da tutuyor.
+- `predictLandingTarget` maliyeti (kalkışta bir kez, tam şarj, 14 platform): V8 JIT 15,0 µs, `--jitless` 49,8 µs.
+- `tsc`: 0 hata. Worklet regresyonu: PASS. `predictLandingTarget` ve `camEase` worklet olarak derleniyor. `expo export --platform ios`: PASS. `git diff --check`: temiz.
+- Canlı Expo web (390×844): seed A, 31337, 2026, B için R055 / R056-band-açık / R056-band-kapalı / band-kapalı-silüetli; sayfa hatası yok.
+- FPS: p50 16,7 ms, >33 ms kare 0/1/1. 5× Play Again: 5/5.
+
+### iPhone'da doğrulanmayanlar
+- Gerçek cihazda kamera hissi (tek tepe, daha yüksek tepe hız).
+- Silüetin görünümü ve dikişi.
+- Değişken kare süresinde planın akışı: plan süresi 1/60 adımla tahmin ediliyor; gerçek uçuş farklı süren karelerle aynı fiziği izliyor.
+
+## REVIZYON-057 (2026-10-06) — teknik kanıt
+
+### Video (`~/Documents/Codex/carsamba-revizyon057/video/`)
+- Montajlar: `s04_24.png`, `s24_36.png` (geçiş ve Game Over zamanları).
+- İzleme: `track.py` → `track.json`. `cv2.goodFeaturesToTrack` + `calcOpticalFlowPyrLK` (y 1500–2750); |dx| üst yarısının medyanı; ekran pt/s = px/3,385·fps. Her karede MAD tutarlılık kaydı. Faz-korelasyon kullanılmadı (brief'teki uyarı).
+- Pencereler: normal 30,45–31,9 s; tam basış 24,65–26,7 s; uzun 33,75–35,9 s; ölüm 21,2–23,1 s.
+
+### Simülasyon (`sim/`)
+- `cam_transitions.cjs`: gerçek `procedural-course`, `jump`, `landing`, `config`, `render-camera`; app/index.tsx'teki R055 ve R056 X/Y render kamerası (plan, sınır, devir, duruş, DEAD; Y koridoru + `preLandBlend`), fizik kamerası, Game Over tetiği. Değişken dt: 30/60/120 fps, 0,35 s'de 50/100/150 ms takılma, inişten 20 ms önce 100 ms takılma.
+- Çalışma: 5 seed × 60 kalkış × şarj 0,3/0,6/0,85/1,0.
+- Bulgular:
+  - `breakdown.cjs`: R056'nın kalan yeniden hızlanmalarının tamamı DEAD geçişinde.
+  - `where_decel.cjs`: en sert frenin kaynağı inişteki sınır değişimi.
+  - `landed_metrics.cjs` → `landed_v1/v2/final.json`: değerlendirilen varyantlar: plan profili (beşinci derece varış 0,62 / 0,85 / 1,0; yumuşak yamuk 0,3–0,5 rampa) ve devir. Profil değişikliği frenin p95'ini düşürmedi (≈1300–1550). Yalnız devir: 3648 → 1260 pt/s², sert durma %5 → %0.
+
+### Kod
+- `CAM_HANDOFF_S = 0.5`.
+- `camHandoff` SharedValue: planlı uçuşta 0'a ayarlanıyor; planlı olmayan uçuşta 0,5'e (devre dışı).
+- Duruşta veya DEAD'de her karede +dt; `pBlend = max(xBlend, 1 − smoothstep(camHandoff/0,5))`. Yalnız X takipçisinin `smoothTime`/`maxSpeed`/`maxAccel` değerlerini etkiliyor; hedef ve önden bakış `xBlend` ile aynı.
+- Diff 27 satır.
+- Yedekle metin olarak AYNI: `makeNextPlatform`, `initWorld`, airborne fizik, fall → game over, fizik kamerası, `onPressOut`, `PlatformView`, `PlatformHouseView`, Y render kamerası bloğu. `src/` ve `assets/` SHA-256 aynı. `SHOW_BACK_DISTRICT = false`, `VISUAL_MODE = istanbul` değişmedi.
+
+### Canlı web
+- `recvideo.py`: Chrome CDP screencast; zaman damgalı ~820 kare/sürüm, ~55 fps; ffmpeg indirilmedi.
+- Seed 31337, basış 1400/1000/1400 ms, R056 (yedek) ve R057. `track_web.py` → `web_track.json`.
+- 0,1 s ortalamaları:
+  - atlayış 1, R056: … 158, 85, 28, 4, 0; R057: … 127, 62, 30, 15, 7, 4, 2, 1.
+  - atlayış 2, R056: … 197, 97, 0; R057: … 133, 65, 30, 15, 7, 4.
+  - atlayış 3 (ölüm): iki sürümde aynı salınım; DEAD dalı değiştirilmedi.
+  - Tekil 1129 / 577 değerleri izleme gürültüsü.
+- Kanıt: `out/1-canli-kamera-hiz-once-sonra.png`, `out/2-canli-kareler-atlayis1/2.png`.
+
+### Testler
+- `tsc`: 0 hata. Worklet regresyonu: PASS. babel-preset-expo iOS derlemesi: OK. `expo export --platform ios`: PASS. `git diff --check`: temiz.
+- FPS: p50 16,7 ms (idle 0, normal 1, tam şarj 1 kare > 33 ms). 5× Play Again: 5/5, sayfa hatası yok.
+
+### Doğrulanmayanlar / açık
+- iPhone'da kamera hissi (ProMotion 120 Hz dahil).
+- Uçuş içi plan şekli (erken tepe + sınır düzlüğü) değişmedi.
+- DEAD geçişindeki ikinci hareket değişmedi.
+- Uzun atlayış video penceresinde izleme güvenilirliği düşük (MAD p90 95).
+
+## REVIZYON-058 — Codex teknik inceleme / cihaz testi bekliyor (2026-10-08)
+Kaynak karşılaştırması: /Users/bekirurazonturk/Downloads/ScreenRecording_10-07-2026 12-18-45_1.MP4 (Spring Ninja) ve /Users/bekirurazonturk/Downloads/ScreenRecording_10-08-2026 13-10-35_1.MP4 (Carsamba), ikisi de 1320×2868. Spring kaydında 26–50s arası 47/47 örnekte koyu oyuncu siluetinin bağlı bileşen merkezi x=422px, std=0px; bu yalnız o kayıt/bölüm için görsel ölçümdür. Carsamba'nın R056/R057 X yolu (tahmini iniş planı, hedef harmanlama, handoff) kaldırılıp camXR her canlı karede max(eskiX, px - 0.32W/zoom) oldu. Y reseti X'i geri çekmez. Zoom 0.62→0.40 yalnız render kompozisyonunu etkiler; sprite+platform birlikte küçülür. GORSEL-017 karakter boyu hesabı %11*(0.40/0.62)=~%7.1. Bu ölçek tercihi cihazda görsel kabul edilmedi; kullanıcı isterse iki kamera/config dosyası yedekten dönebilir. Korunanlar: jump.ts, landing.ts, procedural-course.ts, charge, score, kamera Y. Doğrulama: iOS export PASS (1589 modül), worklet order PASS, git diff --check PASS; tsc yalnız mevcut src/theme.ts 116/126 hataları. Web ekran görüntüsü alınamadı (headless Chrome bu ortamda exit 134), iPhone video testi gerekiyor. Commit/push yok.
+## REVIZYON-059 — Codex iPhone video karşılaştırması (2026-10-08)
+TESLIM_HAZIR — kaynak `ScreenRecording_10-08-2026 15-32-18_1.MP4`; ilk ~90 sn Carsamba, son bölüm Spring Ninja. R058 yatay oyuncu çıpası yaklaşık %32 ile referansın yönünü yakaladı. Kalan belirgin kamera hatası dikey: Carsamba uzak sahne özelliklerinin 0,2 sn aralıklı örneklerinde ~5–26 native px Y kayması görülürken Spring Ninja'nın stabil oynanış örneklerinde ~0 px. Görsel render-Y hayat başında sabitlendi; uçuş/iniş Y tahmin ve takip yolu kaldırıldı. Game Over eşik hesabı görünen sabit kadraja bağlandı. Jump/landing/charge/score/procedural geometry/RNG ve yatay render kamera değiştirilmedi. 440×956 logical analitik sınırda en yüksek kule üstünden tam şarj apeks ayak konumu ekranın %29,4'ü, en alçak kule tepesi %80,4'ü; bu cihaz testi yerine geçmez. iOS export PASS, worklet sıra regresyonu PASS, diff whitespace temiz; tsc yalnız mevcut `src/theme.ts` 116/126 hataları. Çatı ile platformun görsel uyumu hâlâ açık ve kamera değişikliğinden ayrı incelenmeli. Önceki kamera kopyası `shared/backups/camera-fixed-y-2026-10-08/`; karşılaştırma görseli `shared/camera-r059-comparison.jpg`. Commit/push yok; yeni iPhone kabul kaydı bekleniyor.
+
+## REVIZYON-060 (2026-10-12) — takılma teşhisi: teknik kanıt
+- Video (`~/Documents/Codex/carsamba-revizyon060/video/`):
+  - `pts.json`: cv2 `CAP_PROP_POS_MSEC`, 4780 kare. Aralık p50 16,67 ms, p95 33,33 ms; > 33 ms: 105, > 100 ms: 59, en büyük 567 ms.
+  - `gaps.py` → `gap_analysis.json`: boşluk öncesi/sonrası 6'şar kare çiftinde LK ile dünya kayma hızı (y 1200–2700, |dx| üst yarı medyanı) ve boşluk boyunca kayma; etkin oyun süresi = kayma / hız.
+
+    | Boşluk | Etkin oyun süresi |
+    |---|---|
+    | 29,703 s (250 ms) | 17 ms |
+    | 36,153 s (250 ms) | 0 ms |
+    | 72,507 s (317 ms) | 17 ms |
+    | 65,49 s (283 ms) | 17 ms |
+    | 45,505 s (150 ms) | 17 ms |
+    | 79,757 s (183 ms) | 17 ms |
+    | 26,252 s (133 ms) | 0 ms |
+    | 57,705 s (150 ms) | 134 ms (kısmen kaydedici) |
+    | 51,988 s | hareket yok (durağan) |
+    | 11–13 s | hareket yok (durağan) |
+
+  - `gap_frames.png`: hareketli boşlukların hepsi uçuş alçalmasında.
+- Kod: `useFrameCallback` dt sınırı 1/30 (donmadan sonra en fazla 2 kare yetişme). Boşluk sonrası 1 kare ilerleme, kare geri çağrısının o süre çağrılmadığı (UI thread bloke) okumasıyla uyumlu; tam bir profil değil.
+- Simülasyon `sim/pool.cjs` (gerçek procedural + spawn/cleanup kuralı, zoom 0,40, W 390/430/440, 8 seed, 72 000 kare):
+  - liste uzunluğu en fazla 10;
+  - liste olayı başına değişen slot: indeks eşlemesi 4,74, kimlik eşlemesi 1,03;
+  - kimlik çakışması 0.
+- Web vekil (`probe.py`, Chrome, oyun koduna dokunmadan MutationObserver ile kare başına `style` mutasyonu + rAF kare süresi): sonuçlar GAME_STUDIO.md tablosunda (`out/probe_{once,sonra}_{A,H}.json`).
+- Kod değişikliği: `slotPlatform(list, slot)` ve `platformById(list, id)` worklet'leri (POOL'dan sonra); 13 `platforms.value[index]` erişimi `slotPlatform(platforms.value, index)` oldu; `PlatformHouseView` komşuları `platformById(list, p.id ± 1)`. Diff 50 satır, başka dosya değişmedi.
+- Doğrulanmayanlar:
+  - iPhone kare süresi dağılımı;
+  - Expo Go'da UI/JS thread ayrımı (Instruments/perf monitor yok; simülatöre Expo Go kurulmadı).
+
+    Kullanıcı kaydında hedef: uzun atlayış alçalmasında 150–300 ms donmaların kaybolması.
+
+## REVIZYON-061 (2026-10-12) — teknik kanıt
+- Video (`~/Documents/Codex/carsamba-revizyon061/video/`):
+  - `pts.json`: 4549 kare; aralık p50 / p95 / max = 16,67 / 16,67 / 33,3 ms.
+  - `houses.py` → `tops_*.json`: kare başına çatı profili, 330 sütun, `R ≥ B + 4` ve açma işlemi. Komşu karelerin kamera kayması en küçük medyan farkla bulunuyor; ≥ 14 sütun ve > 25 satırlık sapma "pop" sayılıyor. 0,5–75,8 s'de 11 aday; hepsi Game Over/Play Again (görsel doğrulama `ev_0_45.png`, `ev56.png`).
+  - `facade_pop.py`: cephe bloklarında hizalı artık. Karakter/Game Over dışı en büyük artıklar ev kenarlarının yinelenen kareden kaynaklı hizasızlığı (`facade_ev.png`); içerik değişimi yok.
+  - `fgflow.py` → `fg_*.json`: LK ön plan dx. Hareketli 1550+ iç karenin %13'ü ~0 (yinelenmiş) ve komşusu 2×; ilk hareketli kare 2–4× (23/43).
+  - R060 girdisi (`fg060_14.0_40.0.json`, kayıt boşlukları hariç): %16,7.
+- Kod / kaynak: Reanimated 4.5.1 `useAnimatedStyle` (`node_modules/react-native-reanimated/src/hook/useAnimatedStyle.ts` 486–604): `dependencies = [...Object.values(updater.__closure), __workletHash]`; değişince `stopMapper` + `startMapper`. `PlatformHouseView` stillerinin closure'ında render başına yeni `geom`/`colPos` var.
+- Web render sayımı (geçici `globalThis.__R061_phv`, sonra kaldırıldı): R059 yedeği, R060 ve R061 öncesi her bırakmada 14, her iniş/ölümde 14; memo sonrası 0/0.
+- Web vekil (`probe2.py`): kare süresi + stil mutasyonu, bırakma ve skor olaylarına hizalı. Sonuçlar GAME_STUDIO.md tablosunda (`out/p2_{once,sonra}_{A,H}.json`).
+- Değişiklik: `import { memo }`; üç havuz bileşeni `const X = memo(function X(...) {...});`. Başka satır değişmedi.
+- Testler: `tsc`, worklet, babel iOS, `expo export`, `git diff --check`, `perf.py` (p50 16,7 ms, > 33 ms 0/0/0, Play Again 5/5).
+- Doğrulanmayan: iPhone UI/JS thread profili. Hedef: yeni iPhone kaydında hareketli karelerdeki yinelenen kare oranı %13'ün belirgin altına ve kısa uçuşlarda kalkış yetişmesi 1 adıma insin.
+
+## REVIZYON-062 (2026-10-12) — teknik kanıt
+- Video: `video/pts.json` (3108 kare, p50 16,67 ms, max 33,3 ms); `s119.png` (11,6/11,8/11,9/12,0/12,2 s), `f_11.9.png` native.
+- Reanimated kaynağı: `node_modules/react-native-reanimated/src/mappers.ts` `extractInputs` (dizi, `isSharedValue`, `Object.prototype` düz nesne; fonksiyonlar taranmıyor); `hook/useAnimatedStyle.ts` `startMapper(fun, inputs)`, `inputs = Object.values(updater.__closure)`.
+- `closure_check.cjs`: babel-preset-expo, caller ios/metro, isDev false. Updater `__closure`'ında doğrudan `platforms` olanlar:
+
+  | Sürüm | PlatformHouseView | PopupHouseView | PlatformView |
+  |---|---|---|---|
+  | R060 | 0/13 | 10/10 | 3/3 |
+  | R061 | 0/13 | 10/10 | 3/3 |
+  | R062 | 13/13 | 10/10 | 3/3 |
+
+- Web A/B (aynı seed, 450 ms ×4; `out/web_r061_r062.png`): iki sürümde de evler hizalı → web bu hatayı yeniden üretmiyor; kanıt değeri yok.
+- Ritim: `video/fgflow.py` → `fg_0.5_51.5.json`.
+  - 18 segment; yinelenen kare 185/636 (kısa < 0,5 s: 4/28, uzun: 181/608).
+  - İlk hareket karesi ≥ 2 adım: 2/18.
+  - Ölçülen katman bu kayıtta evler yerine cap/silüet olduğundan R061 kaydıyla karşılaştırılamaz.
+- Testler: `tsc`, worklet, `expo export` (`/tmp/r062_export.log`), `git diff --check`, `perf.py` (Play Again 5/5).
+
+## REVIZYON-063 (2026-10-13) — teknik kanıt (kod değişikliği yok)
+- `video/pts.json`: 3545 kare, PTS p50 16,67 ms, en büyük 183 ms; > 20 ms boşluk 60 (21 s sonrası 41).
+- `video/layers.py` → `layers.json`: her ardışık kare çifti için LK.
+  - Ön plan evler: y 1700–2800, |dx| üst %40 medyanı.
+  - Arka mahalle: aynı bölgede alt %30.
+  - Uzak silüet: y 500–950.
+  - Ayrıca kare farkı ortalaması.
+- `video/chary.py` → `chary.json`: x 340–520 bandında kırmızı maske, en üstteki 150 px'ten büyük bileşenin y'si.
+- `video/analyze.py` → `flights.json`: uçuş segmentleri, adım = medyan(px/dt)/60.
+  - Sıfır-adım iç kare: dx < 0,3 adım ve fark < 1,5.
+  - Boşluk ilerlemesi: adım/dt·60.
+  - İlk hareket karesi / adım.
+- Parabol uydurma (karakter y, 3 tur aykırı ayıklama), a / 3000 px/s² beklenen. 3000 = g 2500 dünya·s⁻² × zoom 0,40 × 3 native/pt.
+
+  | t0 | Tür | a (px/s²) | Oyun/duvar | Artık std |
+  |---|---|---|---|---|
+  | 23,65 | yarım | 2966 | 0,994 | 5,6 |
+  | 28,19 | tam | 3026 | 1,004 | 3,7 |
+  | 31,39 | kısa | 3349 | 1,057 | 3,3 |
+  | 45,07 | kısa | 3031 | 1,005 | 4,7 |
+  | 35,84 | — | geçersiz | — | 91 (maske karışması) |
+  | 45,62 | — | geçersiz | — | 68 (maske karışması) |
+
+- 26,40–26,80 s kare tablosu: kalkış 26,435'te ev +37,3 px (3 adım), karakter de sıçrıyor. 26,668 / 26,702 / 26,752 / 26,785'te tüm katmanlar 0,0 ve fark 0,00; sonraki kareler +24,8 (2 adım).
+- Sınır: video, hesaplanmış ama sunulmamış kareyi kompozisyon ile kayıt örneklemesi arasında ayıramıyor. Cihaz profili yok; web bu davranışı yeniden üretmiyor.
+- Kod/test: `app/`+`src/`+`assets/` SHA-256 tur başıyla aynı. `tsc`, worklet, `expo export` (`/tmp/r063_export.log`), `closure_check` (13/13), `perf.py` (Play Again 5/5).
+
+## REVIZYON-064 (2026-10-13) — teknik kanıt (kod değişikliği yok, ENGEL)
+> [DÜZELTME — 2026-10-13] Kullanıcı takılmayı cihaz ekranında doğrudan gözlemliyor; kayıt kaynaklı olma ihtimali ve "kayıt kapalı tekrar" gereksinimi düşürüldü. Bkz. REVIZYON-064 (devam).
+- Süreç/manifest:
+  - `lsof`: 8081 PID 3831 (`expo start --lan --port 8081 --go`), 8082 PID 6650 (`… --no-dev --minify`, 11:59:21).
+  - `curl -H 'expo-platform: ios' localhost:8082` → `launchAsset.url …entry.bundle?platform=ios&dev=false&hot=false&lazy=true&minify=true…`.
+  - Video 2,0 s karesi (`video/qr_frame.png`): Terminal başlığında `--port 8082`, `exp://192.168.1.132:8082`.
+- PTS (`video/pts.json`): 2627 kare; > 45 ms 39; en büyükler 250 ms @ 0,0 (kayıt başı), 217 ms @ 42,97, 200 ms @ 23,985, 183 ms @ 27,887.
+- Katman ölçümü: `layers.py` / `chary.py` / `analyze.py` (R063'ten, kaynak yolu ve başlangıç 7 s) → `layers.json`, `chary.json`, `flights.json`.
+  - 19 uçuş.
+  - Boşluk içi ilerleme: 43/44 boşlukta adım ≈ 1,0 (beklenen dt·60 = 2–5).
+  - Parabol uydurma tablosu: tam uçuşlarda PTS zamanıyla 0,912–1,04 (çoğu 0,93–0,98); kare sırası zamanıyla 1,02–1,09. Gerçek oyun zamanı ikisinin arasında; tam uçuşlarda zaman kaybı var.
+- Konum dağılımı (tam uçuş, kalkış → iniş, 5 dilim): boşluk 11 / 7 / 7 / 10 / 9; sabit kare 24 / 25 / 23 / 21 / 23.
+- Kapsam: `app/`+`src/`+`assets/` SHA-256 tur başıyla aynı.
+- Doğrulanmayan: Metro istek logu; cihaz profili (Instruments Animation Hitches) — sonraki adım GAME_STUDIO.md'de.
+
+## REVIZYON-064 (devam, 2026-10-13) — teşhis aracı ve kanıt
+- `sim/list_events.cjs`: gerçek procedural/jump/landing/config; 8 seed × 5 şarj; fizik camX dead-zone; spawn (spawnAhead 500) / cleanup (removeBehind 260); uçuş başına liste değişimi: kısa 0,38, yarım 1,29, tam 2,78.
+- Kod: `PERF_PROBE`, `HOUSE_AB_FROZEN` (varsayılan false); UI-thread sayaçları (useFrameCallback `timeSincePreviousFrame`); liste değişimi karesi işaretleme; JS rAF ölçümü (`PerfProbeOverlay`). Bayraklar false iken çalışan kod yalnız `housePlatformsFrozen` atamasıdır (hayat başına bir kez).
+- Web A/B (8083, 10 × 600 ms): A uçuş 930 kare / > 25 ms 0 / liste 40 / yakın 0, JS max 83; B 929 / 1 / 40 / 0, JS max 183. Web takılmayı yeniden üretmiyor.
+- Bulgu: kullanıcının 8081 sunucusunun web paketi `PERF_PROBE` içermiyordu (eski transform); 8082 testten önce yeniden başlatılmalı.
+- Testler: `tsc`, worklet, `expo export` (`/tmp/r064b.log`), `closure_check`, `perf.py` (8083).
+
+## REVIZYON-064 — A ölçümü ve B hazırlığı (2026-10-13)
+- A videosu: 8547 kare, 154,56 s.
+- Üst bant okumaları (UI kare, >25, >40, max | uçuş kare, >25, liste, yakın | JS kare, >25):
+
+  | t | UI kare | > 25 | > 40 | max | Uçuş kare | > 25 | Liste | Yakın | JS kare | JS > 25 |
+  |---|---|---|---|---|---|---|---|---|---|---|
+  | 12 s | 230 | 8 | 3 | 60 | 102 | 6 | 5 | 4 | 272 | 2 |
+  | 20 s | 601 | 19 | 13 | 158 | 309 | 13 | 15 | 11 | 750 | 11 |
+  | 40 s | 1613 | 39 | 32 | 158 | 890 | 30 | 43 | 27 | 1920 | 35 |
+  | 60 s | 2663 | 65 | 53 | 158 | 1498 | 52 | 74 | 46 | 3096 | 59 |
+  | 80 s | 3712 | 87 | 72 | 158 | 2117 | 71 | 102 | 63 | 4263 | 85 |
+  | 100 s | 4756 | 111 | 91 | 158 | 2770 | 90 | 126 | 80 | 5438 | 104 |
+  | 120 s | 5762 | 137 | 110 | 158 | 3436 | 108 | 148 | 96 | 6634 | 136 |
+  | 140 s | 6796 | 158 | 127 | 158 | 4103 | 121 | 166 | 110 | 7808 | 155 |
+  | 150 s | 7258 | 168 | 136 | 158 | 4384 | 129 | 175 | 117 | 8407 | 168 |
+  | 154 s | 7433 | 171 | 139 | 158 | 4507 | 131 | 179 | 119 | 8645 | 171 |
+
+- Taban hesap: kapsam 2·179/4507 = %7,9; beklenen 0,079·171 = 13,6; gözlenen 119.
+- Uçuş türleri (`videoA/layers.py`+`analyze.py`, 5 s'den): tam 55 (iç kare 3889), yarım 4, kısa 5. Segment süresi kamera hareketinden; yaklaşık.
+- B: `index-064-B.tsx` = A + `HOUSE_AB_FROZEN = true`. `tsc`, worklet, `expo export` (`/tmp/r064B.log`). 8082 iOS paketinde B işareti var.
+
+## REVIZYON-064 — B ölçümü ve dar ev güncelleme düzeltmesi (2026-10-13)
+- B videosu: 9799 kare, 170,15 s, PTS medyan 16,67 ms. Üst bant (`videoB/ust_band.png`):
+
+  | t | UI kare | > 25 | > 40 | max | Uçuş kare | > 25 | Liste | Yakın | JS kare | JS > 25 |
+  |---|---|---|---|---|---|---|---|---|---|---|
+  | 30 s | 1247 | 3 | 3 | 132 | 543 | 0 | 28 | 0 | 1299 | 19 |
+  | 90 s | 4323 | 19 | 16 | 167 | 2263 | 0 | 101 | 0 | 4856 | 73 |
+  | 150 s | 7368 | 35 | 30 | 167 | 4167 | 0 | 189 | 0 | 8367 | 138 |
+  | 165 s | 8201 | 38 | 32 | 167 | 4632 | 0 | 212 | 0 | 9267 | 153 |
+  | 169,5 s | 8413 | 39 | 33 | 167 | 4762 | 0 | 219 | 0 | 9512 | 155 |
+
+- Uçuş türleri (`videoB/layers.py`+`analyze.py`): tam 41 (iç kare 3687), yarım 1, kısa 7. A: 55/4/5. Video "sıfır adım" oranı A 708/3889, B 785/3687 — bu ölçüt A/B'yi ayırmıyor.
+- Kaynak okuması: `useAnimatedStyle` → `styleUpdater`, animasyonsuz değerlerde `shallowEqual(oldValues,newValues)`; `houseStyle.transform` her çalışmada yeni dizi → her liste değişiminde 14 `updateProps`. `useDerivedValue` her çalışmada değer yazıyor (eşitlik atlaması yok), bu yüzden kapı `useAnimatedReaction` ile yapıldı. Mapper sırası `outputs` yoksa ekleme sırası; reaction her evde stillerden önce tanımlı.
+- Kod: `PlatformHouseView` içinde `houseGeom` + `useAnimatedReaction`; 13 stil `houseGeom.value` okuyor. Başka bölüm değişmedi; `PERF_PROBE`/`HOUSE_AB_FROZEN` false.
+- Kanıt: `closure_check_064.cjs`; `align_web.py` (düzeltme 0/37602, B kontrol 14074); `house_writes_web.py` + `cnt_*.tsx` (houseStyle 784→106, DOM ev yazımı 2023=2023); `perf.py` 5/5; export `scratchpad/export064b.log` çıkış 0.
+- Açık: cihazda düzeltme sonrası sayaç ölçümü yok; yarım basış örneklemi zayıf; uçuş dışı 39 UI > 25 ms incelenmedi.
+
+TESLIM_HAZIR: REVIZYON-064 — B ile ev aboneliği maliyeti doğrulandı; liste değişiminde yalnız değişen ev slotları güncelleniyor; R062 hizası her karede korunuyor; overlay kapalı; iPhone kabulü bekleniyor; commit/push/deploy yok.
+
+## Revizyon denetimi R062–R064 (2026-10-13)
+- Kural: `shared/CLAUDE_COORDINATION_PROTOCOL.md` §"Her yeni oyun videosunda revizyon denetimi"; ayrıntılı istek tablosu `GAME_STUDIO.md` aynı başlık.
+- Özet:
+  - **Yapıldı (cihaz kanıtlı):** R062 havada çizgi düzeltmesi (R063/R064 videoları); R064 A/B (uçuş > 25 ms 131 → 0).
+  - **Kısmi:** R062 cihaz debug konturu (derleme analizi ile ikame); R063 kayıt/kompozisyon ayrımı; R064 üretim modu (manifest+süreç, log yok).
+  - **Yapılmadı:** "iniş sonu"na özgülük ölçümle doğrulanmadı (dağılım uçuş boyunca eşit).
+  - **Cihazda doğrulanmadı:** R064 dar düzeltme (web: hizasız cap 0/37602, houseStyle 784→106).
+- Yeni ölçüm (bu tur, aynı `analyze.py`): kalkışta ilk kare ≥ 2,5 adım — A 11/64 (yarım 3/4), B 1/49 (yarım 0/1).
+- Ölçüm varyantı: `revizyon064/index-064-fix-probe.tsx` = mevcut kod + `PERF_PROBE = true` (tek satır fark).
+- Kabul ölçütleri K1–K5: `GAME_STUDIO.md`.
+
+TESLIM_HAZIR: Revizyon denetimi R062–R064 — kod teslimleri iPhone kabulünden ayrıldı; R064 düzeltmesi iPhone kabulü açık (K1–K3); commit/push/deploy yok.
+
+## REVIZYON-064 — C videosu denetimi ve 8082 zinciri (2026-10-13)
+- C videosu (262,4 s): 20 s'de sayaç sıfırdan başlıyor (UI 465). Yani yeni açılış, ama etiket B. 260 s: uçuş 8050 / > 25 ms 0 / liste 355 / yakın 0. Kabul sayılmadı.
+- Neden:
+  - PID 5253'ün manifest `launchAsset.url`'si (`transform.bytecode=1`, `unstable_transformProfile=hermes-stable`) bayat B paketini veriyordu (md5 ee2b0efa…). Disk değişikliğinden sonra da değişmedi.
+  - Önceki doğrulamam farklı URL'ye bakmıştı (hatalı yöntem; düzeltildi).
+  - LAN IP .132 → .104.
+- Onarım: `--clear` ile yeniden başlatma. Yeni launch URL paketi: B 0, `R064: EV SLOT KAPISI` 1, `houseGeom` var (md5 8a30544a…).
+- Geçici: `PERF_PROBE = true`, `HOUSE_AB_FROZEN = false`, overlay etiketi `[R064: EV SLOT KAPISI]`. K1 sonrası `PERF_PROBE = false`.
+- Açık: K1–K3 (GAME_STUDIO R065 kabul ölçütleri).
+REVIZYON-064 C — ölçüm bekleniyor; kabul açık; commit/push/deploy yok.
+
+## REVIZYON-065 — R064 düzeltmesi cihazda başarısız; ayrıştırıcı sayaç (2026-10-13)
+- D videosu `16-58-32` (183,3 s): uçuş 4958 / > 25 ms 164 / liste 220 / yakın 142 (182 s). Codex okumaları doğru.
+- Değişim başına yakın takılma: A %66, D %65, B %0.
+- Uçuş türleri 56 tam / 9 yarım / 14 kısa. Kalkış ≥ 2,5 adım 15/79 (A 11/64, B 1/49).
+- Hiza 13 örnek karede iyi; kare düzeyinde değil.
+- Önceki varsayım "maliyet ∝ yeniden stillenen ev sayısı" çürüdü. B, değişen evin güncellemesini de kaldırdığı için bu iki payı ayırmıyordu. Web mapper sayısı native commit maliyetini ölçmüyordu.
+- Reanimated 4.5.1 `IOS_SYNCHRONOUSLY_UPDATE_UI_PROPS=false` → tüm updateProps commit yolundan (`performOperations → commitUpdates`) gidiyor. Bayrak Expo Go native kodunda.
+- Instruments: Xcode lisansı kabul edilmemiş; Expo Go App Store derlemesi Time Profiler'a muhtemelen kapalı.
+- Kod: R065 sayaçları (faz; uçuş takılmasının ev-görün/kaybol/kay-boy/liste-evsiz/olaysız ayrımı ve olay sayıları). Ev olay etiketi reaction `react` closure'ında. Web: 25/15/20 olay, 0 hizasız. tsc/worklet/export/diff temiz.
+- Telefona giden paket manifest `launchAsset` ile doğrulandı (FAZ/EV OLAY 1, B 0).
+- Açık: K1, K1a, K2 (kare düzeyi), K3. Geniş seçenekler (düzen dışı ev güncellemesi / dev build / Skia) kullanıcı kararı.
+REVIZYON-065 — ölçüm bekleniyor; R064 performans kabulü başarısız; commit/push/deploy yok.
+
+## REVIZYON-066 — ev-görün maliyeti ve gradyan deneyi (2026-10-13)
+- E videosu `17-38-22` (182,5 s): uçuş 5117 / > 25 ms 190 (%3,7) / liste 232 / yakın 155. Olaylar: ev-görün 117/119, ev-kaybol 33/115, ev-kay/boy 0/65 (çakışma nedeniyle yorumlanamaz), olaysız 40 (taban ≈ %0,8). Faz: bekle 44 / şarj 1 / uçuş 190.
+- Uçuş türleri 53 tam / 21 yarım / 10 kısa; kalkış ≥ 2,5 adım 4/10, 12/21, 7/53. Hiza 13 örnek karede iyi.
+- Zaman yönü: olay kare N mapper'ında; takılma N+1 başında N→N+1 aralığı olarak ölçülüyor. Ters nedensellik eşleşmeyi şişiremez. Çakışma: kay/boy her zaman görün/kaybol ile aynı karede.
+- Spawn/cleanup ekran dışında (`spawnAhead` 500, `removeBehind` 260).
+- `expo-linear-gradient` 57.0.1 iOS `LinearGradientLayer`: `needsDisplayOnBoundsChange = true`, `display()` → `UIGraphicsBeginImageContextWithOptions` CPU çizimi, sıfır boyutta atlama. Ev cephesindeki 2200 pt gradyanlar (%18/%28) görünmede sıfırdan çiziliyor. Desen (görün %98 / kaybol %29 / B %0 / R064 etkisiz) uyumlu.
+- Deney: `HOUSE_GRAD_FIXED = true`, `HOUSE_GRAD_W = 16`; ışık/gölge/saçak gradyanları sabit kutuda, genişlik `scaleX` transform. Web kutu farkı ≤ 0,004 px; hiza 0/36522; closure 16/16; tsc/worklet/export/Play Again/diff temiz. 8082 paketinde `GRADYAN SABIT KUTU` 1, B 0.
+- Kabul: K1, K1b (ev-görün ve ev-kaybol takılma oranı ≤ %5), K2 (ekrana giriş kareleri), K3, K4.
+REVIZYON-066 — iPhone ölçümü bekleniyor; commit/push/deploy yok.
+
+## REVIZYON-066 — iPhone sonucu (2026-10-14)
+- F videosu `12-11-21` (215,5 s). 215 s: uçuş 6720 / > 25 ms 0 / liste 295 / yakın 0; ev-görün 0/154, ev-kaybol 0/145, ev-kay/boy 0/77, olaysız 0; UI > 25 ms 4 (bekle), max 72; JS > 25 ms 292.
+- K1 ✅, K1b ✅ (R065: 190/5117, 117/119, 33/115). Gradyan CPU yeniden çizimi kök nedeni tek değişkenli deneyle doğrulandı.
+- K2: 14 giriş anı × 4 kare (`videoF/k2_*.png`); hizasız çatı/cap yok. Tam kapsam değil.
+- K3: 1/6 ölçek `phaseCorrelate` segmentleme + aday kalkışlarda tam çözünürlük LK (`fast.py`, `k3.py`). Geçerli 20 kısa/yarım kalkışta ≥ 2,5 adım 1 (33 ms PTS ile çakışık). Eşikte; seçim ve kapsam sınırlı.
+- Video: uçuşta "0 + 2 adım" deseni düzenli PTS ile var, UI sayacı 0. 120 Hz ekran / 60 fps kayıt vuruşu veya geç sunum ayrılamadı; his kullanıcıya ait.
+- Kod değişikliği yok. Açık: K3 tam, kullanıcı hissi, `PERF_PROBE` kapatma.
+TESLIM_HAZIR: REVIZYON-066 iPhone — K1/K1b geçti, K2 örneklemde geçti, K3 eşikte/kısmi, his açık; commit/push/deploy yok.
+
+## REVIZYON-067 — mikro-titreme A/B: gösterge açık/kapalı (2026-10-14)
+- Kullanıcı: kayıt kapalıyken de zaman zaman küçük titreme. R066 his maddesi başarısız. UI > 25 ms 0/6720 alt-eşik düzensizlikleri ölçmüyor.
+- B: `PERF_PROBE = false` + sabit `BUILD_TAG` ("R067-B: SAYAC KAPALI"). `HOUSE_GRAD_FIXED = true` aynı. Histogram eklenmedi (ayrı değişken).
+- Kontroller: tsc(app) 0, worklet PASS, closure 16/16, iOS export 0, web hiza 0/36546, gradyan kutu ≤ 0,004 px, Play Again 5/5, diff temiz.
+- 8082 `launchAsset` paketi: B etiketi 1, gösterge metinleri 0, B-donuk 0, sabit gradyan stilleri var.
+- Sonraki (B başarısızsa): Game Over'da gösterilen düşük maliyetli kare aralığı histogramı; 120/60 Hz hizalama; Instruments Animation Hitches. Hiçbiri bugün neden olarak kanıtlanmadı.
+REVIZYON-067 — B cihaz testi bekleniyor; commit/push/deploy yok.
+
+## REVIZYON-068 — R067-B sonucu, R068-DIAG (2026-10-14)
+- R067-B: kullanıcı gösterge kapalıyken titremenin sürdüğünü bildirdi. Paket sunucu tarafında doğruydu (md5 7f269122…); telefonda etiket teyidi yok.
+- R068: `FRAME_DIAG = true`, `BUILD_TAG "R068-DIAG"`, `PERF_PROBE = false`, `HOUSE_GRAD_FIXED = true`.
+  - Frame callback sonunda uçuş aralık kovaları (≤ 12 / 12–20 / 20–25 / > 25 ms), kamera ekran adımında "bekle+sıçra" (önceki < 0,35·EMA, şimdiki > 1,6·EMA; 6 zaman damgalı örnek, karakter X/Y adımı) ve ≤ 12→≥ 20 ms çiftleri.
+  - JS yalnız Game Over'da okur; kartta gösterir ve konsola yazar.
+- Testler: tsc(app) 0, worklet PASS, closure 16/16, export 0, diff temiz. Web 30 basış / 12 Game Over metin ve hata yok. Jitter enjeksiyonunda > 25 kovası 105/1171. Hiza 0/36442, gradyan ≤ 0,004 px, Play Again 5/5. 8082 paketi `R068-DIAG` var, R067-B/gösterge/B-donuk yok (md5 d350652b…).
+- Sınır: desen yakalayıcı web'de tetiklenemedi; uygulama döngüsü dışındaki sunum gecikmesini göremez; yük cihazda ölçülmedi.
+REVIZYON-068 — iPhone tanı verisi bekleniyor; commit/push/deploy yok.
+- R067-B teyidi (2026-10-14): kullanıcı titremeyi `R067-B: SAYAC KAPALI` etiketli sürümde gördü. Gösterge/sayaç yükü neden değil; R067-B başarısız. Tanı R068-DIAG ile sürüyor.
+
+## REVIZYON-069 hazırlığı — R068 sonucu ve sunum hipotezleri (2026-10-14, kod değişmedi)
+- R068-DIAG cihaz: uçuş 3004 kare hepsi 12–20 ms, bekle+sıçra 0, kısa→uzun 0. Video `14-33-04` 23–50 s tam çözünürlük LK: 876 iç karede 74 (%8,4) tam 0 + 2,00 adım, PTS 16,7 ms.
+- Kod: Reanimated/Worklets iOS kare zaman damgası `CADisplayLink.targetTimestamp`; `timeSincePreviousFrame` vsync'e kuantize, geç sunumu göremez. Display link 120 fps istiyor, ölçülen 60 Hz (Expo Go plist anahtarı varsayım).
+- Uçuşta React commit'i yok. Her kare transform'lar commit yolundan gidiyor (`IOS_SYNCHRONOUSLY_UPDATE_UI_PROPS = false`). Evde 2 döndürülmüş `overflow: hidden` kırpma (satır 2423/2425).
+- Hipotezler: H1 render (maske/GPU), H2 commit, H3 60 Hz/ProMotion faz, H4 React commit bekletmesi. Hiçbiri kanıtlanmadı.
+- Öneri: `HOUSE_ROOF_MASK_DIAG` ile satır 2026/2028 `overflow: visible` (R069-B); ölçüt video dur–sıçra ≤ %3 ve his. Olumsuzsa Instruments Animation Hitches / dev-client.
+- Kaynaklar: Apple Tech Talk 10855, 10856; QuartzCore ProMotion makalesi.
+REVIZYON-069 hazırlık — onay bekliyor; commit/push/deploy yok.
+
+## REVIZYON-069 — R069-B çatı maskesi A/B (2026-10-14)
+- Değişiklik `app/index.tsx`: `HOUSE_ROOF_MASK_DIAG = true`, `ROOF_MASK_OFF = { overflow: "visible" }` yalnız `houseRoofClipL/R` stil dizilerinde. `BUILD_TAG` "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)". 9 satır. Geri dönüş: bayrak false.
+- Testler: tsc(app) 0, worklet PASS, closure 16/16, export 0, diff temiz.
+- Web aynı sahne A/B (DOM'da yalnız 14 kırpma kutusu geri açılarak): fark %0,74, yalnız kalça köşeleri. Hiza 0/36700, gradyan ≤ 0,004 px, Play Again 5/5, R068 tanısı 12/12.
+- Betik hatası (RN-web Image sarmalayıcısı) yakalandı ve düzeltildi.
+- 8082 paketi md5 ac1363fa…: R069-B 1, R068 ölçer 1, eski etiketler 0.
+- Sınır: web maske maliyetini ölçemez. Cihaz ölçütü video dur–sıçra ≤ %3 (A %8,4) + his.
+REVIZYON-069 — cihaz sonucu bekleniyor; commit/push/deploy yok.
+
+## REVIZYON-069 cihaz sonucu ve geri alma (2026-10-16)
+- 2026-10-15 `ScreenRecording_10-15-2026 12-09-36_1.MP4`: R069-B etiketi görüldü; kullanıcı takılmanın sürdüğünü ve maske kapalıyken çatı tepelerinin kabul edilemez biçimde genişlediğini bildirdi. Maske maliyetini tek neden sayan H1 bu deneyle desteklenmedi; kesin kök neden hâlâ bilinmiyor.
+- `app/index.tsx` içindeki `HOUSE_ROOF_MASK_DIAG` yeniden `false` yapıldı; fizik, kamera ve parkur değiştirilmedi. 2026-10-16 `ScreenRecording_10-16-2026 12-56-45_1.MP4` içinde `R068-DIAG` etiketi, eski üçgen çatı biçimi ve çalışan oyun görüldü. Kullanıcı bu sürümde de takılmayı oynarken hissettiğini doğruladı. Önceki "ölçüm bekleniyor" satırı artık güncel durum değildir.
+- Aynı 2026-10-16 videoda hareketli aralıkların bazı karelerinde hem deniz/arka plan hem ev bandı birlikte yerinde kalıyor. Bu, tek bir ev katmanına özgü görünmüyor; fakat ekran kaydı, oyun sunumu ile yakalama fazını ayıramaz. Kullanıcının doğrudan his bildirimi nedeniyle sorun yalnız ekran kaydı varsayılamaz.
+- Bu Mac'te etkin geliştirici dizini yalnız `/Library/Developer/CommandLineTools`; `xcrun xctrace` ve `xcodebuild` tam Xcode olmadan çalışmıyor. Instruments Animation Hitches cihaz ölçümü yapılmadı. Yeni görsel/fizik ayarı için kanıt yok; sonraki somut teşhis, tam Xcode kurulup iPhone üzerinde sunum/commit/render sürelerinin ölçülmesidir.
+
+## SDK-58 yükseltmesi (2026-11-08) — teknik kanıt
+- Neden: iPhone Expo Go App Store'dan SDK 58.0.0'a güncellendi; SDK 57 proje açılmıyor ("Project is incompatible with this version of Expo Go"). Kullanıcı onayıyla yükseltildi.
+- Ön adım (2026-11-07): `node_modules`'ün 49.299/49.995 dosyası iCloud'a boşaltılmıştı (dataless); `node_modules.icloud-eski` adıyla kenara alındı (silinmedi, `.git/info/exclude`), `npm ci` ile yeniden kuruldu.
+- Yedek: `backups/sdk57-2026-11-08/` (`package.json`, `package-lock.json`, `app.json`, `metro.config.js`). Geri dönüş: bu dosyaları geri kopyala + `npm ci`.
+- Değişen dosyalar: yalnız `package.json`, `package-lock.json`, `ai_review_evidence/test_worklet_order_regression.cjs`. `app/`, `src/`, `assets/` değişmedi (fizik/kamera/parkur/çatı aynı).
+- Sürümler: expo 57.0.19→58.0.23, react-native 0.86.3→0.88.1, react 19.2.3→19.3.0, reanimated 4.5.1→4.7.1, worklets 0.10.1→0.13.0, gesture-handler 2.32.0→3.3.0 (kodda doğrudan kullanılmıyor), screens 4.30.1, safe-area 5.11.1, webview 14.0.1; `@types/react` ~19.3, `eslint-config-expo` ~58. `expo install --check`: güncel.
+- Kurulum notu: `expo install` eski kilit dosyasıyla `@expo/ui` isteğe bağlı eş bağımlılık çakışması verdi; kilit dosyası boş dizinde temiz çözümlendi (`--package-lock-only`), sonra `npm ci` (805 paket, 0 dataless). `--force`/`--legacy-peer-deps` kullanılmadı.
+- Testler:
+  - `tsc` (app+src, `node_modules.icloud-eski` hariç geçici tsconfig): `app/` 0 hata; yalnız dokunulmamış `src/theme.ts` 4 tip hatası (önceden 2; yeni ikisi RN 0.88 `StyleSheet` tip ad alanı — yalnız tip, çalışma zamanı değil). Not: proje `tsconfig`'i `**/*.ts` içerdiği için `node_modules.icloud-eski` var iken düz `tsc -p .` iCloud'da takılır.
+  - Worklet sıra regresyonu: worklets 0.13 `__closure`'u nesne yerine DİZİ üretiyor → eski test `closure.lerp` okuyup yanlış FAIL verdi. Kaynak sırası doğru (`lerp` önce). Test dizi biçimini de okuyacak şekilde uyarlandı: güncel kaynak PASS (çağrı başarılı), bilerek bozulmuş sıra beklenen belirtiyle FAIL (dizi slot 1 undefined). SONUÇ PASS.
+  - `expo export --platform ios`: çıkış 0, Hermes paketi 4 MB.
+  - Web 8081 (yalnız işlevsel; iPhone performans kanıtı değil): `R068-DIAG` etiketi, üçgen çatılar, kısa/uzun basış zıplama + skor + Game Over, Play Again 5/5, sayfa/konsol hatası 0.
+- Telefona giden paketler (manifest `launchAsset`, sdk 58.0.0, `192.168.1.209`):
+  - 8082 geliştirme `dev=true`: 8,90 MB md5 `25985ac9…`, `R068-DIAG` var.
+  - 8083 üretim `dev=false&minify=true`: 6,14 MB md5 `e5011408…`, `R068-DIAG` var.
+- Risk: RN 0.86→0.88 / Reanimated 4.7 / worklets 0.13 kendisi takılmayı değiştirebilir; SDK 57 dönemindeki ölçümlerle (R066–R069, 20 Eki Instruments) doğrudan karşılaştırma geçerli değil. iPhone'da doğrulanmadı; Android doğrulanmadı.
+
+## Video analizi — ScreenRecording_11-08-2026 10-45-41_1.MP4 (SDK 58, 8082 geliştirme modu)
+- Kaynak: 146,5 sn, 1320×2868, 60 fps, HDR (PQ/BT.2020; çıkarılan kareler bu yüzden koyu — oyun rengi değil). Mod: Game Over sayaçları (3776/3952/4411 uçuş karesi) 8082 Metro günlüğüyle birebir → **geliştirme modu**. 8083 üretim paketi bir kez derlendi, bu videoda değil.
+- 20 tur (19 skor okundu): 6, 7, 24, 0, 0, 0, 5, 0, 18, 1, 1, 0, 12, 6, 10, 0, 13, 6, 24; ortalama ≈ 7, 6 tur 0. BEST 67 (önceki). Sonuç satırı her turda aynı ("Havada emindin, yerde şaşkındın.").
+- Uygulama içi R068 sayacı: 4411 uçuş karesinin hepsi 12–20 ms, >25 ms 0, <=12 ms 0 (60 Hz, ProMotion 120 Hz yok). Sayaç sunum gecikmesini göremez (R069 hazırlık kaydı).
+- Video ev bandı yatay akışı (`win.py`/`holds.py`, R069 ile aynı yöntem): hareketli 4221 iç kare, **dur+sıçra 310 = %7,3** (25 sn pencereler %5,6–8,0). SDK 57 R068 A tabanı %8,4 → **anlamlı iyileşme yok**. Desen: ~8 px → 0 → ~16 px (tek kare tekrar + çift adım); hareket ortası durmaların 550/583'ü tek kare, ≥50 ms donma yok (uzun duruşlar şarj/iniş anları). Kayıt aralığı p50 16,7 ms, 162 kayıt boşluğu (>25 ms) ölçümden hariç.
+- `jump-measurement`: basış → ilk kare 50–58 ms; tam şarj ~454 ms'de doluyor (vx 620, vy −1700).
+- Sonuç: SDK 58 / RN 0.88 takılmayı gidermedi; sorun mod/SDK'dan bağımsız görünüyor ama üretim modu (8083) henüz ölçülmedi.
+
+## R070-A sonucu — ScreenRecording_11-08-2026 11-03-08_1.MP4 (SDK 58, 8083 üretim modu)
+- Mod kanıtı: videonun başında `exp://192.168.1.209:8083` QR'ı okutuluyor; 8083 Metro'da telefondan iki paket isteği (621 ms / 308 ms), 8082 günlüğüne yeni satır düşmedi.
+- 157,8 sn; ilk ~30 sn Expo Go ana ekranı/menü. Okunan turlar: 1, 22, 22, 4, 12, 6, 0, 8, 0, 28. R068 sayacı 2913 uçuş karesinin hepsi 12–20 ms, >25 ms 0 (8082 ile aynı).
+- Video ev bandı (`win.py`/`holds.py`, aynı yöntem): 30 sn sonrası oyun bölümünde 2775 iç kare, **dur+sıçra 218 = %7,9** (25 sn pencereler 5,2–10,0; ilk pencere az örnekli). 8082 geliştirme: **%7,3**. SDK 57 R068 tabanı %8,4.
+- **Sonuç:** geliştirme modu yükü takılmanın nedeni değil (üretim modunda iyileşme yok). SDK 57→58 de değiştirmedi. Desen aynı: tek kare tekrar + çift adım, uygulama içi sayaç göremiyor → sorun karenin ekrana teslim aşamasında (20 Eki Instruments bulgusuyla tutarlı). Expo Go içinde kalan tek değişkenli seçenekler tükendi; sıradaki ayırıcı adım R070-B (Expo Go dışı development build, 120 Hz/ProMotion ve Instruments ile ölçüm), kullanıcı kararı.
+
+## R070-B hazırlık ve B0 derlemesi (2026-11-10)
+- Ortam: Xcode 27.2 (27B52) + iOS 27.2 simülatör bileşeni (CLI `xcodebuild -downloadPlatform iOS`); eski iOS 17.4/27.0/27.1 simülatörleri kullanıcı onayıyla silindi. CocoaPods 1.17.0 (brew). Personal Team `6L6XYSRG28`; Apple Development sertifikası Xcode'da oluşturuldu; geçerli sayılması için Apple WWDR G3 ara sertifikası (apple.com, SHA-256 DC:F2:18:78…60:1F) login anahtar zincirine eklendi (eski WWDR 2023'te dolmuş).
+- Proje: `app.json` `ios.bundleIdentifier` `com.emergent.jumpcharge.lgnngw` → `com.urazonturk.carsamba` (yedek `backups/r070b-2026-11-10/app.json`). `npx expo prebuild -p ios` → `ios/` (git'e eklenmiyor, `.git/info/exclude`); prebuild `package.json` `ios`/`android` betiklerini `expo run:*` yaptı. Oyun kodu (`app/`, `src/`) değişmedi.
+- B0: `xcodebuild … -configuration Release -allowProvisioningUpdates DEVELOPMENT_TEAM=6L6XYSRG28` → BUILD SUCCEEDED; `frontend.app` 65 MB, `main.jsbundle` gömülü (`R068-DIAG` 1), TeamIdentifier 6L6XYSRG28; `devicectl device install` başarılı. İlk başlatma, kullanıcı profil güveni vermediği için reddedildi (beklenen).
+- **Not (tek değişken):** Expo şablonu `Info.plist`'e `CADisableMinimumFrameDurationOnPhone = true` koymuş. Yani B0, Expo Go'ya göre iki şeyi birden değiştiriyor: yerel derleme + 120 Hz izni. Ayırmak için B1 = aynı derleme, yalnız bu anahtar `false`. R068 sayacı 120 Hz'de "<=12ms" kovasını doldurursa fark görülür.
+
+## R070-B B0 sonucu — ScreenRecording_11-10-2026 12-15-50_1.MP4 (yerel Release, 60 Hz)
+- 151,4 sn, 60 fps HDR. Uygulama `com.urazonturk.carsamba` (Expo Go yok, JS gömülü). Okunan turlar: 4, 6, 30, 6, 22, 44, 0, 4, 22, 12 (yeni uygulama depolaması → BEST sıfırdan, 44).
+- R068 sayacı: 4862 uçuş karesinin hepsi 12–20 ms, **<=12 ms 0** → `CADisableMinimumFrameDurationOnPhone=true` olmasına rağmen oyun 60 Hz'de; dolayısıyla B0, Expo Go'dan yalnız "yerel derleme" değişkeniyle ayrılıyor (120 Hz için plist yetmez, kare döngüsü 60 Hz istiyor).
+- Video ev bandı (`win.py`/`holds.py`): 4942 iç kare, dur+sıçra 430 = **%8,7** (25 sn pencereler 7,4–9,9). Karşılaştırma: Expo Go geliştirme %7,3, Expo Go üretim %7,9, SDK 57 tabanı %8,4. Kayıt boşluğu (>25 ms) 15 (Expo Go'da 131–162) → kayıt daha düzgün, oyun deseni aynı.
+- **Sonuç:** Expo Go ortamı takılmanın nedeni değil. Desen (tek kare tekrar + çift adım) her koşulda %7–9. Sıradaki ayırıcı adım: yerel derleme üzerinde Instruments "Animation Hitches" izi (commit / render / sunum ayrımı). Ayrı bir 120 Hz denemesi plist ile mümkün değil; kare hızı isteği kod düzeyinde ayrı, tek değişkenli bir deney olur.
+
+## R070-B Instruments — B0-hitches-2026-11-10.trace (yerel Release, kullanıcı oynarken 90 sn)
+- İz: `~/Documents/Codex/carsamba-r070b/B0-hitches-2026-11-10.trace` (1,0 GB), dışa aktarım `…/export/*.xml`. Ekran: 1320×2868, en yüksek 120 Hz; uygulama 60 Hz (her yüzey 2 vsync).
+- **Resmî hitch: 13 / 90 sn.** İlki açılış (183 ms). Diğerleri 16,7–33,3 ms; açıklamalar "Potentially expensive app update(s)" ve "Potentially expensive render, **39–53 offscreen passes**" (+ bazen GPU).
+- **Gösterilen yüzeyler (`displayed-surfaces-interval`):** 87,5 sn'de 4307 yüzey; **4216'sı tam 2 vsync (16,7 ms)**, 65'i 4 vsync (bir kare kaçırma), 14'ü 3 vsync, birkaç uzun durağan ekran (Game Over). Yani sunum katmanında kare kaçırma ≈ %1,5–2.
+- **Video aynı desende %8,7 "dur + çift adım"** gösteriyor. Ekrana her 16,7 ms'de yeni yüzey geldiği hâlde içeriğin bir karede ilerlemeyip sonraki karede iki adım ilerlemesi → takılmanın büyük kısmı **sunum gecikmesi değil, içerik güncellemesinin bir kare geç uygulanması**. Uygulama içi sayacın (kare geri çağrısı 12–20 ms) bunu görememesiyle tutarlı.
+- En güçlü aday **H2 (commit yolu)**: Reanimated `IOS_SYNCHRONOUSLY_UPDATE_UI_PROPS = false` (varsayılan); transform güncellemeleri Fabric commit üzerinden gidiyor ve o karenin teslim süresini kaçırınca bir sonraki kareye kayıyor. Bu bir **hipotez**; tek değişkenli deneyle sınanmalı.
+- İkincil bulgu: kare başına 39–53 ekran dışı (offscreen) geçiş → gerçek hitch'lerin render maliyeti (döndürülmüş `overflow:hidden` çatı kırpmaları vb.). R069-B bunu tek başına neden olarak desteklememişti; ayrı konu.
+- **Önerilen B1 (onay bekliyor):** yalnız `package.json` → `"reanimated": {"staticFeatureFlags": {"IOS_SYNCHRONOUSLY_UPDATE_UI_PROPS": true}}` + `pod install` + aynı Release derleme. Ölçüt: video dur+sıçra %8,7 → belirgin düşüş (≤ %3) ve his; Instruments ile aynı iz tekrar. Yalnız yerel derlemede denenebilir (Expo Go'da değil). Olumsuzsa geri alınır.
+
+## R070-B B1 kuruldu (2026-11-10) — tek değişken: IOS_SYNCHRONOUSLY_UPDATE_UI_PROPS=true
+- Değişiklik yalnız `package.json` → `"reanimated": {"staticFeatureFlags": {"IOS_SYNCHRONOUSLY_UPDATE_UI_PROPS": true}}` (yedek `backups/r070b-2026-11-10/package.json.B0`) + `pod install`. RNReanimated xcconfig `REANIMATED_FEATURE_FLAGS` içinde `[IOS_SYNCHRONOUSLY_UPDATE_UI_PROPS:true]`; derlenmiş ikilide aynı dize var. JS bayrağı yerel modülden okuyor (`getStaticFeatureFlag` → `ReanimatedModule`). `app/`, `src/` değişmedi; etiket yine `R068-DIAG`.
+- Derleme notu: ilk B1 derlemesi `ios/build/dd` (iCloud'daki Documents) içinde "resource fork, Finder information, or similar detritus not allowed" imza hatasıyla düştü; DerivedData `~/Library/Developer/Xcode/DerivedData/carsamba-r070b`'ye (iCloud dışı) alındı, eski `ios/build/dd` silindi. BUILD SUCCEEDED, `codesign -v` geçti, telefona kuruldu (B0'ın üzerine).
+- Geri dönüş: `cp backups/r070b-2026-11-10/package.json.B0 package.json && (cd ios && pod install)` + yeniden derleme.
+
+## R070-B B1 sonucu ve geri alma (2026-11-10)
+- Video `ScreenRecording_11-10-2026 13-01-14_1.MP4` (108 sn, B1): turlar 0, 0, 22, 4, 14, 6, 0, 6, 38, 0; R068 sayacı 3428 uçuş karesi, 12–20 ms (yalnız açılışta >25 ms 1), "bekle+sicra" 0.
+- Video ev bandı: 3559 iç kare, dur+sıçra 323 = **%9,1** (pencereler 7,8–10,4). B0 %8,7 → **B1 olumsuz**: `IOS_SYNCHRONOUSLY_UPDATE_UI_PROPS` takılmayı değiştirmedi. Bayrak geri alındı (`package.json` = B0, `pod install` → `[IOS_SYNCHRONOUSLY_UPDATE_UI_PROPS:false]`), B0 yeniden derlenip kuruluyor.
+- Tablo: oyunun hesapladığı kamera adımı her karede düzgün (R068 "bekle+sicra" 0, binlerce uçuş karesi), Instruments'ta sunulan yüzeylerin %98'i tam 16,7 ms, ama ekran kaydında her koşulda %7–9 "dur + çift adım". Kayıt PTS'leri tamamen 16,7 ms (kaydedicinin gerçek yakalama anı görünmüyor).
+- **Yeni hipotez H5 (ölçüm yapaylığı):** 120 Hz ekranda 60 Hz içerik + 60 fps ekran kaydedici → kaydedici zaman zaman aynı içerik karesini iki kez yakalayıp sonrakini atlıyor olabilir. Sınama: oyundan bağımsız, içeriği zamana bağlı ve kesin düzgün ilerleyen bir kontrol sayfasının (60 Hz ve ekran hızı modları) aynı kaydediciyle kaydı + aynı `win.py`/`holds.py`. Kontrolde de ~%8 çıkarsa video metriği takılma ölçüsü olarak geçersizdir ve kullanıcı hissi ayrı (ör. ikinci cihazla yavaş çekim) ölçülmelidir. Sayfa hazır (`scratchpad/kontrol/index.html`); LAN sunucusu otomatik izinle reddedildi, kullanıcı kararı bekleniyor.
+
+## R070-B kontrol testi — ekran kaydedici yapaylığı (H5) sınaması (2026-11-10)
+- Kontrol sayfası (claude.ai özel artifact "Kayıt kontrol testi"): oyunun ev bandıyla aynı ekran bölgesinde şerit, 160 CSS px/s. İlk sürüm (rAF) gömülü çerçevede ~15 Hz'e kısıldı → `ScreenRecording_11-10-2026 13-13-52` geçersiz. İkinci sürüm Core Animation CSS animasyonu: "60 Hz" = `steps(216)` / 3,6 sn (her 1/60 sn bir adım), "Akıcı" = `linear` (ekran hızı).
+- Kayıt `ScreenRecording_11-10-2026 13-18-08_1.MP4` (61 sn): 0–30 sn 60 Hz modu, 30–61 sn akıcı. Aynı `win.py`.
+  - **60 Hz içerik:** adımlar çoğunlukla 8 px, ama bazı aralıklarda 0/16 px çiftleri; hareket sırasında sıfır-adım karesi oranı **%10,3**, 5 sn pencerelerde **0,7 → 1,0 → 26,8 → 55,9 → 5,1 → 0,3 %** (kaydedici ile içerik adımları arasındaki faz kayması; vuru deseni). `holds.py` dur+sıçra %2,0 (yoğun patlamalarda pencere kuralı eksik sayıyor).
+  - **Akıcı (120 Hz) içerik:** sıfır-adım **%0**, dur+sıçra **%0** (adımlar 7–9 px).
+- Aynı ham ölçü oyunda: Expo Go geliştirme %18,6, üretim %16,9, B0 %23,4, B1 %17,9; 5 sn pencerelerin en düşüğü bile %7–9 (kontrolün sıfıra düşen pencereleri gibi değil).
+- **Sonuç:** 60 Hz içerik + 120 Hz ekran + 60 fps iOS ekran kaydında **kaydedicinin kendisi "dur + çift adım" üretiyor** (patlamalı, %0–56). Bu yüzden R063'ten beri kullanılan video dur+sıçra metriği takılmanın güvenilir ölçüsü DEĞİL; önceki A/B'lerin (R069-B, R070-A, B0/B1) "değişmedi" sonuçları bu metrikle verildiği için zayıf kanıttır. Oyunun oranı kontrolün ortalamasından yüksek ve hiç sıfıra inmiyor → gerçek bir pay da olabilir, ama video bunu ayıramaz.
+- **Yeni birincil metrik:** Instruments `displayed-surfaces-interval` → 2 vsync'ten uzun kalan yüzey oranı. B0 tabanı: 4307 yüzeyde 65 × 4 vsync + 14 × 3 vsync + 7 daha uzun ≈ **%2,0** (~0,9/sn), resmî hitch 13/90 sn; render notları 39–53 offscreen pass.
+- Kontrolün ikinci çıkarımı: 120 Hz içerik kayıtta tamamen düzgün görünüyor. Oyunu 120 Hz'e çıkarmak (kare hızı isteği kod düzeyinde) hem his hem ölçüm için aday tek değişkenli deney.
+
+## 120 Hz ön incelemesi — neden 60 Hz'de kalıyor ve kare maliyeti (2026-11-10, kod değişmedi)
+- `react-native-worklets` `AnimationFrameQueue.mm`: display link zaten `preferredFramesPerSecond = 120` istiyor; `IOS_DYNAMIC_FRAMERATE_ENABLED = true` (varsayılan, RNWorklets xcconfig'de doğrulandı) iken kare geri çağrılarının ortalama süresi ≥ 8 ms ise aralığı 60 Hz'e (STANDARD) düşürüyor. R068 sayacında <=12 ms kovası hep 0 → oyun sürekli bu 60 Hz dalında.
+- B0 Instruments izinden kare başına aşama süreleri (≈5400 kare):
+  - Uygulama güncellemesi (`hitches-updates`): p50 2,8 / p90 4,0 / p99 10,7 ms; >8 ms %2,3.
+  - **Render sunucusu (`hitches-renders`): p50 6,2 / p90 11,3 / p99 14,4 ms; >8,3 ms %42.** Offscreen pass p50 17, p90 69, en fazla 86.
+  - GPU: p50 1,7 / p90 6,7 ms.
+- **Sonuç:** darboğaz uygulama kodu değil, Core Animation render aşaması (ekran dışı geçişler). 120 Hz'de her kare render için ~8,3 ms bütçe var; karelerin %42'si bunu aşıyor → 120 Hz'e zorlamak (dinamik kare hızını kapatmak) büyük olasılıkla daha çok kare kaçırma üretir. 60 Hz'de de p99 14,4 ms bütçeye (16,7) yakın; kaçan ~%2 kare bununla tutarlı.
+- Öneri sırası: önce offscreen pass kaynaklarını tek tek bul ve azalt (görünümü koruyarak), Instruments'ta render p90 < 8 ms olursa 120 Hz denemesi anlamlı hâle gelir.
+
+## R071-A sonucu — yuvarlak köşe kırpmaları kaldırıldı (2026-11-10, Instruments 90 sn)
+- Değişiklik (`app/index.tsx`, bayrak `ROUNDED_CLIP_OFF = true`, etiket `R071-A: KOSE KIRPMA YOK`): `tower` ve `playableChimneyCap` stillerine yalnız `overflow: visible`. Köşe yarıçapları ve çatı kırpmaları aynı; kutuların görünür çocukları (yalnız `towerCenter` şeridi, diğerleri opaklık 0) yuvarlak şeklin içinde → görüntü değişmemeli. tsc(app) 0, worklet PASS, Release derleme + kurulum OK. Yedek: `backups/r070b-2026-11-10/index.tsx.pre-R071A`.
+- İz `~/Documents/Codex/carsamba-r070b/R071A-hitches-2026-11-10.trace`, dışa aktarım `export-r071a/`.
+
+| Ölçü | B0 | R071-A |
+|---|---|---|
+| Resmî hitch / 90 sn | 13 | 11 |
+| Geç yüzey (3–9 vsync) | %2,00 (86/4307) | %2,60 (121/4664) |
+| Render p50 / p90 / p99 ms | 6,2 / 11,3 / 14,4 | 7,9 / 11,0 / 13,8 |
+| Offscreen pass, oyun kümesi | 50–80 (mod ~60–70) | 40–60 (mod ~45–55) |
+| Render ms, yoğun kümede p50 | 10,3 (50–70 pass) | 9,7–10,0 (30–70 pass) |
+
+- Offscreen dağılımı iki kümeli (0–10: muhtemelen Game Over/durağan, 40–80: oyun). Oyun kümesinde kare başına ~14 geçiş azaldı (≈ 7 platform × 2 kutu, beklenen), ama **render süresi neredeyse aynı (−0,3…0,6 ms)** ve geç kare oranı iyileşmedi (gürültü içinde). Sonuç: bu iki kutu ucuzmuş; **geçiş SAYISI değil, geçişlerin ALANI belirleyici**.
+- En güçlü kalan aday: her evde iç içe döndürülmüş 1200×1200 birimlik çatı kırpma kutuları (`houseRoofClipL/R`). R069-B onları kapattığında "fark yok" sonucu geçersiz video metriğiyle verilmişti → **yeniden ölçülmeli**. Öneri: ölçüm amaçlı R069-B'yi (çatı köşeleri geçici bozuk) R071-A üzerine açıp yalnız Instruments ile render süresini karşılaştırmak; büyük düşüş görülürse kabul edilmiş silueti maskesiz çizen kalıcı bir yöntem (önceden kesilmiş çatı yüzü görseli) ayrıca tasarlanır.
+- R071-A şimdilik açık bırakıldı (görsel aynı, zararsız); karar kullanıcıda.
+
+## R069-B yeniden ölçümü — çatı kırpmaları kapalı, Instruments (2026-11-10)
+- Ölçüm sürümü: R071-A + `HOUSE_ROOF_MASK_DIAG = true` (çatı köşeleri geçici bozuk). İz `R069B2-hitches-2026-11-10.trace`, dışa aktarım `export-r069b2/`. Not: bu koşuda yalnız ~1500 kare çizildi (B0 ~5400) → oyun süresi kısa kaldı; örneklem küçük.
+
+| Ölçü | B0 | R071-A | R071-A + maske kapalı |
+|---|---|---|---|
+| Resmî hitch / 90 sn | 13 | 11 | 7 |
+| Offscreen pass, oyun kümesi | 50–80 | 40–60 | **30–50** |
+| Render p50 / p90, oyun kümesi (≥20 pass) | 10,0 / 11,9 | 9,8 / 11,4 | **8,8 / 10,3** |
+| Render p50, düşük küme (<20 pass) | 4,3 | 4,3 | 4,2 |
+| Geç yüzey | %2,00 | %2,60 | %2,14 |
+
+- Çatı maskeleri kare başına ~14 geçiş ve ~1 ms render tutuyor: ölçülebilir ama **baskın neden değil**. Oyun sırasında hâlâ 30–50 geçiş ve ~9 ms render var; maskeler ve köşe kırpmaları birlikte ~1,2–1,5 ms açıklıyor. Maske bayrağı geri alındı (`false`); R071-A açık.
+- Kalan render maliyetinin kaynağı henüz bilinmiyor. Sonraki teşhis (kör değişiklik yerine): Xcode'dan cihazda çalıştırıp "Color Offscreen-Rendered" / "Color Blended Layers" ile hangi katmanların ekran dışı çizildiğini ve ne kadar saydam katman üst üste bindiğini görsel olarak tespit etmek.
+
+## R071-B…R072 — Xcode "Color Offscreen-Rendered Yellow" teşhisi (2026-11-10)
+- Yöntem: `ios/` şeması LaunchAction = Release, `DEVELOPMENT_TEAM` projeye yazıldı; Xcode Run ile cihazda başlatılıp Debug → View Debugging → Rendering → Color Offscreen-Rendered Yellow (her Run'da yeniden açılması gerekiyor). Kullanıcı ekran görüntüleri.
+- R071-A: **oyun ekranının tamamı** sarı (sistem ana ekranında duvar kâğıdı sarı değil → oyuna özgü); evler/çatılar/karakter ek olarak koyu sarı.
+- R071-B (kök `overflow:hidden` kaldırıldı): tam ekran yine sarı → neden değil. Geri alındı.
+- R071-C (yalnız düz renk + yazı): renk saf (BGR 192,157,99 ≈ #4f9ec4) → uygulama iskeleti (Expo Router/ekran) masum.
+- R071-D (dünya gizli, yalnız ekran-uzayı arka plan): tam ekran sarı. R071-E (uzak manzara grubu da gizli): saf mavi; yalnız martıların küçük yarı saydam grupları sarı → tam ekran sarılığın kaynağı **uzak manzara görsel grubu**.
+- R072 (canlı sahnede expo-image → RN `Image`, aynı kaynak/`stretch`): tam ekran ve karakter kutusu **hâlâ sarı** → expo-image'ın Fabric maske yolu (expo/expo#34201, `RCTViewComponentView` clipping) tek neden değil. Geri alındı (`LIVE_RN_IMAGE = false`).
+- Ortak desen: **görsel içeren her katman sarı** (arka plan, karakter pozları, ev cepheleri), görselsiz katmanlar (düz renk, gradyan, düz kutu) değil. Hem RN `RCTImageComponentView` hem expo-image görsel katmanına `minificationFilter/magnificationFilter = trilinear` koyuyor; kaynak boyutundan farklı çizilen görseller için mipmap/ön işlem geçişi hipotezi (H6). Doğrulanmadı.
+- Engel: RN çekirdeği (`React-Core-prebuilt`) ve Expo modülleri önceden derlenmiş; filtre satırını değiştirmek için `ios.buildReactNativeFromSource` + `EXPO_USE_PRECOMPILED_MODULES=false` ile kaynaktan derleme gerekir (uzun, ikinci değişken).
+- Önerilen ucuz doğrulama (yalnız JS, teşhis): uzak manzara görselini geçici olarak 1:1 piksel ölçeğinde (ölçeklemesiz) çizmek; sarılık kalkarsa H6 güçlenir.
+- Kod durumu: R071-A açık; `ROOT_CLIP_OFF`, `BISECT_*`, `LIVE_RN_IMAGE` = false (etiket yine R071-A). Commit yok.
+
+## R073 ölçek testi + karşılaştırma (2026-11-10)
+- R073 (teşhis, geri alındı): dünya ve uzak manzara gizli; aynı ana görsel RN `Image` ile A = 1:1 piksel (ölçeksiz), B = 0,5×, C = 1,3× çizildi. Üçü de **sarı** → ölçekleme/mipmap hipotezi (H6'nın ölçek kısmı) reddedildi.
+- Kontrol: aynı teşhis açıkken Fotoğraflar ızgarası ve Safari'deki görseller **sarı değil** (yalnız sistem cam/bulanık UI öğeleri sarı). → Görsellerin ekran dışı çizilmesi iOS genel davranışı değil, **bizim görsel katmanlarımıza özgü**.
+- Ortak noktalar (henüz ayrıştırılmadı): RN `RCTImageComponentView` ve expo-image görsel katmanında `trilinear` filtre; görsel görünümü `clipsToBounds = YES`; Fabric bileşen sarmalayıcısı. Ayrıştırmak için yerel kod gerekir (RN ve Expo modülleri önceden derlenmiş): (a) uygulama içi küçük bir yerel teşhis modülüyle çalışma anında katman özelliklerini tek tek değiştirmek ya da (b) RN'yi kaynaktan derleyip satır yamalamak.
+- Kod R071-A durumuna döndü (tüm teşhis bayrakları false). Commit yok.
+
+## R074 katman envanteri + R075 düzeltmesi (2026-11-10)
+- R074 teşhis modülü `modules/layer-diag` (Expo yerel modülü, Swift; yalnız teşhis, `LAYER_DIAG=false` ile kapalı): anahtar penceredeki tüm görsel katmanlarını ve ekran dışı geçiş tetikleyicilerini listeler (cihazdan `Documents/r074-inventory.txt`), çalışma anında mod uygular.
+- Envanter (oyun sahnesi): **95 görsel katmanı, hepsinde `MASK(CAShapeLayer)`**; sarmalayıcıları `masksToBounds` (RN `RCTImageComponentView` ve expo-image `ImageView`). Filtre trilinear, renk uzayı sRGB, 8 bpc — sıradan. Ana görsel expo-image `SDAnimatedImageView` 941×1672, ev cephesi 140×560, çatı 486×47, oluk 584×16 (RN `RCTUIImageViewAnimated`).
+- Mekanizma: Fabric `RCTViewComponentView` kırpma yolu, kap `clipsToBounds` iken köşe yarıçapı olmasa bile `UIImageView` alt görünümüne `CAShapeLayer` maskesi koyuyor (RN 0.88 `RCTViewComponentView.mm` "clipping"; bkz. expo/expo#34201). Maskeli katman her karede ekran dışı geçişle çizilir.
+- Cihaz doğrulaması: "noclip" modu (görsel görünümü + sarmalayıcı kırpma/maskesi kaldırıldı) → arka plan, cepheler, karakter sarı değil; görüntü aynı. "Color Offscreen-Rendered" altında sarı kalan: döndürülmüş çatı kırpmaları (kabul edilmiş siluet, dokunulmadı) ve martıların küçük yarı saydam grupları.
+- **R075 (tek değişken, kalıcı aday):** `src/game/NoClipImage.tsx` = RN `Image` + `overflow: "visible"` (bayrak `NO_IMAGE_CLIP`). `app/index.tsx` ve `ChargePoses.tsx` içindeki tüm `Image`/`Animated.Image` bununla; canlı sahnede expo-image kullanan uzak manzara ve karakter pozları RN tabanlı bu bileşene geçti (`LIVE_RN_IMAGE = true`). Tüm oyun görselleri `stretch` (popup modundaki birkaç `cover` görsel kullanılmıyor). Etiket `R075: GORSEL KIRPMA YOK`. tsc(app) 0, worklet PASS. Yedekler `backups/r070b-2026-11-10/*.pre-R075`.
+- Bekleyen: cihazda görsel kontrol (aynılık) + Instruments render süresi ve geç kare karşılaştırması (B0/R071-A ile).
+
+## R075 sonucu — Instruments 90 sn (2026-11-10, telefon yeniden başlatıldıktan sonra)
+- İz `R075-hitches-2026-11-10.trace`, dışa aktarım `export-r075/`. Not: önceki üç deneme, Xcode hata ayıklayıcısı zorla durdurulduktan sonra cihazdaki günlük servisi takıldığı için boş kaydedildi ("Logging" / "malformed trace"); cihaz yeniden başlatılınca düzeldi.
+
+| Ölçü | B0 | R071-A | **R075** |
+|---|---|---|---|
+| Render p50 / p90 / p99 ms | 6,2 / 11,3 / 14,4 | 7,9 / 11,0 / 13,8 | **4,3 / 6,7 / 8,1** |
+| Render > 8,3 ms (120 Hz bütçesi) | %41 | %48 | **%1** |
+| Render > 16,7 ms | %0,50 | %0,37 | **%0,08** |
+| GPU p50 / p90 ms | 1,7 / 6,7 | 5,4 / 6,6 | **1,2 / 2,6** |
+| Offscreen pass p50 / p90 / maks | 17 / 69 / 86 | 45 / 57 / 69 | **9 / 15 / 19** |
+| Uygulama güncellemesi p50 ms | 2,8 | 3,1 | 2,7 |
+| Resmî hitch / 90 sn | 13 | 11 | 10 |
+| Geç yüzey (3–9 vsync) | %2,00 | %2,60 | %2,14 |
+
+- **Render darboğazı çözüldü**: oyun sırasında render süresi neredeyse yarıya, kuyruk (p99) 14,4 → 8,1 ms; kalan offscreen geçişleri yalnız çatı kırpmaları + martılar. Render artık 120 Hz bütçesine de sığıyor.
+- Geç kare oranı (~%2) değişmedi; R075'teki 10 hitch'in 9'u **"Potentially expensive app update(s)"** (açılıştaki 50/283 ms + oyun içinde 16,7 ms'lik tekil olaylar) → kalan takılma render değil, uygulama güncelleme (ana iş parçacığı / commit) tarafında. Sonraki teşhis hedefi bu.
+- Görsel: kullanıcı onayı "arka plan ve evler aynı". Çatı silueti, fizik, kamera değişmedi.
+
+## Kalan takılma teşhisi — R075 izi Time Profiler örnekleri (2026-11-10)
+- Kaynak: `R075-hitches-2026-11-10.trace` içindeki `time-profile` (14 783 örnek, hepsi uygulama). İş parçacığı dağılımı: ana iş parçacığı 11 135, JS 2 666, diğer 943.
+- Ana iş parçacığı örneklerinin yığınlarında (aynı örnek birden çok kategoriye girebilir): **Hermes (UI worklet'leri) %70, Reanimated `performOperations` %47, Reanimated `commitUpdates` → `ShadowTree::commit` %44, Fabric `RCTMountingManager` mount %24**, CA commit %10, Yoga düzeni ~%5.
+- Hitch anları (R075'teki "expensive app update" olayları): verisi olan pencerelerde (−60…+20 ms) ana iş parçacığı örnek sayısı 28–36; normal 50 ms pencere p50 6, p99 19 → takılma anlarında ana iş parçacığı 2–3 kat yüklü ve yığın yine **Reanimated commit + Fabric mount + worklet** (ör. `ReanimatedModuleProxy::commitUpdates`, `ShadowTree::tryCommit`, `-[RCTMountingManager performTransaction:]`). Bazı hitch pencerelerinde örnek yok (zaman hizası/örnekleme boşluğu).
+- Yorum: kalan takılma, kare başına UI iş parçacığında çalışan worklet'ler (45 `useAnimatedStyle` × havuz slotları) ve her karede ShadowTree commit + mount yolunun ara sıra kare bütçesini aşmasından geliyor. `IOS_SYNCHRONOUSLY_UPDATE_UI_PROPS = false` iken transform güncellemeleri de bu commit yolundan geçiyor. B1 (bu bayrak true) daha önce yalnız geçersiz video metriğiyle "etkisiz" bulunmuştu → Instruments ile yeniden ölçülmeli.
+- Öneri (tek değişken): R076 = R075 + `IOS_SYNCHRONOUSLY_UPDATE_UI_PROPS: true`; ölçüt: ana iş parçacığında `commitUpdates` payı, uygulama güncelleme süresi p99, geç kare oranı, hitch sayısı. Sonraki aday: her karede değişen stillerden yerleşim özelliklerini (width/height/left/top; ör. `bgFarStyle` her kare sabit width/height yazıyor) çıkarıp yalnız transform bırakmak.
+
+## R076 — R075 + IOS_SYNCHRONOUSLY_UPDATE_UI_PROPS=true, Instruments 90 sn (2026-11-10)
+- Değişiklik: yalnız `package.json` `reanimated.staticFeatureFlags.IOS_SYNCHRONOUSLY_UPDATE_UI_PROPS = true` (+ pod install; ikili dosyada doğrulandı) ve etiket `R076: GORSEL KIRPMA YOK + SYNC PROPS`. Yedek `backups/r070b-2026-11-10/package.json.pre-R076`. İz `R076-hitches-2026-11-10.trace`, dışa aktarım `export-r076/`.
+
+| Ölçü | R075 | R076 |
+|---|---|---|
+| Geç yüzey (3–9 vsync) | %2,14 (71/3321) | **%0,62 (33/5358)** |
+| Resmî hitch / 90 sn | 10 | 17 (biri 116 ms) |
+| Render p50 / p99 ms | 4,3 / 8,1 | 6,4 / 12,3 |
+| Uygulama güncellemesi p50 / p90 / p99 ms | 2,7 / 4,1 / 11,1 | 2,5 / 4,4 / 12,3 |
+| Ana iş parçacığı: commitUpdates payı | %44 | **%16** |
+| Ana iş parçacığı: eşzamanlı prop yolu | %0 | %19 |
+| Ana iş parçacığı örneği | 11 135 | 14 145 |
+
+- Yorum: bayrak beklendiği gibi transform güncellemelerini ShadowTree commit yolundan çıkardı (commit payı %44 → %16) ve **ekranda geç kalan yüzey oranı ~3,5 kat düştü**. Ama resmî hitch sayısı ve render süresi arttı; ana iş parçacığı örneği de arttı. İki koşu arasında oynanış farkı büyük (R075'te 3321, R076'da 5358 yüzey) → tek koşu karşılaştırması kesin değil. Sonuç: **belirsiz/karışık**; karar için kullanıcı hissi + tekrar ölçüm (A/B/A) gerekli.

@@ -1,4 +1,11 @@
 import { Image as CachedImage } from "expo-image";
+import { NoClipImage as Image } from "./NoClipImage";
+
+// REVIZYON-072: same switch as LIVE_RN_IMAGE in app/index.tsx (kept in step by
+// hand). expo-image's always-clipping ImageView makes Fabric mask each pose
+// image -> one offscreen pass per pose layer per frame. React Native's Image
+// draws the same source with resizeMode "stretch" (== contentFit "fill").
+const LIVE_RN_IMAGE = true as boolean;
 import Animated, { useAnimatedStyle, type SharedValue } from "react-native-reanimated";
 
 import { CHARGE_POSES, poseOpacity } from "./character-pose";
@@ -51,17 +58,29 @@ function PoseLayer({ i, px, py, poseCharge, scale, feetCenterOffset, feetHalf, l
       pointerEvents="none"
       style={[{ position: "absolute", left: 0, top: 0, width: pose.w * scale, height: pose.h * scale }, style]}
     >
-      <CachedImage
-        cachePolicy="memory-disk"
-        priority="high"
-        transition={0}
-        source={pose.source}
-        style={{ width: "100%", height: "100%" }}
-        contentFit="fill"
-        onLoadStart={cb.onLoadStart}
-        onLoad={cb.onLoad}
-        onError={cb.onError}
-      />
+      {LIVE_RN_IMAGE ? (
+        <Image
+          source={pose.source}
+          resizeMode="stretch"
+          fadeDuration={0}
+          style={{ width: "100%", height: "100%" }}
+          onLoadStart={cb.onLoadStart}
+          onLoad={cb.onLoad}
+          onError={cb.onError}
+        />
+      ) : (
+        <CachedImage
+          cachePolicy="memory-disk"
+          priority="high"
+          transition={0}
+          source={pose.source}
+          style={{ width: "100%", height: "100%" }}
+          contentFit="fill"
+          onLoadStart={cb.onLoadStart}
+          onLoad={cb.onLoad}
+          onError={cb.onError}
+        />
+      )}
     </Animated.View>
   );
 }
