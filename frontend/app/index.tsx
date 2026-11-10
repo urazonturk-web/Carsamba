@@ -109,13 +109,23 @@ const BACK_HAZE_TOP = 48 * DISTRICT_SCALE * BACK_DISTRICT_SCALE;
 // -- see AI_REVIEW.md REVIZYON-054). The landing ridge is the existing cap at
 // exactly p.x/p.topY/p.width; hips fall away from it, the house widens to the
 // neighbour gaps (always leaving an alley) and its facade runs off-screen.
-const HOUSE_ROOF_SOURCE = require("@/assets/environment/district/house/house-roof-tiles.png");
+// GORSEL-018 trial (user approved the style direction 2026-11-10; NOT final
+// acceptance): Kıvılcım's first two samples -- a sharper, more saturated
+// cream/ochre facade (350x1340 after a 60 px vertical crossfade so it tiles)
+// and a glare-free roof strip cropped to exactly 6 tile periods (6 x 195 px)
+// so it repeats without a seam. false = the original district assets.
+const GORSEL018_TRIAL = true as boolean;
+const HOUSE_ROOF_SOURCE = GORSEL018_TRIAL
+  ? require("@/assets/environment/district/house/g018/roof-tiles-g018.png")
+  : require("@/assets/environment/district/house/house-roof-tiles.png");
 const HOUSE_GUTTER_SOURCE = require("@/assets/environment/district/house/house-gutter.png");
-const HOUSE_FACADE_SOURCE = require("@/assets/environment/district/house/house-facade-column.png");
+const HOUSE_FACADE_SOURCE = GORSEL018_TRIAL
+  ? require("@/assets/environment/district/house/g018/facade-g018-cream.png")
+  : require("@/assets/environment/district/house/house-facade-column.png");
 const HOUSE_K = DISTRICT_SCALE;
 const HOUSE_ROOF_W = 486 * HOUSE_K;
 const HOUSE_ROOF_H = 47 * HOUSE_K;
-const HOUSE_ROOF_TEX_PERIOD = 86 * HOUSE_K;
+const HOUSE_ROOF_TEX_PERIOD = GORSEL018_TRIAL ? (HOUSE_ROOF_W * 195) / 1170 : 86 * HOUSE_K;
 const HOUSE_HIP_W = 40 * HOUSE_K;
 const HOUSE_HIP_SLOPE = 47 / 40; // the district's own hip: 47 px drop over 40 px run
 // The front roof face is ONE continuous tile image cut along both hip lines by
@@ -132,9 +142,11 @@ const HOUSE_GUTTER_W = 584 * HOUSE_K;
 const HOUSE_GUTTER_H = 16 * HOUSE_K;
 const HOUSE_GUTTER_OVERLAP = 6;
 const HOUSE_COL_W = 140 * HOUSE_K;
-const HOUSE_PERIOD = 560 * HOUSE_K;
+const HOUSE_PERIOD = GORSEL018_TRIAL ? (HOUSE_COL_W * 1340) / 350 : 560 * HOUSE_K;
 // Facade phase always starts at a floor boundary of the column asset.
-const HOUSE_FLOOR_STARTS = [0, 163, 309, 407].map((v) => v * HOUSE_K);
+const HOUSE_FLOOR_STARTS = GORSEL018_TRIAL
+  ? [0, 393, 725, 1018].map((v) => (v * HOUSE_COL_W) / 350) // calm wall rows of the g018 facade
+  : [0, 163, 309, 407].map((v) => v * HOUSE_K);
 const HOUSE_ALLEY = 30;
 const HOUSE_R_MIN = 38;
 // Deep enough to stay below the screen even while the dead-fall camera sinks.
@@ -200,7 +212,18 @@ const NO_CLIP = ROUNDED_CLIP_OFF ? { overflow: "visible" as const } : null;
 // Same source, resizeMode "stretch" == contentFit "fill". false = expo-image.
 const LIVE_RN_IMAGE = true as boolean;
 const AnimatedImage = Animated.createAnimatedComponent(Image);
-const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
+// REVIZYON-077 (one variable, feel test -- KAMERA-HIS-001): in Spring Ninja the
+// ground moves with the columns and the clouds at about half speed, so the
+// whole world travels; here the far sea+skyline moved only ~8% of the house
+// speed and stopped at the image edge (overscan clamp), so the houses looked
+// like they slid in front of a still painting. true = the far image group is
+// repeated as mirrored tiles (the art is not seamless; seams are a known test
+// artifact) and scrolls without a clamp at BG_SCROLL_RATIO of the world speed.
+// Y stays world-locked exactly as before. false = REVIZYON-030 clamped layer.
+const BG_SCROLL_TEST = true as boolean;
+const BG_SCROLL_RATIO = 0.45;
+const BG_SCROLL_TILES = 4;
+const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
 const DIAG_MAX_EXAMPLES = 6;
 const HOUSE_AB_FROZEN = false as boolean;
 // REVIZYON-066 experiment (one variable): expo-linear-gradient's iOS layer
@@ -1258,6 +1281,20 @@ export default function Game() {
       ],
     };
   });
+  const bgTileScale = Math.max(W / BG_IMG_W, H / BG_IMG_H) * BG_FAR_OVERSCAN;
+  const bgTileW = BG_IMG_W * bgTileScale;
+  const bgTileH = BG_IMG_H * bgTileScale;
+  const bgScrollStyle = useAnimatedStyle(() => {
+    const period = 2 * bgTileW; // a tile and its mirror image repeat exactly
+    let off = (camXR.value * CONFIG.cameraZoom * BG_SCROLL_RATIO) % period;
+    if (off < 0) off += period;
+    return {
+      transform: [
+        { translateX: (W - bgTileW) / 2 - off },
+        { translateY: (BG_SEA_END_WORLD_Y - camYR.value) * CONFIG.cameraZoom - BG_SEA_END_ROW * bgTileScale },
+      ],
+    };
+  });
   // GORSEL-015 iPhone-reddi fix (2026-09-22): replaces the old screen-space
   // "near" box (see ROOFTOP_BAND_* comment above for why that was the root
   // cause of floating chimney bases). This is a WORLD-space rect -- a child
@@ -1353,7 +1390,27 @@ export default function Game() {
           full scene (sky/sea/skyline + foreground rooftops in one image), so
           there is no separate far/near split to draw -- see the panel
           rendering inside the world container below. */}
-      {!USE_FIXED_PANEL_COURSE && !POPUP && (
+      {!USE_FIXED_PANEL_COURSE && !POPUP && BG_SCROLL_TEST && (
+        <Animated.View style={[{ position: "absolute", left: 0, top: 0, width: bgTileW * BG_SCROLL_TILES, height: bgTileH }, bgScrollStyle]} pointerEvents="none">
+          {Array.from({ length: BG_SCROLL_TILES }).map((_, k) => (
+            <View key={`bg-tile-${k}`} pointerEvents="none"
+              style={{ position: "absolute", left: k * bgTileW, top: 0, width: bgTileW, height: bgTileH, transform: k % 2 ? [{ scaleX: -1 }] : undefined }}>
+              <Image source={MASTER_NEIGHBORHOOD_SOURCE} resizeMode="stretch" fadeDuration={0}
+                onLoadStart={k === 0 ? () => markArtStarted("background") : undefined}
+                onLoad={k === 0 ? () => markArtLoaded("background") : undefined}
+                onError={k === 0 ? failArt : undefined}
+                style={{ width: "100%", height: "100%" }}
+              />
+              {!SHOW_BACK_DISTRICT && (
+                <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: "100%", marginTop: -1, aspectRatio: BG_IMG_W / BG_LOW_SIL_H }}>
+                  <Image source={BG_LOW_SIL_SOURCE} style={{ width: "100%", height: "100%" }} resizeMode="stretch" fadeDuration={0} />
+                </View>
+              )}
+            </View>
+          ))}
+        </Animated.View>
+      )}
+      {!USE_FIXED_PANEL_COURSE && !POPUP && !BG_SCROLL_TEST && (
         <Animated.View style={[{ position: "absolute", left: 0, top: 0 }, bgFarStyle]} pointerEvents="none">
           {LIVE_RN_IMAGE ? (
             <Image source={MASTER_NEIGHBORHOOD_SOURCE} resizeMode="stretch" fadeDuration={0}

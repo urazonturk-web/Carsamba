@@ -3068,3 +3068,28 @@ REVIZYON-069 — cihaz sonucu bekleniyor; commit/push/deploy yok.
 | Ana iş parçacığı örneği | 11 135 | 14 145 |
 
 - Yorum: bayrak beklendiği gibi transform güncellemelerini ShadowTree commit yolundan çıkardı (commit payı %44 → %16) ve **ekranda geç kalan yüzey oranı ~3,5 kat düştü**. Ama resmî hitch sayısı ve render süresi arttı; ana iş parçacığı örneği de arttı. İki koşu arasında oynanış farkı büyük (R075'te 3321, R076'da 5358 yüzey) → tek koşu karşılaştırması kesin değil. Sonuç: **belirsiz/karışık**; karar için kullanıcı hissi + tekrar ölçüm (A/B/A) gerekli.
+
+## KAMERA-HIS-001 — "karakter yerinde zıplıyor, kolonlar hareket ediyor" (2026-11-10, ölçüm; kod değişmedi)
+- Referans: `ScreenRecording_11-10-2026 16-23-54_1.MP4` (Spring Ninja, 69 sn). Kırmızı kafa bandı takibi: ninja ekran x'i oyun boyunca ~420/1320 (%32) sabit; uçuşta da değişmiyor → Spring Ninja da kamerayı karakterin x'ine kilitliyor (R058 ile aynı ilke).
+- Katman hareketi (LK optik akış, bir atlayış boyunca toplam yatay kayma, ekran px):
+  - Spring Ninja 14,2–15,6 s: bulutlar −241, ağaçlar −435, zemin çimi −443 (kolonlarla aynı); 20,3–21,7 s: bulutlar −303, ağaçlar −448, zemin −450.
+  - Çarşamba (B0 videosu 40,0–41,6 s): gök/silüet −38, deniz/vapurlar −38, arka mahalle −525, öndeki evler −396.
+- Sonuç: fark kamera kilidinde değil, **arka planda**. Spring Ninja'da zemin ve ağaçlar kolonlarla birlikte kayıyor, bulutlar yaklaşık yarı hızda → bütün dünya ilerliyor. Bizde deniz ve silüet evlerin hızının ~%8'iyle kayıyor (`BG_FAR_PARALLAX_RATIO = 0.06`, üstelik `BG_FAR_OVERSCAN = 1.19` ile sınırlı: birkaç atlayıştan sonra durur) → evler duran bir tablonun önünde kayıyor gibi görünüyor, karakter "yerinde zıplıyor" hissi.
+- İkincil fark: bizim zıplama çok dikey (tam şarj vx 620 / vy −1700, karakter ekranın üst bölgesine çıkıyor), Spring Ninja'nın yayı alçak. Kullanıcı bizim atlama mekaniğini daha çok beğendiği için fizik değiştirilmeyecek.
+- Önerilen tek değişkenli deney (onay bekliyor): uzak arka planı (gök+silüet+deniz) sınırsız kaydırılabilir yapıp parallax oranını yükseltmek (ör. 0,3–0,5). Mevcut tek görsel yatayda döşenebilir değil; test için ayna-döşeme ile, kalıcı çözüm için Görsel atölyesinden döşenebilir katmanlar (gök/silüet, deniz) gerekir.
+
+## R077 — arka plan kayar (2026-11-10, his testi)
+- Değişiklik (`app/index.tsx`, bayrak `BG_SCROLL_TEST = true`, `BG_SCROLL_RATIO = 0.45`, `BG_SCROLL_TILES = 4`): uzak manzara grubu (ana görsel + alçak silüet) 4 karo halinde, tek numaralı karolar yatay aynalı; `translateX = (W − karoG)/2 − (camX·zoom·0,45 mod 2·karoG)`, sınırlama yok. Y eskisi gibi dünyaya kilitli. Fizik, kamera X kilidi, evler, çatı silueti aynı. Etiket `R077: ARKA PLAN KAYAR`. tsc(app) 0, web açılış + Game Over çalışıyor, Release derleme + kurulum OK. Yedek `backups/r070b-2026-11-10/index.tsx.pre-R077`.
+- Bilinen test kusuru: görsel döşenebilir değil; ayna birleşimlerinde silüet/Galata aynalanıyor.
+- Kullanıcı hissi: **"daha iyi"** ("karakter yerinde zıplıyor" hissi azaldı).
+- Kalıcı çözüm için: yatayda kesintisiz döşenebilir ayrı katmanlar (gök+silüet yavaş, deniz/vapurlar orta hız) — Görsel atölyesi işi, kullanıcı onayı gerekli; hız oranları (0,45 tek katman) katmanlara ayrılınca yeniden ayarlanmalı.
+
+## GORSEL-018 deneme entegrasyonu (2026-11-10)
+- Kaynak (Kıvılcım, kabul edilmemiş önizleme): `~/Documents/Codex/2026-09-09/referenced-chatgpt-conversation-this-is-an/shared/GORSEL-018-preview/` — `facade-cream-window-PREVIEW-UNACCEPTED.png` 350×1400, `roof-tiles-v2-PREVIEW-UNACCEPTED.png` 1215×118. Kullanıcı üslup yönünü onayladı (tam set değil).
+- Ölçümler: yeni cephe HSV ort. doygunluk 129 / parlaklık 185 (eski 89 / 167). Dikiş: cephe üst/alt kenar farkı 71 (iç komşu satır 4) → dikişli; kiremit sol/sağ kenar 35 (iç 6) → dikişli. Kiremit dokusunun doğal dönemi otokorelasyonla 195 px.
+- İşleme (yerel, üretimsiz):
+  - **Dosya:** `assets/environment/district/house/g018/roof-tiles-g018.png` = kiremit x 15–1185 (6 × 195 = 1170 × 118; kenar farkı 13,5). `assets/environment/district/house/g018/facade-g018-cream.png` = cephe, alt 60 satır üst 60 satırla doğrusal geçişle birleştirildi → 350 × 1340, dikeyde döşenebilir.
+  - **Ölçü/pivot:** cephe kolonu genişliği aynı (`HOUSE_COL_W` = 266 dünya birimi), dönem 266·1340/350 ≈ 1018 birim (eski 1064). Kat başlangıç fazları sakin duvar satırlarından: 0 / 393 / 725 / 1018 kaynak px. Çatı görsel kutusu aynı (`HOUSE_ROOF_W/H`), doku dönemi `HOUSE_ROOF_W·195/1170` ≈ 154 birim (eski 163).
+  - **Katman:** değişmedi (cephe kolonları, çatı kırpmaları, oluk aynı sırada).
+  - **Risk:** üslup kabulü var, nihai kabul yok; cephe geçiş bölgesinde (balkon altı → panjur) hafif yarı saydamlık; tek renk/tek modül olduğu için tekrar hissi sürüyor; kontur/gölge (şartname 5) henüz yok. Kiremit ekranda ~%4 dikey esniyor (1170/118 ≈ 9,9 vs 486/47 ≈ 10,3).
+- Kod: `app/index.tsx` bayrak `GORSEL018_TRIAL = true` (false = eski görseller), etiket `G018 DENEME + R077`. tsc(app) 0, Release derleme + telefona kurulum OK. Yedek `backups/r070b-2026-11-10/index.tsx.pre-G018`. Commit yok.

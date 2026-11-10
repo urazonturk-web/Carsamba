@@ -1642,3 +1642,26 @@ TESLIM_HAZIR: R070-A — geliştirme/üretim modu iPhone karşılaştırması ta
 TESLIM_HAZIR: R075 — görsel maskesi kaldırıldı, render maliyeti yarıya indi (Instruments: AI_REVIEW.md "R075 sonucu"); kullanıcı kararı bekliyor: his testi + commit; sonraki hedef uygulama güncelleme takılmaları / 120 Hz denemesi.
 - **2026-11-10 R075 kullanıcı hissi:** "biraz akıcı" (Instruments render iyileşmesiyle tutarlı; kalan ~%2 geç kare uygulama güncellemelerinden).
 - **2026-11-10 R076 kararı:** kullanıcı hissi "daha akıcı" (R075'e göre); Instruments'ta geç yüzey %2,14 → %0,62, commit yolu payı %44 → %16 (resmî hitch sayısı tek koşuda arttı, oynanış farkıyla belirsiz). R076 (R075 + `IOS_SYNCHRONOUSLY_UPDATE_UI_PROPS=true`) çalışma sürümü olarak tutuluyor. Commit kullanıcı onayı bekliyor.
+- **2026-11-10 KAMERA-HIS-001 / R077:** kullanıcının "karakter yerinde zıplıyor, kolonlar hareket ediyor" şikâyeti ölçüldü (Spring Ninja'da da karakter x'i sabit; fark arka planın kaymasında: SN zemini kolonlarla 1:1, bulutlar ~yarı hız; bizde deniz/silüet ~%8 ve kenarda duruyordu). R077 deneme: arka plan aynalı karolarla sınırsız, %45 hızda kayıyor → kullanıcı: "daha iyi". Karar bekleyen: kalıcı döşenebilir katman görselleri (gök+silüet, deniz) üretimi. Commit yok.
+
+## GORSEL-DEG-001 — kolon/ev yapıları bağımsız değerlendirme (2026-11-10)
+Görseller: `side-session-notes/.../carsamba-kolon-degerlendirme/` (oyun ekranı, yakın plan, Spring Ninja karşılaştırması). Değerlendirenler birbirinin puanını görmeden yanıtladı.
+
+| Başlık | Oyun yöneticisi | Kitap oturumu | Film yöneticisi |
+|---|---|---|---|
+| Arka planla üslup uyumu | 7 | 6 | 7 |
+| İniş yerinin okunurluğu | 5 | 4 | 4 |
+| İşçilik / detay | 5 | 6 | 5 |
+| Çeşitlilik | 4 | 4 | 4 |
+| **Genel** | **6** | **5** | **5** |
+
+Üçünün ortak bulguları: (1) ön plan–arka plan ayrımı yok (kuleler arkadaki evlerle aynı ton/değer/netlik) → hedef kule kalabalıkta kayboluyor; (2) iniş noktası belirsiz (sivri tepe, arka plan çatılarıyla aynı kiremit tonu); (3) düz, gölgesiz, düşük çözünürlüklü ve tekrar eden cephe dokusu (dikiş/kesik izleri, kiremitte beyaz parlama çizgileri, alt uç belirsiz); (4) çeşitlilik yok.
+Ortak öneriler (çatı silueti korunarak): koyu dış kontur + tek yön kenar gölgesi, arka plan evlerine atmosferik soluklaştırma; mahya vurgusu + daha doygun kiremit (+ şarj sırasında hedef tepe parıltısı); 3–4 sıva rengi ve cephe modülü, yüksek çözünürlüklü dikişsiz doku. Ek: "Hold to charge" yazısı kulelerin üstünde okunmuyor.
+Karar bekleyen: önce kodla yapılabilecek hızlı deneme (kontur/gölge/arka plan soluklaştırma/mahya vurgusu) mı, yoksa Görsel atölyesinden yeni cephe varlıkları mı.
+- **2026-11-10 GORSEL-018 şartnamesi:** `GORSEL-SARTNAME-2026-11.md` yazıldı — yüksek çözünürlüklü ve dikeyde dikişsiz cephe (4 sıva rengi × 3 modül, 350×1400 px), beyaz parlamasız ve daha doygun kiremit (1215×118) + mahya vurgusu, iki yatayda dikişsiz arka plan katmanı (A gök+silüet 3840×2000 ~0,15–0,2 hız; B deniz 3840×1500 ~0,45), daha soluk arka mahalle şeridi; kontur/gölge/parıltı kodda. Çatı silueti ve oynanış sabit. Üretim/harcama kararı kullanıcıda.
+TESLIM_HAZIR: GORSEL-018 şartname — `frontend/GORSEL-SARTNAME-2026-11.md`; kullanıcı kararı bekliyor: görsel üretimini kim/nasıl yapacak.
+- **2026-11-10 GORSEL-018 iletimi:** kullanıcı Codex'e iletilmesini istedi; doğrudan araç yok → yapıştırılacak metin `CODEX-MESAJI-GORSEL-018.md` hazırlandı.
+- **2026-11-10 GORSEL-018 gönderildi:** kullanıcının isteğiyle mesaj computer use ile Codex "Kıvılcım — Çarşamba Oyun Koordinatörü" sohbetine yapıştırılıp gönderildi (16:55); Kıvılcım düşünmeye başladı. Yanıt/örnek görseller bekleniyor.
+- **2026-11-10 17:07 GORSEL-018 onayı:** Kıvılcım tutarı önceden belirsiz kredi/kullanım için onay istedi; kullanıcı yalnız iki örnek görseli (krem sıva + yeşil panjurlu cephe, beyaz parlamasız kiremit) onayladı. Mesaj gönderildi: tüm sete geçmeden yeniden kullanıcı onayı beklenecek.
+- **2026-11-10 GORSEL-018 deneme:** kullanıcı üslup yönünü onayladı; iki örnek (cephe + kiremit) dikişsiz hâle getirilip bayrakla (`GORSEL018_TRIAL`) telefona kuruldu; nihai kabul bekleniyor. Ayrıntı AI_REVIEW.md.
+- **2026-11-10 GORSEL-018 deneme sonucu:** kullanıcı telefonda yeni cephe + kiremidi **beğendi** (üslup ve iki örnek kabul). Açık: kalan cephe varyantları (renk × modül), arka plan katmanları (A/B), kodla kontur/gölge, R077 ayna izinin kalıcı katmanlarla giderilmesi.
