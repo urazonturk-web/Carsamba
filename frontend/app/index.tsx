@@ -33,7 +33,8 @@ import { NO_IMAGE_CLIP, NoClipImage as Image } from "../src/game/NoClipImage";
 import { ChargePoses } from "../src/game/ChargePoses";
 import { CHARGE_POSES } from "../src/game/character-pose";
 import { ANCHOR_SHIFT_PX, GLOBAL_VISUAL_SCALE, POSE_FEET_SPAN_PX } from "../src/game/character-pose";
-import { GAME_OVER_LINE } from "../src/game/copy";
+import { SFX_ON, initSfx, playFart, playSfx, stopFart, stopSfx } from "../src/game/sfx";
+import { GAME_OVER_LINE, QUIP_ON, multiJumpShout, pickQuip, quipContext } from "../src/game/copy";
 import { jumpVelocity, advanceFlight } from "../src/game/jump";
 import { findFootLanding } from "../src/game/landing";
 import { referencePlatform, referenceTowerWidth } from "../src/game/reference-course";
@@ -119,9 +120,36 @@ const HOUSE_ROOF_SOURCE = GORSEL018_TRIAL
   ? require("@/assets/environment/district/house/g018/roof-tiles-g018.png")
   : require("@/assets/environment/district/house/house-roof-tiles.png");
 const HOUSE_GUTTER_SOURCE = require("@/assets/environment/district/house/house-gutter.png");
-const HOUSE_FACADE_SOURCE = GORSEL018_TRIAL
-  ? require("@/assets/environment/district/house/g018/facade-g018-cream.png")
-  : require("@/assets/environment/district/house/house-facade-column.png");
+// GORSEL-018 (2026-11-10): 12 facade variants (4 plaster colours x 3 modules)
+// in ONE horizontal atlas (350 px cells, 1340 px tall), so a recycled house slot
+// switches variant with a layout offset only -- no React re-render, no new decode.
+const FACADE_ATLAS = GORSEL018_TRIAL;
+const HOUSE_FACADE_SOURCE = FACADE_ATLAS
+  ? require("@/assets/environment/district/house/g018/facade-atlas-g018.jpg")
+  : GORSEL018_TRIAL
+    ? require("@/assets/environment/district/house/g018/facade-g018-cream.png")
+    : require("@/assets/environment/district/house/house-facade-column.png");
+const FACADE_CELLS = FACADE_ATLAS ? 12 : 1;
+// GORSEL-018 sartname 5: darker 3-unit outline + right-face shadow strip on the
+// playable towers, and a warm glow on the target tower's cap while charging.
+const KONTUR_PARILTI = true as boolean;
+// 2026-11-11 user: glow only on the NEXT tower is meaningless for 2+ tower
+// jumps; removed (a charge-predicted glow would be an aim assist). Kept off.
+const HEDEF_PARILTI = false as boolean;
+const HOUSE_EDGE_W = KONTUR_PARILTI ? 3 : 1.8;
+const HOUSE_EDGE_COLOR = KONTUR_PARILTI ? "#2a1b12" : "#3a281c";
+const HOUSE_SHADE_A = KONTUR_PARILTI ? 0.4 : 0.3;
+const GLOW_W = 200;
+const GLOW_H = 38;
+// order: cream, light-pink, ochre, gray-blue x (window, balcony, kilim/laundry/cumba)
+const FACADE_PERIOD_PX = [1340, 1035, 1035, 1035, 1035, 1035, 1035, 1035, 1035, 1035, 1035, 1035];
+// calm wall rows per variant (cell px) -- the gutter never cuts through a window
+const FACADE_STARTS_PX = [
+  [0, 393, 725, 1018], [3, 284, 692, 1029], [0, 437, 658, 1031],
+  [0, 379, 745, 1021], [228, 515, 649, 890], [0, 384, 769, 1021],
+  [0, 377, 730, 1031], [10, 371, 543, 876], [8, 293, 605, 1028],
+  [242, 426, 742, 1029], [0, 367, 525, 1029], [0, 392, 659, 1026],
+];
 const HOUSE_K = DISTRICT_SCALE;
 const HOUSE_ROOF_W = 486 * HOUSE_K;
 const HOUSE_ROOF_H = 47 * HOUSE_K;
@@ -144,6 +172,8 @@ const HOUSE_GUTTER_OVERLAP = 6;
 const HOUSE_COL_W = 140 * HOUSE_K;
 const HOUSE_PERIOD = GORSEL018_TRIAL ? (HOUSE_COL_W * 1340) / 350 : 560 * HOUSE_K;
 // Facade phase always starts at a floor boundary of the column asset.
+const FACADE_PERIODS = FACADE_PERIOD_PX.map((v) => (v * HOUSE_COL_W) / 350);
+const FACADE_STARTS = FACADE_STARTS_PX.map((row) => row.map((v) => (v * HOUSE_COL_W) / 350));
 const HOUSE_FLOOR_STARTS = GORSEL018_TRIAL
   ? [0, 393, 725, 1018].map((v) => (v * HOUSE_COL_W) / 350) // calm wall rows of the g018 facade
   : [0, 163, 309, 407].map((v) => v * HOUSE_K);
@@ -188,6 +218,43 @@ const PERF_PROBE = false as boolean;
 // camera's and the character's own per-frame screen steps. UI thread writes a
 // few SharedValues only; JS reads them once, when Game Over appears.
 const FRAME_DIAG = true as boolean;
+// FAZ1 (2026-11-11, ANALIZ-2026-11-11): Turkish HUD/hint/result card, quip
+// pool, big "+N" with a shout; build tag only as faint text on the result
+// card; R068 counters keep running but their text is no longer shown.
+const FAZ1_UI = true as boolean;
+const SHOW_DIAG_TEXT = !FAZ1_UI;
+// FAZ2 (2026-11-11): landing feel + character size trial. All visual-only:
+// physics, collision, camera and the landing point are untouched.
+const FAZ2_SQUASH = true as boolean; // re-enable GORSEL-017 landing squash (pivot = feet)
+const FAZ2_DUST = true as boolean; // roof-dust puff on every new-tower landing
+const CHAR_SIZE_TRIAL = 1.4 as number; // sprite drawn 1.4x around the same foot pivot (1 = accepted size)
+// GAZ trial (2026-11-11, OSURUK-2026-11-11): fart sound on take-off sized by
+// the charge + a short-lived cream puff trail behind the hips; both cut on
+// landing ("pof"). Visual/audio only. 6 pooled puffs, transform+opacity only.
+// 2026-11-11 KARAR (kullanıcı): "Her zıplamada kalsın" -- always on, no mode/unlock.
+const FART_TRIAL = true as boolean;
+const FART_N = 6;
+const FART_SLOTS = [0, 1, 2, 3, 4, 5];
+const FART_LIFE = 800; // ms
+// v2 (user: "osuruk gibi olmamış"): classic cartoon gas cloud -- pale
+// yellow-green lobes with an olive rim and shadow, big enough to read
+// against the sea (box = ~45% of the character height). Fractions of FART_BOX.
+const FART_LOBES = [
+  { x: 0.1, y: 0.42, d: 0.56, c: "rgba(146,156,74,0.75)", b: 0 }, // olive under-shadow
+  { x: 0.0, y: 0.26, d: 0.52, c: "rgba(214,222,150,0.97)", b: 1 },
+  { x: 0.3, y: 0.04, d: 0.62, c: "rgba(224,230,166,0.97)", b: 1 },
+  { x: 0.48, y: 0.32, d: 0.5, c: "rgba(206,214,138,0.97)", b: 1 },
+  { x: 0.22, y: 0.3, d: 0.36, c: "rgba(236,240,190,0.9)", b: 0 }, // highlight
+];
+const DUST_PUFFS = [
+  { a: 200, r: 26, d: 13, c: "rgba(236,220,194,0.95)" },
+  { a: 230, r: 20, d: 11, c: "rgba(198,112,72,0.9)" },
+  { a: 255, r: 14, d: 9, c: "rgba(236,220,194,0.9)" },
+  { a: 285, r: 14, d: 9, c: "rgba(236,220,194,0.9)" },
+  { a: 310, r: 20, d: 11, c: "rgba(198,112,72,0.9)" },
+  { a: 340, r: 26, d: 13, c: "rgba(236,220,194,0.95)" },
+];
+const KILIM_DOTS = ["#c0472b", "#e2a33a", "#3e7a52", "#c0472b", "#e2a33a", "#3e7a52", "#c0472b", "#e2a33a", "#3e7a52"];
 // REVIZYON-069 one-variable device A/B (measurement only, NOT a design): true
 // turns off ONLY the two rotated overflow clips of each roof face (houseRoofClipL/R),
 // so the roof face is cut by the outer band rectangle instead -- the hip corners
@@ -223,7 +290,7 @@ const AnimatedImage = Animated.createAnimatedComponent(Image);
 const BG_SCROLL_TEST = true as boolean;
 const BG_SCROLL_RATIO = 0.45;
 const BG_SCROLL_TILES = 4;
-const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
+const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
 const DIAG_MAX_EXAMPLES = 6;
 const HOUSE_AB_FROZEN = false as boolean;
 // REVIZYON-066 experiment (one variable): expo-linear-gradient's iOS layer
@@ -411,6 +478,14 @@ const SOLE_LEFT = CONFIG.footSoles[0][0];
 const SOLE_RIGHT = CONFIG.footSoles[1][1];
 const SOLE_CENTER_OFFSET = ((SOLE_LEFT + SOLE_RIGHT) / 2 - 0.5) * SOLE_BODY_WIDTH;
 const SPRITE_SCALE = ((SOLE_RIGHT - SOLE_LEFT) * SOLE_BODY_WIDTH) / POSE_FEET_SPAN_PX;
+// GAZ trial: puffs leave from the hips, a little behind the body.
+const FART_CHAR_H = CHARGE_POSES[0].h * SPRITE_SCALE * GLOBAL_VISUAL_SCALE * CHAR_SIZE_TRIAL;
+const FART_FEET_DX = SOLE_CENTER_OFFSET + ANCHOR_SHIFT_PX * SPRITE_SCALE;
+// 2026-11-11 user: gas came out too high (chest level in ScreenRecording
+// 15-04-35); the newest puff now sits on the seat of the tracksuit.
+const FART_HIP = FART_CHAR_H * 0.27;
+const FART_BACK = FART_CHAR_H * 0.11;
+const FART_BOX = FART_CHAR_H * 0.45;
 const POOL = 14; // fixed pool of platform views (only ~5 are visible at once)
 const POOL_IDX = Array.from({ length: POOL }, (_, i) => i);
 // REVIZYON-060: a pool slot shows the platform whose id % POOL equals the
@@ -513,6 +588,9 @@ export default function Game() {
 
   const [perfectVisible, setPerfectVisible] = useState(false);
   const [landingLabel, setLandingLabel] = useState("PERFECT!");
+  const [landingSub, setLandingSub] = useState("");
+  const [quip, setQuip] = useState(GAME_OVER_LINE);
+  const [goInfo, setGoInfo] = useState({ prevBest: 0, newRecord: false });
   const [debug, setDebug] = useState({
     charge: 0, vx: 0, vy: 0, dist: 0, width: 0, offset: 0, fps: 0, p50: 0, p95: 0, dropped: 0,
   });
@@ -648,6 +726,17 @@ export default function Game() {
 
   // Perfect-landing particle burst
   const burst = useSharedValue(0);
+  const dust = useSharedValue(1);
+  const fartPuffs = useSharedValue<any[]>([]);
+  const fartNow = useSharedValue(0);
+  const fartCut = useSharedValue(0);
+  const fartOn = useSharedValue(0);
+  const fartIdx = useSharedValue(0);
+  const fartLastEmit = useSharedValue(-1e9);
+  const fartLaunchAt = useSharedValue(-1);
+  const fartSize = useSharedValue(1);
+  const dustX = useSharedValue(0);
+  const dustY = useSharedValue(0);
   const burstX = useSharedValue(0);
   const burstY = useSharedValue(0);
 
@@ -809,18 +898,28 @@ export default function Game() {
       (perfect ? CONFIG.scorePerfectBonus : 0);
     scoreRef.current += gained;
     setScore(scoreRef.current);
+    if (SFX_ON && towersCrossed > 1) playSfx("multi");
     if (perfect && Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
     }
     if (REFERENCE_TRIAL ? towersCrossed > 1 : perfect) {
       setLandingLabel(REFERENCE_TRIAL ? `+${gained}` : "PERFECT!");
+      setLandingSub(FAZ1_UI && REFERENCE_TRIAL ? multiJumpShout(towersCrossed) : "");
       setPerfectVisible(true);
       if (perfectTimer.current) clearTimeout(perfectTimer.current);
-      perfectTimer.current = setTimeout(() => setPerfectVisible(false), 750);
+      perfectTimer.current = setTimeout(() => setPerfectVisible(false), FAZ1_UI ? 1000 : 750);
     }
   }, []);
 
   const onGameOver = useCallback(() => {
+    if (SFX_ON && FART_TRIAL) stopFart();
+    if (SFX_ON) playSfx(scoreRef.current > bestRef.current && scoreRef.current > 0 ? "record" : "fall");
+    if (FAZ1_UI) {
+      const prevBest = bestRef.current;
+      const sc = scoreRef.current;
+      setGoInfo({ prevBest, newRecord: sc > prevBest && sc > 0 });
+      setQuip((prev) => pickQuip(quipContext(sc, prevBest), prev));
+    }
     setGameOver(true);
     if (FRAME_DIAG) {
       // One read of the UI-thread counters per Game Over (no per-frame JS work).
@@ -836,6 +935,10 @@ export default function Game() {
       setBest(scoreRef.current);
       storage.setItem(BEST_SCORE_KEY, scoreRef.current);
     }
+  }, []);
+
+  useEffect(() => {
+    initSfx();
   }, []);
 
   const pushDebug = useCallback((d: typeof debug) => setDebug(d), []);
@@ -870,6 +973,7 @@ export default function Game() {
       jacketPopped.value = 0;
       puffAge.value = 1;
       phase.value = PHASE.CHARGING;
+      if (SFX_ON) runOnJS(playSfx)("charge");
     })(timestamp);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -895,6 +999,13 @@ export default function Game() {
       releasedCharge.value = c;
       phase.value = PHASE.AIRBORNE;
       charge.value = 0;
+      if (SFX_ON) runOnJS(stopSfx)("charge");
+      if (FART_TRIAL) {
+        fartOn.value = 1;
+        fartLaunchAt.value = -1;
+        fartSize.value = 0.6 + 0.8 * c;
+        if (SFX_ON) runOnJS(playFart)(c);
+      }
       // Defense in depth alongside onPressIn above: also clear right at
       // launch, so the pose is guaranteed to track real charge/idle for the
       // jump that is about to play out, regardless of anything set earlier.
@@ -908,6 +1019,7 @@ export default function Game() {
       "worklet";
       if (phase.value !== PHASE.CHARGING) return;
       phase.value = PHASE.IDLE;
+      if (SFX_ON) runOnJS(stopSfx)("charge");
       charge.value = 0;
       releasedCharge.value = 0;
       visualCharge.value = 0;
@@ -1014,6 +1126,9 @@ export default function Game() {
       jacketOpen.value = withSpring(1, { damping: 15, stiffness: 240, mass: 0.7 });
     }
 
+    // GAZ trial clock: ticks only while a puff can still be on screen.
+    if (FART_TRIAL && frame.timestamp - fartLastEmit.value < FART_LIFE + 300) fartNow.value = frame.timestamp;
+
     // --- airborne physics ---
     if (phase.value === PHASE.AIRBORNE) {
       const prevX = px.value;
@@ -1022,6 +1137,21 @@ export default function Game() {
       px.value = flight.x;
       py.value = flight.y;
       vy.value = flight.vy;
+      if (FART_TRIAL && fartOn.value === 1) {
+        const now = frame.timestamp;
+        if (fartLaunchAt.value < 0) fartLaunchAt.value = now;
+        const gap = now - fartLaunchAt.value < 160 ? 55 : 105;
+        if (now - fartLastEmit.value >= gap) {
+          fartLastEmit.value = now;
+          fartNow.value = now;
+          const slot = fartIdx.value % FART_N;
+          fartIdx.value = slot + 1;
+          const arr = fartPuffs.value.slice();
+          const first = now === fartLaunchAt.value;
+          arr[slot] = { x: px.value + FART_FEET_DX - FART_BACK, y: py.value + PH / 2 - FART_HIP, b: now, s: fartSize.value * (first ? 1.5 : 1) };
+          fartPuffs.value = arr;
+        }
+      }
       const newBottom = py.value + PH / 2;
 
       if (vy.value > 0) {
@@ -1055,6 +1185,14 @@ export default function Game() {
           // the "hafif yukarı toparlanma" (slight upward overshoot) before
           // settling back to 0. Total duration 35+75+80=190ms, inside the
           // requested 150-200ms window.
+          // FAZ2 sound: every landing contact says "tak" (also short hops on
+          // the same tower, which score nothing and used to be silent).
+          if (SFX_ON) runOnJS(playSfx)("land");
+          if (FART_TRIAL && fartOn.value === 1) {
+            fartOn.value = 0;
+            fartCut.value = frame.timestamp;
+            if (SFX_ON) runOnJS(stopFart)();
+          }
           landPulse.value = withSequence(
             withTiming(1, { duration: 35 }),
             withTiming(-0.2, { duration: 75 }),
@@ -1067,6 +1205,12 @@ export default function Game() {
           if (p.id > lastLandedId.value) {
             const towersCrossed = p.id - lastLandedId.value;
             lastLandedId.value = p.id;
+            if (FAZ2_DUST) {
+              dustX.value = cx;
+              dustY.value = p.topY;
+              dust.value = 0;
+              dust.value = withTiming(1, { duration: 420 });
+            }
             if (perfect) {
               burstX.value = cx;
               burstY.value = p.topY;
@@ -1241,6 +1385,21 @@ export default function Game() {
   // __DEV__-only visual freeze; it never touches `charge`.
   const poseCharge = useDerivedValue(() => (poseOverride.value >= 0 ? poseOverride.value : charge.value));
 
+  // GORSEL-018 sartname 5: one glow for the whole course, parked on the next
+  // tower's cap only while charging; opacity follows the charge (non-layout).
+  const targetGlowStyle = useAnimatedStyle(() => {
+    const t = HEDEF_PARILTI && phase.value === PHASE.CHARGING ? platformById(platforms.value, standingPlatformId.value + 1) : null;
+    if (!t) return { opacity: 0, transform: [{ translateX: -99999 }, { translateY: -99999 }, { scaleX: 1 }] };
+    return { opacity: 0.35 + 0.55 * Math.min(1, visualCharge.value),
+      transform: [{ translateX: t.x }, { translateY: t.topY - GLOW_H + 2 }, { scaleX: t.width / GLOW_W }] };
+  });
+  const dustStyle = useAnimatedStyle(() => {
+    const d = dust.value;
+    return {
+      opacity: d < 1 ? 1 - d * d : 0,
+      transform: [{ translateX: dustX.value }, { translateY: dustY.value }, { scale: 0.55 + d * 1.25 }],
+    };
+  });
   const burstStyle = useAnimatedStyle(() => {
     const b = burst.value;
     return {
@@ -1720,6 +1879,21 @@ export default function Game() {
             onArtError={failArt}
           />
         ))}
+        {HEDEF_PARILTI && (
+          <Animated.View style={[styles.targetGlow, targetGlowStyle]}>
+            <LinearGradient pointerEvents="none" colors={["rgba(255,236,170,0)", "rgba(255,226,140,0.55)", "rgba(255,248,214,0.95)"]} locations={[0, 0.75, 1]} style={styles.houseGradFill} />
+          </Animated.View>
+        )}
+        {FAZ2_DUST && (
+          <Animated.View style={[styles.burst, dustStyle]}>
+            {DUST_PUFFS.map((q, i) => {
+              const ang = (q.a * Math.PI) / 180;
+              return <View key={i} style={{ position: "absolute", width: q.d, height: q.d, borderRadius: q.d / 2, backgroundColor: q.c,
+                left: Math.cos(ang) * q.r - q.d / 2, top: Math.sin(ang) * q.r * 0.45 - q.d / 2 }} />;
+            })}
+          </Animated.View>
+        )}
+        {FART_TRIAL && FART_SLOTS.map((i) => <FartPuff key={`fart-${i}`} i={i} puffs={fartPuffs} now={fartNow} cut={fartCut} />)}
         {/* Perfect-landing particle burst */}
         <Animated.View style={[styles.burst, burstStyle]}>
           {[0, 1, 2, 3, 4, 5].map((i) => {
@@ -1746,7 +1920,7 @@ export default function Game() {
           px={px}
           py={py}
           poseCharge={poseCharge}
-          scale={SPRITE_SCALE * GLOBAL_VISUAL_SCALE}
+          scale={SPRITE_SCALE * GLOBAL_VISUAL_SCALE * CHAR_SIZE_TRIAL}
           feetCenterOffset={SOLE_CENTER_OFFSET + ANCHOR_SHIFT_PX * SPRITE_SCALE}
           feetHalf={PH / 2}
           // GORSEL-017 ROLLBACK-01 (2026-09-23): landing squash disabled --
@@ -1755,6 +1929,7 @@ export default function Game() {
           // default), so this is a no-op rather than deleting the feature;
           // the withSequence trigger in the landing-contact block still
           // sets landPulse.value, it's just never read by anything now.
+          landPulse={FAZ2_SQUASH ? landPulse : undefined}
           onLoadStart={() => markArtStarted("character")}
           onLoad={() => { poseLoads.current += 1; if (poseLoads.current >= CHARGE_POSES.length) markArtLoaded("character"); }}
           onError={failArt}
@@ -1780,7 +1955,7 @@ export default function Game() {
         onResponderTerminate={cancelCharge}
       />
 
-      {BUILD_TAG !== "" && (
+      {BUILD_TAG !== "" && !FAZ1_UI && (
         <View pointerEvents="none" style={{ position: "absolute", left: 6, top: insets.top + 4, paddingHorizontal: 4, backgroundColor: "rgba(0,0,0,0.45)", borderRadius: 4, zIndex: 50 }}>
           <Text style={{ color: "#fff", fontSize: 10 }}>{BUILD_TAG}</Text>
         </View>
@@ -1792,7 +1967,7 @@ export default function Game() {
           {score}
         </Text>
         <Text style={[styles.bestText, POPUP && styles.puBestText]} testID="best-value">
-          BEST {best}
+          {FAZ1_UI ? "REKOR" : "BEST"} {best}
         </Text>
       </View>}
 
@@ -1810,14 +1985,20 @@ export default function Game() {
       {/* Hint (only before first jump) */}
       {score === 0 && !gameOver && assetsReady && (
         <View style={styles.hint}>
-          <Text style={[styles.hintText, POPUP && styles.puHintText]}>Hold to charge · Release to jump</Text>
+          {FAZ1_UI ? (
+            <View style={styles.hintPill}>
+              <Text style={styles.hintPillText}>Basılı tut… bırak, zıpla!</Text>
+            </View>
+          ) : (
+            <Text style={[styles.hintText, POPUP && styles.puHintText]}>Hold to charge · Release to jump</Text>
+          )}
         </View>
       )}
 
       {/* PERFECT! popup */}
       {perfectVisible && (
         <View style={styles.perfectWrap}>
-          <PerfectPop key={`${score}-${landingLabel}`} styles={styles} label={landingLabel} />
+          <PerfectPop key={`${score}-${landingLabel}`} styles={styles} label={landingLabel} sub={landingSub} big={FAZ1_UI} />
         </View>
       )}
 
@@ -1841,7 +2022,39 @@ export default function Game() {
       )}
 
       {/* Game Over */}
-      {gameOver && (
+      {gameOver && FAZ1_UI && (
+        <View style={styles.overlay} testID="game-over-overlay">
+          <View style={styles.trCard}>
+            <View style={styles.kilimRow}>
+              {KILIM_DOTS.map((c, i) => <View key={i} style={[styles.kilimDot, { backgroundColor: c }]} />)}
+            </View>
+            <Text style={styles.statLabel}>SKOR</Text>
+            <Text style={styles.trScore} testID="final-score">
+              {score}
+            </Text>
+            {goInfo.newRecord ? (
+              <View style={styles.recordBadge}><Text style={styles.recordBadgeText}>YENİ REKOR!</Text></View>
+            ) : (
+              <Text style={styles.trBest} testID="final-best">
+                Rekor {best}{best - score > 0 ? ` · ${best - score} puan kaldı` : best === score && score > 0 ? " · rekora eşitledin" : ""}
+              </Text>
+            )}
+            {QUIP_ON && <View style={styles.bubble}>
+              <Text style={styles.bubbleText} testID="game-over-line">{quip}</Text>
+              <View style={styles.bubbleTail} />
+            </View>}
+            <Pressable
+              testID="play-again-button"
+              style={({ pressed }) => [styles.trPlayBtn, pressed && styles.playBtnPressed]}
+              onPress={restart}
+            >
+              <Text style={styles.playBtnText}>Bir daha</Text>
+            </Pressable>
+            {BUILD_TAG !== "" && <Text style={styles.trBuildTag}>{BUILD_TAG}</Text>}
+          </View>
+        </View>
+      )}
+      {gameOver && !FAZ1_UI && (
         <View style={styles.overlay} testID="game-over-overlay">
           <View style={styles.card}>
             <Text style={styles.gameOverTitle}>Game Over</Text>
@@ -1855,7 +2068,7 @@ export default function Game() {
             <Text style={styles.gameOverLine} testID="game-over-line">
               {GAME_OVER_LINE}
             </Text>
-            {FRAME_DIAG && diagText !== "" && (
+            {FRAME_DIAG && SHOW_DIAG_TEXT && diagText !== "" && (
               <Text testID="r068-diag" style={{ fontSize: 9, color: "#333", marginBottom: 8 }}>{diagText}</Text>
             )}
             <Pressable
@@ -2023,12 +2236,17 @@ const PlatformHouseView = memo(function PlatformHouseView({ index, platforms, st
   const colPos = (k: number, g: any) => {
     "worklet";
     if (!g) return { left: 0, top: 0 };
-    const phase = HOUSE_FLOOR_STARTS[Math.floor(houseHash(g.p.id, 1) * 4) % 4];
-    return { left: (g.fw - HOUSE_COL_W) / 2, top: k * HOUSE_PERIOD - phase };
+    const q = Math.floor(houseHash(g.p.id, 1) * 4) % 4;
+    if (!FACADE_ATLAS) return { left: (g.fw - HOUSE_COL_W) / 2, top: k * HOUSE_PERIOD - HOUSE_FLOOR_STARTS[q] };
+    // seeded variant; never the same as the previous platform's raw pick
+    let v = Math.floor(houseHash(g.p.id, 4) * FACADE_CELLS) % FACADE_CELLS;
+    if (v === Math.floor(houseHash(g.p.id - 1, 4) * FACADE_CELLS) % FACADE_CELLS) v = (v + 1 + Math.floor(houseHash(g.p.id, 5) * (FACADE_CELLS - 1))) % FACADE_CELLS;
+    return { left: (g.fw - HOUSE_COL_W) / 2 - v * HOUSE_COL_W, top: k * FACADE_PERIODS[v] - FACADE_STARTS[v][q] };
   };
   const col0 = useAnimatedStyle(() => colPos(0, houseGeom.value));
   const col1 = useAnimatedStyle(() => colPos(1, houseGeom.value));
   const col2 = useAnimatedStyle(() => colPos(2, houseGeom.value));
+  const col3 = useAnimatedStyle(() => colPos(3, houseGeom.value));
   // Roof face: band (house width x rise) > clip L (rot +a, interior right of
   // the left hip line) > unrotate > clip R (rot -a, interior left of the right
   // hip line) > unrotate > tile image placed in house coordinates.
@@ -2090,13 +2308,14 @@ const PlatformHouseView = memo(function PlatformHouseView({ index, platforms, st
         <Animated.View style={[styles.houseCol, col0]}><Image source={HOUSE_FACADE_SOURCE} style={styles.houseFill} resizeMode="stretch" fadeDuration={0} /></Animated.View>
         <Animated.View style={[styles.houseCol, col1]}><Image source={HOUSE_FACADE_SOURCE} style={styles.houseFill} resizeMode="stretch" fadeDuration={0} /></Animated.View>
         <Animated.View style={[styles.houseCol, col2]}><Image source={HOUSE_FACADE_SOURCE} style={styles.houseFill} resizeMode="stretch" fadeDuration={0} /></Animated.View>
+        {FACADE_ATLAS ? <Animated.View style={[styles.houseCol, col3]}><Image source={HOUSE_FACADE_SOURCE} style={styles.houseFill} resizeMode="stretch" fadeDuration={0} /></Animated.View> : null}
         {HOUSE_GRAD_FIXED ? (
           <>
             <Animated.View pointerEvents="none" style={[styles.houseLightFixed, lightStyle]}>
               <LinearGradient pointerEvents="none" colors={["rgba(255,240,214,0.10)", "rgba(255,240,214,0)"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.houseGradFill} />
             </Animated.View>
             <Animated.View pointerEvents="none" style={[styles.houseShadeFixed, shadeStyle]}>
-              <LinearGradient pointerEvents="none" colors={["rgba(52,30,18,0)", "rgba(52,30,18,0.30)"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.houseGradFill} />
+              <LinearGradient pointerEvents="none" colors={["rgba(52,30,18,0)", `rgba(52,30,18,${HOUSE_SHADE_A})`]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.houseGradFill} />
             </Animated.View>
             <Animated.View pointerEvents="none" style={[styles.houseEaveFixed, eaveStyle]}>
               <LinearGradient pointerEvents="none" colors={["rgba(30,18,10,0.43)", "rgba(30,18,10,0)"]} style={styles.houseGradFill} />
@@ -2105,10 +2324,11 @@ const PlatformHouseView = memo(function PlatformHouseView({ index, platforms, st
         ) : (
           <>
             <LinearGradient pointerEvents="none" colors={["rgba(255,240,214,0.10)", "rgba(255,240,214,0)"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.houseLight} />
-            <LinearGradient pointerEvents="none" colors={["rgba(52,30,18,0)", "rgba(52,30,18,0.30)"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.houseShade} />
+            <LinearGradient pointerEvents="none" colors={["rgba(52,30,18,0)", `rgba(52,30,18,${HOUSE_SHADE_A})`]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.houseShade} />
             <LinearGradient pointerEvents="none" colors={["rgba(30,18,10,0.43)", "rgba(30,18,10,0)"]} style={styles.houseEaveShadow} />
           </>
         )}
+        {KONTUR_PARILTI ? <View style={styles.houseShadeStrip} /> : null}
         <View style={styles.houseEdgeL} />
         <View style={styles.houseEdgeR} />
       </Animated.View>
@@ -2315,7 +2535,33 @@ const PlatformView = memo(function PlatformView({ index, platforms, styles, onAr
 });
 
 // PERFECT! pop with a quick scale-in.
-function PerfectPop({ styles, label }: any) {
+// GAZ trial: one pooled puff (static lobes; only the wrapper animates).
+const FartPuff = memo(function FartPuff({ i, puffs, now, cut }: any) {
+  const st = useAnimatedStyle(() => {
+    const P = puffs.value[i];
+    if (!P) return { opacity: 0, transform: [{ translateX: -99999 }, { translateY: -99999 }, { scale: 1 }] };
+    const age = (now.value - P.b) / FART_LIFE;
+    if (age < 0 || age >= 1) return { opacity: 0, transform: [{ translateX: -99999 }, { translateY: -99999 }, { scale: 1 }] };
+    let op = 0.95 * (1 - age * age);
+    let sc = (0.55 + 0.75 * age) * P.s;
+    if (cut.value > P.b) {
+      const k = Math.min(1, (now.value - cut.value) / 140);
+      op *= 1 - k;
+      sc *= 1 + 0.6 * k;
+    }
+    return { opacity: op, transform: [{ translateX: P.x - FART_BOX / 2 }, { translateY: P.y - FART_BOX / 2 }, { scale: sc }] };
+  });
+  return (
+    <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, width: FART_BOX, height: FART_BOX }, st]}>
+      {FART_LOBES.map((l, k) => (
+        <View key={k} style={{ position: "absolute", left: l.x * FART_BOX, top: l.y * FART_BOX, width: l.d * FART_BOX, height: l.d * FART_BOX, borderRadius: (l.d * FART_BOX) / 2, backgroundColor: l.c,
+          borderWidth: l.b ? 2 : 0, borderColor: "rgba(112,120,52,0.7)" }} />
+      ))}
+    </Animated.View>
+  );
+});
+
+function PerfectPop({ styles, label, sub, big }: any) {
   const s = useSharedValue(0);
   useEffect(() => {
     s.value = withTiming(1, { duration: 180 });
@@ -2327,7 +2573,8 @@ function PerfectPop({ styles, label }: any) {
   }));
   return (
     <Animated.View style={st} testID="perfect-label">
-      <Text style={styles.perfectText}>{label}</Text>
+      <Text style={big ? styles.bigPopText : styles.perfectText}>{label}</Text>
+      {sub ? <Text style={styles.bigPopSub}>{sub}</Text> : null}
     </Animated.View>
   );
 }
@@ -2497,7 +2744,7 @@ const useStyles = makeStyles((colors) => ({
   puPageFloor: { position: "absolute", top: PAGE_FLOOR_Y, height: 2200, backgroundColor: PU_PAPER, borderTopWidth: 3, borderColor: "#2a1c16" },
   puPageFold: { position: "absolute", left: 0, right: 0, top: 26, height: 2, backgroundColor: "rgba(120,86,60,0.45)" },
   houseFacade: { position: "absolute", left: 0, right: 0, height: HOUSE_FACADE_H, overflow: "hidden" },
-  houseCol: { position: "absolute", width: HOUSE_COL_W, height: HOUSE_PERIOD },
+  houseCol: { position: "absolute", width: HOUSE_COL_W * FACADE_CELLS, height: HOUSE_PERIOD },
   houseFill: { width: "100%", height: "100%" },
   houseLight: { position: "absolute", left: 0, top: 0, bottom: 0, width: "18%" },
   houseShade: { position: "absolute", right: 0, top: 0, bottom: 0, width: "28%" },
@@ -2506,8 +2753,10 @@ const useStyles = makeStyles((colors) => ({
   houseShadeFixed: { position: "absolute", right: 0, top: 0, bottom: 0, width: HOUSE_GRAD_W, transformOrigin: "100% 0%" },
   houseEaveFixed: { position: "absolute", left: 0, top: 0, height: 14, width: HOUSE_GRAD_W, transformOrigin: "0% 0%" },
   houseGradFill: { position: "absolute", left: 0, top: 0, right: 0, bottom: 0 },
-  houseEdgeL: { position: "absolute", left: 0, top: 0, bottom: 0, width: 1.8, backgroundColor: "#3a281c" },
-  houseEdgeR: { position: "absolute", right: 0, top: 0, bottom: 0, width: 1.8, backgroundColor: "#3a281c" },
+  houseEdgeL: { position: "absolute", left: 0, top: 0, bottom: 0, width: HOUSE_EDGE_W, backgroundColor: HOUSE_EDGE_COLOR },
+  houseEdgeR: { position: "absolute", right: 0, top: 0, bottom: 0, width: HOUSE_EDGE_W, backgroundColor: HOUSE_EDGE_COLOR },
+  houseShadeStrip: { position: "absolute", right: HOUSE_EDGE_W, top: 0, bottom: 0, width: 7, backgroundColor: "rgba(40,24,14,0.26)" },
+  targetGlow: { position: "absolute", left: 0, top: 0, width: GLOW_W, height: GLOW_H, pointerEvents: "none", transformOrigin: "0% 100%" },
   houseClip: { position: "absolute", top: 0, overflow: "hidden" },
   houseRoofImg: { position: "absolute", top: 0, width: HOUSE_ROOF_W, height: HOUSE_ROOF_H },
   houseRoofClipL: { position: "absolute", width: HOUSE_CLIP_S, height: HOUSE_CLIP_S, overflow: "hidden", transformOrigin: "0% 0%", transform: [{ rotate: HOUSE_HIP_DEG }] },
@@ -2667,6 +2916,33 @@ const useStyles = makeStyles((colors) => ({
     alignItems: "center",
   },
   playBtnPressed: { opacity: 0.85, transform: [{ scale: 0.98 }] },
+  // FAZ1 Turkish result card + HUD bits (plain Views, no clipping masks)
+  trCard: {
+    width: "86%", maxWidth: 370, backgroundColor: "#fff8ec", borderRadius: 22, borderWidth: 3, borderColor: "#c0472b",
+    paddingTop: 18, paddingBottom: 14, paddingHorizontal: 22, alignItems: "center",
+    ...Platform.select({
+      web: { boxShadow: "0px 12px 24px rgba(0,0,0,0.25)" },
+      default: { shadowColor: "#000", shadowOpacity: 0.25, shadowRadius: 20, shadowOffset: { width: 0, height: 10 }, elevation: 8 },
+    }),
+  },
+  kilimRow: { flexDirection: "row", gap: 10, marginBottom: 14 },
+  kilimDot: { width: 10, height: 10, transform: [{ rotate: "45deg" }] },
+  trScore: { fontSize: 72, fontWeight: "900", color: "#2a1b12", marginTop: -2, letterSpacing: -2 },
+  trBest: { fontSize: 15, fontWeight: "700", color: "#7a5a44", marginTop: 0, marginBottom: 18 },
+  recordBadge: { backgroundColor: "#e2a33a", borderRadius: 999, paddingHorizontal: 14, paddingVertical: 5, marginBottom: 18 },
+  recordBadgeText: { color: "#2a1b12", fontSize: 15, fontWeight: "900", letterSpacing: 1 },
+  bubble: { alignSelf: "stretch", backgroundColor: "#f3e3c8", borderRadius: 16, paddingVertical: 14, paddingHorizontal: 16, marginBottom: 22 },
+  bubbleText: { fontSize: 17, lineHeight: 23, fontWeight: "700", color: "#3a281c", textAlign: "center" },
+  bubbleTail: { position: "absolute", bottom: -7, left: 34, width: 14, height: 14, backgroundColor: "#f3e3c8", transform: [{ rotate: "45deg" }] },
+  trPlayBtn: { width: "100%", backgroundColor: "#c0472b", borderRadius: 16, paddingVertical: 16, alignItems: "center" },
+  trBuildTag: { fontSize: 9, color: "rgba(58,40,28,0.35)", marginTop: 10 },
+  hintPill: { backgroundColor: "rgba(32,20,12,0.72)", borderRadius: 999, paddingHorizontal: 16, paddingVertical: 8 },
+  hintPillText: { color: "#fff8ec", fontSize: 16, fontWeight: "800", letterSpacing: 0.3 },
+  bigPopText: {
+    fontSize: 60, fontWeight: "900", color: "#ffcf4a", textAlign: "center", letterSpacing: -1,
+    textShadowColor: "rgba(60,30,10,0.9)", textShadowOffset: { width: 0, height: 3 }, textShadowRadius: 2,
+  },
+  bigPopSub: { fontSize: 40, textAlign: "center", marginTop: -2 },
   playBtnText: {
     color: colors.onBrandPrimary,
     fontSize: 17,

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gaz Modu Değerlendirmesi</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f7f1e6;--card:#fffaf1;--ink:#2a1b12;--muted:#6d5a4b;--line:#e5d8c4;--tile:#b5482c;--sea:#2f6f9a;--green:#3e7a52;--ochre:#c98a1f;--chip:#f1e5d1}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#17120e;--card:#211a14;--ink:#f3e9dc;--muted:#b8a691;--line:#3a2f25;--tile:#e07a5a;--sea:#6fb0db;--green:#7cc394;--ochre:#f0b955;--chip:#2c231b}}
+:root[data-theme="dark"]{--bg:#17120e;--card:#211a14;--ink:#f3e9dc;--muted:#b8a691;--line:#3a2f25;--tile:#e07a5a;--sea:#6fb0db;--green:#7cc394;--ochre:#f0b955;--chip:#2c231b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Inter,system-ui,sans-serif}
+.wrap{max-width:860px;margin:0 auto;padding:40px 16px 80px}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;line-height:1.2;margin:0}
+h1{font-size:clamp(28px,5vw,40px)}
+h2{font-size:23px;margin:44px 0 14px;padding-top:8px;border-top:2px solid var(--line)}
+h3{font-size:17px;margin:0 0 6px}
+.kicker{color:var(--tile);font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:13px}
+.lead{font-size:18px;margin:14px 0 0}
+.muted{color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 0}
+.chip{background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:13px}
+.chip.wait{border-style:dashed;color:var(--muted)}
+.verdict{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+.card p{margin:6px 0 0;font-size:15px}
+.v{display:inline-block;font-weight:700;font-size:13px;padding:2px 10px;border-radius:999px;background:var(--chip);color:var(--ochre)}
+.big{font-family:Fraunces,serif;font-size:clamp(22px,4vw,28px);color:var(--tile);margin:6px 0}
+ul{padding-left:20px} li{margin:0 0 8px}
+.opt{border-left:4px solid var(--line)} .opt.pick{border-left-color:var(--tile)}
+table{width:100%;border-collapse:collapse;font-size:15px;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:13px;color:var(--muted)} tr:last-child td{border-bottom:0}
+.tw{overflow-x:auto}
+code{font-size:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="kicker">Çarşamba · Fikir değerlendirmesi · 11 Kasım 2026</div>
+  <h1>Osuruk izi: "evet, ama oyunun konusu değil, amcanın huyu olsun"</h1>
+  <p class="lead">Fikir: amca zıplarken osuruk sesi çıksın, arkasında uçak izi gibi bir bulut bıraksın, inişte iz kesilsin. Üç bağımsız editör ayrı ayrı inceledi ve aynı sonuca vardı: fikir iyi ve paylaşılabilir, ama her zıplamada zorunlu olursa kaldırttığın espri satırlarıyla aynı akıbete uğrar.</p>
+  <div class="chips">
+    <span class="chip">Oyun tasarımcısı</span><span class="chip">Sanat yönetmeni</span><span class="chip">Oyuncu ve pazar</span>
+    <span class="chip wait">Kıvılcım (Codex): yanıt bekleniyor</span>
+  </div>
+
+  <h2>Kararlar</h2>
+  <div class="verdict">
+    <div class="card"><span class="v">Koşullu evet</span><h3 style="margin-top:8px">Tasarım</h3><p>Zıplamaya bir neden veriyor ("amca gazla kalkıyor") ve tam şarjdaki ceket açılma anına doğal bağlanıyor. Tek sabit ses ve kalıcı çizgiyle yapılmamalı.</p></div>
+    <div class="card"><span class="v">Evet, B seçeneği</span><h3 style="margin-top:8px">Sanat</h3><p>Yeşil "zehir" değil, krem pamuk bulut; ince kontrail değil, aralıklı pofuduk bulutçuklar. İniş tozuyla aynı renk ailesi.</p></div>
+    <div class="card"><span class="v">Şöyle yap</span><h3 style="margin-top:8px">Pazar</h3><p>Varsayılan kapalı, açılabilir "Gaz Modu". Her zıplamada zorunlu olursa "İstanbul oyunu" değil "osuruk oyunu" olur.</p></div>
+  </div>
+
+  <h2>Neden işe yarayabilir</h2>
+  <ul>
+    <li><strong>Hikâye veriyor:</strong> Basılı tutmak "gaz toplamak", bırakmak "salmak" olur. Fizik değişmeden zıplamanın bir nedeni olur.</li>
+    <li><strong>Çoklu atlamayı görünür kılıyor:</strong> Uzun bir iz, 4 kule atlamayı tek karede anlatır. Önceki analizdeki "çoklu atlamanın ödülü görünmüyor" eksiğine de dokunur.</li>
+    <li><strong>Paylaşılabilir:</strong> "Amca gazla uçtu" 3–5 saniyelik bir klip için ideal; sesli şaka videoda iyi çalışır.</li>
+    <li><strong>Karaktere uyuyor:</strong> Bıyıklı, eşofmanlı amca bu şakayı taşıyabilir; Kemal Sunal'ın saf, utanmaz mahalle karakteri çizgisinde.</li>
+  </ul>
+
+  <h2>Riskler</h2>
+  <ul>
+    <li><strong>Tekrar yorgunluğu (en büyük risk):</strong> Dakikada 40'tan fazla zıplama var. Aynı ses üçüncü turda sinir bozar; espri satırlarını kaldırtmanın sebebi de buydu.</li>
+    <li><strong>Kamusal alan:</strong> Hedef oyuncu vapurda, metrobüste oynuyor. Sessiz düğmesi kapalı unutulmuş bir telefondan çıkan osuruk sesi gerçek bir utanç anı; oyunu silme nedeni olabilir.</li>
+    <li><strong>Marka:</strong> "Çarşamba = osuruk oyunu" etiketi bir kez yapışırsa sökülmez; manzara için gelen kitle uzaklaşır.</li>
+    <li><strong>Yaş derecesi:</strong> App Store anketinde "kaba mizah" sorusu var; eski sistemde hafif beyan derecelendirmeyi 4+'tan 9+'ya çekiyordu. Yeni yaş basamaklarındaki karşılığından editör emin değil; yayından önce App Store Connect'te kontrol edilmeli.</li>
+    <li><strong>Nişan yardımı:</strong> İz ileriyi gösterirse yörüngeyi ele verir. Yalnız geride kalmalı ve kısa ömürlü olmalı.</li>
+  </ul>
+
+  <h2>Nasıl görünmeli</h2>
+  <div class="verdict">
+    <div class="card opt"><h3>A · Pamuk kontrail</h3><p>Küçük, sık, çok soluk krem bulutlar. Zarif ve mağazaya güvenli, ama espri zayıf kalıyor.</p></div>
+    <div class="card opt pick"><h3>B · Pofuduk kesik iz (önerilen)</h3><p>Kalçadan çıkan, büyüyerek sönen 6 krem bulutçuk, altında hafif haki gölge, aralıklı. İnişte son bulut "pof" diye dağılır. Ses ile görüntü birebir eşleşir.</p></div>
+    <div class="card opt"><h3>C · Kalkış patlaması + kuyruk</h3><p>Zıplama anında büyük tek bulut, ardından 3 küçük bulutçuk. En komiği, ama büyük bulut kalkıştaki çatıyı bir an örtüyor.</p></div>
+  </div>
+  <p class="muted">Kural: yeşil renk, sinek ya da "koku dalgası" çizgileri yok. Mizahı renk değil biçim taşısın.</p>
+
+  <h2>Nasıl çalışmalı</h2>
+  <div class="tw"><table>
+    <tr><th>Konu</th><th>Öneri</th></tr>
+    <tr><td>Büyüklük</td><td>Şarja bağlı: kısa dokunuşta küçük bir "pıt" ve tek bulut; tam şarjda ceket anına bağlı tok, uzun bir "pırrrt".</td></tr>
+    <tr><td>İz</td><td>Yalnız geride; her bulut ~0,65 sn yaşar. Kalkışta yoğun, sonra seyrek. İnişten ~150 ms önce yeni bulut doğmaz.</td></tr>
+    <tr><td>İniş</td><td>Ses ve iz iniş karesinde kesilir; kapanış sesi "tak" olarak kalır.</td></tr>
+    <tr><td>Çeşitlilik</td><td>5–6 sesten oluşan havuz, aynısı art arda çalmaz, perde biraz değişir, ses düzeyi diğer seslerin altında. Seyrek bir "efsane" osuruk yalnız 3+ kule atlamada.</td></tr>
+    <tr><td>Öncelik</td><td>Düşüş ıslığı ve rekor vapur düdüğü her zaman önce gelir.</td></tr>
+    <tr><td>Performans</td><td>Sabit 6 bulutluk havuz, yalnız konum/ölçek/opaklık değişir, kırpma maskesi yok. Eski kolon dumanının hatası (sürekli üretici, çok öğe) tekrarlanmaz.</td></tr>
+  </table></div>
+
+  <h2>Açık mı, kapalı mı?</h2>
+  <p>Üç editör de <strong>varsayılan kapalı</strong> diyor. Önerilen biçim:</p>
+  <ul>
+    <li><strong>"Gaz Modu" açılabilir bir ödül olsun:</strong> örneğin toplam 100 kulede açılsın. Açılış anı başlı başına bir paylaşım anı. Açılınca oyuncu istediği zaman açıp kapatabilsin; ayarlara gömülü çıplak bir "Gaz" düğmesi olmasın.</li>
+    <li><strong>Tadımlık:</strong> Mod kapalıyken bile, ilk tam şarjda ya da rekor kırılan zıplayışta tek seferlik küçük bir "pıt" ve bulut, modun varlığını haber versin.</li>
+    <li><strong>Sessiz telefonda:</strong> Ses sessiz düğmesine uyar (zaten öyle); iz sessizken de görünür.</li>
+  </ul>
+
+  <h2>Benim önerim: önce hissini telefonda dene</h2>
+  <p class="big">Ödül sistemi ve ayar kurmadan önce, kısa bir deneme sürümü.</p>
+  <ul>
+    <li><strong>Deneme sürümü (küçük iş, maliyet yok):</strong> B tarzı 6 bulutluk iz kodla çizilir. 5 osuruk sesi de diğer sesler gibi kodla sentezlenir (perde değişkenli, şarja göre uzunluk). Her zıplamada açık, tek bayrakla kapanır. Amaç yalnız şu soruya cevap: 2–3 dakika oynayınca komik mi kalıyor, sinir mi bozuyor?</li>
+    <li><strong>Beğenirsen ikinci adım:</strong> "Gaz Modu" kilidi (kalıcı ayar ve açılış anı), rekor tadımlığı ve ince ayar. Sanat yönetmeni, bulut için boyalı dokulu 2 küçük PNG öneriyor (görsel üretimi, ayrı onay).</li>
+    <li><strong>Beğenmezsen:</strong> Bayrak kapanır, oyun bugünkü haliyle kalır.</li>
+  </ul>
+
+  <h2>Telefonda neye bakılacak</h2>
+  <ol>
+    <li>3 dakikalık oturumda aynı ses art arda gelmiyor ve sesi kısmak istemiyorsun.</li>
+    <li>Bulut hiçbir karede karakterin önüne geçmiyor, hedef kuleyi örtmüyor, ileriyi göstermiyor.</li>
+    <li>Ses ve iz iniş anında kesiliyor; "tak" net duyuluyor.</li>
+    <li>Kısa, orta ve tam şarj kulakla ve gözle ayırt ediliyor.</li>
+    <li>Takılma geri gelmiyor.</li>
+  </ol>
+
+  <p class="muted" style="margin-top:32px">Ayrıntılı raporlar: <code>frontend/ai_review_evidence/OSURUK-2026-11-11/editor-tasarim.md</code>, <code>editor-sanat.md</code>, <code>editor-pazar.md</code>. Kıvılcım'ın görüşü gelince bu sayfaya eklenecek.</p>
+</div>
+</body>
+</html>

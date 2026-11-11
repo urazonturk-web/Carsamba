@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Çarşamba Analiz Raporu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f7f1e6; --card:#fffaf1; --ink:#2a1b12; --muted:#6d5a4b; --line:#e5d8c4;
+  --tile:#b5482c; --sea:#2f6f9a; --green:#3e7a52; --ochre:#d99a2b; --chip:#f1e5d1;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#17120e; --card:#211a14; --ink:#f3e9dc; --muted:#b8a691; --line:#3a2f25;
+    --tile:#e07a5a; --sea:#6fb0db; --green:#7cc394; --ochre:#f0b955; --chip:#2c231b;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#17120e; --card:#211a14; --ink:#f3e9dc; --muted:#b8a691; --line:#3a2f25;
+  --tile:#e07a5a; --sea:#6fb0db; --green:#7cc394; --ochre:#f0b955; --chip:#2c231b;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Inter,system-ui,sans-serif}
+.wrap{max-width:880px;margin:0 auto;padding:40px 16px 80px}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;line-height:1.2;margin:0}
+h1{font-size:clamp(28px,5vw,42px)}
+h2{font-size:24px;margin:48px 0 14px;padding-top:8px;border-top:2px solid var(--line)}
+h3{font-size:18px;margin:0 0 6px}
+.kicker{color:var(--tile);font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:13px}
+.lead{font-size:18px;color:var(--ink);margin:14px 0 0}
+.muted{color:var(--muted)}
+.sources{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 0}
+.chip{background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:13px}
+.chip.wait{border-style:dashed;color:var(--muted)}
+figure{margin:24px 0 0}
+figure img{width:100%;border-radius:10px;border:1px solid var(--line);display:block}
+figcaption{font-size:13px;color:var(--muted);margin-top:6px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+.card p{margin:4px 0 0;font-size:15px}
+.who{font-size:12px;color:var(--muted);margin-top:8px}
+table{width:100%;border-collapse:collapse;font-size:15px;background:var(--card);border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:13px;color:var(--muted);font-weight:600}
+tr:last-child td{border-bottom:0}
+.score{font-family:Fraunces,serif;font-size:20px;font-weight:700}
+.bar{height:6px;border-radius:3px;background:var(--line);margin-top:4px}
+.bar i{display:block;height:100%;border-radius:3px;background:var(--tile)}
+ol.finds{padding-left:20px}
+ol.finds li{margin:0 0 12px}
+.hook{border-left:4px solid var(--sea)}
+.hook.top{border-left-color:var(--tile)}
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:6px;background:var(--chip);color:var(--muted);margin-right:6px}
+.tag.s{color:var(--green)} .tag.m{color:var(--ochre)} .tag.l{color:var(--tile)}
+.phase{margin:0 0 14px}
+.phase ul{margin:8px 0 0;padding-left:20px}
+.phase li{margin:0 0 6px}
+.quote{font-family:Fraunces,serif;font-size:clamp(22px,4vw,30px);color:var(--tile);margin:8px 0}
+.decide li{margin:0 0 10px}
+.table-wrap{overflow-x:auto}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="kicker">Çarşamba · Görsel ve kanca analizi · 11 Kasım 2026</div>
+  <h1>Zıplama hissi hazır; eksik olan, o hissin bir yere ve bir hikâyeye bağlanması</h1>
+  <p class="lead">Üç bağımsız editör (sanat yönetmeni, oyun tasarımcısı, oyuncu/pazar) aynı 32 saniyelik telefon kaydını ve kodu ayrı ayrı inceledi. Üçü de aynı noktada buluştu: oyun güzel görünüyor ama küçük karakter, sessiz anlar ve jenerik oyun sonu kartı yüzünden "bir İstanbul oyunu" değil, "güzel bir zıplama oyunu" gibi okunuyor.</p>
+  <div class="sources">
+    <span class="chip">Sanat yönetmeni</span>
+    <span class="chip">Oyun tasarımcısı</span>
+    <span class="chip">Oyuncu ve pazar</span>
+    <span class="chip wait">Kıvılcım (Codex): yanıt bekleniyor</span>
+  </div>
+  <figure>
+    <img src="kontakt.jpg" alt="Telefon kaydından beş kare: renkli cepheli kuleler, Boğaz, Galata ve oyun sonu kartı">
+    <figcaption>Kayıt 11-11-2026 13:27, sürüm "G018 KONTUR". HDR kayıt standart renge çevrildi. Soldan: 3., 9., 15., 21., 27. saniye.</figcaption>
+  </figure>
+
+  <h2>Sanat yönetmeninin puanları</h2>
+  <div class="table-wrap">
+  <table>
+    <tr><th>Başlık</th><th>Puan</th><th>Neden</th></tr>
+    <tr><td>Kimlik / özgünlük</td><td><span class="score">7</span><div class="bar"><i style="width:70%"></i></div></td><td>Galata, köprü, vapur, kilim, çamaşır ipi: İstanbul ilk karede okunuyor. Oyunun en güçlü kozu.</td></tr>
+    <tr><td>Genel</td><td><span class="score">5</span><div class="bar"><i style="width:50%"></i></div></td><td>Arka plan güzel, oyun ise "kartpostalın önünde gezen küçük bir çıkartma" gibi.</td></tr>
+    <tr><td>Okunurluk</td><td><span class="score">5</span><div class="bar"><i style="width:50%"></i></div></td><td>Kuleler artık ayrışıyor; karakter, "+4" ve "Hold to charge" yazısı kayboluyor.</td></tr>
+    <tr><td>Karakter</td><td><span class="score">4</span><div class="bar"><i style="width:40%"></i></div></td><td>Çizim çok iyi (bıyık, bordo eşofman, uykulu göz) ama ekranın yaklaşık %5'i; yüz ifadesi görünmüyor.</td></tr>
+    <tr><td>Hareket / canlılık</td><td><span class="score">3</span><div class="bar"><i style="width:30%"></i></div></td><td>İnişte toz, esneme, sarsıntı yok; çoklu kule atlaması ödüllendirilmiyor.</td></tr>
+    <tr><td>Arayüz</td><td><span class="score">3</span><div class="bar"><i style="width:30%"></i></div></td><td>Gri, sistem fontlu, İngilizce kart; hata ayıklama satırı ve sürüm etiketi görünüyor.</td></tr>
+  </table>
+  </div>
+  <p class="muted">Önceki değerlendirmede (GORSEL-DEG-001) genel puan 6/5/5 idi; kuleler o zamandan beri belirgin biçimde iyileşti, şimdi zayıf halka kulelerin dışındaki her şey.</p>
+
+  <h2>Üç editörün de gördüğü eksikler</h2>
+  <ol class="finds">
+    <li><strong>Karakter çok küçük ve ifadesiz.</strong> Oyunun en özgün varlığı olan bıyıklı adam denizin mavisinde 25–30 piksellik bir leke. Şarjda poz değişse de bu boyutta fark edilmiyor. Mağaza görüntüsünde oyunun yüzü yok.</li>
+    <li><strong>Anlar sessiz.</strong> Ses hiç yok (kodda ses kütüphanesi bulunmuyor). İnişte toz ya da esneme yok. 4 kule birden geçmenin ödülü, köprünün üstünde zor seçilen küçük yeşil bir "+4".</li>
+    <li><strong>Oyun sonu kartı oyunun kimliğini taşımıyor.</strong> Gri, İngilizce ("Game Over", "Play Again"), üstünde "R068 ucus 911 kare…" satırı. En paylaşılabilir öğe olan espri satırı en küçük ve en soluk yazı. Üstelik her turda aynı satır çıkıyor.</li>
+    <li><strong>Turlar arasında hiçbir şey birikmiyor.</strong> Geri dönmek için tek sebep "BEST" sayısı. Merkeze iniş şu an puan getirmiyor (deneme ayarında bonus 0), yani orta şerit anlamsız.</li>
+    <li><strong>Kuleler İstanbul'dan çok Akdeniz'i andırıyor.</strong> Kırmızı kiremit, yeşil panjur ve saksılar Lizbon ya da Liguria havası veriyor. İstanbul'u söyleyen tek şey arka plandaki Galata, köprü ve vapur. Kilim ve çamaşır ipi doğru detaylar ama küçük kalıyor.</li>
+  </ol>
+
+  <h2>Neden oynasınlar? Yaratıcı cevaplar</h2>
+  <p class="quote">"Her zıplayış bir İstanbul anı."</p>
+  <p class="muted">Pazar editörünün önerdiği konum cümlesi. Spring Ninja'nın soyut kulelerine karşı bizim farkımız yer ve hikâye. Aşağıdaki fikirlerin hiçbiri fiziğe, kameraya ya da çatı siluetine dokunmuyor.</p>
+  <div class="grid">
+    <div class="card hook top">
+      <h3>Çarşamba Kupası</h3>
+      <p>Her çarşamba sıfırlanan haftalık yarış; herkes aynı tohumla aynı kule dizisini oynar. Oyunun adı bir ritüele dönüşür: "Çarşamba geldi, kupa açıldı."</p>
+      <div class="who">Pazar + tasarım (ikisi ayrı ayrı önerdi)</div>
+    </div>
+    <div class="card hook top">
+      <h3>Vapura atla</h3>
+      <p>Arada Boğaz'dan geçen bir vapur hareketli platform olur. Üstüne inmek bonus ve "Vapuru yakaladın!" getirir; kaçırınca "Vapur kaçtı, simit kaldı." Beş saniyelik paylaşılabilir klip.</p>
+      <div class="who">Pazar; tasarım vapuru günlük süre işareti olarak önerdi</div>
+    </div>
+    <div class="card hook top">
+      <h3>Semt ve gün yolculuğu</h3>
+      <p>Skor arttıkça semt değişir (Balat → Galata → Karaköy → Kadıköy → yalılar) ve gökyüzü sabahtan gün batımına, ezanla ışıkları yanan geceye döner. "Kadıköy'e kadar gittim" demek "43 puan"dan daha çok paylaşılır.</p>
+      <div class="who">Pazar (semt) + sanat (gün akışı)</div>
+    </div>
+    <div class="card hook">
+      <h3>Çamaşır ipi kombosu</h3>
+      <p>Tek zıplamada geçilen her ip havada "tıng" der, çamaşırlar uçuşur. 3 ve üzerinde pencereden bir laf gelir: "Gördün mü Nermin, üç dam birden!" Çoklu atlamanın ödülü görünür ve işitilir olur.</p>
+      <div class="who">Tasarım</div>
+    </div>
+    <div class="card hook">
+      <h3>Pazar ritmi</h3>
+      <p>Her 10 kulede bir pazar tezgâhlı çatı; merkeze iniş tezgâh bağırışı getirir, peş peşe merkez inişler çarpanı büyütür (x2, x3). Orta şerit anlam kazanır, beceri tavanı açılır.</p>
+      <div class="who">Tasarım + sanat ("Çarşamba pazarı" ünlemleri)</div>
+    </div>
+    <div class="card hook">
+      <h3>Mahalle sakinleri</h3>
+      <p>Çatıda uyuyan kediler (merkeze inince uyanıp seni takip eder, oyun sonunda "4 kedi seni izledi", turlar arası koleksiyon), pencereden "Oğlum düşeceksin!" diyen teyze, inişte havalanan martılar.</p>
+      <div class="who">Tasarım (kedi koleksiyonu) + sanat (teyze, martı)</div>
+    </div>
+    <div class="card hook">
+      <h3>Paylaşılan düşüş</h3>
+      <p>Oyun sonu kartı Türkçe ve kilim çerçeveli olur; karikatür kafa konuşma balonunda bağlama göre değişen espriyi söyler (rekora 3 kala, ilk kulede düşüş, yeni rekor). Kart tek dokunuşla hikâye olarak paylaşılır.</p>
+      <div class="who">Üç editör de; espri malzemesi dialog-mizah'ta hazır</div>
+    </div>
+  </div>
+
+  <h2>Önerilen revizyon sırası</h2>
+  <div class="phase card">
+    <h3><span class="tag s">Küçük</span>Faz 1 — Yarım işleri bitir (yeni görsel gerekmez)</h3>
+    <ul>
+      <li>Sürüm etiketini ve hata ayıklama satırlarını oyuncu sürümünden kaldır.</li>
+      <li>Arayüzü Türkçeleştir: "Tekrar", "Rekor", "Tut… bırak!" (yazı yerine parmak gösterimi).</li>
+      <li>Oyun sonu kartını yeniden kur: büyük skor, rekora kalan kule sayısı, bağlama göre seçilen espri havuzu (8–12 satır, mevcut taslaklardan).</li>
+      <li>Çoklu atlamada büyük, konturlu "+N" ve Türkçe ünlem (Maşallah! / Oha! / Efsane!).</li>
+    </ul>
+  </div>
+  <div class="phase card">
+    <h3><span class="tag m">Orta</span>Faz 2 — His ve karakter</h3>
+    <ul>
+      <li>Ses paketi: yükselen şarj tonu, iniş "tak", çoklu atlama "tıng", rekorda vapur düdüğü. Ses dosyalarının kaynağı ve lisansı ayrıca karar ister.</li>
+      <li>İniş "juice"u: hafif esneme, kiremit tozu, çok kısa sarsıntı.</li>
+      <li>Karakteri çizimde 1,5 kat büyütme denemesi (çarpışma kutusu aynı kalır), ince açık hale. Şarjda abartılı ifade için 2–3 kafa pozu (küçük görsel üretimi).</li>
+    </ul>
+  </div>
+  <div class="phase card">
+    <h3><span class="tag l">Büyük</span>Faz 3 — Tek bir imza kanca seç</h3>
+    <ul>
+      <li><strong>Önerim:</strong> önce <em>semt ve gün yolculuğu</em> + <em>vapura atla</em>. İkisi de çevrimdışı çalışır, hesap ya da sunucu gerektirmez, İstanbul kimliğini en güçlü gösteren fikirler. Arka plan katmanları (bekleyen 3 görsel çağrısı) bu işle birleştirilebilir.</li>
+      <li>Ardından pazar ritmi / çamaşır ipi (puan sistemine dokunur).</li>
+      <li>Çarşamba Kupası en iyi geri dönüş kancası ama sunucu, skor tablosu ve büyük olasılıkla hesap/maliyet gerektirir; yayına yakın aşamaya bırakılmalı.</li>
+    </ul>
+  </div>
+
+  <h2>Senin kararını bekleyenler</h2>
+  <ol class="decide">
+    <li><strong>Karakter boyutu.</strong> Daha önce kabul edilen ölçek (web'de ekranın %11'i ölçülmüştü) telefonda yaklaşık %5 görünüyor. 1,5 kat büyütme denemesi yapılsın mı?</li>
+    <li><strong>Merkeze iniş puanı.</strong> Şu an deneme ayarında 0. Pazar ritmi gibi bir çarpan puanlamayı değiştirir.</li>
+    <li><strong>Ses.</strong> Ses dosyalarını nereden alacağımız (üretim, ücretsiz lisanslı kütüphane, satın alma) ve bütçe.</li>
+    <li><strong>Dil ve isim.</strong> Cihaz diline göre iki dilli arayüz ve mağaza adı önerisi: "Çarşamba: İstanbul Rooftop Jump".</li>
+    <li><strong>İmza kanca.</strong> Faz 3 için hangi fikirle başlanacağı.</li>
+  </ol>
+
+  <h2>Notlar</h2>
+  <ul class="muted">
+    <li>Karakterin üstünde kırmızı yelek değil, beyaz şeritli bordo eşofman var (sanat yönetmeni düzeltmesi).</li>
+    <li>Kayıt HDR olduğu için ilk çıkarılan kareler soluk görünüyordu; değerlendirme standart renge çevrilmiş karelerle yapıldı.</li>
+    <li>Kıvılcım'ın bağımsız görüşü istendi; geldiğinde bu sayfaya eklenecek.</li>
+    <li>Ayrıntılı raporlar: <code>frontend/ai_review_evidence/ANALIZ-2026-11-11/editor-sanat.md</code>, <code>editor-tasarim.md</code>, <code>editor-pazar.md</code>.</li>
+  </ul>
+</div>
+</body>
+</html>
