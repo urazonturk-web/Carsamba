@@ -8,6 +8,7 @@ import {
   type GestureResponderEvent,
   Platform,
   Pressable,
+  ScrollView,
   Text,
   useWindowDimensions,
   View,
@@ -36,6 +37,7 @@ import { NO_IMAGE_CLIP, NoClipImage as Image } from "../src/game/NoClipImage";
 import { ChargePoses } from "../src/game/ChargePoses";
 import { CHARGE_POSES, FAZ2_IFADE } from "../src/game/character-pose";
 import { ANCHOR_SHIFT_PX, GLOBAL_VISUAL_SCALE, POSE_FEET_SPAN_PX } from "../src/game/character-pose";
+import { POSTCARDS, POSTCARDS_KEY, POSTCARDS_ON, parseUnlocked } from "../src/game/postcards";
 import { DAILY_KEY, DAILY_MAP, dailySeed, todayKey, todayLabel, type DailyRecord } from "../src/game/daily";
 import { DURAK_SEFER, nextStopLine, stopName, stopTowerId, stopsPassed, PIER_STOP } from "../src/game/stops";
 import { SFX_ON, initSfx, playFart, playSfx, setSfxMuted, stopFart, stopSfx } from "../src/game/sfx";
@@ -302,7 +304,7 @@ const AnimatedImage = Animated.createAnimatedComponent(Image);
 const BG_SCROLL_TEST = true as boolean;
 const BG_SCROLL_RATIO = 0.45;
 const BG_SCROLL_TILES = 4;
-const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? "DURAK v3 + SES OTURUMU + GORUNUM" : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
+const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? "KARTPOSTAL ALBUMU v1" : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
 const DIAG_MAX_EXAMPLES = 6;
 const HOUSE_AB_FROZEN = false as boolean;
 // REVIZYON-066 experiment (one variable): expo-linear-gradient's iOS layer
@@ -446,6 +448,16 @@ const SFX_MUTED_KEY = "carsamba.sfxMuted.v1";
 const FARTHEST_TOWER_KEY = "carsamba.farthestTower.v1";
 // DURAK SEFERİ: gökyüzü tonu durak başına bir adım (sabah, öğle, ikindi, gün batımı, gece).
 const SKY_STEPS = [0, 1, 2, 3, 4];
+// Gece yıldızları: sabit yerleşim (gökyüzü bandı, üst %32).
+const NIGHT_STARS = Array.from({ length: 18 }, (_, i) => {
+  const h = (n: number) => ((Math.sin(i * 12.9898 + n * 78.233) * 43758.5453) % 1 + 1) % 1;
+  return { x: 3 + h(1) * 92, y: 4 + h(2) * 28, r: 2 + Math.round(h(3) * 2), o: 0.55 + h(4) * 0.45 };
+});
+const CONFETTI_COLORS = ["#c0472b", "#e2a33a", "#3e7a52", "#1f4e79", "#fff8ec", "#b5482c"];
+const CONFETTI = Array.from({ length: 22 }, (_, i) => {
+  const h = (n: number) => ((Math.sin(i * 91.17 + n * 23.71) * 9631.13) % 1 + 1) % 1;
+  return { x: h(1), drift: (h(2) - 0.5) * 0.25, delay: h(3) * 0.35, size: 10 + Math.round(h(4) * 7), rot: (h(5) - 0.5) * 720, c: CONFETTI_COLORS[i % CONFETTI_COLORS.length] };
+});
 // 2026-11-12 video 13-15-13: ilk tonlar telefonda neredeyse fark edilmedi (gök mavisi ~%5 ısındı) -> güçlendirildi.
 const SKY_TINTS = ["rgba(255,205,130,0)", "rgba(255,206,120,0.20)", "rgba(255,150,70,0.30)", "rgba(240,90,70,0.36)", "rgba(16,26,74,0.50)"];
 const BEST_SCORE_KEY = REFERENCE_TRIAL ? "jumpcharge.bestScore.reference.v1" : "jumpcharge.bestScore";
@@ -647,7 +659,22 @@ export default function Game() {
   // DURAK SEFERİ state
   const lastTowerRef = useRef(0);
   const farthestRef = useRef(0);
-  const [stopBanner, setStopBanner] = useState<{ key: number; title: string; sub: string } | null>(null);
+  const [stopBanner, setStopBanner] = useState<{ key: number; title: string; sub: string; pier?: boolean } | null>(null);
+  const [pierFx, setPierFx] = useState(0); // iskele kutlaması anahtarı (0 = yok)
+  // KARTPOSTAL ALBÜMÜ
+  const unlockedRef = useRef<number[]>([]);
+  const [unlocked, setUnlocked] = useState<number[]>([]);
+  const runNewCardsRef = useRef<number[]>([]);
+  const [runNewCards, setRunNewCards] = useState<number[]>([]);
+  const [albumOpen, setAlbumOpen] = useState(false);
+  useEffect(() => {
+    if (!POSTCARDS_ON) return;
+    storage.getItem<string>(POSTCARDS_KEY, "").then((raw) => {
+      const u = parseUnlocked(raw);
+      unlockedRef.current = u;
+      setUnlocked(u);
+    });
+  }, []);
   const stopTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [runEnd, setRunEnd] = useState<{ lastTower: number; stops: number }>({ lastTower: 0, stops: 0 });
   const bestRef = useRef(0);
@@ -972,10 +999,27 @@ export default function Game() {
       const after = stopsPassed(landedId);
       if (after > before) {
         const pier = after === PIER_STOP;
-        setStopBanner({ key: landedId, title: stopName(after), sub: pier ? `Vapura yetiştin! ⛴️ · ${stopTowerId(after)}. kule` : `${after > PIER_STOP ? "🌙 " : ""}${stopTowerId(after)}. kule` });
+        let newCard = false;
+        if (POSTCARDS_ON && after <= POSTCARDS.length && !unlockedRef.current.includes(after)) {
+          newCard = true;
+          unlockedRef.current = [...unlockedRef.current, after];
+          setUnlocked(unlockedRef.current);
+          storage.setItem(POSTCARDS_KEY, JSON.stringify(unlockedRef.current));
+          runNewCardsRef.current = [...runNewCardsRef.current, after];
+        }
+        setStopBanner({ key: landedId, title: stopName(after), sub: pier ? `Vapura yetiştin! ⛴️ · ${stopTowerId(after)}. kule` : `${after > PIER_STOP ? "🌙 " : ""}${stopTowerId(after)}. kule${newCard ? " · 📮 yeni kartpostal" : ""}`, pier });
         if (stopTimer.current) clearTimeout(stopTimer.current);
-        stopTimer.current = setTimeout(() => setStopBanner(null), 1400);
+        stopTimer.current = setTimeout(() => setStopBanner(null), pier ? 2600 : 1400);
         if (SFX_ON) playSfx("record");
+        if (Platform.OS !== "web") {
+          if (pier) Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+          else Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
+        }
+        if (pier) {
+          // İSKELE ANI (2026-11-12): çift vapur düdüğü + kilim renklerinde konfeti.
+          setPierFx(landedId);
+          if (SFX_ON) setTimeout(() => playSfx("record"), 650);
+        }
         skyStep.value = withTiming(Math.min(after, SKY_STEPS.length - 1), { duration: 900 });
       }
     }
@@ -999,6 +1043,7 @@ export default function Game() {
   }, []);
 
   const onGameOver = useCallback(() => {
+    if (POSTCARDS_ON) setRunNewCards(runNewCardsRef.current);
     if (DURAK_SEFER) {
       const lt = lastTowerRef.current;
       setRunEnd({ lastTower: lt, stops: stopsPassed(lt) });
@@ -1054,6 +1099,9 @@ export default function Game() {
 
   const restart = useCallback(() => {
     lastTowerRef.current = 0;
+    runNewCardsRef.current = [];
+    setRunNewCards([]);
+    setAlbumOpen(false);
     skyStep.value = 0;
     setStopBanner(null);
     scoreRef.current = 0;
@@ -1538,6 +1586,8 @@ export default function Game() {
     return { opacity: 0.35 + 0.55 * Math.min(1, visualCharge.value),
       transform: [{ translateX: t.x }, { translateY: t.topY - GLOW_H + 2 }, { scaleX: t.width / GLOW_W }] };
   });
+  // Gece seferi: iskeleden sonra gökte yıldızlar belirir (tek katman, yalnız opaklık).
+  const starsStyle = useAnimatedStyle(() => ({ opacity: Math.max(0, Math.min(1, skyStep.value - 3)) }));
   const skyTintStyle = useAnimatedStyle(() => ({
     backgroundColor: interpolateColor(skyStep.value, SKY_STEPS, SKY_TINTS),
   }));
@@ -1758,6 +1808,13 @@ export default function Game() {
       {!POPUP && <LinearGradient pointerEvents="none" colors={["rgba(30,120,230,0.10)", "rgba(255,190,120,0)", "rgba(255,170,100,0.10)"]}
         locations={[0, 0.5, 1]} style={styles.fill} />}
       {DURAK_SEFER && !POPUP && <Animated.View pointerEvents="none" style={[styles.fill, skyTintStyle]} />}
+      {DURAK_SEFER && !POPUP && (
+        <Animated.View pointerEvents="none" style={[styles.fill, starsStyle]}>
+          {NIGHT_STARS.map((st, i) => (
+            <View key={i} style={{ position: "absolute", left: `${st.x}%`, top: `${st.y}%`, width: st.r, height: st.r, borderRadius: st.r / 2, backgroundColor: "#fff6d8", opacity: st.o }} />
+          ))}
+        </Animated.View>
+      )}
       {POPUP && (
         <>
           {/* POPUP-002: approved backdrop as one screen-fixed matte (height = screen,
@@ -2196,14 +2253,15 @@ export default function Game() {
       )}
 
       {DURAK_SEFER && stopBanner && !gameOver && (
-        <Animated.View key={stopBanner.key} entering={FadeIn.duration(180)} exiting={FadeOut.duration(260)} pointerEvents="none"
+        <Animated.View key={`stop-${stopBanner.key}`} entering={FadeIn.duration(180)} exiting={FadeOut.duration(260)} pointerEvents="none"
           style={[styles.stopBannerWrap, { top: insets.top + 108 }]}>
-          <View style={styles.stopSign}>
-            <Text style={styles.stopTitle}>{stopBanner.title}</Text>
-            {stopBanner.sub !== "" && <Text style={styles.stopSignSub}>{stopBanner.sub}</Text>}
+          <View style={[styles.stopSign, stopBanner.pier && styles.stopSignPier]}>
+            <Text style={[styles.stopTitle, stopBanner.pier && styles.stopTitlePier]}>{stopBanner.title}</Text>
+            {stopBanner.sub !== "" && <Text style={[styles.stopSignSub, stopBanner.pier && styles.stopSignSubPier]}>{stopBanner.sub}</Text>}
           </View>
         </Animated.View>
       )}
+      {DURAK_SEFER && pierFx > 0 && !gameOver && <PierConfetti key={`pier-${pierFx}`} W={W} H={H} onDone={() => setPierFx(0)} />}
       {/* PERFECT! popup */}
       {perfectVisible && (
         <View style={[styles.perfectWrap, DURAK_SEFER && stopBanner && { top: "34%" }]}>
@@ -2252,6 +2310,9 @@ export default function Game() {
               <View style={styles.stopCardBox} testID="stop-summary">
                 <Text style={styles.stopCardMain}>{runEnd.stops > 0 ? `En uzak durak: ${stopName(runEnd.stops)}` : "Henüz durağa varmadın"}</Text>
                 <Text style={styles.stopCardSub}>{nextStopLine(runEnd.lastTower)}</Text>
+                {POSTCARDS_ON && runNewCards.length > 0 && (
+                  <Text style={styles.stopCardNew}>📮 Yeni kartpostal: {runNewCards.map((k) => POSTCARDS[k - 1]?.name).join(", ")}</Text>
+                )}
               </View>
             )}
             {QUIP_ON && <View style={styles.bubble}>
@@ -2265,6 +2326,15 @@ export default function Game() {
             >
               <Text style={styles.playBtnText}>Bir daha</Text>
             </Pressable>
+            {POSTCARDS_ON && (
+              <Pressable
+                testID="album-button"
+                style={({ pressed }) => [styles.modeBtn, pressed && styles.playBtnPressed]}
+                onPress={() => setAlbumOpen(true)}
+              >
+                <Text style={styles.modeBtnText}>📮 Kartpostallar {unlocked.length}/{POSTCARDS.length}</Text>
+              </Pressable>
+            )}
             {DAILY_MAP && (
               <Pressable
                 testID="mode-switch-button"
@@ -2275,6 +2345,34 @@ export default function Game() {
               </Pressable>
             )}
             {BUILD_TAG !== "" && <Text style={styles.trBuildTag}>{BUILD_TAG}</Text>}
+          </View>
+        </View>
+      )}
+      {POSTCARDS_ON && albumOpen && (
+        <View style={styles.albumOverlay} testID="album">
+          <View style={styles.albumCard}>
+            <Text style={styles.albumTitle}>📮 Kartpostallar</Text>
+            <Text style={styles.albumSub}>{unlocked.length}/{POSTCARDS.length} · her yeni durak bir kartpostal</Text>
+            <ScrollView contentContainerStyle={styles.albumGrid}>
+              {POSTCARDS.map((pc) => {
+                const open = unlocked.includes(pc.stop);
+                return (
+                  <View key={pc.stop} style={styles.albumItem}>
+                    {open ? (
+                      <View style={styles.albumImg}>
+                        <Image source={pc.source} style={{ position: "absolute", left: 0, top: 0, width: "100%", height: "100%" }} resizeMode="stretch" fadeDuration={0} />
+                      </View>
+                    ) : (
+                      <View style={[styles.albumImg, styles.albumLocked]}><Text style={styles.albumLockedText}>?</Text></View>
+                    )}
+                    <Text style={styles.albumName}>{open ? pc.name : `${stopTowerId(pc.stop)}. kule`}</Text>
+                  </View>
+                );
+              })}
+            </ScrollView>
+            <Pressable style={({ pressed }) => [styles.trPlayBtn, pressed && styles.playBtnPressed]} onPress={() => setAlbumOpen(false)}>
+              <Text style={styles.playBtnText}>Kapat</Text>
+            </Pressable>
           </View>
         </View>
       )}
@@ -2402,6 +2500,37 @@ function StartCover({ W, H }: { W: number; H: number }) {
 // re-created per render (geom/colPos), so Reanimated stopped and restarted
 // ~13 mappers per house on the UI thread at takeoff and landing. Props here
 // are a SharedValue, the memoized StyleSheet and stable callbacks.
+// İSKELE ANI konfetisi: yalnız iskele durağında ~1,9 sn takılı kalır, sonra kendini kaldırır.
+// Tek paylaşılan ilerleme değeri; her parça yalnız transform/opaklık (gölge, maske yok).
+function ConfettiPiece({ t, q, W, H }: any) {
+  const st = useAnimatedStyle(() => {
+    const k = Math.max(0, Math.min(1, (t.value - q.delay) / (1 - q.delay)));
+    return {
+      opacity: k <= 0 ? 0 : k > 0.85 ? (1 - k) / 0.15 : 1,
+      transform: [
+        { translateX: (q.x + q.drift * k) * W },
+        { translateY: -30 + k * H * 0.75 },
+        { rotate: `${q.rot * k}deg` },
+      ],
+    };
+  });
+  return <Animated.View style={[{ position: "absolute", left: 0, top: 0, width: q.size, height: q.size * 0.6, backgroundColor: q.c }, st]} />;
+}
+function PierConfetti({ W, H, onDone }: { W: number; H: number; onDone: () => void }) {
+  const t = useSharedValue(0);
+  useEffect(() => {
+    t.value = withTiming(1, { duration: 1900, easing: Easing.out(Easing.quad) });
+    const id = setTimeout(onDone, 2000);
+    return () => clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  return (
+    <View pointerEvents="none" style={{ position: "absolute", left: 0, top: 0, right: 0, bottom: 0, zIndex: 45 }}>
+      {CONFETTI.map((q, i) => <ConfettiPiece key={i} t={t} q={q} W={W} H={H} />)}
+    </View>
+  );
+}
+
 const PlatformHouseView = memo(function PlatformHouseView({ index, platforms, styles, probe }: any) {
   // REVIZYON-062: every updater passes its SharedValue's .value itself. Reanimated
   // only subscribes a mapper to SharedValues found directly in the updater's
@@ -3083,11 +3212,25 @@ const useStyles = makeStyles((colors) => ({
   modeSegBtnOn: { backgroundColor: "#c0472b" },
   modeSegText: { fontSize: 13, fontWeight: "800", color: "#2a1b12" },
   modeSegTextOn: { color: "#fff8ec" },
+  stopCardNew: { fontSize: 14, fontWeight: "800", color: "#c0472b", marginTop: 4 },
+  albumOverlay: { position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundColor: "rgba(20,12,6,0.55)", alignItems: "center", justifyContent: "center", zIndex: 80 },
+  albumCard: { width: "90%", maxWidth: 400, maxHeight: "82%", backgroundColor: "#fff8ec", borderRadius: 22, borderWidth: 3, borderColor: "#c0472b", padding: 16 },
+  albumTitle: { fontSize: 22, fontWeight: "900", color: "#2a1b12", textAlign: "center" },
+  albumSub: { fontSize: 13, fontWeight: "700", color: "#7a5a44", textAlign: "center", marginTop: 2, marginBottom: 10 },
+  albumGrid: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", paddingBottom: 10 },
+  albumItem: { width: "48%", marginBottom: 12, alignItems: "center" },
+  albumImg: { width: "100%", aspectRatio: 4 / 3, borderRadius: 4 },
+  albumLocked: { backgroundColor: "#e8dcc6", borderWidth: 2, borderColor: "#cdbb9c", borderStyle: "dashed", alignItems: "center", justifyContent: "center" },
+  albumLockedText: { fontSize: 30, fontWeight: "900", color: "#b8a17e" },
+  albumName: { marginTop: 4, fontSize: 14, fontWeight: "800", color: "#2a1b12" },
   modeBtn: { width: "100%", marginTop: 10, borderRadius: 16, paddingVertical: 12, alignItems: "center", borderWidth: 2, borderColor: "#c0472b", backgroundColor: "#fff8ec" },
   modeBtnText: { color: "#c0472b", fontSize: 16, fontWeight: "800" },
   stopBannerWrap: { position: "absolute", left: 0, right: 0, alignItems: "center", zIndex: 40 },
   stopSign: { backgroundColor: "#1f4e79", borderRadius: 10, borderWidth: 3, borderColor: "#f4ead8", paddingHorizontal: 18, paddingVertical: 7 },
   stopTitle: { color: "#fff", fontSize: 24, fontWeight: "900", letterSpacing: 0.5, textAlign: "center" },
+  stopSignPier: { backgroundColor: "#e2a33a", borderColor: "#2a1b12", paddingHorizontal: 22, paddingVertical: 9 },
+  stopTitlePier: { color: "#2a1b12", fontSize: 28 },
+  stopSignSubPier: { color: "#2a1b12" },
   stopSignSub: { color: "#f4ead8", fontSize: 13, fontWeight: "800", textAlign: "center", marginTop: 1 },
   stopSubPill: { marginTop: 6, backgroundColor: "rgba(255,248,236,0.88)", borderRadius: 999, paddingHorizontal: 12, paddingVertical: 3 },
   stopSub: { color: "#2a1b12", fontSize: 16, fontWeight: "800" },
