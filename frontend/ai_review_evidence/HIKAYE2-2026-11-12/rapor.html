@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Komik Gizem Seçenekleri</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f7f1e6; --card:#fffaf1; --ink:#2a1b12; --muted:#6d5a4b; --line:#e5d8c4;
+  --tile:#b5482c; --sea:#2f6f9a; --green:#3e7a52; --ochre:#d99a2b; --chip:#f1e5d1;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#17120e; --card:#211a14; --ink:#f3e9dc; --muted:#b8a691; --line:#3a2f25;
+    --tile:#e07a5a; --sea:#6fb0db; --green:#7cc394; --ochre:#f0b955; --chip:#2c231b;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#17120e; --card:#211a14; --ink:#f3e9dc; --muted:#b8a691; --line:#3a2f25;
+  --tile:#e07a5a; --sea:#6fb0db; --green:#7cc394; --ochre:#f0b955; --chip:#2c231b;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Inter,system-ui,sans-serif}
+.wrap{max-width:880px;margin:0 auto;padding:40px 16px 80px}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;line-height:1.2;margin:0}
+h1{font-size:clamp(28px,5vw,42px)}
+h2{font-size:24px;margin:48px 0 14px;padding-top:8px;border-top:2px solid var(--line)}
+h3{font-size:18px;margin:0 0 6px}
+.kicker{color:var(--tile);font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:13px}
+.lead{font-size:18px;color:var(--ink);margin:14px 0 0}
+.muted{color:var(--muted)}
+.sources{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 0}
+.chip{background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:13px}
+.chip.wait{border-style:dashed;color:var(--muted)}
+figure{margin:24px 0 0}
+figure img{width:100%;border-radius:10px;border:1px solid var(--line);display:block}
+figcaption{font-size:13px;color:var(--muted);margin-top:6px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+.card p{margin:4px 0 0;font-size:15px}
+.who{font-size:12px;color:var(--muted);margin-top:8px}
+table{width:100%;border-collapse:collapse;font-size:15px;background:var(--card);border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:13px;color:var(--muted);font-weight:600}
+tr:last-child td{border-bottom:0}
+.score{font-family:Fraunces,serif;font-size:20px;font-weight:700}
+.bar{height:6px;border-radius:3px;background:var(--line);margin-top:4px}
+.bar i{display:block;height:100%;border-radius:3px;background:var(--tile)}
+ol.finds{padding-left:20px}
+ol.finds li{margin:0 0 12px}
+.hook{border-left:4px solid var(--sea)}
+.hook.top{border-left-color:var(--tile)}
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:6px;background:var(--chip);color:var(--muted);margin-right:6px}
+.tag.s{color:var(--green)} .tag.m{color:var(--ochre)} .tag.l{color:var(--tile)}
+.phase{margin:0 0 14px}
+.phase ul{margin:8px 0 0;padding-left:20px}
+.phase li{margin:0 0 6px}
+.quote{font-family:Fraunces,serif;font-size:clamp(22px,4vw,30px);color:var(--tile);margin:8px 0}
+.decide li{margin:0 0 10px}
+.table-wrap{overflow-x:auto}
+</style>
+<style>.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:12px 0} .card p{margin:6px 0 0}</style>
+<style>table{width:100%;border-collapse:collapse;margin:8px 0;font-size:15px}th,td{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left;vertical-align:top}th{color:var(--muted);font-weight:600}.muted{color:var(--muted);font-size:14px}@media (max-width:560px){table{font-size:13px}}</style></head><body><div class="wrap">
+<div class="kicker">Komik gizem · 2. tur · 12 Kasım 2026</div>
+<h1>Amcanın peşinde olduğu şey: dört komik gizem</h1>
+<p>Dört bağımsız görüş alındı: anlatı, mizah, pazar ve Kıvılcım. Vapur/buhar ve düğün yönlerini hiçbiri kullanmadı. İki editör birbirinden habersiz <b>aynı fikre</b> vardı: bir martı amcanın takma dişini kapmış.</p>
+
+<h2>1 · Martı dişimi kaptı <span class="muted">(anlatı ve mizah editörü, ayrı ayrı)</span></h2>
+<div class="card">
+<p><b>Gizem:</b> Bir martı, amcanın bardakta duran takma dişini kapmış. Amca çatılardan onun peşinde.</p>
+<p><b>Başta görünen tuhaflık:</b> Amca ağzını hiç açmıyor. Şarj ederken dudakları büzük; o yüz ifadeleri zaten oyunda var.</p>
+<p><b>Yanlış ipuçları:</b> Kartpostal arkalarında "Bardak boş.", "Dişçi, 09.00.", "İki tabak fasulye." var. Martının gagasındaki parıltıyı oyuncu altın sanıyor.</p>
+<p><b>Gazın işi:</b> Fasulyeler bilerek yenmiş, gaz amcanın yakıtı. Finalde "Tam kıvam" patlaması martıyı ürkütüyor, diş havadan düşüyor. Amca dişi kapıp takıyor ve oyunda ilk kez sırıtıyor.</p>
+<p><b>Metin:</b> Yaklaşık 14 kelime. İlk deneme kredisiz yapılabilir; yalnızca son "dişli gülüş" karesi için yeni görsel gerekiyor.</p>
+<p><b>İsim adayları:</b> ★ <b>Toot Pursuit</b> ("hot pursuit", yani kızgın kovalamaca, ile "toot", yani osuruk ve düdük; oyun hem kovalamaca hem gaz) · ★ <b>Tooth or Dare</b> ("Truth or Dare", Doğruluk mu Cesaret mi, ile "tooth", diş) · <b>Dişini Sıkan Amca</b> (çift anlamlı: sabırlı ve dişsiz) · Dişini Geri Ver · Bite Back</p>
+</div>
+
+<h2>2 · Gökteki senet <span class="muted">(mizah editörü)</span></h2>
+<div class="card">
+<p><b>Gizem:</b> Amca gaz iziyle gökyüzüne yazı yazıyor. Karşı yakadaki komşusundan 1998'den beri alamadığı 50 lirayı istiyor.</p>
+<p><b>Gazın işi:</b> Gaz izi kalıcı ve mürekkep işi görüyor. "Tam kıvam" düzgün bir harf çiziyor, "Dayanamadı!" harfi bozuyor.</p>
+<p><b>Açılma:</b> Her düşüşte gökyüzüne bir harf parçası ekleniyor. Yarım harfler "İMDAT" ya da bir harita gibi okunuyor. Gecede yazının tamamı çıkıyor: "… 50 LİRA". Karşı balkonda biri çay bardağını düşürüyor.</p>
+<p><b>Özgünlük:</b> En özgün fikir bu. Gaz hikâyenin aracı oluyor.</p>
+<p><b>İsim adayları:</b> ★ <b>Air Mail</b> / <b>Hava Postası</b> · Pay Up! · Gökteki Senet</p>
+</div>
+
+<h2>3 · Tut Amca <span class="muted">(pazar editörü)</span></h2>
+<div class="card">
+<p><b>Gizem:</b> Amca bir şey tutuyor gibi; "Kimseye söyleme" yazan bir kart var. Oyuncu bir sır sanıyor.</p>
+<p><b>Çözüm:</b> İskelede anlaşılıyor ki tuttuğu şey, kalabalıkta koyveremediği gaz. Gece boş çatılarda rahatlıyor.</p>
+<p><b>Neden güçlü:</b> "Tut" hem oyunun mekaniği (basılı tut), hem gizemin sorusu ("neyi tutuyor?"), hem İngilizcede "toot" çağrışımı.</p>
+<p><b>İsim:</b> ★ <b>Tut Amca</b> / <b>Uncle Tut</b>. Birebir çakışma bulunamadı.</p>
+</div>
+
+<h2>4 · Simit nerede? <span class="muted">(Kıvılcım)</span></h2>
+<div class="card">
+<p><b>Gizem:</b> Amca bir martının simidini kaptığını sanıp onu kovalıyor. Çatılarda susam taneleri, martılar hep arkasına bakıyor.</p>
+<p><b>Çözüm:</b> Gece anlaşılıyor ki simit başından beri eşofmanının kapüşonuna takılı. Amca kendi bıraktığı susam izini kovalamış. Gaz bulutu martıları dağıttığı için bunu fark edememiş.</p>
+<p><b>İsim adayları:</b> ★ <b>Simit Nerede?</b> · Crumb Suspect · Behind You!</p>
+</div>
+
+<h2>Önerim</h2>
+<p><b>1. seçenek: Martı dişimi kaptı, adı "Toot Pursuit".</b> Nedenleri:</p>
+<ul>
+<li>İki editör ayrı ayrı bu fikre vardı.</li>
+<li>Oyundaki mevcut parçaların hepsini açıklıyor: martılar, büzük dudaklı şarj yüzleri, gaz, "Tam kıvam".</li>
+<li>Finali tek bir görüntü: amcanın ilk sırıtışı. Paylaşılmaya çok uygun.</li>
+<li>"Toot Pursuit" bir kelime oyunu, iki dilde de espri taşıyor.</li>
+</ul>
+<p>Daha özgün ve cesur bir şey istersen <b>Gökteki senet / Air Mail</b>.</p>
+
+<h2>Uyarılar</h2>
+<ul>
+<li>Adda "fart" ya da "osuruk" geçmemeli. Apple bu tür uygulamaları düşük değerli sayabiliyor ve o raf zaten çok kalabalık.</li>
+<li>Gizem yazıyla ya da ara sahneyle açıklanmamalı; çözüm görüntüyle gelmeli.</li>
+<li>Gerçek kişi, takım ya da semt adı kullanılmamalı.</li>
+<li>İsimlerin kesin uygunluğu App Store Connect kaydında ve marka tescilinde ayrıca kontrol edilmeli.</li>
+</ul>
+<p class="muted">Ayrıntılı raporlar: editor-anlati.md, editor-mizah.md, editor-pazar.md (kaynaklarıyla), editor-kivilcim.md.</p>
+</div></body></html>

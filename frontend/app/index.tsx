@@ -305,7 +305,7 @@ const AnimatedImage = Animated.createAnimatedComponent(Image);
 const BG_SCROLL_TEST = true as boolean;
 const BG_SCROLL_RATIO = 0.45;
 const BG_SCROLL_TILES = 4;
-const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? "ISTANBUL OLAYLARI v1 (MARTI)" : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
+const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? "PATLAMA ESIGI v1 (500ms)" : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
 const DIAG_MAX_EXAMPLES = 6;
 const HOUSE_AB_FROZEN = false as boolean;
 // REVIZYON-066 experiment (one variable): expo-linear-gradient's iOS layer
@@ -446,6 +446,15 @@ const NEAR_IMG_TILE_COUNT = 8; // covers the "first screen + first 10 jumps" sco
 
 // Preserve historical scores separately because the scoring rules changed.
 const SFX_MUTED_KEY = "carsamba.sfxMuted.v1";
+// PATLAMA EŞİĞİ (2026-11-12, FARK raporu B; kullanıcı: "Evet, başla"):
+// tam şarja ulaşınca OVER_WINDOW_MS'lik "son an" penceresi açılır. Pencerenin
+// son SWEET_FROM kısmında bırakmak "Tam kıvam" (+OVER_BONUS puan). Pencereyi
+// kaçırırsan amca dayanamaz: en yüksek güçle kendiliğinden fırlar, gaz büyük.
+// Fizik değişmez: fırlatma hızı yine jumpVelocity(1); değişen yalnız zamanlama.
+const OVERCHARGE = true as boolean;
+const OVER_WINDOW_MS = 500;
+const SWEET_FROM = 0.6;
+const OVER_BONUS = 2;
 const FARTHEST_TOWER_KEY = "carsamba.farthestTower.v1";
 // DURAK SEFERİ: gökyüzü tonu durak başına bir adım (sabah, öğle, ikindi, gün batımı, gece).
 const SKY_STEPS = [0, 1, 2, 3, 4];
@@ -817,6 +826,7 @@ export default function Game() {
   // Perfect-landing particle burst
   const burst = useSharedValue(0);
   const skyStep = useSharedValue(0);
+  const overT = useSharedValue(-1); // patlama eşiği ilerlemesi (-1 = pencere yok)
   const recordFlagId = useSharedValue(0);
   const dust = useSharedValue(1);
   const fartPuffs = useSharedValue<any[]>([]);
@@ -1043,6 +1053,24 @@ export default function Game() {
     }
   }, []);
 
+  const onSpecialLaunch = useCallback((mode: number) => {
+    // mode 1 = tam kıvam (bonus), 2 = dayanamadı (zorla fırladı)
+    if (mode === 1) {
+      scoreRef.current += OVER_BONUS;
+      setScore(scoreRef.current);
+      setLandingLabel("Tam kıvam!");
+      setLandingSub(`+${OVER_BONUS} 👌`);
+      if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy).catch(() => {});
+    } else {
+      setLandingLabel("Dayanamadı!");
+      setLandingSub("💨");
+      if (Platform.OS !== "web") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => {});
+    }
+    setPerfectVisible(true);
+    if (perfectTimer.current) clearTimeout(perfectTimer.current);
+    perfectTimer.current = setTimeout(() => setPerfectVisible(false), 900);
+  }, []);
+
   const onGameOver = useCallback(() => {
     if (POSTCARDS_ON) setRunNewCards(runNewCardsRef.current);
     if (DURAK_SEFER) {
@@ -1172,13 +1200,13 @@ export default function Game() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const onPressOut = useCallback((event: GestureResponderEvent) => {
-    const timestamp = event.nativeEvent.timestamp;
-    runOnUI((endedAt: number) => {
-      "worklet";
-      if (running.value !== 1 || phase.value !== PHASE.CHARGING) return;
+  // mode: 0 normal, 1 tam kıvam, 2 dayanamadı (zorla). Hem parmak kalkınca hem
+  // pencere dolunca kare döngüsünden çağrılır.
+  const doLaunch = (endedAt: number, mode: number) => {
+    "worklet";
+    {
       const heldSeconds = Math.max(0, endedAt - touchStartedAt.value) / 1000;
-      const c = Math.min(1, heldSeconds / CONFIG.maxChargeDuration);
+      const c = mode === 2 ? 1 : Math.min(1, heldSeconds / CONFIG.maxChargeDuration);
       const launch = jumpVelocity(c, W);
       // Diagnostic snapshot (see CLAUDE_CHARGE_TIMING_RESULT.md): charge.value
       // BEFORE it is reset below is what the player was actually looking at
@@ -1197,22 +1225,39 @@ export default function Game() {
       if (FART_TRIAL) {
         fartOn.value = 1;
         fartLaunchAt.value = -1;
-        fartSize.value = 0.6 + 0.8 * c;
+        fartSize.value = mode === 2 ? 2.2 : 0.6 + 0.8 * c;
         if (SFX_ON) runOnJS(playFart)(c);
       }
+      overT.value = -1;
+      if (mode > 0) runOnJS(onSpecialLaunch)(mode);
       // Defense in depth alongside onPressIn above: also clear right at
       // launch, so the pose is guaranteed to track real charge/idle for the
       // jump that is about to play out, regardless of anything set earlier.
       poseOverride.value = -1;
+    }
+  };
+
+  const onPressOut = useCallback((event: GestureResponderEvent) => {
+    const timestamp = event.nativeEvent.timestamp;
+    runOnUI((endedAt: number) => {
+      "worklet";
+      if (running.value !== 1 || phase.value !== PHASE.CHARGING) return;
+      let mode = 0;
+      if (OVERCHARGE) {
+        const k = (endedAt - touchStartedAt.value - CONFIG.maxChargeDuration * 1000) / OVER_WINDOW_MS;
+        if (k >= SWEET_FROM && k < 1) mode = 1;
+      }
+      doLaunch(endedAt, mode);
     })(timestamp);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [W, reportJump]);
+  }, [W, reportJump, onSpecialLaunch]);
 
   const cancelCharge = useCallback(() => {
     runOnUI(() => {
       "worklet";
       if (phase.value !== PHASE.CHARGING) return;
       phase.value = PHASE.IDLE;
+      overT.value = -1;
       if (SFX_ON) runOnJS(stopSfx)("charge");
       charge.value = 0;
       releasedCharge.value = 0;
@@ -1311,6 +1356,11 @@ export default function Game() {
       }
       const heldMs = frame.timestamp - touchStartedAt.value;
       charge.value = Math.min(1, Math.max(0, heldMs / 1000 / CONFIG.maxChargeDuration));
+      if (OVERCHARGE) {
+        const k = (heldMs - CONFIG.maxChargeDuration * 1000) / OVER_WINDOW_MS;
+        if (k >= 1) doLaunch(frame.timestamp, 2);
+        else overT.value = k >= 0 ? k : -1;
+      }
     }
 
     if (puffAge.value < 1) puffAge.value = Math.min(1, puffAge.value + dt);
@@ -2153,6 +2203,7 @@ export default function Game() {
           // sets landPulse.value, it's just never read by anything now.
           landPulse={FAZ2_SQUASH ? landPulse : undefined}
           halo={FAZ2_HALO}
+          strain={OVERCHARGE ? overT : undefined}
           onLoadStart={() => markArtStarted("character")}
           onLoad={() => { poseLoads.current += 1; if (poseLoads.current >= CHARGE_POSES.length) markArtLoaded("character"); }}
           onError={failArt}

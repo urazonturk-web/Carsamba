@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Büyük Gizem Seçenekleri</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f7f1e6; --card:#fffaf1; --ink:#2a1b12; --muted:#6d5a4b; --line:#e5d8c4;
+  --tile:#b5482c; --sea:#2f6f9a; --green:#3e7a52; --ochre:#d99a2b; --chip:#f1e5d1;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#17120e; --card:#211a14; --ink:#f3e9dc; --muted:#b8a691; --line:#3a2f25;
+    --tile:#e07a5a; --sea:#6fb0db; --green:#7cc394; --ochre:#f0b955; --chip:#2c231b;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#17120e; --card:#211a14; --ink:#f3e9dc; --muted:#b8a691; --line:#3a2f25;
+  --tile:#e07a5a; --sea:#6fb0db; --green:#7cc394; --ochre:#f0b955; --chip:#2c231b;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Inter,system-ui,sans-serif}
+.wrap{max-width:880px;margin:0 auto;padding:40px 16px 80px}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;line-height:1.2;margin:0}
+h1{font-size:clamp(28px,5vw,42px)}
+h2{font-size:24px;margin:48px 0 14px;padding-top:8px;border-top:2px solid var(--line)}
+h3{font-size:18px;margin:0 0 6px}
+.kicker{color:var(--tile);font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:13px}
+.lead{font-size:18px;color:var(--ink);margin:14px 0 0}
+.muted{color:var(--muted)}
+.sources{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 0}
+.chip{background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:13px}
+.chip.wait{border-style:dashed;color:var(--muted)}
+figure{margin:24px 0 0}
+figure img{width:100%;border-radius:10px;border:1px solid var(--line);display:block}
+figcaption{font-size:13px;color:var(--muted);margin-top:6px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+.card p{margin:4px 0 0;font-size:15px}
+.who{font-size:12px;color:var(--muted);margin-top:8px}
+table{width:100%;border-collapse:collapse;font-size:15px;background:var(--card);border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:13px;color:var(--muted);font-weight:600}
+tr:last-child td{border-bottom:0}
+.score{font-family:Fraunces,serif;font-size:20px;font-weight:700}
+.bar{height:6px;border-radius:3px;background:var(--line);margin-top:4px}
+.bar i{display:block;height:100%;border-radius:3px;background:var(--tile)}
+ol.finds{padding-left:20px}
+ol.finds li{margin:0 0 12px}
+.hook{border-left:4px solid var(--sea)}
+.hook.top{border-left-color:var(--tile)}
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:6px;background:var(--chip);color:var(--muted);margin-right:6px}
+.tag.s{color:var(--green)} .tag.m{color:var(--ochre)} .tag.l{color:var(--tile)}
+.phase{margin:0 0 14px}
+.phase ul{margin:8px 0 0;padding-left:20px}
+.phase li{margin:0 0 6px}
+.quote{font-family:Fraunces,serif;font-size:clamp(22px,4vw,30px);color:var(--tile);margin:8px 0}
+.decide li{margin:0 0 10px}
+.table-wrap{overflow-x:auto}
+</style>
+<style>.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:12px 0} .card p{margin:6px 0 0}</style>
+<style>table{width:100%;border-collapse:collapse;margin:8px 0;font-size:15px}th,td{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left;vertical-align:top}th{color:var(--muted);font-weight:600}.muted{color:var(--muted);font-size:14px}@media (max-width:560px){table{font-size:13px}}</style></head><body><div class="wrap">
+<div class="kicker">Büyük gizem · 3. tur · 12 Kasım 2026</div>
+<h1>Şehrin kendisi bir sır saklıyor</h1>
+<p>Dört bağımsız görüş alındı: anlatı, dünya kurgusu, pazar (isim araştırmasıyla) ve Kıvılcım. Bu turda gaz hikâyenin dışında tutuldu, ton gizeme kaydı. Ölçek de büyüdü: artık sır amcanın derdi değil, <b>İstanbul'un kendisi</b>.</p>
+<p>Üç görüş birbirinden habersiz aynı temaya vardı: <b>haritada olmayan, kaybolmuş bir mahalle</b>.</p>
+
+<h2>A · Kule Nerede? <span class="muted">(pazar editörünün önerisi)</span></h2>
+<div class="card">
+<p><b>Çekirdek:</b> Bir sabah İstanbul'da Galata Kulesi yok, ama gölgesi hâlâ çatılara düşüyor. Amca kaçmıyor; <b>kuleyi geri inşa ediyor</b>. Bastığı her çatı kulenin bir taşı oluyor.</p>
+<p><b>"Bu ne ya?" anı:</b> Açılışta ufukta kule yok. İlk kulelerde çatıların üzerinden koni biçimli dev bir gölge geçiyor; ortada gölgeyi düşüren hiçbir şey yok. Amcanın her inişinde çatıda yontulmuş bir taş kalıyor.</p>
+<p><b>Yanlış yorum:</b> Kartpostallardaki eski Galata'da kule her kartta biraz daha kısa. Oyuncu kuleyi amcanın yıktığını ya da çaldığını sanıyor.</p>
+<p><b>Açılım:</b> Gece kartpostalında amcanın bastığı çatılar üst üste dizilince kule ortaya çıkıyor. Kule her gece dağılıyor ve biri taşları tek tek yerine koymadıkça sabah olmuyor. Amca o kişi. Son parça, kulenin külahı, hâlâ eksik.</p>
+<p><b>Neden güçlü:</b> Gizem tek bir karede görülüyor (kulesiz ufuk, sahipsiz gölge). Toplam oynadıkça ufuktaki kule birkaç piksel yükseliyor, böylece 15. kuleye varamayan oyuncu da ilerlemeyi görüyor. İlk deneme kredisiz yapılabilir.</p>
+<p><b>İsim:</b> ★ <b>Who Took Galata?</b> · Türkçesi <b>Kule Nerede?</b> · Tall Order. Bu adlarla bir oyun bulunamadı.</p>
+</div>
+
+<h2>B · Haritada olmayan mahalle <span class="muted">(anlatı, dünya kurgusu ve Kıvılcım; üçünün ortak teması)</span></h2>
+<div class="card">
+<p><b>Çekirdek:</b> İstanbul'un bilinen semtleri arasında, adı haritalardan silinmiş ve yalnızca çatılarda yaşayan bir mahalle var. Amca onun son sakini. Bordo eşofmanı da mahallenin kapanmış spor kulübünün forması.</p>
+<p><b>"Bu ne ya?" anı:</b> 7. kulede adsız bir tabela çıkıyor. Ufukta aynı küçük bina iki farklı yerde görünüyor. Bir kartpostalın köşesinde oyunda olmayan bir çatı var. Albümde hiç açılmayan fazladan bir yuva duruyor.</p>
+<p><b>Açılım:</b> Her oyunda bir bacada tebeşirle bir harf beliriyor. Harfler sabit sırayla geliyor, oyuncular ilk harflerden tahmin yürütüyor. Gece dört durağın ışıkları arasında karanlık bir mahalle silueti beliriyor ve tabela doluyor.</p>
+<p><b>Varyant (dünya kurgusu editöründen):</b> "Yukarı Mahalle". İstanbul'un yıkılan ahşap evleri gökte baş aşağı bir şehirde birikiyor, onları martılar taşıyor. Tepede ters bir çatı silueti, kiremit taşıyan bir martı.</p>
+<p><b>İsim:</b> ★ <b>Çatıköy</b> (adı oyuncu kendi çözüyor) · <b>Off the Map</b> · Haritada Yok · Kayıp Beşinci · Yukarı Mahalle</p>
+</div>
+
+<h2>C · Yer değiştiren ev <span class="muted">(Kıvılcım'ın önerisi)</span></h2>
+<div class="card">
+<p><b>Çekirdek:</b> Yüz yıllık bir ev her sabah başka bir semtin çatısında beliriyor. Kimse onu aynı anda iki yerde göremiyor.</p>
+<p><b>"Bu ne ya?" anı:</b> Ufukta tek pencereli bordo bir ev. Birkaç kule sonra aynı ev, aynı ayrıntılarla, tam önünde.</p>
+<p><b>Açılım:</b> Farklı tarihlerde çekilmiş dört kartpostalda aynı ev var. Gece ışıklar tek tek sönerken evin penceresi yerinde kalıyor, çevresindeki binalar kayıyor. Evin içinde ne olduğu ikinci bölümün sorusu.</p>
+<p><b>İsim:</b> ★ <b>Wrong Address</b> · Ev Yerinde Yok · House on the Run</p>
+</div>
+
+<h2>D · Sürü <span class="muted">(anlatı editörünün ikinci önerisi)</span></h2>
+<div class="card">
+<p><b>Çekirdek:</b> İstanbul'un binaları çok yavaş göç eden bir sürü; amca onların çobanı.</p>
+<p><b>"Bu ne ya?" anı:</b> Amca bir çatıya inince uzaktaki binalar onunla aynı ritimde hafifçe eğiliyor.</p>
+<p><b>Açılım:</b> Gece Eminönü'nde amca ıslık çalıyor ve şehrin bütün çatı silueti Haliç'e doğru eğiliyor.</p>
+<p><b>İsim:</b> ★ <b>Flock of Stone</b> · Sürü · Çatı Çobanı · The Slow City</p>
+</div>
+
+<h2>Önerim</h2>
+<p><b>A, "Who Took Galata?".</b> Mağaza görselinde tek karede merak uyandıran tek seçenek bu. İstanbul'un en tanınan siluetiyle oynuyor ve oyuncunun ilerlemesini (kulenin yükselmesi) hikâyenin kendisi yapıyor.</p>
+<p>Daha gizemli, daha "kimsenin bulamayacağı" bir şey istersen <b>B, Çatıköy</b>: oyuncu oyunun adını kendisi çözüyor.</p>
+
+<h2>Hepsinde ortak uyarı</h2>
+<ul>
+<li>Sır yalnızca 60. kuleye ya da gece finaline bağlanmamalı; oyuncuların büyük çoğunluğu oraya varmıyor.</li>
+<li>Her tur en az bir somut kanıt göstermeli. Asıl ilerleme toplam oynamayla birikmeli.</li>
+<li>Final tamamen kapanmamalı; ikinci bölüm için bir soru kalmalı.</li>
+</ul>
+<p class="muted">Ayrıntılı raporlar: editor-anlati.md, editor-dunya.md, editor-pazar.md (kaynaklarıyla), editor-kivilcim.md.</p>
+</div></body></html>

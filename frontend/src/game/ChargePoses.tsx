@@ -29,6 +29,9 @@ type Props = {
   // HALO_PX inside the pose's own animated view: no extra mapper, no shadow
   // (shadows force an offscreen pass on iOS), invisible with the pose.
   halo?: boolean;
+  // PATLAMA EŞİĞİ (2026-11-12): tam şarj penceresinde 0..1 ilerleme (-1 = yok).
+  // Amca titrer ve hafifçe şişer; yalnız transform.
+  strain?: SharedValue<number>;
   onLoad?: () => void;
   onLoadStart?: () => void;
   onError?: () => void;
@@ -38,7 +41,7 @@ const HALO_PX = 9; // sprite pixels
 const HALO_COLOR = "rgba(255,248,230,0.8)";
 const HALO_OFFSETS = [[-1, 0], [1, 0], [0, -1], [0, 1]];
 
-function PoseLayer({ i, px, py, poseCharge, scale, feetCenterOffset, feetHalf, landPulse, halo, ...cb }: Props & { i: number }) {
+function PoseLayer({ i, px, py, poseCharge, scale, feetCenterOffset, feetHalf, landPulse, halo, strain, ...cb }: Props & { i: number }) {
   const pose = CHARGE_POSES[i];
   const style = useAnimatedStyle(() => {
     // Squash toward the FOOT line (feetHalf), not the sprite's own center,
@@ -51,13 +54,16 @@ function PoseLayer({ i, px, py, poseCharge, scale, feetCenterOffset, feetHalf, l
     const bulge = 1 + pulse * 0.08;
     const height = pose.h * scale;
     const extraY = (height * (1 - sq)) / 2;
+    const k = strain ? strain.value : -1;
+    const jitter = k >= 0 ? Math.sin(k * 95) * (1.5 + 5 * k) : 0;
+    const swell = k >= 0 ? 1 + 0.035 * k + 0.015 * Math.sin(k * 40) : 1;
     return {
       opacity: poseOpacity(i, poseCharge.value),
       transform: [
-        { translateX: px.value + feetCenterOffset - pose.pivotX * scale },
+        { translateX: px.value + feetCenterOffset - pose.pivotX * scale + jitter },
         { translateY: py.value + feetHalf - pose.pivotY * scale + extraY },
         { scaleY: sq },
-        { scaleX: bulge },
+        { scaleX: bulge * swell },
       ],
     };
   });

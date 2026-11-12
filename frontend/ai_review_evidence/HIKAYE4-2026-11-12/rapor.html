@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Deprem Tohumu: Seçenekler</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f7f1e6; --card:#fffaf1; --ink:#2a1b12; --muted:#6d5a4b; --line:#e5d8c4;
+  --tile:#b5482c; --sea:#2f6f9a; --green:#3e7a52; --ochre:#d99a2b; --chip:#f1e5d1;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#17120e; --card:#211a14; --ink:#f3e9dc; --muted:#b8a691; --line:#3a2f25;
+    --tile:#e07a5a; --sea:#6fb0db; --green:#7cc394; --ochre:#f0b955; --chip:#2c231b;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#17120e; --card:#211a14; --ink:#f3e9dc; --muted:#b8a691; --line:#3a2f25;
+  --tile:#e07a5a; --sea:#6fb0db; --green:#7cc394; --ochre:#f0b955; --chip:#2c231b;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Inter,system-ui,sans-serif}
+.wrap{max-width:880px;margin:0 auto;padding:40px 16px 80px}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;line-height:1.2;margin:0}
+h1{font-size:clamp(28px,5vw,42px)}
+h2{font-size:24px;margin:48px 0 14px;padding-top:8px;border-top:2px solid var(--line)}
+h3{font-size:18px;margin:0 0 6px}
+.kicker{color:var(--tile);font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:13px}
+.lead{font-size:18px;color:var(--ink);margin:14px 0 0}
+.muted{color:var(--muted)}
+.sources{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 0}
+.chip{background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:13px}
+.chip.wait{border-style:dashed;color:var(--muted)}
+figure{margin:24px 0 0}
+figure img{width:100%;border-radius:10px;border:1px solid var(--line);display:block}
+figcaption{font-size:13px;color:var(--muted);margin-top:6px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+.card p{margin:4px 0 0;font-size:15px}
+.who{font-size:12px;color:var(--muted);margin-top:8px}
+table{width:100%;border-collapse:collapse;font-size:15px;background:var(--card);border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:13px;color:var(--muted);font-weight:600}
+tr:last-child td{border-bottom:0}
+.score{font-family:Fraunces,serif;font-size:20px;font-weight:700}
+.bar{height:6px;border-radius:3px;background:var(--line);margin-top:4px}
+.bar i{display:block;height:100%;border-radius:3px;background:var(--tile)}
+ol.finds{padding-left:20px}
+ol.finds li{margin:0 0 12px}
+.hook{border-left:4px solid var(--sea)}
+.hook.top{border-left-color:var(--tile)}
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:6px;background:var(--chip);color:var(--muted);margin-right:6px}
+.tag.s{color:var(--green)} .tag.m{color:var(--ochre)} .tag.l{color:var(--tile)}
+.phase{margin:0 0 14px}
+.phase ul{margin:8px 0 0;padding-left:20px}
+.phase li{margin:0 0 6px}
+.quote{font-family:Fraunces,serif;font-size:clamp(22px,4vw,30px);color:var(--tile);margin:8px 0}
+.decide li{margin:0 0 10px}
+.table-wrap{overflow-x:auto}
+</style>
+<style>.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:12px 0} .card p{margin:6px 0 0}</style>
+<style>table{width:100%;border-collapse:collapse;margin:8px 0;font-size:15px}th,td{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left;vertical-align:top}th{color:var(--muted);font-weight:600}.muted{color:var(--muted);font-size:14px}@media (max-width:560px){table{font-size:13px}}</style></head><body><div class="wrap">
+<div class="kicker">Tohum: beklenen büyük İstanbul depremi · 12 Kasım 2026</div>
+<h1>Şehir sessizce birbirine hazırlanıyor, ama kimse söylemiyor</h1>
+<p>Dört bağımsız görüş alındı: anlatı, dünya kurgusu, pazar ve uygunluk, Kıvılcım. Dördü de birbirinden habersiz aynı yere vardı:</p>
+<ul>
+<li>Deprem oyunda <b>hiç gösterilmiyor, adı bile geçmiyor</b>.</li>
+<li>Gizemin sorusu "ne zaman olacak?" değil, <b>"şehirdeki bu tuhaf işaretleri kim, neden bırakıyor?"</b></li>
+<li>Cevap felaket değil; komşuların birbirini unutmamaya karar vermesi.</li>
+</ul>
+
+<h2>A · Kim ışığı yaktı? <span class="muted">(Kıvılcım ve dünya kurgusu editörü ayrı ayrı; pazar editöründe de var)</span></h2>
+<div class="card">
+<p><b>"Bu ne ya?" anı:</b> İlk kulelerde, biri yakında biri uzakta iki pencere, amcadan bağımsız olarak aynı üç kısa ışık ritmini veriyor. Gece çatılarda tek tek yeşil lambalar yanıyor; uzaktaki vapur her birine iki kısa düdükle cevap veriyor.</p>
+<p><b>Yanlış yorum:</b> Gizli bir alarm, bir sayım ya da bir yarışma gibi görünüyor. Kartpostallarda farklı semtlerde aynı üç ışık işareti var. Oyuncu "kötü bir şeyin geri sayımı mı?" diye kuşkulanıyor.</p>
+<p><b>Açılım:</b> Işıklar tek bir merkezden gelmiyor. Birbirini tanımayan sıradan evler birbirine cevap veriyor; her ışık, hazırlığını bitirip "buradayız" diyen bir ev. Eminönü'nde bütün şehir yanıyor, en son amcanın kendi damı. Son kart tek kelime: <b>"Buradayız."</b></p>
+<p><b>Neden güçlü:</b> İlk dakikada iki basit ışıkla merak uyandırıyor. Gece bölümü yıkım göstermeden büyük ölçekte çalışıyor. Mevcut pencereler, gece tonu, vapur düdüğü ve kartlarla kredisiz denenebilir.</p>
+<p><b>İsim:</b> ★ <b>Kim Işığı Yaktı?</b> / <b>Who Lit the City?</b> · Bir Lamba Daha · Buradayız · Three Lights</p>
+</div>
+
+<h2>B · Çatıdaki emanetler <span class="muted">(anlatı, pazar ve dünya kurgusu editörü; üçü ayrı ayrı)</span></h2>
+<div class="card">
+<p><b>"Bu ne ya?" anı:</b> Çatılarda kimin bıraktığı belli olmayan kurdeleli çantalar ya da yedek anahtarlar var. Her birinin kartında başka birinin adı yazıyor. Amca onları topluyor.</p>
+<p><b>Yanlış yorum:</b> Kaçakçılık, hırsızlık ya da bir hazine avı gibi görünüyor.</p>
+<p><b>Açılım:</b> Komşular birbirine anahtar emanet etmiş; "kim kime bakacak" diye bir zincir kurmuşlar. Son kartta "Bordo eşofmanlı amcaya" yazıyor: zincirin son halkası amcanın kendisi.</p>
+<p><b>İsim:</b> ★ <b>Uncle Keeps the Keys</b> · Spare Key Uncle · The Bag Next Door</p>
+</div>
+
+<h2>Önerim</h2>
+<p><b>A'yı ana hikâye yapalım, B'yi gündüz katmanı olarak ekleyelim.</b></p>
+<ul>
+<li><b>Gündüz:</b> Amca çatılarda emanetleri (anahtar ve çanta) topluyor. Oyuncu bir şeyler döndüğünü seziyor.</li>
+<li><b>Gece:</b> Işıklar birbirine cevap veriyor ve emanetlerin kime ait olduğu anlaşılıyor.</li>
+<li><b>Final:</b> Bütün şehir "Buradayız" diyor.</li>
+</ul>
+<p>İsim için ★ <b>Kim Işığı Yaktı? / Who Lit the City?</b> öneriyorum. Merak uyandırıyor ve depremi bir eğlence vaadine dönüştürmüyor. Aramada bu adla bir oyun bulunmadı; kesin kontrol App Store Connect kaydında yapılır.</p>
+
+<h2>Dikkat edilecekler (pazar ve uygunluk editörü)</h2>
+<ul>
+<li><b>Mağaza metnine ve anahtar kelimelere "deprem" yazılmamalı.</b> 2025'te çıkan "Deprem İstanbul" adlı bir oyun, depremi estetize edip "farkındalık" satmakla eleştirildi.</li>
+<li><b>"Farkındalık oyunu" iddiasında bulunulmamalı.</b> Işıklar ve emanetler gerçek bir güvenlik yöntemi gibi sunulmamalı; oyun dünyasına ait kurgusal işaretler olarak kalmalı.</li>
+<li><b>Düdük gizemin nesnesi olmamalı.</b> Deprem çantasındaki düdük enkaz altından yardım çağırmayı hatırlatıyor. Vapurun düdüğü ayrı kalabilir.</li>
+<li><b>Gaz şakası hikâye anlarıyla aynı karede görünmemeli.</b></li>
+<li><b>Yayından önce</b> deprem yaşamış birkaç kişi hikâyeyi okumalı.</li>
+<li><b>Gerçek bir afet olursa</b> o hafta pazarlama durdurulmalı.</li>
+<li><b>Apple kuralları</b> (1.1.6 yanlış bilgi ya da sahte uyarı, 1.1.7 güncel olayları istismar): A ve B bu kurallara göre güvenli görünüyor.</li>
+</ul>
+
+<h2>Senin kararını bekleyen</h2>
+<ol>
+<li>Bu yön (ışıklar ve emanetler, sonunda "Buradayız") içine sinen bir şey mi?</li>
+<li>İsim: "Kim Işığı Yaktı? / Who Lit the City?" mi, yoksa başka bir aday mı?</li>
+</ol>
+<p class="muted">Ayrıntılı raporlar: editor-anlati.md, editor-dunya.md, editor-pazar.md (kaynaklarıyla), editor-kivilcim.md.</p>
+</div></body></html>

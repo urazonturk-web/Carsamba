@@ -4,12 +4,16 @@
     "slug": "frontend",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/icon-amca.png",
     "scheme": "frontend",
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.urazonturk.carsamba"
+      "bundleIdentifier": "com.urazonturk.carsamba",
+      "infoPlist": {
+        "CFBundleDisplayName": "Byzantion",
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -38,7 +42,14 @@
       "expo-secure-store",
       "expo-web-browser",
       "expo-status-bar",
-      ["expo-audio", { "microphonePermission": false, "recordAudioAndroid": false, "enableBackgroundPlayback": false }]
+      [
+        "expo-audio",
+        {
+          "microphonePermission": false,
+          "recordAudioAndroid": false,
+          "enableBackgroundPlayback": false
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

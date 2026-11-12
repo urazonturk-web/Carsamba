@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Hikâye ve İsim</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f7f1e6; --card:#fffaf1; --ink:#2a1b12; --muted:#6d5a4b; --line:#e5d8c4;
+  --tile:#b5482c; --sea:#2f6f9a; --green:#3e7a52; --ochre:#d99a2b; --chip:#f1e5d1;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#17120e; --card:#211a14; --ink:#f3e9dc; --muted:#b8a691; --line:#3a2f25;
+    --tile:#e07a5a; --sea:#6fb0db; --green:#7cc394; --ochre:#f0b955; --chip:#2c231b;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#17120e; --card:#211a14; --ink:#f3e9dc; --muted:#b8a691; --line:#3a2f25;
+  --tile:#e07a5a; --sea:#6fb0db; --green:#7cc394; --ochre:#f0b955; --chip:#2c231b;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Inter,system-ui,sans-serif}
+.wrap{max-width:880px;margin:0 auto;padding:40px 16px 80px}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;line-height:1.2;margin:0}
+h1{font-size:clamp(28px,5vw,42px)}
+h2{font-size:24px;margin:48px 0 14px;padding-top:8px;border-top:2px solid var(--line)}
+h3{font-size:18px;margin:0 0 6px}
+.kicker{color:var(--tile);font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:13px}
+.lead{font-size:18px;color:var(--ink);margin:14px 0 0}
+.muted{color:var(--muted)}
+.sources{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 0}
+.chip{background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:13px}
+.chip.wait{border-style:dashed;color:var(--muted)}
+figure{margin:24px 0 0}
+figure img{width:100%;border-radius:10px;border:1px solid var(--line);display:block}
+figcaption{font-size:13px;color:var(--muted);margin-top:6px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+.card p{margin:4px 0 0;font-size:15px}
+.who{font-size:12px;color:var(--muted);margin-top:8px}
+table{width:100%;border-collapse:collapse;font-size:15px;background:var(--card);border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:13px;color:var(--muted);font-weight:600}
+tr:last-child td{border-bottom:0}
+.score{font-family:Fraunces,serif;font-size:20px;font-weight:700}
+.bar{height:6px;border-radius:3px;background:var(--line);margin-top:4px}
+.bar i{display:block;height:100%;border-radius:3px;background:var(--tile)}
+ol.finds{padding-left:20px}
+ol.finds li{margin:0 0 12px}
+.hook{border-left:4px solid var(--sea)}
+.hook.top{border-left-color:var(--tile)}
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:6px;background:var(--chip);color:var(--muted);margin-right:6px}
+.tag.s{color:var(--green)} .tag.m{color:var(--ochre)} .tag.l{color:var(--tile)}
+.phase{margin:0 0 14px}
+.phase ul{margin:8px 0 0;padding-left:20px}
+.phase li{margin:0 0 6px}
+.quote{font-family:Fraunces,serif;font-size:clamp(22px,4vw,30px);color:var(--tile);margin:8px 0}
+.decide li{margin:0 0 10px}
+.table-wrap{overflow-x:auto}
+</style>
+<style>.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:12px 0} .card p{margin:6px 0 0}</style>
+<style>table{width:100%;border-collapse:collapse;margin:8px 0;font-size:15px}th,td{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left;vertical-align:top}th{color:var(--muted);font-weight:600}.muted{color:var(--muted);font-size:14px}@media (max-width:560px){table{font-size:13px}}</style></head><body><div class="wrap">
+<div class="kicker">Hikâye ve isim · 12 Kasım 2026</div>
+<h1>Son Vapur: amcanın içindeki buhar</h1>
+<p>Beş bağımsız görüş alındı: anlatı tasarımcısı, oyun tasarımı, sanat ve mizah, pazar ve marka (isim araştırmasıyla), bir de Kıvılcım. Hiçbiri diğerlerinin yazdığını görmedi. Beşinden dördü hikâyeyi kendiliğinden <b>eski bir buharlı vapura</b> bağladı. Gaz izinin aslında vapurun buharı ve baca dumanı olduğu fikrinde de birleştiler.</p>
+
+<h2>Önerdiğim birleşik hikâye</h2>
+<div class="card"><h3>Gizli gerçek</h3>
+<p>Amca, İstanbul'un son buharlı vapurunun ateşçisiydi. Vapur hurdaya çıktığı gece kazandaki buhar gidecek yer bulamadı ve amcanın içinde kaldı. Şarj ettikçe ıkınması kazan basıncı. "Tam kıvam!" kaptanın eski sözü. "Dayanamadı!" emniyet supabı. Arkasındaki iz, vapurun baca dumanı.</p>
+<p>Her tur aynı akşam: saat 19.40, son sefer. Vapur Eminönü'nde bekliyor, ateşçisi olmadan kalkamıyor. Düşmek o akşamı baştan yaşamak demek.</p>
+<p><b>Son ters köşe (gece seferi):</b> Vapur sisin içinde amcayı beklemiyordu; onun bıraktığı izi takip ediyordu. Tek cümle: <i>"Bu kez yolu sen gösterdin."</i></p>
+<p class="muted">Kaynaklar: ateşçi ve kazan basıncı anlatı editöründen; buharın amcanın içinde kalması sanat editöründen; aynı akşamın tekrarı ve saat tasarım editöründen; vapurun izi takip etmesi Kıvılcım'dan; iskele anı pazar editöründen.</p></div>
+
+<h2>Hikâye nasıl açılır? Metin yok denecek kadar az</h2>
+<table>
+<tr><th>Ne zaman</th><th>Oyuncunun gördüğü</th><th>Henüz bilmediği</th></tr>
+<tr><td><b>İlk tur, ilk kuleler</b></td><td>Köşede küçük bir cep saati 19.40'tan ilerler. Ufukta bacası tütmeyen bir vapur durur. Düşünce uzaktan tek bir düdük gelir. Bir martı amcanın izine dönüp bakar.</td><td>Saatin, düdüğün ve vapurun amcayla ne ilgisi olduğunu.</td></tr>
+<tr><td><b>Her tekrar</b></td><td>Önceki düşüş kulesinde soluk bir iz kalır ("dünden kalan"). Sonuç kartında saat donmuştur: "19.43 · ⛴ 20.00".</td><td>Aynı akşamı tekrar tekrar yaşadığını.</td></tr>
+<tr><td><b>Karaköy (15)</b></td><td>Kartpostalın arkası açılır: 1968 tarihli bir vapur damgası.</td><td>Damganın amcanın vapuruna ait olduğunu.</td></tr>
+<tr><td><b>Galata (30)</b></td><td>Kart arkasında el yazısıyla tek satır: "Tam kıvam. — Kaptan"</td><td>Oyundaki "Tam kıvam"ın nereden geldiğini.</td></tr>
+<tr><td><b>Sirkeci (45)</b></td><td>"HURDA" damgalı bir sefer bileti.</td><td>Vapurun emekli edildiğini.</td></tr>
+<tr><td><b>Eminönü İskelesi (60)</b></td><td>Amca vapura yetişir. Bacadan amcanınkiyle aynı duman çıkar, düdük onun sesinin perdesinde çalar.</td><td>"Aaa!" anı: buhar amcanın içinde.</td></tr>
+<tr><td><b>Gece seferi</b></td><td>Sisli gecede ışıklı vapur, amcanın izini takip ederek yanında gider. Tek cümle: "Bu kez yolu sen gösterdin."</td><td>Ters köşe: kaçan değil, yolu gösteren o.</td></tr>
+</table>
+<p><b>Önemli tasarım kararı:</b> Oyuncuların çoğu 15. kuleye varamıyor. Bu yüzden hikâye parçaları <b>toplam oynanan kuleyle</b> de birikir (50 kule, 150 kule…). Hiç durağa varamayan biri bile yaklaşık 10 turda ilk kartın arkasını açar. Sonuç kartında "1 parça kaldı" satırı olur.</p>
+<p>Oyundaki toplam metin 25 kelimeyi geçmez. Espri satırı ve kaba ifade yok. Gaz şakası kalıyor, ama hikâye ona anlam veriyor.</p>
+
+<h2>İsim</h2>
+<table>
+<tr><th>Aday</th><th>Neden</th><th>Çakışma</th></tr>
+<tr><td><b>★ Son Vapur</b></td><td>Üç editör ayrı ayrı önerdi. Hikâyenin kendisi; gizemi ele vermiyor. İngilizcesi "Last Ferry".</td><td>App Store'da aynı adlı oyun bulunamadı</td></tr>
+<tr><td>Tam Kıvam</td><td>Anlatı editörünün ilk tercihi. Mekaniği ve kaptanın sözünü birleştiriyor, akılda kalıyor.</td><td>Kontrol edilmedi</td></tr>
+<tr><td>Vapura Yetiş</td><td>Oyunun hedefini doğrudan söylüyor.</td><td>Eşleşme bulunamadı</td></tr>
+<tr><td>Gece Seferi</td><td>Gizemli; son bölümün adı.</td><td>Yalnızca benzer adlı bir tarayıcı oyunu var ("Gece Nöbeti")</td></tr>
+<tr><td>Ateşçi · Düdük · İzin Peşinde</td><td>Daha kapalı ya da daha dar çağrışımlı.</td><td>—</td></tr>
+</table>
+<p><b>Önerim: "Son Vapur".</b> Mağaza adı "Son Vapur: Çatılardan Karşıya" (29 karakter, App Store'un 30 sınırının altında); simgenin altında "Son Vapur" yazar. Kesin uygunluğu App Store Connect kaydı sırasında ve TÜRKPATENT'te ayrıca kontrol etmek gerekir.</p>
+
+<h2>Maliyet ve sıra</h2>
+<ol>
+<li><b>İlk deneme, kredi yok (1–2 gün):</b> saat, dumansız vapurun yeri, uzak düdük zamanlaması, kartpostal arkasına sade damga ve satırlar, birikimli parça sistemi. Hepsi kodla ve mevcut görsellerle yapılır. Hikâyenin telefonda "merak" yaratıp yaratmadığını önce bununla sınarız.</li>
+<li><b>Sonra, senin onayınla görsel üretimi:</b> editörlerin tahmini 4–9 görsel arasında (kartpostal arka yüzü, iskele anı, gece vapuru, kaptan damgası). Kıvılcım önce maliyeti yazar.</li>
+<li>Fizik, kamera ve çatılar değişmez.</li>
+</ol>
+
+<h2>Yapılmayacaklar</h2>
+<ul>
+<li>Açılışta hikâyeyi anlatan bir giriş, metin ya da video. Merakı öldürür.</li>
+<li>Hikâyeyi yalnızca 15. kulenin arkasına kilitlemek.</li>
+<li>"Aslında ölüymüş" ya da hayalet sonu.</li>
+<li>Gazı kelime oyunlarıyla açıklamak.</li>
+</ul>
+
+<h2>Senin kararını bekleyenler</h2>
+<ol>
+<li><b>Hikâye:</b> Bu birleşik "Son Vapur" hikâyesi tamam mı, değiştirmek istediğin bir yer var mı?</li>
+<li><b>İsim:</b> "Son Vapur" mu, yoksa "Tam Kıvam" ya da başka bir aday mı?</li>
+<li><b>Gazın rengi:</b> Sanat editörü, hikâye "buhar" dediği için izin sarı-yeşil yerine buhar beyazı olmasını öneriyor. Şu anki sarı-yeşili sen beğenmiştin. Değişsin mi, kalsın mı?</li>
+</ol>
+<p class="muted">Ayrıntılı raporlar: editor-anlati.md, editor-tasarim.md, editor-sanat.md, editor-pazar.md (isim araştırması kaynaklarıyla), editor-kivilcim.md.</p>
+</div></body></html>

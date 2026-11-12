@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Fark Yaratma Raporu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f7f1e6; --card:#fffaf1; --ink:#2a1b12; --muted:#6d5a4b; --line:#e5d8c4;
+  --tile:#b5482c; --sea:#2f6f9a; --green:#3e7a52; --ochre:#d99a2b; --chip:#f1e5d1;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#17120e; --card:#211a14; --ink:#f3e9dc; --muted:#b8a691; --line:#3a2f25;
+    --tile:#e07a5a; --sea:#6fb0db; --green:#7cc394; --ochre:#f0b955; --chip:#2c231b;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#17120e; --card:#211a14; --ink:#f3e9dc; --muted:#b8a691; --line:#3a2f25;
+  --tile:#e07a5a; --sea:#6fb0db; --green:#7cc394; --ochre:#f0b955; --chip:#2c231b;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Inter,system-ui,sans-serif}
+.wrap{max-width:880px;margin:0 auto;padding:40px 16px 80px}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;line-height:1.2;margin:0}
+h1{font-size:clamp(28px,5vw,42px)}
+h2{font-size:24px;margin:48px 0 14px;padding-top:8px;border-top:2px solid var(--line)}
+h3{font-size:18px;margin:0 0 6px}
+.kicker{color:var(--tile);font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:13px}
+.lead{font-size:18px;color:var(--ink);margin:14px 0 0}
+.muted{color:var(--muted)}
+.sources{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 0}
+.chip{background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:13px}
+.chip.wait{border-style:dashed;color:var(--muted)}
+figure{margin:24px 0 0}
+figure img{width:100%;border-radius:10px;border:1px solid var(--line);display:block}
+figcaption{font-size:13px;color:var(--muted);margin-top:6px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+.card p{margin:4px 0 0;font-size:15px}
+.who{font-size:12px;color:var(--muted);margin-top:8px}
+table{width:100%;border-collapse:collapse;font-size:15px;background:var(--card);border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:13px;color:var(--muted);font-weight:600}
+tr:last-child td{border-bottom:0}
+.score{font-family:Fraunces,serif;font-size:20px;font-weight:700}
+.bar{height:6px;border-radius:3px;background:var(--line);margin-top:4px}
+.bar i{display:block;height:100%;border-radius:3px;background:var(--tile)}
+ol.finds{padding-left:20px}
+ol.finds li{margin:0 0 12px}
+.hook{border-left:4px solid var(--sea)}
+.hook.top{border-left-color:var(--tile)}
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:6px;background:var(--chip);color:var(--muted);margin-right:6px}
+.tag.s{color:var(--green)} .tag.m{color:var(--ochre)} .tag.l{color:var(--tile)}
+.phase{margin:0 0 14px}
+.phase ul{margin:8px 0 0;padding-left:20px}
+.phase li{margin:0 0 6px}
+.quote{font-family:Fraunces,serif;font-size:clamp(22px,4vw,30px);color:var(--tile);margin:8px 0}
+.decide li{margin:0 0 10px}
+.table-wrap{overflow-x:auto}
+</style>
+<style>.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:12px 0} .card p{margin:6px 0 0}</style>
+<style>table{width:100%;border-collapse:collapse;margin:8px 0;font-size:15px}th,td{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left;vertical-align:top}th{color:var(--muted);font-weight:600}.muted{color:var(--muted);font-size:14px}@media (max-width:560px){table{font-size:13px}}</style></head><body><div class="wrap">
+<div class="kicker">Benzerlerinden ayrışma · 12 Kasım 2026</div>
+<h1>Şu an "kostümlü bir Jump Jump"; gaz bir yetenek olursa ayrışırız</h1>
+<p>Dört bağımsız görüş alındı: oyun tasarımı, sanat yönetmeni, pazar (web araştırmasıyla) ve Kıvılcım. Hiçbiri diğerlerini görmedi. Teşhiste dördü de aynı yere vardı.</p>
+
+<h2>Dürüst teşhis (dördü de aynı fikirde)</h2>
+<ul>
+<li><b>Kimlik güçlü ama yalnız kabukta.</b> Amca, gaz ve İstanbul görüntüyü ve sesi farklılaştırıyor. Ama oyuncunun yaptığı şey Jump Jump'la birebir aynı: basılı tut, bırak, gerisini izle.</li>
+<li><b>Gaz bir süs, bir karar değil.</b> Oyunun en akılda kalan şakası oyuncunun hiçbir seçimine girmiyor.</li>
+<li><b>En iyi içerik görünmüyor.</b> Turların çoğu 15. kuleden önce bitiyor. Duraklar, iskele anı ve albüm çoğu oyuncuya hiç ulaşmıyor.</li>
+<li><b>Pazar tarafı:</b> App Store'da aynı bas-bırak kontrolüyle onlarca oyun var (Charge and Jump, Jump Dash, 100 Jumps…). Jump Jump'ı oynanışı değil, WeChat'in dağıtımı ve skor karşılaştırması büyüttü. "İstanbul çatıları + bıyıklı amca + şarjlı zıplama" birleşimini kullanan bir oyun bulunamadı; boşluk bizim.</li>
+</ul>
+
+<h2>Önerilen imza özellikler</h2>
+<div class="card"><h3>A · Gaz kurtarışı: tasarım ve pazar editörünün ana önerisi</h3>
+<ul>
+<li><b>Nasıl işler:</b> Havadayken bir kez dokununca amca gaz kaçırır ve küçük bir ileri-yukarı itiş alır. Kısa kalan zıplamayı kurtarır.</li>
+<li><b>Hak sayısı:</b> Tura 1 hakla başlanır, hazne en fazla 2 hak alır. Merkeze her inişte +1 hak dolar, böylece merkeze iniş sonunda bir anlam kazanır.</li>
+<li><b>Tek cümle:</b> "Amca düşerken osurup kendini kurtarır."</li>
+<li><b>Neden ayırır:</b> Bu türde kimsede yok. Komik, kısa videoya çok uygun, ve gaz şakasını oyuncunun elindeki bir karara çeviriyor.</li>
+<li><b>Bedel:</b> Zıplama fiziğine dokunuyor (havada tek bir itiş). Kabul ettiğimiz "fizik sabit" kuralını bilerek esnetmek gerekiyor. Görsel ya da kredi gerekmiyor.</li>
+</ul></div>
+<div class="card"><h3>B · Patlama eşiği: sanat yönetmeninin ana önerisi, tasarımın yedeği</h3>
+<ul>
+<li><b>Nasıl işler:</b> Tam şarjda yaklaşık 0,4–0,6 saniyelik bir "son an" penceresi açılır. Amcanın yüzü titrer, kızarır. Bu pencerede bırakırsan "Tam kıvam" bonusu alırsın. Fazla tutarsan amca dayanamaz ve en yüksek güçle kendiliğinden fırlar, gaz da kocaman çıkar.</li>
+<li><b>Tek cümle:</b> "Amcayı ıkındır, ama fazla değil."</li>
+<li><b>Neden ayırır:</b> Bugün yaptığımız yüz ifadelerini oyunun göstergesine çeviriyor. Güç çubuğu yok, amcanın yüzüne bakarak oynuyorsun.</li>
+<li><b>Bedel:</b> Fizik değişmiyor, yalnızca bırakma zamanı değişiyor. Görsel ya da kredi yok, yaklaşık 1 günlük iş.</li>
+</ul></div>
+<div class="card"><h3>C · Çatıdan çatıya posta: Kıvılcım'ın önerisi</h3>
+<ul>
+<li><b>Nasıl işler:</b> Her 4–6 kulede ulaşılabilir iki çatıdan birinde bir 📮 işareti çıkar. O çatıyı seçip oraya inersen postayı teslim edersin. İlk fırsat 3–5. kulede gelir.</li>
+<li><b>Neden ayırır:</b> İlk dakikada bir rota seçimi yaratıyor. İlerde kartpostal albümünü besleyebilir.</li>
+<li><b>Bedel:</b> Fizik değişmiyor, görsel gerekmiyor. Ama tek başına "komik ve benzersiz" bir kanca değil, daha çok bir yan hedef.</li>
+</ul></div>
+
+<h2>Önerim</h2>
+<ol>
+<li><b>Önce B'yi (Patlama eşiği) yapalım.</b> Fiziğe dokunmuyor, 1 günde telefona gelir, kimliği oynanışa en hızlı ve en ucuz taşıyan fikir bu. 0,4 ve 0,6 saniyelik pencereyi deneriz. Hedef: pencereyi kaçırma oranı %10–20 arasında olsun.</li>
+<li><b>Sonra A'yı (Gaz kurtarışı) ayrı bir anahtarla deneyelim.</b> En güçlü "bizden başkasında yok" fikri bu, ama fiziğe dokunduğu için kararı sen vermelisin. Kapalı ve açık hâlini telefonda karşılaştırırız. Ölçüt: oyuncuların 15. kuleye ulaşma oranı artıyor mu.</li>
+<li><b>C'yi şimdilik beklet.</b> Kötü bir fikir değil, ama A ve B'den sonra albümü beslemek için daha uygun.</li>
+</ol>
+
+<h2>Yapılmayacaklar</h2>
+<ul>
+<li>İmza özelliği meta katmana saklamak: durak, albüm, kostüm. Fark ilk dakikada hissedilmeli.</li>
+<li>Güç çubuğu ya da yüzde göstergesi eklemek. Göstergemiz amcanın yüzü.</li>
+<li>Gazı sınırsız çift zıplamaya ya da çok tuşlu kontrole çevirmek.</li>
+<li>Mekanik oturmadan yeni içerik yığmak: kostüm, yeni semt arka planı, yeni gaz türü.</li>
+</ul>
+
+<h2>Senin kararını bekleyenler</h2>
+<ol>
+<li><b>Patlama eşiğiyle başlayalım mı?</b> Fazla tutunca ne olsun?
+<ul>
+<li>En yüksek güçle kendiliğinden fırlasın (benim önerim).</li>
+<li>Ya da amca yerinde kalıp puan kaybetsin.</li>
+</ul></li>
+<li><b>Gaz kurtarışı için zıplama fiziğine bir anahtar arkasında dokunmaya izin veriyor musun?</b> Havada tek seferlik küçük bir itiş eklenecek. Kapalı hâli bugünkü oyunun aynısı kalır.</li>
+<li><b>Hedef kitle:</b> Önce Türkiye mi, baştan dünya mı? Pazar editörü bunun isim ve mağaza metnini belirleyeceğini söylüyor. Acil değil.</li>
+</ol>
+<p class="muted">Ayrıntılı raporlar bu klasörde: editor-tasarim.md, editor-sanat.md, editor-pazar.md (kaynak bağlantılarıyla), editor-kivilcim.md.</p>
+</div></body></html>
