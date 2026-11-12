@@ -13,6 +13,8 @@ const SOURCES = {
   multi: require("@/assets/sounds/multi.wav"),
   record: require("@/assets/sounds/record.wav"),
   fall: require("@/assets/sounds/fall.wav"),
+  // İstanbul anlık olayı: uzaktan vapur düdüğü (aynı kayıt, çok kısık).
+  horn_far: require("@/assets/sounds/record.wav"),
   // GAZ trial (2026-11-11): fart variants, short / medium / long. Since v3
   // these are real recordings: "Fart 3-8" by aPebble, Pixabay Content
   // License (free, commercial use, no attribution; see assets/sounds/LICENSE-PIXABAY.md),
@@ -28,7 +30,7 @@ const SOURCES = {
 export type SfxName = keyof typeof SOURCES;
 
 const VOLUME: Record<SfxName, number> = {
-  charge: 0.35, land: 0.7, multi: 0.6, record: 0.55, fall: 0.45,
+  charge: 0.35, land: 0.7, multi: 0.6, record: 0.55, fall: 0.45, horn_far: 0.14,
   fart_s1: 0.55, fart_s2: 0.55, fart_m1: 0.55, fart_m2: 0.55, fart_l1: 0.6, fart_l2: 0.6,
 };
 const FARTS: SfxName[] = ["fart_s1", "fart_s2", "fart_m1", "fart_m2", "fart_l1", "fart_l2"];
