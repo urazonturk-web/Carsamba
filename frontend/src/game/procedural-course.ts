@@ -1,5 +1,6 @@
 import { CONFIG } from "./config";
 import { jumpVelocity, flightGravity } from "./jump";
+import { DURAK_SEFER, isStopTower, stopDifficulty } from "./stops";
 
 // Extracted from app/index.tsx (was inlined there) so this exact math has a
 // single source of truth that both the live game and offline simulation/test
@@ -53,18 +54,23 @@ export function generateProceduralPlatform(
 ): Platform {
   "worklet";
   const warm = id <= CONFIG.warmupTowers; // gentle warm-up section
-  const t = Math.min(1, id / CONFIG.difficultyRamp); // 0 early -> 1 late
+  // DURAK SEFERİ (2026-11-12): doğrusal artış yerine durak başına bir basamak.
+  const t = DURAK_SEFER ? stopDifficulty(id) : Math.min(1, id / CONFIG.difficultyRamp); // 0 early -> 1 late
+  // Durak kulesi = nefes molası: geniş, öncekine yakın yükseklik, kısa/orta aralık.
+  const breath = DURAK_SEFER && isStopTower(id);
   // gap distance (grows with difficulty; warm-up = short/medium only)
   const gMin = warm ? CONFIG.gapEarly.min : lerp(CONFIG.gapEarly.min, CONFIG.gapLate.min, t);
-  const gMax = warm
+  const gMaxRaw = warm
     ? CONFIG.warmupGapMax
     : lerp(CONFIG.gapEarly.max, CONFIG.gapLate.max, t);
+  const gMax = breath ? Math.max(gMin, (gMin + gMaxRaw) / 2) : gMaxRaw;
   const gapSample = rand();
   // Sample within the world bounds instead of clamping: clamping stacks
   // consecutive tower tops at exactly the same upper/lower limit.
-  const hv = warm
+  const hvRaw = warm
     ? CONFIG.heightVarWarmup
     : lerp(CONFIG.heightVarEarly, CONFIG.heightVarLate, t);
+  const hv = breath ? Math.min(hvRaw, 70) : hvRaw;
   const minDelta = Math.max(-hv, CONFIG.platformMinTopY - prev.topY);
   const maxDelta = Math.min(hv, CONFIG.platformMaxTopY - prev.topY);
   const topY = prev.topY + minDelta + rand() * (maxDelta - minDelta);
@@ -83,6 +89,11 @@ export function generateProceduralPlatform(
     if (id <= CONFIG.noNarrowBeforeId) wNar = 0; // forgiving start
   }
   if (prev.cat === 2) wNar *= 0.25; // avoid consecutive narrow towers
+  if (breath) {
+    wWide = 1;
+    wMed = 0;
+    wNar = 0;
+  }
   const sum = wWide + wMed + wNar;
   const r = rand() * sum;
   let cat: number;

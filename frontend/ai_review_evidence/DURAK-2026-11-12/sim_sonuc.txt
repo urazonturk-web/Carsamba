@@ -1,0 +1,9 @@
+kule bandı | ort. aralık | en büyük aralık | dar kule % | ort. yükseklik farkı
+1-9 | 212 | 340 | 1.6 | 97
+10-24 | 215 | 320 | 12.0 | 94
+25-39 | 209 | 300 | 18.8 | 90
+40-54 | 204 | 280 | 25.0 | 86
+55-120 | 198 | 260 | 30.6 | 81
+nefes kulesi: 24000, geniş %100.0, ort. aralık 170, ort. yük. farkı 34; negatif aralık: 0
+durak kuleleri: 10,25,40,55,70,85 | stopsPassed(9,10,24,25,55,70): 0,1,1,2,4,5
+satırlar: Karaköy'e 10 kule kaldı | Karaköy'e 1 kule kaldı | Galata'ya 13 kule kaldı | Sirkeci'ye 10 kule kaldı | Eminönü İskelesi'ne 1 kule kaldı | Sonraki gece durağına 10 kule kaldı

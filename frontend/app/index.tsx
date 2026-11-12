@@ -25,6 +25,9 @@ import Animated, {
   withSequence,
   withRepeat,
   Easing,
+  interpolateColor,
+  FadeIn,
+  FadeOut,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -33,6 +36,8 @@ import { NO_IMAGE_CLIP, NoClipImage as Image } from "../src/game/NoClipImage";
 import { ChargePoses } from "../src/game/ChargePoses";
 import { CHARGE_POSES, FAZ2_IFADE } from "../src/game/character-pose";
 import { ANCHOR_SHIFT_PX, GLOBAL_VISUAL_SCALE, POSE_FEET_SPAN_PX } from "../src/game/character-pose";
+import { DAILY_KEY, DAILY_MAP, dailySeed, todayKey, todayLabel, type DailyRecord } from "../src/game/daily";
+import { DURAK_SEFER, nextStopLine, stopName, stopTowerId, stopsPassed, PIER_STOP } from "../src/game/stops";
 import { SFX_ON, initSfx, playFart, playSfx, setSfxMuted, stopFart, stopSfx } from "../src/game/sfx";
 import { GAME_OVER_LINE, QUIP_ON, multiJumpShout, pickQuip, quipContext } from "../src/game/copy";
 import { jumpVelocity, advanceFlight } from "../src/game/jump";
@@ -116,8 +121,14 @@ const BACK_HAZE_TOP = 48 * DISTRICT_SCALE * BACK_DISTRICT_SCALE;
 // and a glare-free roof strip cropped to exactly 6 tile periods (6 x 195 px)
 // so it repeats without a seam. false = the original district assets.
 const GORSEL018_TRIAL = true as boolean;
+// GÖRÜNÜM REV (2026-11-12, kullanıcı: "Üçünü de yap"; Çizgi film yöneticisi
+// değerlendirmesinin yeni maddeleri): ön planı arka plandan ayırmak için
+// (1) arka plan biraz soluk, (2) iniş çatısı daha canlı + mahya vurgusu, merkez
+// şeridi (puanı 0 olduğu için anlamsız beyaz çizgi) gizli, (3) ekran altında
+// yumuşak geçiş. Hepsi kodla/var olan görselin işlenmesiyle; siluet aynı.
+const GORUNUM_REV = true as boolean;
 const HOUSE_ROOF_SOURCE = GORSEL018_TRIAL
-  ? require("@/assets/environment/district/house/g018/roof-tiles-g018.png")
+  ? (GORUNUM_REV ? require("@/assets/environment/district/house/g018/roof-tiles-g018-canli.png") : require("@/assets/environment/district/house/g018/roof-tiles-g018.png"))
   : require("@/assets/environment/district/house/house-roof-tiles.png");
 const HOUSE_GUTTER_SOURCE = require("@/assets/environment/district/house/house-gutter.png");
 // GORSEL-018 (2026-11-10): 12 facade variants (4 plaster colours x 3 modules)
@@ -291,7 +302,7 @@ const AnimatedImage = Animated.createAnimatedComponent(Image);
 const BG_SCROLL_TEST = true as boolean;
 const BG_SCROLL_RATIO = 0.45;
 const BG_SCROLL_TILES = 4;
-const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
+const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? "DURAK v3 + SES OTURUMU + GORUNUM" : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
 const DIAG_MAX_EXAMPLES = 6;
 const HOUSE_AB_FROZEN = false as boolean;
 // REVIZYON-066 experiment (one variable): expo-linear-gradient's iOS layer
@@ -432,6 +443,11 @@ const NEAR_IMG_TILE_COUNT = 8; // covers the "first screen + first 10 jumps" sco
 
 // Preserve historical scores separately because the scoring rules changed.
 const SFX_MUTED_KEY = "carsamba.sfxMuted.v1";
+const FARTHEST_TOWER_KEY = "carsamba.farthestTower.v1";
+// DURAK SEFERİ: gökyüzü tonu durak başına bir adım (sabah, öğle, ikindi, gün batımı, gece).
+const SKY_STEPS = [0, 1, 2, 3, 4];
+// 2026-11-12 video 13-15-13: ilk tonlar telefonda neredeyse fark edilmedi (gök mavisi ~%5 ısındı) -> güçlendirildi.
+const SKY_TINTS = ["rgba(255,205,130,0)", "rgba(255,206,120,0.20)", "rgba(255,150,70,0.30)", "rgba(240,90,70,0.36)", "rgba(16,26,74,0.50)"];
 const BEST_SCORE_KEY = REFERENCE_TRIAL ? "jumpcharge.bestScore.reference.v1" : "jumpcharge.bestScore";
 // EXPERIMENTAL_COURSE (see src/game/config.ts) swaps the fixed, measured
 // REFERENCE_COURSE for the procedural generator below, independent of
@@ -537,6 +553,19 @@ export default function Game() {
   // FAZ2 kapanış (2026-11-12): ses aç/kapa, kalıcı.
   const [sfxMuted, setSfxMutedState] = useState(false);
   useEffect(() => {
+    if (!DURAK_SEFER) return;
+    storage.getItem<number>(FARTHEST_TOWER_KEY, 0).then((v) => {
+      if (typeof v === "number" && v > 0) {
+        freeFarthestRef.current = v;
+        if (modeRef.current === "free") {
+          farthestRef.current = v;
+          recordFlagId.value = v;
+        }
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  useEffect(() => {
     storage.getItem<boolean>(SFX_MUTED_KEY, false).then((m) => {
       if (m === true) {
         setSfxMuted(true);
@@ -615,7 +644,20 @@ export default function Game() {
     charge: 0, vx: 0, vy: 0, dist: 0, width: 0, offset: 0, fps: 0, p50: 0, p95: 0, dropped: 0,
   });
   const scoreRef = useRef(0);
+  // DURAK SEFERİ state
+  const lastTowerRef = useRef(0);
+  const farthestRef = useRef(0);
+  const [stopBanner, setStopBanner] = useState<{ key: number; title: string; sub: string } | null>(null);
+  const stopTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [runEnd, setRunEnd] = useState<{ lastTower: number; stops: number }>({ lastTower: 0, stops: 0 });
   const bestRef = useRef(0);
+  // GÜNÜN HARİTASI: oyun modu. bestRef/best ve farthestRef/recordFlagId her
+  // zaman AKTİF modun değerini tutar; serbest mod değerleri ayrıca saklanır.
+  const [mode, setMode] = useState<"free" | "daily">("free");
+  const modeRef = useRef<"free" | "daily">("free");
+  const freeBestRef = useRef(0);
+  const freeFarthestRef = useRef(0);
+  const dailyRef = useRef<DailyRecord>({ date: "", best: 0, farthest: 0 });
   const perfectTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // --- Shared (UI-thread) game state ---------------------------------------
@@ -746,6 +788,8 @@ export default function Game() {
 
   // Perfect-landing particle burst
   const burst = useSharedValue(0);
+  const skyStep = useSharedValue(0);
+  const recordFlagId = useSharedValue(0);
   const dust = useSharedValue(1);
   const fartPuffs = useSharedValue<any[]>([]);
   const fartNow = useSharedValue(0);
@@ -768,8 +812,18 @@ export default function Game() {
     (async () => {
       const saved = await storage.getItem<number>(BEST_SCORE_KEY, 0);
       if (alive && typeof saved === "number") {
-        bestRef.current = saved;
-        setBest(saved);
+        freeBestRef.current = saved;
+        if (modeRef.current === "free") {
+          bestRef.current = saved;
+          setBest(saved);
+        }
+      }
+      if (DAILY_MAP) {
+        const raw = await storage.getItem<string>(DAILY_KEY, "");
+        try {
+          const d = raw ? (JSON.parse(raw) as DailyRecord) : null;
+          if (alive && d && typeof d.date === "string") dailyRef.current = d;
+        } catch {}
       }
     })();
     return () => {
@@ -911,7 +965,20 @@ export default function Game() {
   // ------------------------------------------------------------------------
   // JS callbacks triggered from the worklet (rare, event-based).
   // ------------------------------------------------------------------------
-  const onLanding = useCallback((perfect: number, towersCrossed: number) => {
+  const onLanding = useCallback((perfect: number, towersCrossed: number, landedId: number) => {
+    if (DURAK_SEFER) {
+      lastTowerRef.current = landedId;
+      const before = stopsPassed(landedId - towersCrossed);
+      const after = stopsPassed(landedId);
+      if (after > before) {
+        const pier = after === PIER_STOP;
+        setStopBanner({ key: landedId, title: stopName(after), sub: pier ? `Vapura yetiştin! ⛴️ · ${stopTowerId(after)}. kule` : `${after > PIER_STOP ? "🌙 " : ""}${stopTowerId(after)}. kule` });
+        if (stopTimer.current) clearTimeout(stopTimer.current);
+        stopTimer.current = setTimeout(() => setStopBanner(null), 1400);
+        if (SFX_ON) playSfx("record");
+        skyStep.value = withTiming(Math.min(after, SKY_STEPS.length - 1), { duration: 900 });
+      }
+    }
     const gained =
       towersCrossed * CONFIG.scorePerLanding +
       (towersCrossed > 1 ? towersCrossed * CONFIG.scoreMultiTowerBonus : 0) +
@@ -932,6 +999,22 @@ export default function Game() {
   }, []);
 
   const onGameOver = useCallback(() => {
+    if (DURAK_SEFER) {
+      const lt = lastTowerRef.current;
+      setRunEnd({ lastTower: lt, stops: stopsPassed(lt) });
+      setStopBanner(null);
+      if (lt > farthestRef.current) {
+        farthestRef.current = lt;
+        recordFlagId.value = lt;
+        if (modeRef.current === "daily") {
+          dailyRef.current = { ...dailyRef.current, farthest: lt };
+          storage.setItem(DAILY_KEY, JSON.stringify(dailyRef.current));
+        } else {
+          freeFarthestRef.current = lt;
+          storage.setItem(FARTHEST_TOWER_KEY, lt);
+        }
+      }
+    }
     if (SFX_ON && FART_TRIAL) stopFart();
     if (SFX_ON) playSfx(scoreRef.current > bestRef.current && scoreRef.current > 0 ? "record" : "fall");
     if (FAZ1_UI) {
@@ -953,7 +1036,13 @@ export default function Game() {
     if (scoreRef.current > bestRef.current) {
       bestRef.current = scoreRef.current;
       setBest(scoreRef.current);
-      storage.setItem(BEST_SCORE_KEY, scoreRef.current);
+      if (modeRef.current === "daily") {
+        dailyRef.current = { ...dailyRef.current, best: scoreRef.current };
+        storage.setItem(DAILY_KEY, JSON.stringify(dailyRef.current));
+      } else {
+        freeBestRef.current = scoreRef.current;
+        storage.setItem(BEST_SCORE_KEY, scoreRef.current);
+      }
     }
   }, []);
 
@@ -964,13 +1053,49 @@ export default function Game() {
   const pushDebug = useCallback((d: typeof debug) => setDebug(d), []);
 
   const restart = useCallback(() => {
+    lastTowerRef.current = 0;
+    skyStep.value = 0;
+    setStopBanner(null);
     scoreRef.current = 0;
     setScore(0);
     setLastJump(null);
     setGameOver(false);
     setPerfectVisible(false);
-    initWorld();
+    if (DAILY_MAP && modeRef.current === "daily") {
+      // Gün değiştiyse günlük kayıt sıfırlanır; harita o günün tohumuyla kurulur.
+      const key = todayKey();
+      if (dailyRef.current.date !== key) {
+        dailyRef.current = { date: key, best: 0, farthest: 0 };
+        bestRef.current = 0;
+        setBest(0);
+        farthestRef.current = 0;
+        recordFlagId.value = 0;
+      }
+      initWorld(dailySeed(key));
+    } else {
+      initWorld();
+    }
   }, [initWorld]);
+
+  const switchMode = useCallback((next: "free" | "daily") => {
+    modeRef.current = next;
+    setMode(next);
+    if (next === "daily") {
+      const key = todayKey();
+      if (dailyRef.current.date !== key) dailyRef.current = { date: key, best: 0, farthest: 0 };
+      bestRef.current = dailyRef.current.best;
+      setBest(dailyRef.current.best);
+      farthestRef.current = dailyRef.current.farthest;
+      recordFlagId.value = dailyRef.current.farthest;
+    } else {
+      bestRef.current = freeBestRef.current;
+      setBest(freeBestRef.current);
+      farthestRef.current = freeFarthestRef.current;
+      recordFlagId.value = freeFarthestRef.current;
+    }
+    restart();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [restart]);
 
   // ------------------------------------------------------------------------
   // Raw responder events avoid Pressability's 130ms minimum press duration.
@@ -1237,7 +1362,7 @@ export default function Game() {
               burst.value = 0;
               burst.value = withTiming(1, { duration: 620 });
             }
-            runOnJS(onLanding)(perfect, towersCrossed);
+            runOnJS(onLanding)(perfect, towersCrossed, p.id);
           }
         }
       }
@@ -1412,6 +1537,15 @@ export default function Game() {
     if (!t) return { opacity: 0, transform: [{ translateX: -99999 }, { translateY: -99999 }, { scaleX: 1 }] };
     return { opacity: 0.35 + 0.55 * Math.min(1, visualCharge.value),
       transform: [{ translateX: t.x }, { translateY: t.topY - GLOW_H + 2 }, { scaleX: t.width / GLOW_W }] };
+  });
+  const skyTintStyle = useAnimatedStyle(() => ({
+    backgroundColor: interpolateColor(skyStep.value, SKY_STEPS, SKY_TINTS),
+  }));
+  // Rekor bayrağı: şimdiye kadar varılan en uzak kulenin çatısında.
+  const recordFlagStyle = useAnimatedStyle(() => {
+    const f = DURAK_SEFER && recordFlagId.value > 0 ? platformById(platforms.value, recordFlagId.value) : null;
+    if (!f) return { opacity: 0, transform: [{ translateX: -99999 }, { translateY: -99999 }] };
+    return { opacity: 1, transform: [{ translateX: f.x + f.width - 5 }, { translateY: f.topY - 54 }] };
   });
   const dustStyle = useAnimatedStyle(() => {
     const d = dust.value;
@@ -1618,11 +1752,12 @@ export default function Game() {
           )}
         </Animated.View>
       )}
-      {!POPUP && <View style={styles.backgroundWash} pointerEvents="none" />}
+      {!POPUP && <View style={[styles.backgroundWash, GORUNUM_REV && { opacity: 0.26 }]} pointerEvents="none" />}
       {/* REVIZYON-034: very light depth/colour: warm glow toward the horizon,
           deeper blue at the top. Screen-space, under the world + HUD. */}
       {!POPUP && <LinearGradient pointerEvents="none" colors={["rgba(30,120,230,0.10)", "rgba(255,190,120,0)", "rgba(255,170,100,0.10)"]}
         locations={[0, 0.5, 1]} style={styles.fill} />}
+      {DURAK_SEFER && !POPUP && <Animated.View pointerEvents="none" style={[styles.fill, skyTintStyle]} />}
       {POPUP && (
         <>
           {/* POPUP-002: approved backdrop as one screen-fixed matte (height = screen,
@@ -1904,6 +2039,12 @@ export default function Game() {
             <LinearGradient pointerEvents="none" colors={["rgba(255,236,170,0)", "rgba(255,226,140,0.55)", "rgba(255,248,214,0.95)"]} locations={[0, 0.75, 1]} style={styles.houseGradFill} />
           </Animated.View>
         )}
+        {DURAK_SEFER && (
+          <Animated.View pointerEvents="none" style={[styles.burst, recordFlagStyle]}>
+            <View style={styles.flagPole} />
+            <View style={styles.flagCloth}><Text style={styles.flagText}>REKOR</Text></View>
+          </Animated.View>
+        )}
         {FAZ2_DUST && (
           <Animated.View style={[styles.burst, dustStyle]}>
             {DUST_PUFFS.map((q, i) => {
@@ -1982,6 +2123,10 @@ export default function Game() {
         </View>
       )}
       {PERF_PROBE && <PerfProbeOverlay top={insets.top + 4} sv={{ pFrames, pHitch, pHitchBig, pAirFrames, pAirHitch, pListAir, pHitchNearList, pMaxMs, pHitchIdle, pHitchCharge, pHitchDead, pEvAppear, pEvGone, pEvMove, pListNoHouse, pHitchAppear, pHitchGone, pHitchMove, pHitchListOnly, pHitchNoEvent }} />}
+      {GORUNUM_REV && !POPUP && (
+        <LinearGradient pointerEvents="none" colors={["rgba(58,36,24,0)", "rgba(58,36,24,0.38)"]}
+          style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: "16%" }} />
+      )}
       {SFX_ON && assetsReady && (
         <Pressable
           testID="sfx-toggle"
@@ -2000,8 +2145,9 @@ export default function Game() {
           {score}
         </Text>
         <Text style={[styles.bestText, POPUP && styles.puBestText]} testID="best-value">
-          {FAZ1_UI ? "REKOR" : "BEST"} {best}
+          {FAZ1_UI ? (mode === "daily" ? "GÜNÜN REKORU" : "REKOR") : "BEST"} {best}
         </Text>
+        {DAILY_MAP && mode === "daily" && score > 0 && <Text style={styles.dailyChip}>📅 Günün haritası · {todayLabel()}</Text>}
       </View>}
 
       {/* GORSEL-017 HOTFIX-01 (2026-09-23): was gated on __DEV__ alone, which
@@ -2015,6 +2161,27 @@ export default function Game() {
         </View>
       )}
 
+      {/* GÜNÜN HARİTASI v2 (2026-11-12, kullanıcı: "serbest oyun / günün oyun
+          sekmelerini kendin değiştiremiyorsun ... onun değişmesi gerekir"):
+          tur başında (ilk zıplamadan önce) sol üstte mod seçici; dokununca
+          harita hemen o moda geçer, oynamak ya da düşmek gerekmez. */}
+      {DAILY_MAP && score === 0 && !gameOver && assetsReady && (
+        <View pointerEvents="box-none" style={[styles.modeSegWrap, { top: insets.top + 112 }]}>
+        <View style={styles.modeSeg} testID="mode-tabs">
+          {(["free", "daily"] as const).map((m) => (
+            <Pressable
+              key={m}
+              testID={`mode-tab-${m}`}
+              hitSlop={6}
+              onPress={() => { if (mode !== m) switchMode(m); }}
+              style={[styles.modeSegBtn, mode === m && styles.modeSegBtnOn]}
+            >
+              <Text style={[styles.modeSegText, mode === m && styles.modeSegTextOn]}>{m === "free" ? "🎲 Serbest" : `📅 ${todayLabel()}`}</Text>
+            </Pressable>
+          ))}
+        </View>
+        </View>
+      )}
       {/* Hint (only before first jump) */}
       {score === 0 && !gameOver && assetsReady && (
         <View style={styles.hint}>
@@ -2028,9 +2195,18 @@ export default function Game() {
         </View>
       )}
 
+      {DURAK_SEFER && stopBanner && !gameOver && (
+        <Animated.View key={stopBanner.key} entering={FadeIn.duration(180)} exiting={FadeOut.duration(260)} pointerEvents="none"
+          style={[styles.stopBannerWrap, { top: insets.top + 108 }]}>
+          <View style={styles.stopSign}>
+            <Text style={styles.stopTitle}>{stopBanner.title}</Text>
+            {stopBanner.sub !== "" && <Text style={styles.stopSignSub}>{stopBanner.sub}</Text>}
+          </View>
+        </Animated.View>
+      )}
       {/* PERFECT! popup */}
       {perfectVisible && (
-        <View style={styles.perfectWrap}>
+        <View style={[styles.perfectWrap, DURAK_SEFER && stopBanner && { top: "34%" }]}>
           <PerfectPop key={`${score}-${landingLabel}`} styles={styles} label={landingLabel} sub={landingSub} big={FAZ1_UI} />
         </View>
       )}
@@ -2061,7 +2237,7 @@ export default function Game() {
             <View style={styles.kilimRow}>
               {KILIM_DOTS.map((c, i) => <View key={i} style={[styles.kilimDot, { backgroundColor: c }]} />)}
             </View>
-            <Text style={styles.statLabel}>SKOR</Text>
+            <Text style={styles.statLabel}>{DAILY_MAP && mode === "daily" ? `GÜNÜN HARİTASI · ${todayLabel()}` : "SKOR"}</Text>
             <Text style={styles.trScore} testID="final-score">
               {score}
             </Text>
@@ -2071,6 +2247,12 @@ export default function Game() {
               <Text style={styles.trBest} testID="final-best">
                 Rekor {best}{best - score > 0 ? ` · ${best - score} puan kaldı` : best === score && score > 0 ? " · rekora eşitledin" : ""}
               </Text>
+            )}
+            {DURAK_SEFER && (
+              <View style={styles.stopCardBox} testID="stop-summary">
+                <Text style={styles.stopCardMain}>{runEnd.stops > 0 ? `En uzak durak: ${stopName(runEnd.stops)}` : "Henüz durağa varmadın"}</Text>
+                <Text style={styles.stopCardSub}>{nextStopLine(runEnd.lastTower)}</Text>
+              </View>
             )}
             {QUIP_ON && <View style={styles.bubble}>
               <Text style={styles.bubbleText} testID="game-over-line">{quip}</Text>
@@ -2083,6 +2265,15 @@ export default function Game() {
             >
               <Text style={styles.playBtnText}>Bir daha</Text>
             </Pressable>
+            {DAILY_MAP && (
+              <Pressable
+                testID="mode-switch-button"
+                style={({ pressed }) => [styles.modeBtn, pressed && styles.playBtnPressed]}
+                onPress={() => switchMode(mode === "daily" ? "free" : "daily")}
+              >
+                <Text style={styles.modeBtnText}>{mode === "daily" ? "🎲 Serbest oyun" : `📅 Günün haritası · ${todayLabel()}`}</Text>
+              </Pressable>
+            )}
             {BUILD_TAG !== "" && <Text style={styles.trBuildTag}>{BUILD_TAG}</Text>}
           </View>
         </View>
@@ -2486,7 +2677,7 @@ const PlatformView = memo(function PlatformView({ index, platforms, styles, onAr
   const centerStyle = useAnimatedStyle(() => {
     const p = slotPlatform(platforms.value, index);
     return {
-      opacity: p ? 0.55 : 0,
+      opacity: p && !GORUNUM_REV ? 0.55 : 0,
       left: (p ? p.width : 0) / 2 - CONFIG.perfectTolerance,
     };
   });
@@ -2885,6 +3076,27 @@ const useStyles = makeStyles((colors) => ({
     lineHeight: 18,
   },
 
+  dailyChip: { marginTop: 2, fontSize: 12, fontWeight: "800", color: "#2a1b12", opacity: 0.8 },
+  modeSegWrap: { position: "absolute", left: 0, right: 0, alignItems: "center", zIndex: 60 },
+  modeSeg: { flexDirection: "row", backgroundColor: "rgba(255,250,241,0.78)", borderRadius: 999, borderWidth: 1.5, borderColor: "rgba(42,27,18,0.35)", padding: 3 },
+  modeSegBtn: { borderRadius: 999, paddingHorizontal: 10, paddingVertical: 6 },
+  modeSegBtnOn: { backgroundColor: "#c0472b" },
+  modeSegText: { fontSize: 13, fontWeight: "800", color: "#2a1b12" },
+  modeSegTextOn: { color: "#fff8ec" },
+  modeBtn: { width: "100%", marginTop: 10, borderRadius: 16, paddingVertical: 12, alignItems: "center", borderWidth: 2, borderColor: "#c0472b", backgroundColor: "#fff8ec" },
+  modeBtnText: { color: "#c0472b", fontSize: 16, fontWeight: "800" },
+  stopBannerWrap: { position: "absolute", left: 0, right: 0, alignItems: "center", zIndex: 40 },
+  stopSign: { backgroundColor: "#1f4e79", borderRadius: 10, borderWidth: 3, borderColor: "#f4ead8", paddingHorizontal: 18, paddingVertical: 7 },
+  stopTitle: { color: "#fff", fontSize: 24, fontWeight: "900", letterSpacing: 0.5, textAlign: "center" },
+  stopSignSub: { color: "#f4ead8", fontSize: 13, fontWeight: "800", textAlign: "center", marginTop: 1 },
+  stopSubPill: { marginTop: 6, backgroundColor: "rgba(255,248,236,0.88)", borderRadius: 999, paddingHorizontal: 12, paddingVertical: 3 },
+  stopSub: { color: "#2a1b12", fontSize: 16, fontWeight: "800" },
+  stopCardBox: { alignSelf: "stretch", alignItems: "center", backgroundColor: "#f3e3c8", borderRadius: 14, paddingVertical: 10, paddingHorizontal: 12, marginBottom: 16, marginTop: -6 },
+  stopCardMain: { fontSize: 16, fontWeight: "800", color: "#2a1b12" },
+  stopCardSub: { fontSize: 14, fontWeight: "700", color: "#7a5a44", marginTop: 2 },
+  flagPole: { position: "absolute", left: 0, top: 0, width: 4, height: 54, backgroundColor: "#3a281c" },
+  flagCloth: { position: "absolute", left: 4, top: 2, backgroundColor: "#c0472b", borderWidth: 1.5, borderColor: "#fff8ec", paddingHorizontal: 7, paddingVertical: 4, borderTopRightRadius: 6, borderBottomRightRadius: 6 },
+  flagText: { color: "#fff8ec", fontSize: 14, fontWeight: "900", letterSpacing: 0.5 },
   overlay: {
     ...absoluteFill(),
     backgroundColor: "rgba(20,48,58,0.35)",

@@ -49,6 +49,8 @@ function loadTs(p, imp = {}) {
 // actually crashed, needs the REAL worklet transform for this specific test.
 const cfgMod = loadTs("/src/game/config.ts");
 const jumpMod = loadTs("/src/game/jump.ts", { "./config": cfgMod });
+// 2026-11-12 DURAK SEFERİ: procedural-course.ts now also imports ./stops.
+const stopsMod = loadTs("/src/game/stops.ts");
 
 // Explicit iOS/Metro/Hermes caller, matching what Metro actually passes to
 // babel-preset-expo when bundling this app for a real iOS device/simulator
@@ -87,6 +89,7 @@ function transformAndInspect(tsSource, label) {
       require: (id) => {
         if (id === "./config") return cfgMod;
         if (id === "./jump") return jumpMod;
+        if (id === "./stops") return stopsMod;
         throw new Error("unexpected require: " + id);
       },
       global: { Error, __DEV__: true },

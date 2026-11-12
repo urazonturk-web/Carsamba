@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Oyun Yapısı Kararı</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f7f1e6; --card:#fffaf1; --ink:#2a1b12; --muted:#6d5a4b; --line:#e5d8c4;
+  --tile:#b5482c; --sea:#2f6f9a; --green:#3e7a52; --ochre:#d99a2b; --chip:#f1e5d1;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#17120e; --card:#211a14; --ink:#f3e9dc; --muted:#b8a691; --line:#3a2f25;
+    --tile:#e07a5a; --sea:#6fb0db; --green:#7cc394; --ochre:#f0b955; --chip:#2c231b;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#17120e; --card:#211a14; --ink:#f3e9dc; --muted:#b8a691; --line:#3a2f25;
+  --tile:#e07a5a; --sea:#6fb0db; --green:#7cc394; --ochre:#f0b955; --chip:#2c231b;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Inter,system-ui,sans-serif}
+.wrap{max-width:880px;margin:0 auto;padding:40px 16px 80px}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;line-height:1.2;margin:0}
+h1{font-size:clamp(28px,5vw,42px)}
+h2{font-size:24px;margin:48px 0 14px;padding-top:8px;border-top:2px solid var(--line)}
+h3{font-size:18px;margin:0 0 6px}
+.kicker{color:var(--tile);font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:13px}
+.lead{font-size:18px;color:var(--ink);margin:14px 0 0}
+.muted{color:var(--muted)}
+.sources{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 0}
+.chip{background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:13px}
+.chip.wait{border-style:dashed;color:var(--muted)}
+figure{margin:24px 0 0}
+figure img{width:100%;border-radius:10px;border:1px solid var(--line);display:block}
+figcaption{font-size:13px;color:var(--muted);margin-top:6px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+.card p{margin:4px 0 0;font-size:15px}
+.who{font-size:12px;color:var(--muted);margin-top:8px}
+table{width:100%;border-collapse:collapse;font-size:15px;background:var(--card);border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:13px;color:var(--muted);font-weight:600}
+tr:last-child td{border-bottom:0}
+.score{font-family:Fraunces,serif;font-size:20px;font-weight:700}
+.bar{height:6px;border-radius:3px;background:var(--line);margin-top:4px}
+.bar i{display:block;height:100%;border-radius:3px;background:var(--tile)}
+ol.finds{padding-left:20px}
+ol.finds li{margin:0 0 12px}
+.hook{border-left:4px solid var(--sea)}
+.hook.top{border-left-color:var(--tile)}
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:6px;background:var(--chip);color:var(--muted);margin-right:6px}
+.tag.s{color:var(--green)} .tag.m{color:var(--ochre)} .tag.l{color:var(--tile)}
+.phase{margin:0 0 14px}
+.phase ul{margin:8px 0 0;padding-left:20px}
+.phase li{margin:0 0 6px}
+.quote{font-family:Fraunces,serif;font-size:clamp(22px,4vw,30px);color:var(--tile);margin:8px 0}
+.decide li{margin:0 0 10px}
+.table-wrap{overflow-x:auto}
+</style>
+<style>.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:12px 0} .card p{margin:6px 0 0}</style>
+<style>table{width:100%;border-collapse:collapse;margin:8px 0;font-size:15px}th,td{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left;vertical-align:top}th{color:var(--muted);font-weight:600}.muted{color:var(--muted);font-size:14px}@media (max-width:560px){table{font-size:13px}}</style></head><body>
+<div class="wrap">
+<div class="kicker">Oyun yapısı ve yeni özellikler · 12 Kasım 2026</div>
+<h1>Sonsuz koşu kalsın, içine duraklar girsin</h1>
+<p>Dört bağımsız görüş alındı: oyun tasarımı, sanat yönetmeni, pazar editörü ve Kıvılcım. Hiçbiri diğerlerinin yazdığını görmedi, ama dördü de aynı yapıyı önerdi: <b>sonsuz oyunun içine duraklar</b>. Seçilen bölüm ya da bölüm geçme yapısını hiçbiri istemedi.</p>
+
+<h2>Yapı: duraklı sonsuz sefer</h2>
+<div class="card"><h3>Nasıl işler</h3>
+<ul>
+<li><b>Duraklar:</b> İlk durak 10. kulede gelir, böylece ilk turda bile bir "vardım" anı yaşanır. Sonra her 15 kulede bir durak var: 10, 25, 40, 55…</li>
+<li><b>Durağa varınca oyun durmaz.</b> Yaklaşık 1 saniye boyunca:
+<ul>
+<li>Üstte semt adı belirir.</li>
+<li>Kısa bir vapur düdüğü çalar.</li>
+<li>Gökyüzü sabahtan akşama bir adım ilerler.</li>
+<li>Durak kulesi geniş olur, bir nefes molası verir.</li>
+</ul></li>
+<li><b>Son durak iskele:</b> Vapura yetişmek bir "bitirdim" anı olur. Oyun bitmez, gece seferi olarak sonsuz devam eder.</li>
+<li><b>Düşünce hep baştan başlanır.</b> Kayıt noktası olmaz. Dördü de bunda kesin: kayıt noktası olursa rekor anlamsızlaşır.</li>
+<li><b>Sonuç kartında</b> "En uzak durak: Eminönü" ve "Fatih'e 4 kule kaldı" yazar. "Bir daha oynayayım" dedirten en güçlü satırın bu "az kaldı" bilgisi olduğunu düşünüyorlar.</li>
+</ul></div>
+
+<h2>Zorluk: her durakta bir basamak</h2>
+<ul>
+<li>Bugün zorluk ilk 40 kulede düz bir çizgiyle artıyor ve sonra sabit kalıyor; 40. kuleden sonra oyun yeni bir şey sunmuyor.</li>
+<li>Bunun yerine zorluk her durakta bir basamak artacak. Başta kolay olur, sonra kule aralığı, dar kule oranı ve yükseklik farkı artar. Zorluk belli bir noktada sabitlenir.</li>
+<li>İlk iki durak kolay kalmalı. İlk oturumda durak görmeyen oyuncu, böyle bir yapı olduğunu hiç öğrenmez.</li>
+<li>Yeni desenler de eklenebilir: art arda yükselen kuleler ("merdiven"), "dar–dar–geniş" dizisi, çoklu atlamaya davet eden yakın kule kümeleri.</li>
+<li>Bunların hepsi yalnızca kule üretim ayarı. Fizik ve kamera değişmez.</li>
+<li>Rüzgâr, hareketli çatı ve kaygan yüzey fiziğe dokunduğu için ertelenecek. Dördü de aynı görüşte.</li>
+</ul>
+
+<h2>Özellik fikirleri</h2>
+<table>
+<tr><th>Fikir</th><th>Neden tekrar oynatır</th><th>Görsel?</th><th>Kaç editör</th></tr>
+<tr><td><b>Duraklı sefer</b> (yukarıdaki yapı)</td><td>Bir hedef ve ilerleme hissi verir.</td><td>Hayır</td><td>4/4</td></tr>
+<tr><td><b>Günün haritası:</b> herkes o gün aynı çatıları oynar, günlük rekor ayrı tutulur. Sunucu gerekmez.</td><td>Her gün dönmek için bir neden. "Bugün sen kaça vardın?" sorusunu doğurur.</td><td>Hayır</td><td>4/4</td></tr>
+<tr><td><b>Kartpostal albümü / amca kıyafetleri:</b> yeni bir durağa ilk kez varınca açılır.</td><td>Uzun vadeli toplama isteği yaratır.</td><td>Evet, kredi gerekir</td><td>3/4</td></tr>
+<tr><td><b>Paylaşım kartı:</b> "Eminönü'ne kadar uçtu · 47 kule" yazar, tek dokunuşla paylaşılır.</td><td>Arkadaşa göndermeyi tetikler.</td><td>Hayır</td><td>2/4</td></tr>
+<tr><td><b>Yalnız görsel İstanbul olayları:</b> martı geçer, vapur düdük çalar, çatıda kedi ya da çamaşır görünür.</td><td>Ekranı canlı tutar, küçük sürprizler yaratır.</td><td>Hayır (mevcut parçalar)</td><td>2/4</td></tr>
+<tr><td><b>Günde 3 küçük görev:</b> örneğin "bir zıplamada 3 kule geç", "Karaköy'e var".</td><td>Kısa oturumlara hedef koyar.</td><td>Hayır</td><td>2/4</td></tr>
+<tr><td><b>Rekor çatısı:</b> önceki rekorun bittiği kulede küçük bir bayrak.</td><td>Rekora yaklaşırken gerilim, geçince anında tatmin.</td><td>Hayır</td><td>1/4</td></tr>
+<tr><td><b>Tam isabet serisi:</b> merkeze art arda inince puan katlanır ve gaz bulutu büyür.</td><td>Ustalaşmaya yer açar, gaz şakası ödüle dönüşür.</td><td>Hayır</td><td>1/4</td></tr>
+</table>
+
+<h2>Önerim: iki aşamalı deneme</h2>
+<div class="card"><h3>1. deneme: duraklı sefer (görsel üretimi yok, kredi yok)</h3>
+<ul>
+<li>Duraklar, semt adı ve vapur düdüğü.</li>
+<li>Gökyüzü tonunun durak durak ilerlemesi.</li>
+<li>Durak durak artan zorluk.</li>
+<li>Sonuç kartında "En uzak durak" ve "X'e N kule kaldı".</li>
+<li>Önceki rekorun bittiği kulede küçük bir bayrak (yarım günlük iş, aynı denemeye eklenebilir).</li>
+</ul>
+<p>Telefonda oynayıp bakarız. Sen 10 tur oynadığında turların yaklaşık yarısından fazlası ilk durağa varamıyorsa, ilk durağı 8. kuleye çekeriz.</p></div>
+<div class="card"><h3>2. deneme: günün haritası</h3>
+<p>Kod buna hazır (aynı haritayı yeniden üretebiliyor). Beta açıldığında paylaşım kartı da bunun üstüne eklenir.</p></div>
+<p>Kartpostal albümü, kıyafetler ve iskele sahnesi ancak durakların telefonda beğenilmesinden sonra ve görsel onayıyla gelir.</p>
+
+<h2>Yapılmayacaklar (dördü de aynı görüşte)</h2>
+<ul>
+<li>Kayıt noktası ya da "duraktan devam et".</li>
+<li>Numaralı bölüm haritası, bölüm seçme ekranı.</li>
+<li>Can, enerji, para birimi, mağaza, "reklam izle devam et".</li>
+<li>Durakta oyunu durduran ekran.</li>
+<li>Her semt için yeni arka plan ya da kule seti. Semtin kimliğini şimdilik isim kartı ve gökyüzü saati taşıyacak.</li>
+<li>Yeni espri ya da kaba ses.</li>
+</ul>
+
+<h2>Senin kararını bekleyenler</h2>
+<ol>
+<li><b>Sefer uzunluğu.</b> İskele kaçıncı durakta olsun? Editörler 3. ile 6. durak arasında farklı görüşte.
+<ul>
+<li>Benim önerim 4. durak (55. kule). Hem ulaşılabilir hem de her turda vardırmaz.</li>
+</ul></li>
+<li><b>Durak bonusu.</b> İki editör her durakta +5 puan öneriyor, Kıvılcım puan kuralını şimdilik değiştirmemeyi.
+<ul>
+<li>Benim önerim: ilk denemede bonus olmasın. Durağın kendisi ödül mü, onu ölçelim.</li>
+</ul></li>
+<li><b>Semt sırası.</b> Örnek sıra: Karaköy, Galata, Eminönü, ardından iskele.
+<ul>
+<li>Sevdiğin ya da oyunda olmasını istediğin semtler varsa söyle; sıralamayı ona göre kurarız.</li>
+</ul></li>
+</ol>
+<p class="muted">Ayrıntılı raporlar bu klasörde: editor-tasarim.md, editor-sanat.md, editor-pazar.md, editor-kivilcim.md.</p>
+</div></body></html>

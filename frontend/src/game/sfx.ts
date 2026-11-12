@@ -3,7 +3,7 @@
 // and reused; playing restarts from 0. Respects the phone's silent switch and
 // mixes with the user's own music. Calls are JS-thread only, at discrete events
 // (press, release, landing, game over) -- nothing per frame.
-import { createAudioPlayer, setAudioModeAsync, type AudioPlayer } from "expo-audio";
+import { createAudioPlayer, setAudioModeAsync, setIsAudioActiveAsync, type AudioPlayer } from "expo-audio";
 
 export const SFX_ON = true as boolean;
 
@@ -44,13 +44,19 @@ const turn: Partial<Record<SfxName, number>> = {};
 
 export function initSfx() {
   if (!SFX_ON || players) return;
-  setAudioModeAsync({ playsInSilentMode: false, interruptionMode: "mixWithOthers" }).catch(() => {});
+  // 2026-11-12 kullanıcı: "ses tuşu önce telefonun sesini, sonra oyunun sesini açıp kısıyor".
+  // expo-audio her ses bitince iOS ses oturumunu kapatıyordu; oturum kapalıyken
+  // donanım ses tuşları zil sesini değiştirir. Oturum oyun boyunca açık tutulur
+  // (keepAudioSessionActive + setIsAudioActiveAsync), tuşlar hep oyun sesini değiştirir.
+  setAudioModeAsync({ playsInSilentMode: false, interruptionMode: "mixWithOthers" })
+    .then(() => setIsAudioActiveAsync(true))
+    .catch(() => {});
   players = {};
   for (const k of Object.keys(SOURCES) as SfxName[]) {
     const list: AudioPlayer[] = [];
     for (let i = 0; i < (k === "charge" ? 1 : POOL); i++) {
       try {
-        const p = createAudioPlayer(SOURCES[k]);
+        const p = createAudioPlayer(SOURCES[k], { keepAudioSessionActive: true });
         p.volume = VOLUME[k];
         list.push(p);
       } catch {
