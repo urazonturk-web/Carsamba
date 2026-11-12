@@ -1,5 +1,6 @@
 import { Image as CachedImage } from "expo-image";
 import { NoClipImage as Image } from "./NoClipImage";
+import { View } from "react-native";
 
 // REVIZYON-072: same switch as LIVE_RN_IMAGE in app/index.tsx (kept in step by
 // hand). expo-image's always-clipping ImageView makes Fabric mask each pose
@@ -32,6 +33,8 @@ type Props = {
   // PATLAMA EŞİĞİ (2026-11-12): tam şarj penceresinde 0..1 ilerleme (-1 = yok).
   // Amca titrer ve hafifçe şişer; yalnız transform.
   strain?: SharedValue<number>;
+  // PATLAMA (2026-11-12): 1 = amca bu tur lekeli (kahverengi lekeler, yalnız opaklık).
+  dirty?: SharedValue<number>;
   onLoad?: () => void;
   onLoadStart?: () => void;
   onError?: () => void;
@@ -40,8 +43,14 @@ type Props = {
 const HALO_PX = 9; // sprite pixels
 const HALO_COLOR = "rgba(255,248,230,0.8)";
 const HALO_OFFSETS = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+const DIRT_SPOTS = [
+  { x: 0.52, y: 0.58, d: 0.30 }, { x: 0.40, y: 0.72, d: 0.22 }, { x: 0.60, y: 0.82, d: 0.24 },
+  { x: 0.45, y: 0.90, d: 0.18 }, { x: 0.66, y: 0.30, d: 0.16 }, { x: 0.34, y: 0.47, d: 0.20 },
+  { x: 0.56, y: 0.20, d: 0.14 },
+];
+const DIRT_COLORS = ["rgba(150,104,48,0.92)", "rgba(126,86,40,0.92)", "rgba(171,124,62,0.9)"];
 
-function PoseLayer({ i, px, py, poseCharge, scale, feetCenterOffset, feetHalf, landPulse, halo, strain, ...cb }: Props & { i: number }) {
+function PoseLayer({ i, px, py, poseCharge, scale, feetCenterOffset, feetHalf, landPulse, halo, strain, dirty, ...cb }: Props & { i: number }) {
   const pose = CHARGE_POSES[i];
   const style = useAnimatedStyle(() => {
     // Squash toward the FOOT line (feetHalf), not the sprite's own center,
@@ -67,6 +76,7 @@ function PoseLayer({ i, px, py, poseCharge, scale, feetCenterOffset, feetHalf, l
       ],
     };
   });
+  const dirtStyle = useAnimatedStyle(() => ({ opacity: dirty ? dirty.value : 0 }));
   return (
     <Animated.View
       testID={`charge-pose-${i}`}
@@ -108,6 +118,13 @@ function PoseLayer({ i, px, py, poseCharge, scale, feetCenterOffset, feetHalf, l
           onError={cb.onError}
         />
       )}
+      {dirty ? (
+        <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, right: 0, bottom: 0 }, dirtStyle]}>
+          {DIRT_SPOTS.map((d, k) => (
+            <View key={k} style={{ position: "absolute", left: `${(d.x - d.d / 2) * 100}%`, top: `${(d.y - d.d / 3) * 100}%`, width: `${d.d * 100}%`, aspectRatio: 1.25, borderRadius: 999, borderWidth: 1, borderColor: "rgba(60,36,16,0.7)", backgroundColor: DIRT_COLORS[k % 3] }} />
+          ))}
+        </Animated.View>
+      ) : null}
     </Animated.View>
   );
 }

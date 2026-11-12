@@ -25,6 +25,7 @@ import Animated, {
   withSpring,
   withSequence,
   withRepeat,
+  cancelAnimation,
   Easing,
   interpolateColor,
   FadeIn,
@@ -305,7 +306,7 @@ const AnimatedImage = Animated.createAnimatedComponent(Image);
 const BG_SCROLL_TEST = true as boolean;
 const BG_SCROLL_RATIO = 0.45;
 const BG_SCROLL_TILES = 4;
-const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? "PATLAMA ESIGI v1 (500ms)" : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
+const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? "PATLAMA v1 (KIRLI AMCA)" : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
 const DIAG_MAX_EXAMPLES = 6;
 const HOUSE_AB_FROZEN = false as boolean;
 // REVIZYON-066 experiment (one variable): expo-linear-gradient's iOS layer
@@ -455,6 +456,14 @@ const OVERCHARGE = true as boolean;
 const OVER_WINDOW_MS = 500;
 const SWEET_FROM = 0.6;
 const OVER_BONUS = 2;
+// PATLAMA (2026-11-12, kullanıcı: "çok basınca adam patlasın, boka bulansın" -> seçim b:
+// tur devam eder, çizgi film tarzı): pencere dolunca kahverengi "şlap" patlaması,
+// amca o tur boyunca lekeli ve başında sinekler döner. Yeniden başlayınca temizlenir.
+const SPLAT_ON = true as boolean;
+const SPLAT_BLOBS = Array.from({ length: 14 }, (_, i) => {
+  const h = (n: number) => ((Math.sin(i * 37.7 + n * 11.3) * 9187.31) % 1 + 1) % 1;
+  return { a: (i / 14) * Math.PI * 2 + h(1) * 0.4, r: 26 + h(2) * 46, d: 9 + Math.round(h(3) * 14), c: i % 3 === 0 ? "#5a3a1e" : i % 3 === 1 ? "#7a4e2a" : "#8d6236" };
+});
 const FARTHEST_TOWER_KEY = "carsamba.farthestTower.v1";
 // DURAK SEFERİ: gökyüzü tonu durak başına bir adım (sabah, öğle, ikindi, gün batımı, gece).
 const SKY_STEPS = [0, 1, 2, 3, 4];
@@ -827,6 +836,11 @@ export default function Game() {
   const burst = useSharedValue(0);
   const skyStep = useSharedValue(0);
   const overT = useSharedValue(-1); // patlama eşiği ilerlemesi (-1 = pencere yok)
+  const dirty = useSharedValue(0); // 1 = amca bu tur lekeli
+  const splat = useSharedValue(1); // 0..1 patlama animasyonu (1 = bitti)
+  const splatX = useSharedValue(0);
+  const splatY = useSharedValue(0);
+  const flyT = useSharedValue(0);
   const recordFlagId = useSharedValue(0);
   const dust = useSharedValue(1);
   const fartPuffs = useSharedValue<any[]>([]);
@@ -1062,8 +1076,8 @@ export default function Game() {
       setLandingSub(`+${OVER_BONUS} 👌`);
       if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy).catch(() => {});
     } else {
-      setLandingLabel("Dayanamadı!");
-      setLandingSub("💨");
+      setLandingLabel(SPLAT_ON ? "PATLADI!" : "Dayanamadı!");
+      setLandingSub(SPLAT_ON ? "💩" : "💨");
       if (Platform.OS !== "web") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => {});
     }
     setPerfectVisible(true);
@@ -1127,6 +1141,12 @@ export default function Game() {
   const pushDebug = useCallback((d: typeof debug) => setDebug(d), []);
 
   const restart = useCallback(() => {
+    if (SPLAT_ON) {
+      cancelAnimation(flyT);
+      flyT.value = 0;
+      dirty.value = 0;
+      splat.value = 1;
+    }
     lastTowerRef.current = 0;
     runNewCardsRef.current = [];
     setRunNewCards([]);
@@ -1229,6 +1249,17 @@ export default function Game() {
         if (SFX_ON) runOnJS(playFart)(c);
       }
       overT.value = -1;
+      if (SPLAT_ON && mode === 2) {
+        splatX.value = px.value + FART_FEET_DX;
+        splatY.value = py.value + PH / 2 - FART_CHAR_H * 0.35;
+        splat.value = 0;
+        splat.value = withTiming(1, { duration: 750, easing: Easing.out(Easing.quad) });
+        if (dirty.value === 0) {
+          dirty.value = 1;
+          flyT.value = 0;
+          flyT.value = withRepeat(withTiming(1, { duration: 1400, easing: Easing.linear }), -1, false);
+        }
+      }
       if (mode > 0) runOnJS(onSpecialLaunch)(mode);
       // Defense in depth alongside onPressIn above: also clear right at
       // launch, so the pose is guaranteed to track real charge/idle for the
@@ -1639,6 +1670,20 @@ export default function Game() {
   });
   // Gece seferi: iskeleden sonra gökte yıldızlar belirir (tek katman, yalnız opaklık).
   const starsStyle = useAnimatedStyle(() => ({ opacity: Math.max(0, Math.min(1, skyStep.value - 3)) }));
+  const splatStyle = useAnimatedStyle(() => {
+    const k = splat.value;
+    return {
+      opacity: k < 1 ? (k < 0.6 ? 1 : (1 - k) / 0.4) : 0,
+      transform: [{ translateX: splatX.value }, { translateY: splatY.value }, { scale: 0.4 + k * 1.3 }],
+    };
+  });
+  const fliesStyle = useAnimatedStyle(() => ({
+    opacity: dirty.value,
+    transform: [{ translateX: px.value + FART_FEET_DX }, { translateY: py.value + PH / 2 - FART_CHAR_H * 0.98 }],
+  }));
+  const fly0 = useAnimatedStyle(() => { const a = flyT.value * Math.PI * 2; return { transform: [{ translateX: Math.cos(a) * 30 }, { translateY: Math.sin(a * 2) * 9 }] }; });
+  const fly1 = useAnimatedStyle(() => { const a = flyT.value * Math.PI * 2 + 2.1; return { transform: [{ translateX: Math.cos(-a) * 24 }, { translateY: Math.sin(a * 3) * 11 - 6 }] }; });
+  const fly2 = useAnimatedStyle(() => { const a = flyT.value * Math.PI * 4 + 4.2; return { transform: [{ translateX: Math.cos(a) * 18 }, { translateY: Math.sin(a) * 7 - 14 }] }; });
   const skyTintStyle = useAnimatedStyle(() => ({
     backgroundColor: interpolateColor(skyStep.value, SKY_STEPS, SKY_TINTS),
   }));
@@ -2166,6 +2211,14 @@ export default function Game() {
           </Animated.View>
         )}
         {FART_TRIAL && FART_SLOTS.map((i) => <FartPuff key={`fart-${i}`} i={i} puffs={fartPuffs} now={fartNow} cut={fartCut} />)}
+        {SPLAT_ON && (
+          <Animated.View pointerEvents="none" style={[styles.burst, splatStyle]}>
+            {SPLAT_BLOBS.map((b, i) => (
+              <View key={i} style={{ position: "absolute", width: b.d, height: b.d * 0.8, borderRadius: b.d / 2, backgroundColor: b.c,
+                left: Math.cos(b.a) * b.r - b.d / 2, top: Math.sin(b.a) * b.r * 0.8 - b.d / 2 }} />
+            ))}
+          </Animated.View>
+        )}
         {/* Perfect-landing particle burst */}
         <Animated.View style={[styles.burst, burstStyle]}>
           {[0, 1, 2, 3, 4, 5].map((i) => {
@@ -2188,6 +2241,13 @@ export default function Game() {
             layer -- same z-order slot the old layered character had. The old
             layered character (jacket halves, belly, puff, pants, head) is no
             longer part of the render tree. */}
+        {SPLAT_ON && (
+          <Animated.View pointerEvents="none" style={[styles.burst, fliesStyle]}>
+            {[fly0, fly1, fly2].map((st, i) => (
+              <Animated.View key={i} style={[{ position: "absolute", left: -3, top: -3, width: 9, height: 7, borderRadius: 4, backgroundColor: "#141414" }, st]} />
+            ))}
+          </Animated.View>
+        )}
         <ChargePoses
           px={px}
           py={py}
@@ -2204,6 +2264,7 @@ export default function Game() {
           landPulse={FAZ2_SQUASH ? landPulse : undefined}
           halo={FAZ2_HALO}
           strain={OVERCHARGE ? overT : undefined}
+          dirty={SPLAT_ON ? dirty : undefined}
           onLoadStart={() => markArtStarted("character")}
           onLoad={() => { poseLoads.current += 1; if (poseLoads.current >= CHARGE_POSES.length) markArtLoaded("character"); }}
           onError={failArt}

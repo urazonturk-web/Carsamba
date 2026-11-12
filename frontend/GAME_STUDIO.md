@@ -1739,3 +1739,6 @@ TESLIM_HAZIR: FAZ2 tamam — hale + şarj yüz ifadeleri (050/075/100) telefonda
 - 2026-11-12 TestFlight: derleme 1.0.0 (1) Validated, iç test grubu "Ekip" (otomatik dağıtım açık) oluşturuldu, kullanıcı test eden olarak eklendi; davet e-postası 18:41 geldi. Dış test (arkadaşlar) henüz açılmadı.
 - 2026-11-12 Kullanıcı: "TestFlight da oyun açıldı, her şey tamam" — Byzantion 1.0.0 (1) TestFlight üzerinden telefonda çalışıyor.
 - 2026-11-12 Kullanıcı: "Evet, ikisini de" — patlama eşiği, Byzantion adı/ikon, FARK ve HIKAYE raporları commit + push.
+- 2026-11-12 PATLAMA v1 (KIRLI AMCA) — kullanıcı: "çok basınca adam patlasın boka bulansın" → seçenek "b": aşırı basışta (zorunlu fırlatma) kahverengi patlama + "PATLADI! 💩"; amca o koşu boyunca lekeli kalır, başının üstünde 3 sinek döner; yeniden başlayınca temizlenir. Koşu devam eder, fizik/kamera değişmedi. Bayrak: SPLAT_ON (app/index.tsx), lekeler ChargePoses `dirty`. Web önizlemede patlama, popup, lekeler ve sinekler görüldü; Release telefona kuruldu. Commit yok.
+TESLIM_HAZIR: PATLAMA v1 (KIRLI AMCA) telefonda — kullanıcı onayı bekleniyor.
+- 2026-11-12 Kullanıcı: "Beğendim, commit" — PATLAMA v1 (KIRLI AMCA) commit edildi (push yok).
