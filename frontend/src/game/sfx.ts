@@ -61,7 +61,16 @@ export function initSfx() {
   }
 }
 
+// FAZ2 kapanış (2026-11-12): oyuncu ses aç/kapa düğmesi. Kapalıyken hiçbir
+// ses başlamaz ve çalanlar durur. Tercih index.tsx'te kalıcı saklanır.
+let muted = false;
+export function setSfxMuted(m: boolean) {
+  muted = m;
+  if (m && players) for (const k of Object.keys(players) as SfxName[]) stopSfx(k);
+}
+
 export function playSfx(name: SfxName) {
+  if (muted) return;
   const list = players?.[name];
   if (!list || list.length === 0) return;
   const i = (turn[name] ?? 0) % list.length;

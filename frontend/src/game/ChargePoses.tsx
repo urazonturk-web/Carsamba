@@ -24,12 +24,21 @@ type Props = {
   // physics (py/vx/vy and the resolved landing point are already committed
   // before this value is even set).
   landPulse?: SharedValue<number>;
+  // FAZ2 (2026-11-11): thin warm-white halo so the character reads against
+  // the sea and the busy facades. Four tinted silhouette copies offset by
+  // HALO_PX inside the pose's own animated view: no extra mapper, no shadow
+  // (shadows force an offscreen pass on iOS), invisible with the pose.
+  halo?: boolean;
   onLoad?: () => void;
   onLoadStart?: () => void;
   onError?: () => void;
 };
 
-function PoseLayer({ i, px, py, poseCharge, scale, feetCenterOffset, feetHalf, landPulse, ...cb }: Props & { i: number }) {
+const HALO_PX = 9; // sprite pixels
+const HALO_COLOR = "rgba(255,248,230,0.8)";
+const HALO_OFFSETS = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+
+function PoseLayer({ i, px, py, poseCharge, scale, feetCenterOffset, feetHalf, landPulse, halo, ...cb }: Props & { i: number }) {
   const pose = CHARGE_POSES[i];
   const style = useAnimatedStyle(() => {
     // Squash toward the FOOT line (feetHalf), not the sprite's own center,
@@ -58,6 +67,18 @@ function PoseLayer({ i, px, py, poseCharge, scale, feetCenterOffset, feetHalf, l
       pointerEvents="none"
       style={[{ position: "absolute", left: 0, top: 0, width: pose.w * scale, height: pose.h * scale }, style]}
     >
+      {halo && LIVE_RN_IMAGE
+        ? HALO_OFFSETS.map(([dx, dy], k) => (
+            <Image
+              key={`h${k}`}
+              source={pose.source}
+              resizeMode="stretch"
+              fadeDuration={0}
+              tintColor={HALO_COLOR}
+              style={{ position: "absolute", left: dx * HALO_PX * scale, top: dy * HALO_PX * scale, width: "100%", height: "100%" }}
+            />
+          ))
+        : null}
       {LIVE_RN_IMAGE ? (
         <Image
           source={pose.source}

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Çarşamba Yol Haritası</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f7f1e6; --card:#fffaf1; --ink:#2a1b12; --muted:#6d5a4b; --line:#e5d8c4;
+  --tile:#b5482c; --sea:#2f6f9a; --green:#3e7a52; --ochre:#d99a2b; --chip:#f1e5d1;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#17120e; --card:#211a14; --ink:#f3e9dc; --muted:#b8a691; --line:#3a2f25;
+    --tile:#e07a5a; --sea:#6fb0db; --green:#7cc394; --ochre:#f0b955; --chip:#2c231b;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#17120e; --card:#211a14; --ink:#f3e9dc; --muted:#b8a691; --line:#3a2f25;
+  --tile:#e07a5a; --sea:#6fb0db; --green:#7cc394; --ochre:#f0b955; --chip:#2c231b;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Inter,system-ui,sans-serif}
+.wrap{max-width:880px;margin:0 auto;padding:40px 16px 80px}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;line-height:1.2;margin:0}
+h1{font-size:clamp(28px,5vw,42px)}
+h2{font-size:24px;margin:48px 0 14px;padding-top:8px;border-top:2px solid var(--line)}
+h3{font-size:18px;margin:0 0 6px}
+.kicker{color:var(--tile);font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:13px}
+.lead{font-size:18px;color:var(--ink);margin:14px 0 0}
+.muted{color:var(--muted)}
+.sources{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 0}
+.chip{background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:13px}
+.chip.wait{border-style:dashed;color:var(--muted)}
+figure{margin:24px 0 0}
+figure img{width:100%;border-radius:10px;border:1px solid var(--line);display:block}
+figcaption{font-size:13px;color:var(--muted);margin-top:6px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+.card p{margin:4px 0 0;font-size:15px}
+.who{font-size:12px;color:var(--muted);margin-top:8px}
+table{width:100%;border-collapse:collapse;font-size:15px;background:var(--card);border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:13px;color:var(--muted);font-weight:600}
+tr:last-child td{border-bottom:0}
+.score{font-family:Fraunces,serif;font-size:20px;font-weight:700}
+.bar{height:6px;border-radius:3px;background:var(--line);margin-top:4px}
+.bar i{display:block;height:100%;border-radius:3px;background:var(--tile)}
+ol.finds{padding-left:20px}
+ol.finds li{margin:0 0 12px}
+.hook{border-left:4px solid var(--sea)}
+.hook.top{border-left-color:var(--tile)}
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:6px;background:var(--chip);color:var(--muted);margin-right:6px}
+.tag.s{color:var(--green)} .tag.m{color:var(--ochre)} .tag.l{color:var(--tile)}
+.phase{margin:0 0 14px}
+.phase ul{margin:8px 0 0;padding-left:20px}
+.phase li{margin:0 0 6px}
+.quote{font-family:Fraunces,serif;font-size:clamp(22px,4vw,30px);color:var(--tile);margin:8px 0}
+.decide li{margin:0 0 10px}
+.table-wrap{overflow-x:auto}
+</style>
+<style>.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:12px 0} .card p{margin:6px 0 0}</style>
+</head><body>
+<div class="wrap">
+<div class="kicker">Çarşamba · Yol haritası · 12 Kasım 2026</div>
+<h1>Sırada ilerleme hissi var, ama önce Faz 2'yi kapatmak gerekiyor</h1>
+<p>Dört bağımsız görüş alındı: oyun tasarımı, sanat yönetmeni, pazar ve yayın editörleri ile Kıvılcım. Hiçbiri diğerlerinin yazdığını görmedi.</p>
+
+<h2>Dördünün birleştiği yer</h2>
+<ul>
+<li><b>Oyun hissi oturdu, eksik olan bir hedef.</b> Oyuncu yalnızca skoru görüyor, "nereye varacağım?" sorusunun cevabı yok. Dört editörün dördü de bunu en büyük eksik olarak gördü.</li>
+<li><b>Ses aç/kapa düğmesi şart.</b> Gaz sesi her zıplamada çaldığı için kalabalık ortamda oyunun silinme nedeni olabilir. Dört görüşün dördünde de var.</li>
+<li><b>Yeni espri ya da mizah eklenmesin.</b> Gaz, ifadeler ve emoji yeterli. Dördü de aynı görüşte.</li>
+<li><b>Çarşamba Kupası, hesap, sunucu, reklam ertelensin.</b> Hepsi gizlilik ve bakım yükü getiriyor. Dördü de aynı görüşte.</li>
+<li><b>Bekleyen 3 arka plan görseli şimdi harcanmasın.</b> Önce ücretsiz bir ilerleme denemesi telefonda görülsün. Bunu üç editör söylüyor; sanat yönetmeni ise bu çağrıların gün batımı ve gece varyantlarına harcanmasını istiyor.</li>
+</ul>
+
+<h2>Ayrıştıkları yer</h2>
+<ul>
+<li><b>İlerleme ne olsun?</b> Tasarım editörü semt yolculuğunu öneriyor (her 15 kulede "Karaköy → Eminönü → Fatih"). Sanat yönetmeni yalnız kodla sabahtan geceye dönen bir gün akışı istiyor. Kıvılcım "vapura yetiş" hedefini savunuyor.</li>
+<li><b>Merkeze iniş puanı.</b> Tasarım editörü +1 ve art arda isabetlere ×2/×3 çarpan istiyor. Kıvılcım ise kanca denemesini bulandırır diye şimdilik 0'da kalmasını öneriyor.</li>
+<li><b>Beta ne zaman?</b> Pazar editörü hemen TestFlight istiyor, çünkü bugüne kadarki kararların hepsi tek kişinin zevkine dayanıyor. Kıvılcım betayı oyun döngüsü sınandıktan sonraya bırakıyor.</li>
+</ul>
+
+<h2>Önerim: üç adım</h2>
+<div class="card"><h3>1 · Faz 2'yi kapat (küçük iş, maliyetsiz)</h3>
+<ul>
+<li>Ses aç/kapa düğmesi eklenecek.</li>
+<li>Telefonda simgenin altındaki ad "frontend" yerine "Çarşamba" olacak.</li>
+<li>iCloud'un önceki commit'e soktuğu kopya dosyalar temizlenecek.</li>
+<li>Faz 2'nin kalanı commit edilecek. Push ayrıca onayına gelecek.</li>
+</ul></div>
+<div class="card"><h3>2 · "Yolculuk" denemesi (orta iş, görsel üretimi yok)</h3>
+<p>Üç fikir tek bir sistemde birleşiyor:</p>
+<ul>
+<li>Her 15 kule bir durak: ekranın üstünde kısa süre semt adı görünür (Karaköy, Eminönü, Fatih…).</li>
+<li>Her durakta gökyüzünün tonu sabahtan akşama bir adım ilerler.</li>
+<li>Son durak iskele: vapura yetişmek turun hedefi olur.</li>
+<li>Sonuç kartında "En uzak durak: Eminönü" yazar.</li>
+</ul>
+<p>Fizik, kamera ve çatılar değişmez. Telefonda beğenilirse gün batımı ve gece arka planları sonra ayrı onayla üretilir.</p></div>
+<div class="card"><h3>3 · Kapalı beta (karar gerekiyor)</h3>
+<p>Telefondaki imza ~17 Kasım'da bitiyor. 7 günde biten imza ücretsiz Apple hesabına işaret ediyor. Oyunu başkalarına oynatmak (TestFlight) için ücretli Apple Developer hesabı gerekiyor: yılda 99 $. Önce dahili test, ardından 5–10 kişi.</p>
+<p>Betacılara üç soru sorulur: Kaç tur oynadın? Gaz seni güldürdü mü, rahatsız mı etti? Arkadaşına gönderir misin?</p></div>
+
+<h2>Şimdilik yapılmayacaklar</h2>
+<ul>
+<li>Çarşamba Kupası, hesap, sunucu, reklam ve uygulama içi satın alma.</li>
+<li>Yeni espri ya da mizah öğesi.</li>
+<li>Karakteri yeniden üretmek. Mevcut çizim artık markanın kendisi; yeni pozlar yalnızca ona birebir oturtularak eklenir.</li>
+<li>"Vapura atla" yalnızca hareket eden bir iniş yüzeyi olarak yapılmayacak, çünkü sabit tuttuğumuz zıplama fiziğine dokunur.</li>
+</ul>
+
+<h2>Senin kararını bekleyenler</h2>
+<ol>
+<li><b>Apple Developer hesabı.</b> Ücretli hesap açılsın mı ve beta 17 Kasım'dan önce başlasın mı? Bu hesap yoksa imza her 7 günde bir yenilenmek zorunda kalır.</li>
+<li><b>Merkeze iniş puanı.</b> Seçenekler:
+<ul>
+<li>Şimdi açılsın: art arda isabetler çarpan alır, eski rekor sıfırlanır.</li>
+<li>"Yolculuk" denemesi bitene kadar 0'da kalsın.</li>
+</ul></li>
+<li><b>Mağaza adı.</b> "Çarşamba: İstanbul Rooftop Jump" 31 karakter ve 30 karakter sınırını aşıyor. Öneri "Çarşamba: Rooftop Jump", İstanbul alt başlıkta. Bu karar beta zamanına kadar bekleyebilir.</li>
+</ol>
+
+<h2>Notlar</h2>
+<ul>
+<li>Sanat yönetmeni kayıtlarda ekranın gri göründüğünü fark etti. Bu oyunda bir örtü değil: iPhone ekran kayıtları HDR, standart renge çevrilmeden açılınca soluk görünüyor.</li>
+<li>Pazar editörü web araması yapmadı. Yaş derecelendirmesine dair söyledikleri (eski sistemde "seyrek kaba mizah" 9+ çıkarıyordu) yayın öncesinde Apple'ın güncel anketiyle doğrulanmalı.</li>
+<li>Ayrıntılar bu klasörde: editor-tasarim.md, editor-sanat.md, editor-pazar.md, editor-kivilcim.md.</li>
+</ul>
+</div></body></html>

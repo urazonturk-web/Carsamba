@@ -31,9 +31,9 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AmbientBirds } from "../src/game/AmbientBirds";
 import { NO_IMAGE_CLIP, NoClipImage as Image } from "../src/game/NoClipImage";
 import { ChargePoses } from "../src/game/ChargePoses";
-import { CHARGE_POSES } from "../src/game/character-pose";
+import { CHARGE_POSES, FAZ2_IFADE } from "../src/game/character-pose";
 import { ANCHOR_SHIFT_PX, GLOBAL_VISUAL_SCALE, POSE_FEET_SPAN_PX } from "../src/game/character-pose";
-import { SFX_ON, initSfx, playFart, playSfx, stopFart, stopSfx } from "../src/game/sfx";
+import { SFX_ON, initSfx, playFart, playSfx, setSfxMuted, stopFart, stopSfx } from "../src/game/sfx";
 import { GAME_OVER_LINE, QUIP_ON, multiJumpShout, pickQuip, quipContext } from "../src/game/copy";
 import { jumpVelocity, advanceFlight } from "../src/game/jump";
 import { findFootLanding } from "../src/game/landing";
@@ -227,6 +227,7 @@ const SHOW_DIAG_TEXT = !FAZ1_UI;
 // physics, collision, camera and the landing point are untouched.
 const FAZ2_SQUASH = true as boolean; // re-enable GORSEL-017 landing squash (pivot = feet)
 const FAZ2_DUST = true as boolean; // roof-dust puff on every new-tower landing
+const FAZ2_HALO = true as boolean; // thin warm-white outline around the character
 const CHAR_SIZE_TRIAL = 1.4 as number; // sprite drawn 1.4x around the same foot pivot (1 = accepted size)
 // GAZ trial (2026-11-11, OSURUK-2026-11-11): fart sound on take-off sized by
 // the charge + a short-lived cream puff trail behind the hips; both cut on
@@ -290,7 +291,7 @@ const AnimatedImage = Animated.createAnimatedComponent(Image);
 const BG_SCROLL_TEST = true as boolean;
 const BG_SCROLL_RATIO = 0.45;
 const BG_SCROLL_TILES = 4;
-const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
+const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
 const DIAG_MAX_EXAMPLES = 6;
 const HOUSE_AB_FROZEN = false as boolean;
 // REVIZYON-066 experiment (one variable): expo-linear-gradient's iOS layer
@@ -430,6 +431,7 @@ const NEAR_IMG_TILE_COUNT = 8; // covers the "first screen + first 10 jumps" sco
 // convention, but nothing in this file requires them any more.
 
 // Preserve historical scores separately because the scoring rules changed.
+const SFX_MUTED_KEY = "carsamba.sfxMuted.v1";
 const BEST_SCORE_KEY = REFERENCE_TRIAL ? "jumpcharge.bestScore.reference.v1" : "jumpcharge.bestScore";
 // EXPERIMENTAL_COURSE (see src/game/config.ts) swaps the fixed, measured
 // REFERENCE_COURSE for the procedural generator below, independent of
@@ -532,6 +534,24 @@ export default function Game() {
     console.info("[jump-measurement]", JSON.stringify({ heldMs: ms, charge: power, visualCharge: lastVisualCharge, pressToFirstFrameMs, vx: launchVX, vy: launchVY, screenWidth: width, fromPlatformId: fromId }));
   }, []);
   const [best, setBest] = useState(0);
+  // FAZ2 kapanış (2026-11-12): ses aç/kapa, kalıcı.
+  const [sfxMuted, setSfxMutedState] = useState(false);
+  useEffect(() => {
+    storage.getItem<boolean>(SFX_MUTED_KEY, false).then((m) => {
+      if (m === true) {
+        setSfxMuted(true);
+        setSfxMutedState(true);
+      }
+    });
+  }, []);
+  const toggleSfx = useCallback(() => {
+    setSfxMutedState((prev) => {
+      const next = !prev;
+      setSfxMuted(next);
+      storage.setItem(SFX_MUTED_KEY, next);
+      return next;
+    });
+  }, []);
   const [gameOver, setGameOver] = useState(false);
   const [coverMounted, setCoverMounted] = useState(true);
   const coverOpacity = useSharedValue(1);
@@ -1930,6 +1950,7 @@ export default function Game() {
           // the withSequence trigger in the landing-contact block still
           // sets landPulse.value, it's just never read by anything now.
           landPulse={FAZ2_SQUASH ? landPulse : undefined}
+          halo={FAZ2_HALO}
           onLoadStart={() => markArtStarted("character")}
           onLoad={() => { poseLoads.current += 1; if (poseLoads.current >= CHARGE_POSES.length) markArtLoaded("character"); }}
           onError={failArt}
@@ -1961,6 +1982,18 @@ export default function Game() {
         </View>
       )}
       {PERF_PROBE && <PerfProbeOverlay top={insets.top + 4} sv={{ pFrames, pHitch, pHitchBig, pAirFrames, pAirHitch, pListAir, pHitchNearList, pMaxMs, pHitchIdle, pHitchCharge, pHitchDead, pEvAppear, pEvGone, pEvMove, pListNoHouse, pHitchAppear, pHitchGone, pHitchMove, pHitchListOnly, pHitchNoEvent }} />}
+      {SFX_ON && assetsReady && (
+        <Pressable
+          testID="sfx-toggle"
+          accessibilityRole="button"
+          accessibilityLabel={sfxMuted ? "Sesi aç" : "Sesi kapat"}
+          onPress={toggleSfx}
+          hitSlop={12}
+          style={[styles.sfxBtn, { top: insets.top + 30 }]}
+        >
+          <Text style={styles.sfxBtnText}>{sfxMuted ? "🔇" : "🔊"}</Text>
+        </Pressable>
+      )}
       {/* Score HUD */}
       {!gameOver && assetsReady && <View style={[styles.hud, { top: insets.top + 24 }]}>
         <Text style={[styles.scoreText, POPUP && styles.puScoreText]} testID="score-value">
@@ -2782,6 +2815,8 @@ const useStyles = makeStyles((colors) => ({
     backgroundColor: colors.perfect,
   },
 
+  sfxBtn: { position: "absolute", right: 16, width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center", backgroundColor: "rgba(255,250,241,0.72)", borderWidth: 1.5, borderColor: "rgba(42,27,18,0.35)", zIndex: 60 },
+  sfxBtnText: { fontSize: 18 },
   hud: { position: "absolute", left: 0, right: 0, alignItems: "center", pointerEvents: "none" },
   scoreText: {
     fontSize: 56,

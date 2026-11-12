@@ -46,16 +46,22 @@ export const POSE_FEET_SPAN_PX = 271;
 // right (idle stable anchor 308 - 224).
 export const ANCHOR_SHIFT_PX = 308 - 224;
 
+// FAZ2-IFADE (2026-11-12, kullanıcı: "Evet, bağla ve kur"): şarj arttıkça yüz
+// ifadesi değişir. %50/%62 gergin, %75/%87 ıkınma, %100 patlamak üzere.
+// Yalnız baş bölgesi (üst 502 px) değişti; tuval, pivot ve gövde aynı.
+// false = eski R12 yüzleri.
+export const FAZ2_IFADE = true;
+
 export const CHARGE_POSES = [
   { source: require("@/assets/characters/charge-000-r12.png"), w: 516, h: 1103, pivotX: 308, pivotY: 1103 },
   { source: require("@/assets/characters/charge-012-r12.png"), w: 516, h: 1080, pivotX: 311, pivotY: 1080 },
   { source: require("@/assets/characters/charge-025-r12.png"), w: 516, h: 1056, pivotX: 310, pivotY: 1056 },
   { source: require("@/assets/characters/charge-037-r12.png"), w: 516, h: 1031, pivotX: 309, pivotY: 1031 },
-  { source: require("@/assets/characters/charge-050-r12.png"), w: 516, h: 1005, pivotX: 306, pivotY: 1005 },
-  { source: require("@/assets/characters/charge-062-r12.png"), w: 516, h: 979, pivotX: 302, pivotY: 979 },
-  { source: require("@/assets/characters/charge-075-r12.png"), w: 516, h: 951, pivotX: 298, pivotY: 951 },
-  { source: require("@/assets/characters/charge-087-r12.png"), w: 516, h: 922, pivotX: 293, pivotY: 922 },
-  { source: require("@/assets/characters/charge-100-r12.png"), w: 516, h: 892, pivotX: 288, pivotY: 892 },
+  { source: (FAZ2_IFADE ? require("@/assets/characters/charge-050-r12-ifade.png") : require("@/assets/characters/charge-050-r12.png")), w: 516, h: 1005, pivotX: 306, pivotY: 1005 },
+  { source: (FAZ2_IFADE ? require("@/assets/characters/charge-062-r12-ifade.png") : require("@/assets/characters/charge-062-r12.png")), w: 516, h: 979, pivotX: 302, pivotY: 979 },
+  { source: (FAZ2_IFADE ? require("@/assets/characters/charge-075-r12-ifade.png") : require("@/assets/characters/charge-075-r12.png")), w: 516, h: 951, pivotX: 298, pivotY: 951 },
+  { source: (FAZ2_IFADE ? require("@/assets/characters/charge-087-r12-ifade.png") : require("@/assets/characters/charge-087-r12.png")), w: 516, h: 922, pivotX: 293, pivotY: 922 },
+  { source: (FAZ2_IFADE ? require("@/assets/characters/charge-100-r12-ifade.png") : require("@/assets/characters/charge-100-r12.png")), w: 516, h: 892, pivotX: 288, pivotY: 892 },
 ] as const;
 
 /**
