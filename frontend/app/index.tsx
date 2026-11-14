@@ -52,6 +52,12 @@ import { FIXED_PANEL_PLATFORMS, PANEL_SOURCES, PANEL_WORLD_WIDTH, PANEL_WORLD_HE
 import { CONFIG, DEBUG_MODE, EXPERIMENTAL_COURSE, PHASE, REFERENCE_TRIAL } from "@/src/game/config";
 import { makeStyles, useTheme } from "@/src/theme";
 import { storage } from "@/src/utils/storage";
+import * as GameCenter from "../modules/byzantion-gamecenter/src";
+
+// Game Center: Apple hesabıyla otomatik giriş + serbest oyun rekoru için
+// arkadaş sıralaması. Kimlik App Store Connect'teki skor tablosuyla aynı olmalı.
+const GAME_CENTER_ON = true;
+const LEADERBOARD_ID = "byzantion.rekor";
 
 // Small shared texture travels with the JS bundle, avoiding a separate Metro image request.
 const BRICK_SOURCE = require("@/assets/environment/brick-inline.json");
@@ -306,7 +312,7 @@ const AnimatedImage = Animated.createAnimatedComponent(Image);
 const BG_SCROLL_TEST = true as boolean;
 const BG_SCROLL_RATIO = 0.45;
 const BG_SCROLL_TILES = 4;
-const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? "PATLAMA v1 (KIRLI AMCA)" : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
+const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? "GAME CENTER v1 + PATLAMA" : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
 const DIAG_MAX_EXAMPLES = 6;
 const HOUSE_AB_FROZEN = false as boolean;
 // REVIZYON-066 experiment (one variable): expo-linear-gradient's iOS layer
@@ -613,6 +619,7 @@ export default function Game() {
     });
   }, []);
   const [gameOver, setGameOver] = useState(false);
+  const [gcPlayer, setGcPlayer] = useState<GameCenter.GameCenterPlayer | null>(null);
   const [coverMounted, setCoverMounted] = useState(true);
   const coverOpacity = useSharedValue(1);
   const coverStyle = useAnimatedStyle(() => ({ opacity: coverOpacity.value }));
@@ -855,6 +862,27 @@ export default function Game() {
   const dustY = useSharedValue(0);
   const burstX = useSharedValue(0);
   const burstY = useSharedValue(0);
+
+  // Game Center sign-in once at launch (no-op without the native module).
+  useEffect(() => {
+    if (!GAME_CENTER_ON || !GameCenter.gameCenterAvailable) return;
+    let alive = true;
+    GameCenter.authenticate().then((p) => {
+      if (alive) setGcPlayer(p);
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  const openLeaderboard = useCallback(async () => {
+    let p = gcPlayer;
+    if (!p?.authenticated) {
+      p = await GameCenter.authenticate();
+      setGcPlayer(p);
+    }
+    if (p.authenticated) GameCenter.showLeaderboard(LEADERBOARD_ID);
+  }, [gcPlayer]);
 
   // ------------------------------------------------------------------------
   // Load persisted best score once.
@@ -1112,6 +1140,8 @@ export default function Game() {
       setQuip((prev) => pickQuip(quipContext(sc, prevBest), prev));
     }
     setGameOver(true);
+    // Free-mode runs only: the daily map is a different course every day.
+    if (GAME_CENTER_ON && modeRef.current !== "daily") GameCenter.submitScore(scoreRef.current, LEADERBOARD_ID);
     if (FRAME_DIAG) {
       // One read of the UI-thread counters per Game Over (no per-frame JS work).
       const n = dB12.value + dB20.value + dB25.value + dBOver.value;
@@ -2442,6 +2472,15 @@ export default function Game() {
             >
               <Text style={styles.playBtnText}>Bir daha</Text>
             </Pressable>
+            {GAME_CENTER_ON && GameCenter.gameCenterAvailable && (
+              <Pressable
+                testID="leaderboard-button"
+                style={({ pressed }) => [styles.modeBtn, pressed && styles.playBtnPressed]}
+                onPress={openLeaderboard}
+              >
+                <Text style={styles.modeBtnText}>{gcPlayer?.authenticated ? "🏆 Arkadaşlarla sıralama" : "🏆 Game Center'a gir"}</Text>
+              </Pressable>
+            )}
             {POSTCARDS_ON && (
               <Pressable
                 testID="album-button"

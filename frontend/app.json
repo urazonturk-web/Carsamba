@@ -13,6 +13,9 @@
       "infoPlist": {
         "CFBundleDisplayName": "Byzantion",
         "ITSAppUsesNonExemptEncryption": false
+      },
+      "entitlements": {
+        "com.apple.developer.game-center": true
       }
     },
     "android": {

@@ -1,0 +1,9 @@
+{
+  "name": "byzantion-gamecenter",
+  "version": "0.1.0",
+  "description": "Byzantion Game Center bridge (sign-in, score submit, leaderboard)",
+  "main": "src/index.ts",
+  "license": "UNLICENSED",
+  "author": "Byzantion",
+  "homepage": "https://example.invalid"
+}
