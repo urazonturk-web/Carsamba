@@ -1,0 +1,4 @@
+ESKİ (HEAD): 1-14. kule, 420 zıplama | ulaşılamayan 0 | ort. pencere 72.0 ms | en dar 37 ms | <40ms %0.7 | dar kule %2
+YENİ       : 1-14. kule, 420 zıplama | ulaşılamayan 0 | ort. pencere 75.7 ms | en dar 50 ms | <40ms %0.0 | dar kule %0
+ESKİ (HEAD): 15-45. kule, 930 zıplama | ulaşılamayan 0 | ort. pencere 72.0 ms | en dar 32 ms | <40ms %0.5 | dar kule %15
+YENİ       : 15-45. kule, 930 zıplama | ulaşılamayan 0 | ort. pencere 72.0 ms | en dar 31 ms | <40ms %0.4 | dar kule %15

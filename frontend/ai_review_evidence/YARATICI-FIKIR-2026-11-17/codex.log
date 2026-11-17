@@ -1,0 +1,189 @@
+OpenAI Codex v0.167.0-alpha.3.2
+--------
+workdir: /Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend
+model: gpt-6-luna
+provider: openai
+approval: never
+sandbox: read-only
+reasoning effort: medium
+reasoning summaries: none
+session id: 01a1e864-eb7d-7df3-affb-dfa42507f600
+--------
+user
+# Byzantion — yaratıcı fikir turu (2026-11-17)
+
+Byzantion: Expo/React Native iPhone oyunu. Bıyıklı, eşofmanlı bir "amca" İstanbul çatılarında kuleden kuleye zıplıyor (bas-tut-bırak şarjla zıplama, Stick Hero/Jump benzeri). El çizimi sıcak İstanbul arka planı (Boğaz, vapurlar, Galata, camiler, martılar, kediler).
+
+Mevcut özellikler: Kadıköy'den Boğaz boyunca Karadeniz'e duraklar (her 15 kulede bir: Harem, Üsküdar·Kız Kulesi, Kuzguncuk, Beylerbeyi, Ortaköy… Rumeli Feneri), üç köprü geçişi; 12 kartpostal albümü; pijama kapısı (amca pijamaya geçiyor); Kurukafa (geçici dar/geniş kuleler); aşırı basışta amca "patlıyor", lekeli kalıyor; anlık olaylar (martı sürüsü, uzak vapur düdüğü), gece yıldızları; Günün Haritası (her gün aynı tohum); Game Center sıralama, arkadaşa meydan okuma (kod/seed) ve 2 dakikalık hayalet yarış (rakibin soluk figürü); kartpostal tarzı menü / oyun sonu ekranları; sesler.
+
+Kullanıcının fikri: "Hava o gün İstanbul'da nasılsa oyunda da gerçek zamanlı olsun" — ve bunun gibi YARATICI fikirler istiyor.
+
+Kısıtlar:
+- Zıplama fiziği, kamera, çatı silueti değişmez (gerçek hava fiziği etkilemesin ya da yalnız kozmetik/isteğe bağlı mod olsun; rüzgâr gibi fizik etkisi önerecekseniz ayrı mod olarak ve riskini yazın).
+- Sunucu yok. Ücretsiz, anahtarsız API'ler (ör. Open-Meteo) kullanılabilir; kullanıcı konumu İSTENMEZ (sabit İstanbul koordinatı). Çevrimdışıyken oyun sorunsuz çalışmalı.
+- Yeni görsel üretimi mümkün ama her görsel ayrı onay ister; kodla yapılabilenleri ayrıca belirtin.
+- Hassas konulardan (din, siyaset, takım kavgası) kaçının ya da riskini belirtin.
+
+İstenen (Türkçe, sade dil, en fazla ~700 kelime):
+1. Gerçek zamanlı İstanbul havası fikrini değerlendirin: nasıl görünmeli (yağmur, kar, lodos, sis, poyraz, gün batımı, gece), oyuncu bunu nasıl fark etmeli ("Bugün İstanbul'da lodos var" gibi), ne riskleri var.
+2. Aynı ruhta 6–8 YARATICI fikir: gerçek dünya İstanbul'una bağlanan (gerçek saat/gün doğumu-batımı, ay evresi, gerçek vapur saatleri, bayramlar/özel günler, maç günleri, Boğaz'da sis, kar tatili…) veya amcanın kişiliğine dayanan şaşırtıcı mekanikler. Her biri için: tek cümle fikir, oyuncuya hissi, kodla mı/görsel mi, kabaca efor (küçük/orta/büyük).
+3. İlk yapılacak 3 fikri sıralayın ve nedenini yazın.
+
+warning: Under-development features enabled: chronicle. Under-development features are incomplete and may behave unpredictably. To suppress this warning, set `suppress_unstable_features_warning = true` in /Users/bekirurazonturk/.codex/config.toml.
+codex
+Mevcut oyun tercihlerini ve önceki Byzantion kararlarını kısaca kontrol edip fikirleri fizik ve üretim sınırlarına göre sıralayacağım.
+exec
+/bin/zsh -lc 'rg -n -i "Byzantion|kartpostal|overpress|hava|weather|first stop|easy" /Users/bekirurazonturk/.codex/memories/MEMORY.md' in /Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend
+ succeeded in 0ms:
+37:- KARTPOSTAL-preview, imagegen, amca-poz.png, CODEX-MESAJI-KARTPOSTAL-PAKET, alpha, pajamas, gece-kulahi.png, terlik.png, preview HTML, 7 çağrı, 8 çağrı
+46:- Read frontend/CODEX-MESAJI-KARTPOSTAL-PAKET{1,2,3}-2026-11-16.md and inspect references first. Outputs and pilot / paket1–3-yerlesim-onizleme.html are in shared/KARTPOSTAL-preview/. Accepted base amca-poz.png has burgundy striped tracksuit, white shoes and dark-brown outline. [Task 1]
+72:# Task Group: Byzantion three-bridge route, postcards and multiplayer testing
+85:- GUZERGAH-2026-11-16, PIJAMA-2026-11-16, Boğaziçi Köprüsü, Fatih Sultan Mehmet Köprüsü, Yavuz Sultan Selim Köprüsü, kartpostal, Ortaköy, 75. kule, kurukafa
+110:- açılış menüsü, yarı saydam hayalet, ses kapatma, kartpostal, posta damgası, yarıştan çıkış, Devam et, Çık, kartpostal-uclu.png
+250:# Task Group: Byzantion Game Center and one-step difficulty adjustment
+271:- Byzantion, Game Center, 362ba26, TestFlight, Arkadaşlar, 1.0.0 (3), src/game/config.ts, difficulty, typecheck
+275:- After the harder build, the user disliked its early difficulty and requested an easier path through the first stop, then gradual difficulty by stop; assess two-player online play and an airborne skull power-up changing landing-platform size about 10% for 15 seconds, with the timer paused while waiting. These were requests for evaluation, not approved implementation. [Task 1] [skysight memory]
+491:- Çarşamba, sonsuz sefer, durak, stops.ts, procedural-course.ts, kartpostal albümü, Karaköy, Galata, 2d53690, TestFlight
+493:## Task 2: Byzantion naming and TestFlight follow-up
+506:- Byzantion, com.urazonturk.carsamba, TestFlight 1.0.0 (1), 1.0.0 (2), Arkadaşlar, Waiting for Review, 16e9dac, aşırı basma, İstanbul gizemi, 21
+510:- User chose a continuous journey with regular stops over stage transitions, tied stops to tower count rather than score, and retained the first 15 towers' difficulty. User subsequently selected Byzantion and favored a lighter mystery linked to Istanbul’s history; story details remained open. [Task 1] [skysight memory]
+517:- The user reported TestFlight 1.0.0 (1) worked on the phone. Overpress feedback, where the round continues with an in-game consequence, was reported pushed as `16e9dac` after web preview; the earlier TestFlight build did not contain it. A later invitation appeared without evidence of device testing; verify current build and Git state. [Task 2] [skysight memory]
+518:- On November 13, `1.0.0 (2)` was `Waiting for Review` in the `Arkadaşlar` external group; the internal-test email did not establish access. On November 14 approval and an enabled public beta link were reported, and the user shared it with two testers. Recheck live group/build status; device validation of the overpress change remains unverified. [Task 2] [skysight memory]
+523:- A phone recording that ends before tower 15 cannot establish whether the first stop triggers; test through the relevant threshold. [Task 1] [skysight memory]
+1237:- BOOK-02 v8 weather science was PASS; the optional smallest clarity changes are explaining the repeated freezing/growth on s.20 and using “Güneş ışığı” on s.28. BOOK-03 Microraptor first HOLD became PASS after inspecting the close crop: the four feathered limbs were present but unreadable at full-spread scale. [Task 1]
+1294:## Task 3: Selin BOOK-02 weather science and BOOK-03 Microraptor reassessment
+
+exec
+/bin/zsh -lc "nl -ba /Users/bekirurazonturk/.codex/memories/MEMORY.md | sed -n '250,280p;490,525p'" in /Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend
+ succeeded in 0ms:
+   250	# Task Group: Byzantion Game Center and one-step difficulty adjustment
+   251	
+   252	scope: Game Center delivery and difficulty follow-up in the Carsamba game.
+   253	applies_to: cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend; reuse_rule=build and device state are time-sensitive; verify current checkout and TestFlight.
+   254	
+   255	## Task 1: Game Center build and difficulty verification
+   256	
+   257	### rollout_summary_files
+   258	
+   259	- extensions/skysight/resources/2026-11-15T13-00-00-QKzx-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-15T13-00-00-QKzx-10min-memory-summary.md, updated_at=2026-11-15T13:00:00+00:00, new difficulty and feature evaluation requested) [skysight memory]
+   260	- extensions/skysight/resources/2026-11-15T13-50-00-jdCy-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-15T13-50-00-jdCy-10min-memory-summary.md, updated_at=2026-11-15T13:50:00+00:00, phone installation reported; real-device play and commit pending) [skysight memory]
+   261	
+   262	- extensions/skysight/resources/2026-11-15T11-50-00-AHsu-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-15T11-50-00-AHsu-10min-memory-summary.md, updated_at=2026-11-15T11:50:00+00:00, reported phone installation and simulation) [skysight memory]
+   263	
+   264	- extensions/skysight/resources/2026-11-14T12-00-00-SezP-6h-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-14T12-00-00-SezP-6h-memory-summary.md, updated_at=2026-11-14T12:00:00+00:00, Game Center and difficulty work) [skysight memory]
+   265	
+   266	- extensions/skysight/resources/2026-11-16T06-50-00-KGPV-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-16T06-50-00-KGPV-10min-memory-summary.md, updated_at=2026-11-16T06:50:00+00:00, phone test reported; analysis requested) [skysight memory]
+   267	- extensions/skysight/resources/2026-11-16T00-00-00-GyXE-6h-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-16T00-00-00-GyXE-6h-memory-summary.md, updated_at=2026-11-16T00:00:00+00:00, easier first 14 towers; release installation reported) [skysight memory]
+   268	
+   269	### keywords
+   270	
+   271	- Byzantion, Game Center, 362ba26, TestFlight, Arkadaşlar, 1.0.0 (3), src/game/config.ts, difficulty, typecheck
+   272	
+   273	## User preferences
+   274	
+   275	- After the harder build, the user disliked its early difficulty and requested an easier path through the first stop, then gradual difficulty by stop; assess two-player online play and an airborne skull power-up changing landing-platform size about 10% for 15 seconds, with the timer paused while waiting. These were requests for evaluation, not approved implementation. [Task 1] [skysight memory]
+   276	
+   277	## Reusable knowledge
+   278	
+   279	- First-stop release was reported installed; first 14 towers had wider landing tolerances while later sections were retained. On Nov 16 the user reported playing the first 15 sections on phone, found difficulty inconsistent, and requested analysis; its result and commit were not observed. Recheck current state. [Task 1] [skysight memory]
+   280	- Game Center commit `362ba26` was reported on remote `main`; build 1.0.0 (3) appeared Testing in the Arkadaşlar TestFlight group. Check current remote and device behavior. [Task 1] [skysight memory]
+   490	
+   491	- Çarşamba, sonsuz sefer, durak, stops.ts, procedural-course.ts, kartpostal albümü, Karaköy, Galata, 2d53690, TestFlight
+   492	
+   493	## Task 2: Byzantion naming and TestFlight follow-up
+   494	
+   495	### rollout_summary_files
+   496	
+   497	- extensions/skysight/resources/2026-11-14T04-20-00-wKMd-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-14T04-20-00-wKMd-10min-memory-summary.md, updated_at=2026-11-14T04:20:00+00:00, external approval and enabled link reported) [skysight memory]
+   498	
+   499	- extensions/skysight/resources/2026-11-13T09-20-00-RNTz-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-13T09-20-00-RNTz-10min-memory-summary.md, updated_at=2026-11-13T09:20:00+00:00, external review pending) [skysight memory]
+   500	- extensions/skysight/resources/2026-11-13T08-50-00-GVFY-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-13T08-50-00-GVFY-10min-memory-summary.md, updated_at=2026-11-13T08:50:00+00:00, external group status) [skysight memory]
+   501	- extensions/skysight/resources/2026-11-12T12-00-00-lRQt-6h-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-12T12-00-00-lRQt-6h-memory-summary.md, updated_at=2026-11-12T12:00:00+00:00, activity overview) [skysight memory]
+   502	- extensions/skysight/resources/2026-11-12T18-00-00-lixS-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-12T18-00-00-lixS-10min-memory-summary.md, updated_at=2026-11-12T18:00:00+00:00, accidental number corrected) [skysight memory]
+   503	
+   504	### keywords
+   505	
+   506	- Byzantion, com.urazonturk.carsamba, TestFlight 1.0.0 (1), 1.0.0 (2), Arkadaşlar, Waiting for Review, 16e9dac, aşırı basma, İstanbul gizemi, 21
+   507	
+   508	## User preferences
+   509	
+   510	- User chose a continuous journey with regular stops over stage transitions, tied stops to tower count rather than score, and retained the first 15 towers' difficulty. User subsequently selected Byzantion and favored a lighter mystery linked to Istanbul’s history; story details remained open. [Task 1] [skysight memory]
+   511	
+   512	## Reusable knowledge
+   513	
+   514	- Stops were 15 Karaköy, 30 Galata, 45 Sirkeci and 60 Eminönü İskelesi. A later phone test reportedly triggered Karaköy and confirmed the sound button controlled game audio. Postcard album showed 2/5 unlocked; a phone recording was submitted for evaluation, with no final product decision observed. [Task 1] [skysight memory]
+   515	- The user approved a push of seagull flocks and distant ferry horn changes; the later report said local and remote main matched at `2d53690` and the worktree was clean. Verify current Git state. Apple Developer enrollment was explored but not completed. [Task 1] [skysight memory]
+   516	
+   517	- The user reported TestFlight 1.0.0 (1) worked on the phone. Overpress feedback, where the round continues with an in-game consequence, was reported pushed as `16e9dac` after web preview; the earlier TestFlight build did not contain it. A later invitation appeared without evidence of device testing; verify current build and Git state. [Task 2] [skysight memory]
+   518	- On November 13, `1.0.0 (2)` was `Waiting for Review` in the `Arkadaşlar` external group; the internal-test email did not establish access. On November 14 approval and an enabled public beta link were reported, and the user shared it with two testers. Recheck live group/build status; device validation of the overpress change remains unverified. [Task 2] [skysight memory]
+   519	- App Store form showed Turkish primary language, bundle ID `com.urazonturk.carsamba` and SKU `amcahop-ios-001`; registration completion was not established. The user clarified “21” was accidental, not a game parameter decision. [Task 2] [skysight memory]
+   520	
+   521	## Failures and how to do differently
+   522	
+   523	- A phone recording that ends before tower 15 cannot establish whether the first stop triggers; test through the relevant threshold. [Task 1] [skysight memory]
+   524	
+   525	# Task Group: Adel–Alpi T98 four-language print revision and KDP draft
+
+codex
+## 1. Gerçek zamanlı İstanbul havası
+
+Bunu **dekor ve atmosfer katmanı** olarak yapmak iyi bir fikir: Boğaz’da sis, yağmur çizgileri, kar taneleri, akşam kızıllığı, gece yıldızları ve vapur ışıkları; zıplamanın mesafesini, kamerayı ve çatı şeklini değiştirmez. Lodos ya da poyraz varsa bulutların, martıların ve dumanın yönü bunu belli eder; ekranda kısa bir not çıkar: **“Bugün İstanbul’da lodos var.”**
+
+Sabit İstanbul koordinatıyla ücretsiz bir hava kaynağından veri alınabilir. Son alınan hava bilgisi telefonda saklanır; bağlantı yoksa oyun son kayıtlı bilgiyi, o da yoksa varsayılan havayı gösterir. Oyuncu konumunu istemeye gerek yok.
+
+Başlıca riskler: hava verisinin gecikmesi veya alınamaması, gerçek havayla ekrandakinin uyuşmaması ve efektlerin oyunu kalabalıklaştırıp okunabilirliği azaltması. Efektler hafif olmalı; oyuncu isterse kapatabilmeli. **Rüzgârın zıplamayı etkilemesi** ayrı ve isteğe bağlı bir mod olabilir, fakat skor adaletini ve alışılmış fiziği bozma riski taşır.
+
+## 2. Yaratıcı fikirler
+
+| Fikir | Oyuncuya hissi | Yapım |
+|---|---|---|
+| **Günün İstanbul’u:** Saat ve gün ışığına göre şehir şafaktan gün batımına, oradan geceye akar. | Şehirle aynı vakitte yaşıyor. | Kodla, orta |
+| **Vapur düdüğü saati:** Gerçek sefer saatlerinde değil, oyun içinde rastgele aralıklarla uzaktan bir düdük duyulur; kıyıdaki ışıklar kısa süre parlar. | Boğaz’ın canlı ve sakin ritmi. | Kodla, küçük |
+| **Ayın izi:** Ay evresine göre geceleri ayın biçimi değişir; dolunayda denizde ince bir ışık yolu belirir. | Her gece küçük bir gökyüzü sürprizi. | Kodla, küçük |
+| **Sisli Boğaz anı:** Hava raporu sis gösterirse uzaktaki siluetler yumuşar; yakındaki çatılar ve iniş noktaları net kalır. | İstanbul’un sisli sabahında yolculuk. | Kodla, orta |
+| **Özel gün kartpostalı:** Bayram veya takvimde belirli günlerde menüde kısa bir selam ve o güne özel küçük bir kutlama ayrıntısı görünür. | Şehrin takvimine ortak olma. | Kodla orta; yeni çizim istenirse görsel onaylı |
+| **Kar günü amcası:** Kar yağınca amca atkısını takar ya da kar birikintisine basınca kısa bir silkelenme animasyonu oynar; fizik aynı kalır. | Hava durumuna kişisel, sevimli tepki. | Kodla orta; yeni kıyafet/poz görsel onaylı |
+| **Amcanın çay molası:** Uzun seride bir çatıda kısa süre durup çayını üfler; oyuncu isterse devam eder, istemezse dokunup geçer. | Karaktere sıcaklık ve küçük bir nefes. | Kodla orta; yeni poz görsel onaylı |
+| **Martı kaptan:** Bazen bir martı güvenli iniş çatısının üstünde belirip kısa bir selam verir; oynanışı etkilemez. | Şehrin tanıdık sakiniyle karşılaşma. | Kodla küçük; yeni martı çizimi gerekirse görsel onaylı |
+
+## 3. İlk üç öneri
+
+1. **Günün İstanbul’u:** Var olan gece ve şehir atmosferini genişletir; temel oyun hissini riske atmadan her açılışta taze görünür.
+2. **Günün hava durumu:** Kullanıcının ana fikrini karşılar ve yağmur, sis, kar, lodos gibi koşulları tanınır kılar; çevrimdışı yedeğiyle güvenilir kalabilir.
+3. **Ayın izi:** Uygulaması görece küçük, görsel etkisi yüksek; günlük gökyüzü değişimine ikinci bir keşif katmanı ekler.
+
+Bunlar mevcut sürekli rota ve hafif İstanbul gizemi tonuna uyuyor; erken bölümün zorluğunu artırmıyor. 【memory: Byzantion rota ve tercih notları】<!-- memory citation placeholder -->
+
+
+tokens used
+18.214
+## 1. Gerçek zamanlı İstanbul havası
+
+Bunu **dekor ve atmosfer katmanı** olarak yapmak iyi bir fikir: Boğaz’da sis, yağmur çizgileri, kar taneleri, akşam kızıllığı, gece yıldızları ve vapur ışıkları; zıplamanın mesafesini, kamerayı ve çatı şeklini değiştirmez. Lodos ya da poyraz varsa bulutların, martıların ve dumanın yönü bunu belli eder; ekranda kısa bir not çıkar: **“Bugün İstanbul’da lodos var.”**
+
+Sabit İstanbul koordinatıyla ücretsiz bir hava kaynağından veri alınabilir. Son alınan hava bilgisi telefonda saklanır; bağlantı yoksa oyun son kayıtlı bilgiyi, o da yoksa varsayılan havayı gösterir. Oyuncu konumunu istemeye gerek yok.
+
+Başlıca riskler: hava verisinin gecikmesi veya alınamaması, gerçek havayla ekrandakinin uyuşmaması ve efektlerin oyunu kalabalıklaştırıp okunabilirliği azaltması. Efektler hafif olmalı; oyuncu isterse kapatabilmeli. **Rüzgârın zıplamayı etkilemesi** ayrı ve isteğe bağlı bir mod olabilir, fakat skor adaletini ve alışılmış fiziği bozma riski taşır.
+
+## 2. Yaratıcı fikirler
+
+| Fikir | Oyuncuya hissi | Yapım |
+|---|---|---|
+| **Günün İstanbul’u:** Saat ve gün ışığına göre şehir şafaktan gün batımına, oradan geceye akar. | Şehirle aynı vakitte yaşıyor. | Kodla, orta |
+| **Vapur düdüğü saati:** Gerçek sefer saatlerinde değil, oyun içinde rastgele aralıklarla uzaktan bir düdük duyulur; kıyıdaki ışıklar kısa süre parlar. | Boğaz’ın canlı ve sakin ritmi. | Kodla, küçük |
+| **Ayın izi:** Ay evresine göre geceleri ayın biçimi değişir; dolunayda denizde ince bir ışık yolu belirir. | Her gece küçük bir gökyüzü sürprizi. | Kodla, küçük |
+| **Sisli Boğaz anı:** Hava raporu sis gösterirse uzaktaki siluetler yumuşar; yakındaki çatılar ve iniş noktaları net kalır. | İstanbul’un sisli sabahında yolculuk. | Kodla, orta |
+| **Özel gün kartpostalı:** Bayram veya takvimde belirli günlerde menüde kısa bir selam ve o güne özel küçük bir kutlama ayrıntısı görünür. | Şehrin takvimine ortak olma. | Kodla orta; yeni çizim istenirse görsel onaylı |
+| **Kar günü amcası:** Kar yağınca amca atkısını takar ya da kar birikintisine basınca kısa bir silkelenme animasyonu oynar; fizik aynı kalır. | Hava durumuna kişisel, sevimli tepki. | Kodla orta; yeni kıyafet/poz görsel onaylı |
+| **Amcanın çay molası:** Uzun seride bir çatıda kısa süre durup çayını üfler; oyuncu isterse devam eder, istemezse dokunup geçer. | Karaktere sıcaklık ve küçük bir nefes. | Kodla orta; yeni poz görsel onaylı |
+| **Martı kaptan:** Bazen bir martı güvenli iniş çatısının üstünde belirip kısa bir selam verir; oynanışı etkilemez. | Şehrin tanıdık sakiniyle karşılaşma. | Kodla küçük; yeni martı çizimi gerekirse görsel onaylı |
+
+## 3. İlk üç öneri
+
+1. **Günün İstanbul’u:** Var olan gece ve şehir atmosferini genişletir; temel oyun hissini riske atmadan her açılışta taze görünür.
+2. **Günün hava durumu:** Kullanıcının ana fikrini karşılar ve yağmur, sis, kar, lodos gibi koşulları tanınır kılar; çevrimdışı yedeğiyle güvenilir kalabilir.
+3. **Ayın izi:** Uygulaması görece küçük, görsel etkisi yüksek; günlük gökyüzü değişimine ikinci bir keşif katmanı ekler.
+
+Bunlar mevcut sürekli rota ve hafif İstanbul gizemi tonuna uyuyor; erken bölümün zorluğunu artırmıyor. 【memory: Byzantion rota ve tercih notları】<!-- memory citation placeholder -->
+
+

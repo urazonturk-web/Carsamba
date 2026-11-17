@@ -42,6 +42,9 @@ const PREVIOUS_CONFIG = {
   // Landing-surface widths come in three readable categories. The visible top
   // width IS the collision width — no hidden margins.
   widthWide: { min: 76, max: 96 }, // forgiving
+  // Starting tower width + initial camera framing (was widthWide.max; kept at
+  // 96 so ZORLUK KADEMESİ 1 does not move the start/camera).
+  startTowerWidth: 96,
   widthMedium: { min: 56, max: 68 }, // standard
   // GORSEL-016 (2026-09-23): raised from {38,46}. With the new, much smaller
   // character (GLOBAL_VISUAL_SCALE 0.42, see character-pose.ts), the narrow
@@ -66,6 +69,10 @@ const PREVIOUS_CONFIG = {
   difficultyRamp: 40, // platforms over which difficulty ramps 0 -> 1
   noNarrowBeforeId: 6, // never spawn NARROW towers before this platform id
   warmupTowers: 3, // first N towers are a gentle warm-up (wide/medium, short gaps)
+  // Width-category weights after warm-up, lerped early -> late by difficulty t
+  // (medium stays 0.4). Moved here from procedural-course.ts (same values).
+  wideWeight: { early: 0.55, late: 0.2 },
+  narrowWeight: { early: 0.05, late: 0.42 },
 
   platformMinTopY: -320, // highest a tower top can sit (remember +y is down)
   platformMaxTopY: 320, // lowest a tower top can sit
@@ -130,6 +137,34 @@ export const REFERENCE_TRIAL = true;
 // Both default OFF; flip either back to false to fully revert to baseline.
 export const EXPERIMENTAL_PHYSICS = false;
 export const EXPERIMENTAL_COURSE = true;
+
+// ZORLUK KADEMESİ 1 (2026-11-14, kullanıcı: "bir kademe zorlaştıralım oyunu";
+// bir arkadaşı oyunu kolay bulmuştu). YALNIZ kule dizilimi değişir: zıplama
+// fiziği, kamera, çatı silüeti ve kule boşlukları aynı kalır. Daha dar kule
+// tepeleri, dar kulenin daha erken ve daha sık gelmesi, daha kısa ısınma ve
+// biraz daha fazla yükseklik farkı. Geri almak için: false.
+// Kanıt: ai_review_evidence/ZORLUK-2026-11-14/sim_zorluk.cjs
+export const ZORLUK_KADEMESI = false as boolean;
+
+// KOLAY İLK DURAK (2026-11-15, kullanıcı: "ilk durağa kadar kolaylaştıralım,
+// durak durak sonrasında kademeli zorlaştırabiliriz"). Yalnız 1-14. kule
+// (FIRST_STOP öncesi): dar kule yok, geniş kule daha sık, yükseklik farkı ve
+// boşluk üst sınırı daha küçük. 15. kuleden sonrası, fizik, kamera, silüet aynı.
+// Kanıt: ai_review_evidence/KURUKAFA-ONLINE-2026-11-15/sim_kolay_basla.cjs
+// Geri almak için: false.
+export const ILK_DURAK_KOLAY = true as boolean;
+// maxClimb: hedef kule öncekinden en fazla bu kadar YÜKSEK olabilir (iniş serbest).
+export const EASY_START = { wideWeight: 1, mediumWeight: 0, heightVar: 160, maxClimb: 160, gapMax: 300 } as const; // 2026-11-16 seçenek A: yalnız geniş kule (C beğenilmedi: 220/±100)
+const HARDER = ZORLUK_KADEMESI ? {
+  widthWide: { min: 70, max: 90 }, // önce 76-96
+  widthMedium: { min: 52, max: 64 }, // önce 56-68
+  // widthNarrow 38-46 aynı kalır (karakter/kapak görünürlük sınırı).
+  wideWeight: { early: 0.45, late: 0.15 }, // önce 0.55 -> 0.2
+  narrowWeight: { early: 0.15, late: 0.5 }, // önce 0.05 -> 0.42
+  noNarrowBeforeId: 4, // önce 6
+  warmupTowers: 2, // önce 3
+  heightVarEarly: 250, // önce 220
+} : {};
 
 export const CONFIG = REFERENCE_TRIAL ? {
   ...PREVIOUS_CONFIG,
@@ -254,7 +289,11 @@ export const CONFIG = REFERENCE_TRIAL ? {
   // this change, not just these two numbers). 340/220 -- see GAME_STUDIO.md
   // for the full reasoning and the min/max table.
   gapLate: EXPERIMENTAL_COURSE ? { min: PREVIOUS_CONFIG.gapLate.min, max: 260 } : PREVIOUS_CONFIG.gapLate,
-  heightVarLate: EXPERIMENTAL_COURSE ? 180 : PREVIOUS_CONFIG.heightVarLate,
+  heightVarLate: EXPERIMENTAL_COURSE ? (ZORLUK_KADEMESI ? 210 : 180) : PREVIOUS_CONFIG.heightVarLate,
+  // 2026-11-16 kullanıcı (video 13-45-25): "hala ilk başlarda çok dar kolonlar var" ->
+  // dar kule 2. duraktan (Üsküdar, 30. kule) önce hiç çıkmaz; önce 6. kuleden sonra.
+  noNarrowBeforeId: ILK_DURAK_KOLAY ? 29 : PREVIOUS_CONFIG.noNarrowBeforeId,
+  ...HARDER,
 } as const : PREVIOUS_CONFIG;
 
 // ============================================================================

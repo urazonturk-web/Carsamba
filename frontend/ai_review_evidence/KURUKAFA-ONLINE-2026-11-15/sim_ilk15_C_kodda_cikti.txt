@@ -1,0 +1,2 @@
+ŞU AN (kodda, C)                   başarısız 0 | pencere p10/p50 72/82 ms | tahmini zıplama başarısı ort %97, en kötü %10'luk %93 | 14 kuleyi düşmeden geçme %62 | basış farkı p90 56 ms | ort. kule tepesi y -18
+C: B + yükseklik ±100              başarısız 0 | pencere p10/p50 72/82 ms | tahmini zıplama başarısı ort %97, en kötü %10'luk %93 | 14 kuleyi düşmeden geçme %62 | basış farkı p90 56 ms | ort. kule tepesi y -18

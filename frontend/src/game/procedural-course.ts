@@ -1,6 +1,6 @@
-import { CONFIG } from "./config";
+import { CONFIG, ILK_DURAK_KOLAY, EASY_START } from "./config";
 import { jumpVelocity, flightGravity } from "./jump";
-import { DURAK_SEFER, isStopTower, stopDifficulty } from "./stops";
+import { DURAK_SEFER, FIRST_STOP, isStopTower, stopDifficulty } from "./stops";
 
 // Extracted from app/index.tsx (was inlined there) so this exact math has a
 // single source of truth that both the live game and offline simulation/test
@@ -58,11 +58,14 @@ export function generateProceduralPlatform(
   const t = DURAK_SEFER ? stopDifficulty(id) : Math.min(1, id / CONFIG.difficultyRamp); // 0 early -> 1 late
   // Durak kulesi = nefes molası: geniş, öncekine yakın yükseklik, kısa/orta aralık.
   const breath = DURAK_SEFER && isStopTower(id);
+  // KOLAY İLK DURAK: 1-14. kule (bkz. config.ts ILK_DURAK_KOLAY).
+  const easy = ILK_DURAK_KOLAY && DURAK_SEFER && id < FIRST_STOP;
   // gap distance (grows with difficulty; warm-up = short/medium only)
   const gMin = warm ? CONFIG.gapEarly.min : lerp(CONFIG.gapEarly.min, CONFIG.gapLate.min, t);
-  const gMaxRaw = warm
+  const gMaxBase = warm
     ? CONFIG.warmupGapMax
     : lerp(CONFIG.gapEarly.max, CONFIG.gapLate.max, t);
+  const gMaxRaw = easy ? Math.min(gMaxBase, EASY_START.gapMax) : gMaxBase;
   const gMax = breath ? Math.max(gMin, (gMin + gMaxRaw) / 2) : gMaxRaw;
   const gapSample = rand();
   // Sample within the world bounds instead of clamping: clamping stacks
@@ -70,8 +73,10 @@ export function generateProceduralPlatform(
   const hvRaw = warm
     ? CONFIG.heightVarWarmup
     : lerp(CONFIG.heightVarEarly, CONFIG.heightVarLate, t);
-  const hv = breath ? Math.min(hvRaw, 70) : hvRaw;
-  const minDelta = Math.max(-hv, CONFIG.platformMinTopY - prev.topY);
+  const hv = breath ? Math.min(hvRaw, 70) : easy ? Math.min(hvRaw, EASY_START.heightVar) : hvRaw;
+  // +y aşağı: negatif delta = daha yüksek hedef. Kolay ilk durakta tırmanış ayrıca sınırlı.
+  const climb = easy ? Math.min(hv, EASY_START.maxClimb) : hv;
+  const minDelta = Math.max(-climb, CONFIG.platformMinTopY - prev.topY);
   const maxDelta = Math.min(hv, CONFIG.platformMaxTopY - prev.topY);
   const topY = prev.topY + minDelta + rand() * (maxDelta - minDelta);
   // width category: warm-up = WIDE/MEDIUM only; late adds more NARROW
@@ -83,10 +88,15 @@ export function generateProceduralPlatform(
     wMed = 0.38;
     wNar = 0;
   } else {
-    wWide = lerp(0.55, 0.2, t);
+    wWide = lerp(CONFIG.wideWeight.early, CONFIG.wideWeight.late, t);
     wMed = 0.4;
-    wNar = lerp(0.05, 0.42, t);
+    wNar = lerp(CONFIG.narrowWeight.early, CONFIG.narrowWeight.late, t);
     if (id <= CONFIG.noNarrowBeforeId) wNar = 0; // forgiving start
+    if (easy) {
+      wWide = EASY_START.wideWeight;
+      wMed = EASY_START.mediumWeight;
+      wNar = 0;
+    }
   }
   if (prev.cat === 2) wNar *= 0.25; // avoid consecutive narrow towers
   if (breath) {
@@ -124,6 +134,7 @@ export function generateProceduralPlatform(
 
 // ---------------------------------------------------------------------------
 // REVIZYON-027: everything ABOVE this line is byte-identical to commit 7b8bd6b
+// (except ZORLUK KADEMESİ 1, 2026-11-14: width weights now read from CONFIG)
 // (frontend/src/game/procedural-course.ts). Everything below is render-only
 // support kept from the working tree: it never feeds generateProceduralPlatform.
 // ---------------------------------------------------------------------------

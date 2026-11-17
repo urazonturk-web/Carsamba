@@ -8,8 +8,12 @@ import {
   type GestureResponderEvent,
   Platform,
   Pressable,
+  Alert,
+  AppState,
   ScrollView,
+  Share,
   Text,
+  TextInput,
   useWindowDimensions,
   View,
 } from "react-native";
@@ -24,12 +28,14 @@ import Animated, {
   withTiming,
   withSpring,
   withSequence,
+  withDelay,
   withRepeat,
   cancelAnimation,
   Easing,
   interpolateColor,
   FadeIn,
   FadeOut,
+  FadeInDown,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -37,15 +43,22 @@ import { AmbientBirds } from "../src/game/AmbientBirds";
 import { NO_IMAGE_CLIP, NoClipImage as Image } from "../src/game/NoClipImage";
 import { ChargePoses } from "../src/game/ChargePoses";
 import { CHARGE_POSES, FAZ2_IFADE } from "../src/game/character-pose";
+import { PIJAMA_ON, HAT_SOURCE, SLIPPER_SOURCE, DOOR_CLOSED_SOURCE, DOOR_OPEN_SOURCE, DOOR_ASPECT, DOOR_HEIGHT_RATIO, DOOR_MS, DOOR_SINK, STEP_LIFT, PIJAMA_TEST_EARLY, TEST_START_TOWER } from "../src/game/pijama";
 import { ANCHOR_SHIFT_PX, GLOBAL_VISUAL_SCALE, POSE_FEET_SPAN_PX } from "../src/game/character-pose";
 import { AMBIENT_ON, AmbientEvents } from "../src/game/AmbientEvents";
 import { POSTCARDS, POSTCARDS_KEY, POSTCARDS_ON, parseUnlocked } from "../src/game/postcards";
 import { DAILY_KEY, DAILY_MAP, dailySeed, todayKey, todayLabel, type DailyRecord } from "../src/game/daily";
-import { DURAK_SEFER, nextStopLine, stopName, stopTowerId, stopsPassed, PIER_STOP } from "../src/game/stops";
+import { DURAK_SEFER, nextStopLine, stopName, stopTowerId, stopsPassed, NIGHT_STOP, FINAL_STOP, bridgeAt, bridgeFromFoot, bridgeArrivingAt, skyStepForStops } from "../src/game/stops";
+const START_SKY = DURAK_SEFER ? skyStepForStops(stopsPassed(TEST_START_TOWER)) : 0;
 import { SFX_ON, initSfx, playFart, playSfx, setSfxMuted, stopFart, stopSfx } from "../src/game/sfx";
 import { GAME_OVER_LINE, QUIP_ON, multiJumpShout, pickQuip, quipContext } from "../src/game/copy";
 import { jumpVelocity, advanceFlight } from "../src/game/jump";
 import { findFootLanding } from "../src/game/landing";
+import { MEYDAN_ON, makeCode, parseCode, shareText, type Challenge } from "../src/game/meydan";
+import { SymbolView } from "expo-symbols";
+import { YARIS_ON, RACE_MS, RESPAWN_MS, EV_LAUNCH, EV_LAND, EV_FALL, EV_RESPAWN, pushEvent, encodeRace, decodeRace, compareRace, clockText, type RaceData, type RaceLog, type RaceSummary } from "../src/game/yaris";
+const MENU_ON = true; // açılış menüsü
+import { KURUKAFA_ON, SKULL_SOURCE, SKULL_SIZE, SKULL_HIT_R, skullTouches, skullAfter, skullLift, skullPoint, scaledPlatforms, rollSkullEffect } from "../src/game/kurukafa";
 import { referencePlatform, referenceTowerWidth } from "../src/game/reference-course";
 import { generateProceduralPlatform, mulberry32Step, classifyPlatformVisualType, ROOFTOP_GROUND_Y, type PlatformVisualType } from "../src/game/procedural-course";
 import { FIXED_PANEL_PLATFORMS, PANEL_SOURCES, PANEL_WORLD_WIDTH, PANEL_WORLD_HEIGHT, PANEL_FILL_STRIP_HEIGHT, PANEL_TOP_EDGE_SOURCES, PANEL_BOTTOM_EDGE_SOURCES, PANEL_SEAM_OVERLAP } from "../src/game/panel-course";
@@ -312,7 +325,7 @@ const AnimatedImage = Animated.createAnimatedComponent(Image);
 const BG_SCROLL_TEST = true as boolean;
 const BG_SCROLL_RATIO = 0.45;
 const BG_SCROLL_TILES = 4;
-const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? "GAME CENTER v1 + PATLAMA" : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
+const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "KARTPOSTAL v2 + YARIS CIKIS") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
 const DIAG_MAX_EXAMPLES = 6;
 const HOUSE_AB_FROZEN = false as boolean;
 // REVIZYON-066 experiment (one variable): expo-linear-gradient's iOS layer
@@ -393,6 +406,8 @@ const PRELOAD_MODULES: number[] = [
   MASTER_NEIGHBORHOOD_SOURCE, DISTRICT_SOURCE, DISTRICT_BODY_SOURCE, HOUSE_ROOF_SOURCE, HOUSE_GUTTER_SOURCE, HOUSE_FACADE_SOURCE, BG_LOW_SIL_SOURCE,
   PU_ROOF_MID_SOURCE, PU_ROOF_HIP_L_SOURCE, PU_ROOF_HIP_R_SOURCE, PU_WALL_SOURCE, PU_BACKDROP_SOURCE, PU_SUN_SOURCE, PU_CLOUD_A_SOURCE, PU_CLOUD_B_SOURCE, PU_CLOUD_C_SOURCE, PU_ERASER_SOURCE, PU_ERASED_SOURCE,
   ...CHARGE_POSES.map((p) => p.source),
+  ...(PIJAMA_ON ? [HAT_SOURCE, SLIPPER_SOURCE, DOOR_CLOSED_SOURCE, DOOR_OPEN_SOURCE] : []),
+  ...(KURUKAFA_ON ? [SKULL_SOURCE] : []),
 ];
 (async () => {
   try {
@@ -535,6 +550,13 @@ const SOLE_CENTER_OFFSET = ((SOLE_LEFT + SOLE_RIGHT) / 2 - 0.5) * SOLE_BODY_WIDT
 const SPRITE_SCALE = ((SOLE_RIGHT - SOLE_LEFT) * SOLE_BODY_WIDTH) / POSE_FEET_SPAN_PX;
 // GAZ trial: puffs leave from the hips, a little behind the body.
 const FART_CHAR_H = CHARGE_POSES[0].h * SPRITE_SCALE * GLOBAL_VISUAL_SCALE * CHAR_SIZE_TRIAL;
+// PİJAMA ANI: çatı kapısı ayaktaki amcadan ~%30 uzun (dünya birimi).
+const DOOR_H = FART_CHAR_H * DOOR_HEIGHT_RATIO;
+// KURUKAFA: amcanın gövdesinin yarı genişliği (çizilen pozun ~%60'ı, kollar dahil).
+const SKULL_BADGE_W = 280; // dünya birimi (kamera 0,4 -> ~110 nokta)
+const SKULL_BADGE_H = 100;
+const CHAR_BODY_HALF_W = (CHARGE_POSES[0].w * SPRITE_SCALE * GLOBAL_VISUAL_SCALE * CHAR_SIZE_TRIAL * 0.6) / 2;
+const DOOR_W = DOOR_H * DOOR_ASPECT;
 const FART_FEET_DX = SOLE_CENTER_OFFSET + ANCHOR_SHIFT_PX * SPRITE_SCALE;
 // 2026-11-11 user: gas came out too high (chest level in ScreenRecording
 // 15-04-35); the newest puff now sits on the seat of the tracksuit.
@@ -556,6 +578,137 @@ function slotPlatform(list: any[], slot: number) {
   }
   return undefined;
 }
+// TASARIM 2026-11-16: emoji yerine tek renkli iOS simgeleri (el çizimi sanatla çatışmasın).
+function Ico({ name, size = 22, color = "#6e4632" }: { name: string; size?: number; color?: string }) {
+  return <SymbolView name={name as any} size={size} tintColor={color} type="monochrome" style={{ width: size, height: size }} />;
+}
+
+// KARTPOSTAL OYUN SONU (2026-11-16): kullanıcı "tasarım sıkıcı"; editörlerin ortak önerisi:
+// kartpostal + posta damgası, sayarak artan skor, amcanın ifadeli kafası çıkartma. Yeni görsel yok.
+const PC_STICKER = {
+  rec: require("@/assets/characters/charge-100-r12-ifade.png"),
+  mid: require("@/assets/characters/charge-050-r12-ifade.png"),
+  low: require("@/assets/characters/charge-000-r12.png"),
+};
+const PC_STAMP = require("@/assets/postcards/kartpostal-galata.jpg");
+const PC_HAND = Platform.OS === "ios" ? "Noteworthy-Bold" : undefined;
+const PC_TYPE = Platform.OS === "ios" ? "AmericanTypewriter-Bold" : undefined;
+const PC_SCRIPT = Platform.OS === "ios" ? "SnellRoundhand-Bold" : undefined;
+const TR_MONTHS = ["OCAK", "ŞUBAT", "MART", "NİSAN", "MAYIS", "HAZİRAN", "TEMMUZ", "AĞUSTOS", "EYLÜL", "EKİM", "KASIM", "ARALIK"];
+const countUpMs = (n: number) => (n <= 0 ? 0 : Math.min(900, 300 + n * 12));
+function CountUp({ to, style }: { to: number; style: any }) {
+  const [v, setV] = useState(0);
+  const pop = useSharedValue(1);
+  useEffect(() => {
+    const dur = countUpMs(to);
+    if (dur === 0) { setV(0); return; }
+    const start = Date.now();
+    const id = setInterval(() => {
+      const k = Math.min(1, (Date.now() - start) / dur);
+      setV(Math.round(to * (1 - Math.pow(1 - k, 3))));
+      if (k >= 1) {
+        clearInterval(id);
+        pop.value = withSequence(withTiming(1.14, { duration: 110 }), withSpring(1, { damping: 9, stiffness: 220 }));
+      }
+    }, 16);
+    return () => clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [to]);
+  const st = useAnimatedStyle(() => ({ transform: [{ scale: pop.value }] }));
+  return <Animated.Text style={[style, st]}>{v}</Animated.Text>;
+}
+function Postmark({ delay, styles, label = "YENİ REKOR", small = false }: { delay: number; styles: any; label?: string; small?: boolean }) {
+  const k = useSharedValue(0);
+  useEffect(() => {
+    k.value = withDelay(delay + 120, withSpring(1, { damping: 7, stiffness: 160, mass: 0.8 }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const st = useAnimatedStyle(() => ({
+    opacity: Math.min(1, k.value * 1.6) * 0.9,
+    transform: [{ rotate: "-14deg" }, { scale: 2.3 - 1.3 * k.value }],
+  }));
+  const d = new Date();
+  return (
+    <Animated.View pointerEvents="none" style={[styles.pcPostmark, small && styles.pcPostmarkSm, st]}>
+      <View style={[styles.pcPostmarkInner, small && styles.pcPostmarkInnerSm]}>
+        {!small && <Text style={styles.pcPostmarkSmall} numberOfLines={1}>BYZANTION</Text>}
+        <Text style={[styles.pcPostmarkBig, small && { fontSize: 11 }]} numberOfLines={1} adjustsFontSizeToFit>{label}</Text>
+        {!small && <Text style={styles.pcPostmarkSmall} numberOfLines={1}>{d.getDate()} {TR_MONTHS[d.getMonth()]}</Text>}
+      </View>
+    </Animated.View>
+  );
+}
+
+// HAYALET YARIŞ: yarışın canlı durumu (JS tarafı).
+type RaceState = {
+  seed: number; startedAt: number; pausedAt: number; pausedTotal: number; ended: boolean; waiting: boolean;
+  far: number; best: number; runs: number; log: RaceLog;
+  ghost: RaceData | null; oppName: string; matchID?: string;
+};
+function raceElapsed(rc: RaceState) {
+  return (rc.pausedAt || Date.now()) - rc.startedAt - rc.pausedTotal;
+}
+// Bitmiş yarış sonucu, meydan okuyanın açısından: 1 kazandım, -1 kaybettim, 0 berabere.
+function raceOutcome(c: { race?: string; replyRace?: string; score: number; reply?: number }) {
+  const a = decodeRace(c.race);
+  const b = decodeRace(c.replyRace);
+  if (a && b) return compareRace(a, b);
+  const r = c.reply ?? 0;
+  return r > c.score ? -1 : r === c.score ? 0 : 1;
+}
+// Sayaç + ilerleme şeridi kendi içinde yeniden çizilir (ana bileşen her saniye render edilmez).
+const RaceHud = memo(function RaceHud(props: {
+  raceRef: { current: RaceState | null };
+  ghostRef: { current: { idx: number; tower: number; far: number; falling: boolean } };
+  towerRef: { current: number };
+  tick: () => void;
+  onTimeUp: () => void;
+  bottom: number;
+}) {
+  const { raceRef, ghostRef, towerRef, tick, onTimeUp, bottom } = props;
+  const [, force] = useState(0);
+  useEffect(() => {
+    let last = "";
+    const id = setInterval(() => {
+      const rc = raceRef.current;
+      if (!rc || rc.ended) return;
+      tick();
+      const left = RACE_MS - raceElapsed(rc);
+      if (left <= 0) { onTimeUp(); return; }
+      const g = ghostRef.current;
+      const key = `${clockText(left)}|${towerRef.current}|${rc.far}|${g.tower}|${g.far}`;
+      if (key !== last) { last = key; force((n) => n + 1); }
+    }, 100);
+    return () => clearInterval(id);
+  }, [raceRef, ghostRef, towerRef, tick, onTimeUp]);
+  const rc = raceRef.current;
+  if (!rc) return null;
+  const left = RACE_MS - raceElapsed(rc);
+  const g = ghostRef.current;
+  const me = towerRef.current;
+  const myFar = Math.max(rc.far, me);
+  const span = Math.max(20, myFar, g.far, me, g.tower) * 1.1;
+  return (
+    <View pointerEvents="none" style={{ position: "absolute", left: 16, right: 16, bottom, alignItems: "center", zIndex: 40 }} testID="race-hud">
+      <View style={{ width: "100%", maxWidth: 420, borderRadius: 16, paddingVertical: 8, paddingHorizontal: 12, backgroundColor: "rgba(42,27,18,0.78)" }}>
+        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+          <Text style={{ color: left < 20000 ? "#ffb4a0" : "#fff", fontSize: 22, fontWeight: "900" }}>⏱ {clockText(left)}</Text>
+          <Text style={{ color: "#ffd66b", fontSize: 13, fontWeight: "800" }}>Sen: kule {me} · en uzak {myFar}</Text>
+        </View>
+        {rc.ghost && (
+          <Text style={{ color: "#d9c8ff", fontSize: 13, fontWeight: "800", textAlign: "right", marginTop: 2 }} numberOfLines={1}>
+            👻 {rc.oppName || "Rakip"}: kule {g.tower} · en uzak {g.far}
+          </Text>
+        )}
+        <View style={{ height: 8, borderRadius: 4, backgroundColor: "rgba(255,255,255,0.18)", marginTop: 6 }}>
+          {rc.ghost && <View style={{ position: "absolute", top: -3, width: 14, height: 14, borderRadius: 7, backgroundColor: "#b9a0ff", left: `${Math.min(97, (g.tower / span) * 100)}%` }} />}
+          <View style={{ position: "absolute", top: -3, width: 14, height: 14, borderRadius: 7, backgroundColor: "#ff9a3c", borderWidth: 2, borderColor: "#fff", left: `${Math.min(97, (me / span) * 100)}%` }} />
+        </View>
+      </View>
+    </View>
+  );
+});
+
 function platformById(list: any[], id: number) {
   "worklet";
   for (let i = 0; i < list.length; i++) {
@@ -619,7 +772,11 @@ export default function Game() {
     });
   }, []);
   const [gameOver, setGameOver] = useState(false);
+  // AÇILIŞ MENÜSÜ (2026-11-16): kullanıcı "oyunun ilk açılışında bir menü olmalı, hemen oyun açılıyor".
+  const [menuOpen, setMenuOpen] = useState(MENU_ON);
   const [gcPlayer, setGcPlayer] = useState<GameCenter.GameCenterPlayer | null>(null);
+  const gcNameRef = useRef("");
+  useEffect(() => { gcNameRef.current = gcPlayer?.displayName ?? ""; }, [gcPlayer]);
   const [coverMounted, setCoverMounted] = useState(true);
   const coverOpacity = useSharedValue(1);
   const coverStyle = useAnimatedStyle(() => ({ opacity: coverOpacity.value }));
@@ -683,10 +840,45 @@ export default function Game() {
   });
   const scoreRef = useRef(0);
   // DURAK SEFERİ state
-  const lastTowerRef = useRef(0);
+  const lastTowerRef = useRef(TEST_START_TOWER);
   const farthestRef = useRef(0);
   const [stopBanner, setStopBanner] = useState<{ key: number; title: string; sub: string; pier?: boolean } | null>(null);
-  const [pierFx, setPierFx] = useState(0); // iskele kutlaması anahtarı (0 = yok)
+  const [pierFx, setPierFx] = useState(0); // final kutlaması anahtarı (0 = yok)
+  const [bigCard, setBigCard] = useState<number | null>(null); // albümde büyütülen kart
+  // MEYDAN OKUMA
+  const seedRef = useRef(0); // bu koşunun harita tohumu
+  const challengeRef = useRef<Challenge | null>(null);
+  const [challenge, setChallenge] = useState<Challenge | null>(null);
+  const [codeOpen, setCodeOpen] = useState(false);
+  const [codeText, setCodeText] = useState("");
+  const [codeError, setCodeError] = useState("");
+  const [copied, setCopied] = useState(false);
+  // MEYDAN OKUMA · ARKADAŞ (Game Center sıra tabanlı maç)
+  const [incoming, setIncoming] = useState<GameCenter.FriendChallenge[]>([]);
+  const [friendResults, setFriendResults] = useState<GameCenter.FriendChallenge[]>([]);
+  const [toast, setToast] = useState<string | null>(null);
+  const [friendSheet, setFriendSheet] = useState(false);
+  const [friends, setFriends] = useState<GameCenter.GameCenterFriend[]>([]);
+  const [friendsMsg, setFriendsMsg] = useState<string | null>(null);
+  const [sendingTo, setSendingTo] = useState<string | null>(null);
+  // HAYALET YARIŞ
+  const raceRef = useRef<RaceState | null>(null);
+  const ghostRef = useRef({ idx: 0, tower: 0, far: 0, falling: false });
+  const [raceOn, setRaceOn] = useState(false);
+  const [raceResult, setRaceResult] = useState<null | { me: RaceSummary; opp: RaceSummary | null; oppName: string; seed: number; race: string }>(null);
+  const [sheetMode, setSheetMode] = useState<"score" | "race">("score");
+  const respawnTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const restartRef = useRef<() => void>(() => {});
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const showToast = useCallback((t: string) => {
+    setToast(t);
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setToast(null), 2600);
+  }, []);
+  const copiedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [arrivalCard, setArrivalCard] = useState<number | null>(null); // varışta kayan küçük kart
+  const arrivalTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [bridgeStrip, setBridgeStrip] = useState<{ name: string; from: string; to: string; progress: number } | null>(null);
   // KARTPOSTAL ALBÜMÜ
   const unlockedRef = useRef<number[]>([]);
   const [unlocked, setUnlocked] = useState<number[]>([]);
@@ -841,9 +1033,41 @@ export default function Game() {
 
   // Perfect-landing particle burst
   const burst = useSharedValue(0);
-  const skyStep = useSharedValue(0);
+  const skyStep = useSharedValue(START_SKY);
   const overT = useSharedValue(-1); // patlama eşiği ilerlemesi (-1 = pencere yok)
   const dirty = useSharedValue(0); // 1 = amca bu tur lekeli
+  // PİJAMA ANI (2026-11-16): gece başlarken çatı kapısı + gece külahı/terlik.
+  const pajama = useSharedValue(0); // 1 = gece kıyafeti
+  const doorLock = useSharedValue(0); // 1 = kapı anı sürüyor, dokunma yok sayılır
+  const doorOp = useSharedValue(0);
+  const doorOpen = useSharedValue(0);
+  const doorX = useSharedValue(0);
+  const doorBottom = useSharedValue(0);
+  const charOp = useSharedValue(1);
+  const walkX = useSharedValue(0); // kapıya yürüme (yalnız görüntü)
+  // HAYALET YARIŞ: yarış sürüyor mu + rakip hayaletin durumu (yalnız çizim).
+  const raceLive = useSharedValue(0);
+  const gOn = useSharedValue(0);
+  const gMode = useSharedValue(0); // 0 duruyor, 1 zıplıyor, 2 düşüyor
+  const gFromId = useSharedValue(0);
+  const gFromR = useSharedValue(0.5);
+  const gToId = useSharedValue(0);
+  const gToR = useSharedValue(0.5);
+  const gProg = useSharedValue(0);
+  // KURUKAFA (2026-11-16)
+  const skullX = useSharedValue(0);
+  const skullY = useSharedValue(0);
+  const skullVis = useSharedValue(0);
+  const skullOwner = useSharedValue(-1); // görünen kurukafanın taşındığı kule kimliği
+  const skullTaken = useSharedValue(-1); // alınan kurukafanın kule kimliği
+  const effectK = useSharedValue(1); // 1.2 / 0.8 / 1
+  const effectLeft = useSharedValue(0); // kalan iniş
+  const skullBob = useSharedValue(0); // süzülme (0..1 döngü)
+  useEffect(() => {
+    if (KURUKAFA_ON) skullBob.value = withRepeat(withTiming(1, { duration: 1600, easing: Easing.linear }), -1, false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const walkY = useSharedValue(0);
   const splat = useSharedValue(1); // 0..1 patlama animasyonu (1 = bitti)
   const splatX = useSharedValue(0);
   const splatY = useSharedValue(0);
@@ -868,12 +1092,30 @@ export default function Game() {
     if (!GAME_CENTER_ON || !GameCenter.gameCenterAvailable) return;
     let alive = true;
     GameCenter.authenticate().then((p) => {
-      if (alive) setGcPlayer(p);
+      if (!alive) return;
+      setGcPlayer(p);
+      if (MEYDAN_ON && p.authenticated) {
+        GameCenter.loadChallenges().then((r) => {
+          if (!alive) return;
+          setIncoming(r.incoming);
+          setFriendResults(r.results);
+        });
+      }
+    });
+    const offIn = GameCenter.onChallenge("onChallenge", (c) => {
+      setIncoming((list) => (list.some((x) => x.matchID === c.matchID) ? list : [...list, c]));
+      showToast(c.race ? `🏁 ${c.from || "Bir arkadaşın"} seni 2 dk yarışa çağırdı: ${c.score}. kule` : `⚔️ ${c.from || "Bir arkadaşın"} sana meydan okudu: ${c.score} puan`);
+    });
+    const offRes = GameCenter.onChallenge("onChallengeResult", (c) => {
+      setFriendResults((list) => (list.some((x) => x.matchID === c.matchID) ? list : [...list, c]));
+      showToast(c.race ? `🏁 ${c.replier || "Arkadaşın"} yarışını oynadı: ${c.reply ?? 0}. kule` : `⚔️ ${c.replier || "Arkadaşın"} meydan okumanı oynadı: ${c.reply ?? 0} puan`);
     });
     return () => {
       alive = false;
+      offIn();
+      offRes();
     };
-  }, []);
+  }, [showToast]);
 
   const openLeaderboard = useCallback(async () => {
     let p = gcPlayer;
@@ -932,7 +1174,10 @@ export default function Game() {
     if (measured) return measured;
     const generated = generateProceduralPlatform(prev, id, rand, W);
     const width = USE_REFERENCE_COURSE ? referenceTowerWidth(W, CONFIG.cameraZoom) : generated.width;
-    return { ...generated, width, visualType: classifyPlatformVisualType(id) };
+    const out: any = { ...generated, width, visualType: classifyPlatformVisualType(id) };
+    // KURUKAFA: prev -> bu kule arasındaki boşlukta mı? Ayrı karma; RNG akışına dokunmaz.
+    if (KURUKAFA_ON && DURAK_SEFER && skullAfter(runSeed.value, prev.id)) out.skull = skullPoint(prev, out, PH / 2, W, skullLift(runSeed.value, prev.id));
+    return out;
   };
 
   // ------------------------------------------------------------------------
@@ -945,6 +1190,7 @@ export default function Game() {
       (seed !== undefined
         ? seed
         : (Date.now() ^ Math.floor(Math.random() * 0xffffffff)) >>> 0) >>> 0;
+    seedRef.current = seedVal;
     // Native SharedValue writes from JS are asynchronous. Build and publish
     // the entire round on the UI thread before rendering or advancing it.
     runOnUI((seedVal: number) => {
@@ -965,7 +1211,7 @@ export default function Game() {
           // "uzun varyantı başlangıçta kullanma". Switched to cat:1 (medium)
           // so the very first tower's cap sits at a moderate height instead of
           // the long asset's much taller one.
-          ?? { id: 0, x: 0, topY: 0, width: CONFIG.widthWide.max, cat: 0, visualType: "normal" as PlatformVisualType };
+          ?? { id: TEST_START_TOWER, x: 0, topY: 0, width: CONFIG.startTowerWidth, cat: 0, visualType: "normal" as PlatformVisualType };
       const list: any[] = [first];
 
       // Reference video: character's rest stance sits ~0.53-0.58 of the way
@@ -999,16 +1245,16 @@ export default function Game() {
           list[list.length - 1].x + list[list.length - 1].width <
           px.value + viewW + CONFIG.spawnAhead
         ) {
-          list.push(makeNextPlatform(list[list.length - 1], list.length));
+          list.push(makeNextPlatform(list[list.length - 1], TEST_START_TOWER + list.length));
         }
         // Guarantee the starting tower + at least the next TWO upcoming towers,
         // regardless of viewport size, so a run never starts under-populated.
         while (list.length < 3) {
-          list.push(makeNextPlatform(list[list.length - 1], list.length));
+          list.push(makeNextPlatform(list[list.length - 1], TEST_START_TOWER + list.length));
         }
       }
-      idCounter.value = list.length;
-      lastLandedId.value = 0;
+      idCounter.value = TEST_START_TOWER + list.length;
+      lastLandedId.value = TEST_START_TOWER;
       standingPlatformId.value = first.id;
       standingPlatformIsChimney.value = first.visualType === "chimney";
       platforms.value = list;
@@ -1045,13 +1291,22 @@ export default function Game() {
   // ------------------------------------------------------------------------
   // JS callbacks triggered from the worklet (rare, event-based).
   // ------------------------------------------------------------------------
-  const onLanding = useCallback((perfect: number, towersCrossed: number, landedId: number) => {
+  const onLanding = useCallback((perfect: number, towersCrossed: number, landedId: number, ratio = 0.5) => {
+    const rcL = raceRef.current;
+    if (YARIS_ON && rcL && !rcL.ended) pushEvent(rcL.log, raceElapsed(rcL), EV_LAND, landedId, ratio);
     if (DURAK_SEFER) {
       lastTowerRef.current = landedId;
       const before = stopsPassed(landedId - towersCrossed);
       const after = stopsPassed(landedId);
+      // GÜZERGÂH 2026-11-16: köprü üstündeyken üstte "Anadolu ●━━○ Avrupa" şeridi.
+      const onBridge = bridgeAt(landedId);
+      setBridgeStrip(onBridge ? { name: onBridge.bridge.name, from: onBridge.bridge.from, to: onBridge.bridge.side, progress: onBridge.progress } : null);
       if (after > before) {
-        const pier = after === PIER_STOP;
+        // Büyük an = final (Rumeli Feneri): konfeti + çift düdük. Köprüden karşıya varış = kısa kutlama (çift düdük, konfetisiz).
+        const finale = after === FINAL_STOP;
+        const arrived = bridgeArrivingAt(after);
+        const foot = bridgeFromFoot(after);
+        const pier = finale || !!arrived;
         let newCard = false;
         if (POSTCARDS_ON && after <= POSTCARDS.length && !unlockedRef.current.includes(after)) {
           newCard = true;
@@ -1060,20 +1315,30 @@ export default function Game() {
           storage.setItem(POSTCARDS_KEY, JSON.stringify(unlockedRef.current));
           runNewCardsRef.current = [...runNewCardsRef.current, after];
         }
-        setStopBanner({ key: landedId, title: stopName(after), sub: pier ? `Vapura yetiştin! ⛴️ · ${stopTowerId(after)}. kule` : `${after > PIER_STOP ? "🌙 " : ""}${stopTowerId(after)}. kule${newCard ? " · 📮 yeni kartpostal" : ""}`, pier });
+        const card = newCard ? " · 📮 yeni kartpostal" : "";
+        if (newCard && !raceRef.current) {
+          // KARTPOSTAL v2: oyun durmadan köşede küçük kart belirir (~1,6 sn), dokunma kilidi yok.
+          setArrivalCard(after);
+          if (arrivalTimer.current) clearTimeout(arrivalTimer.current);
+          arrivalTimer.current = setTimeout(() => setArrivalCard(null), 1600);
+        }
+        const sub = arrived
+          ? `${arrived.arrive} ${finale ? "⛴️" : "🌉"}${card}`
+          : foot
+            ? `Sıradaki: ${foot.name} 🌉${card}`
+            : `${after > FINAL_STOP ? "🌙 " : ""}${stopTowerId(after)}. kule${card}`;
+        setStopBanner({ key: landedId, title: stopName(after), sub, pier });
         if (stopTimer.current) clearTimeout(stopTimer.current);
-        stopTimer.current = setTimeout(() => setStopBanner(null), pier ? 2600 : 1400);
+        stopTimer.current = setTimeout(() => setStopBanner(null), finale ? 2600 : pier || foot ? 2000 : 1400);
         if (SFX_ON) playSfx("record");
         if (Platform.OS !== "web") {
           if (pier) Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
           else Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
         }
-        if (pier) {
-          // İSKELE ANI (2026-11-12): çift vapur düdüğü + kilim renklerinde konfeti.
-          setPierFx(landedId);
-          if (SFX_ON) setTimeout(() => playSfx("record"), 650);
-        }
-        skyStep.value = withTiming(Math.min(after, SKY_STEPS.length - 1), { duration: 900 });
+        if (pier && SFX_ON) setTimeout(() => playSfx("record"), 650);
+        // İSKELE ANI konfetisi artık yalnız finalde (kilim renkleri).
+        if (finale && !raceRef.current) setPierFx(landedId); // yarışta konfeti yok
+        skyStep.value = withTiming(skyStepForStops(after), { duration: 900 });
       }
     }
     const gained =
@@ -1113,13 +1378,69 @@ export default function Game() {
     perfectTimer.current = setTimeout(() => setPerfectVisible(false), 900);
   }, []);
 
+  // KURUKAFA: alınınca tabela + sayaç; her inişte sayaç.
+  const [skullHud, setSkullHud] = useState<{ k: number; left: number } | null>(null);
+  const onSkull = useCallback((k: number, left: number) => {
+    setSkullHud({ k, left });
+    setLandingLabel("💀 Kurukafa!");
+    setLandingSub(`Kuleler %${Math.round(Math.abs(k - 1) * 100)} ${k > 1 ? "büyüdü 😀" : "küçüldü 😬"} · ${left} zıplama`);
+    setPerfectVisible(true);
+    if (perfectTimer.current) clearTimeout(perfectTimer.current);
+    perfectTimer.current = setTimeout(() => setPerfectVisible(false), 1300);
+    if (SFX_ON) playSfx("record");
+    if (Platform.OS !== "web") Haptics.notificationAsync(k > 1 ? Haptics.NotificationFeedbackType.Success : Haptics.NotificationFeedbackType.Warning).catch(() => {});
+  }, []);
+  const onSkullTick = useCallback((k: number, left: number) => {
+    setSkullHud(left > 0 ? { k, left } : null);
+  }, []);
+
+  const onRaceLaunch = useCallback(() => {
+    const rc = raceRef.current;
+    if (rc && !rc.ended) pushEvent(rc.log, raceElapsed(rc), EV_LAUNCH, lastTowerRef.current);
+  }, []);
+
   const onGameOver = useCallback(() => {
+    // HAYALET YARIŞ: düşünce oyun bitmez; koşu kaydedilir, kısa bekleyişten sonra baştan başlanır.
+    const rc = raceRef.current;
+    if (YARIS_ON && rc) {
+      if (rc.ended) return;
+      pushEvent(rc.log, raceElapsed(rc), EV_FALL, lastTowerRef.current);
+      rc.far = Math.max(rc.far, lastTowerRef.current);
+      rc.best = Math.max(rc.best, scoreRef.current);
+      rc.runs += 1;
+      rc.waiting = true;
+      setStopBanner(null);
+      setBridgeStrip(null);
+      setArrivalCard(null);
+      if (KURUKAFA_ON) setSkullHud(null);
+      if (SFX_ON && FART_TRIAL) stopFart();
+      if (SFX_ON) playSfx("fall");
+      if (respawnTimer.current) clearTimeout(respawnTimer.current);
+      respawnTimer.current = setTimeout(() => {
+        const r = raceRef.current;
+        if (!r || r.ended) return;
+        r.waiting = false;
+        pushEvent(r.log, raceElapsed(r), EV_RESPAWN, TEST_START_TOWER);
+        restartRef.current();
+      }, RESPAWN_MS);
+      return;
+    }
     if (POSTCARDS_ON) setRunNewCards(runNewCardsRef.current);
+    // MEYDAN OKUMA · ARKADAŞ: ilk denemenin skoru maça yazılır ve maç biter (sonuç arkadaşa gider).
+    const ch = challengeRef.current;
+    if (MEYDAN_ON && ch?.matchID) {
+      const id = ch.matchID;
+      challengeRef.current = { ...ch, matchID: undefined };
+      GameCenter.finishChallenge(id, scoreRef.current, gcNameRef.current);
+    }
     if (DURAK_SEFER) {
       const lt = lastTowerRef.current;
       setRunEnd({ lastTower: lt, stops: stopsPassed(lt) });
       setStopBanner(null);
-      if (lt > farthestRef.current) {
+      setBridgeStrip(null);
+      setArrivalCard(null);
+      if (KURUKAFA_ON) setSkullHud(null);
+      if (lt > farthestRef.current && TEST_START_TOWER === 0) { // deneme başlangıcı rekoru kirletmesin
         farthestRef.current = lt;
         recordFlagId.value = lt;
         if (modeRef.current === "daily") {
@@ -1177,18 +1498,33 @@ export default function Game() {
       dirty.value = 0;
       splat.value = 1;
     }
-    lastTowerRef.current = 0;
+    lastTowerRef.current = TEST_START_TOWER;
     runNewCardsRef.current = [];
     setRunNewCards([]);
     setAlbumOpen(false);
-    skyStep.value = 0;
+    skyStep.value = START_SKY;
     setStopBanner(null);
+    setBridgeStrip(null);
+    setArrivalCard(null);
+    if (KURUKAFA_ON) {
+      skullVis.value = 0; skullTaken.value = -1; skullOwner.value = -1; effectK.value = 1; effectLeft.value = 0;
+      setSkullHud(null);
+    }
+    if (PIJAMA_ON) {
+      cancelAnimation(doorOp); cancelAnimation(doorOpen); cancelAnimation(charOp); cancelAnimation(pajama); cancelAnimation(doorLock); cancelAnimation(walkX); cancelAnimation(walkY);
+      pajama.value = 0; doorOp.value = 0; doorOpen.value = 0; charOp.value = 1; doorLock.value = 0; walkX.value = 0; walkY.value = 0;
+    }
     scoreRef.current = 0;
     setScore(0);
     setLastJump(null);
     setGameOver(false);
+    setMenuOpen(false);
     setPerfectVisible(false);
-    if (DAILY_MAP && modeRef.current === "daily") {
+    if (YARIS_ON && raceRef.current && !raceRef.current.ended) {
+      initWorld(raceRef.current.seed);
+    } else if (MEYDAN_ON && challengeRef.current) {
+      initWorld(challengeRef.current.seed);
+    } else if (DAILY_MAP && modeRef.current === "daily") {
       // Gün değiştiyse günlük kayıt sıfırlanır; harita o günün tohumuyla kurulur.
       const key = todayKey();
       if (dailyRef.current.date !== key) {
@@ -1203,6 +1539,242 @@ export default function Game() {
       initWorld();
     }
   }, [initWorld]);
+
+  restartRef.current = restart;
+
+  // HAYALET YARIŞ: başlat / hayaleti ilerlet / bitir.
+  const startRace = useCallback((opts: { seed?: number; ghost?: RaceData | null; oppName?: string; matchID?: string }) => {
+    challengeRef.current = null;
+    setChallenge(null);
+    if (respawnTimer.current) clearTimeout(respawnTimer.current);
+    const seed = opts.seed !== undefined ? opts.seed >>> 0 : ((Date.now() ^ Math.floor(Math.random() * 0xffffffff)) >>> 0);
+    raceRef.current = {
+      seed, startedAt: Date.now(), pausedAt: 0, pausedTotal: 0, ended: false, waiting: false,
+      far: 0, best: 0, runs: 0, log: [], ghost: opts.ghost ?? null, oppName: opts.oppName ?? "", matchID: opts.matchID,
+    };
+    ghostRef.current = { idx: 0, tower: TEST_START_TOWER, far: 0, falling: false };
+    cancelAnimation(gProg);
+    gMode.value = 0;
+    gFromId.value = TEST_START_TOWER;
+    gFromR.value = 0.5;
+    gProg.value = 0;
+    gOn.value = opts.ghost ? 1 : 0;
+    raceLive.value = 1;
+    setRaceResult(null);
+    setRaceOn(true);
+    restart();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [restart]);
+
+  const advanceGhost = useCallback(() => {
+    const rc = raceRef.current;
+    if (!rc || rc.ended || !rc.ghost) return;
+    const log = rc.ghost.log;
+    const g = ghostRef.current;
+    const now = raceElapsed(rc);
+    const fall = () => {
+      g.falling = true;
+      gMode.value = 2;
+      gProg.value = 0;
+      gProg.value = withTiming(1, { duration: 900, easing: Easing.in(Easing.quad) });
+    };
+    while (g.idx + 3 < log.length && log[g.idx] <= now) {
+      const t = log[g.idx], k = log[g.idx + 1], tw = log[g.idx + 2], r = log[g.idx + 3] / 1000;
+      const n = g.idx + 4 + 3 < log.length ? g.idx + 4 : -1;
+      if (k === EV_LAUNCH) {
+        const nk = n >= 0 ? log[n + 1] : -1;
+        const nt = n >= 0 ? log[n] : t + 600;
+        if (nk === EV_FALL) {
+          fall();
+        } else {
+          if (nk === EV_LAND) { gToId.value = log[n + 2]; gToR.value = log[n + 3] / 1000; }
+          else { gToId.value = gFromId.value; gToR.value = gFromR.value; } // aynı kulede küçük sıçrama
+          gMode.value = 1;
+          gProg.value = 0;
+          gProg.value = withTiming(1, { duration: Math.max(120, Math.min(nk === EV_LAND ? 2500 : 450, nt - t)), easing: Easing.linear });
+        }
+      } else if (k === EV_LAND) {
+        cancelAnimation(gProg);
+        gFromId.value = tw;
+        gFromR.value = r;
+        gMode.value = 0;
+        gProg.value = 0;
+        g.falling = false;
+        g.tower = tw;
+        g.far = Math.max(g.far, tw);
+      } else if (k === EV_FALL) {
+        if (!g.falling) fall();
+      } else if (k === EV_RESPAWN) {
+        cancelAnimation(gProg);
+        gFromId.value = TEST_START_TOWER;
+        gFromR.value = 0.5;
+        gMode.value = 0;
+        gProg.value = 0;
+        g.falling = false;
+        g.tower = TEST_START_TOWER;
+      }
+      g.idx += 4;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const endRace = useCallback(() => {
+    const rc = raceRef.current;
+    if (!rc || rc.ended) return;
+    rc.ended = true;
+    if (respawnTimer.current) clearTimeout(respawnTimer.current);
+    runOnUI(() => {
+      "worklet";
+      running.value = 0;
+      raceLive.value = 0;
+    })();
+    if (!rc.waiting) {
+      // süre bittiğinde süren koşu da sayılır
+      rc.far = Math.max(rc.far, lastTowerRef.current);
+      rc.best = Math.max(rc.best, scoreRef.current);
+      rc.runs += 1;
+    }
+    cancelAnimation(gProg);
+    gOn.value = 0;
+    const me: RaceSummary = { far: rc.far, best: rc.best, runs: rc.runs };
+    const opp: RaceSummary | null = rc.ghost ? { far: rc.ghost.far, best: rc.ghost.best, runs: rc.ghost.runs } : null;
+    const race = encodeRace(me, rc.log);
+    if (rc.matchID && opp) {
+      GameCenter.finishChallengeRace(rc.matchID, me.far, gcNameRef.current, race, compareRace(me, opp));
+    }
+    setStopBanner(null);
+    setBridgeStrip(null);
+    setArrivalCard(null);
+    if (KURUKAFA_ON) setSkullHud(null);
+    if (SFX_ON && FART_TRIAL) stopFart();
+    if (SFX_ON) playSfx("record");
+    if (Platform.OS !== "web") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+    setRaceOn(false);
+    setRaceResult({ me, opp, oppName: rc.oppName, seed: rc.seed, race });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const closeRace = useCallback(() => {
+    raceRef.current = null;
+    setRaceResult(null);
+    restart();
+  }, [restart]);
+
+  // Kullanıcı: "2 dakikalık oyundan çıkmak istediğimde çıkış yapamıyorum" -> yarıştan çık (sonuç gönderilmez).
+  const quitRace = useCallback(() => {
+    const rc = raceRef.current;
+    if (rc) rc.ended = true;
+    if (respawnTimer.current) clearTimeout(respawnTimer.current);
+    runOnUI(() => {
+      "worklet";
+      raceLive.value = 0;
+    })();
+    cancelAnimation(gProg);
+    gOn.value = 0;
+    setStopBanner(null);
+    setBridgeStrip(null);
+    setArrivalCard(null);
+    if (KURUKAFA_ON) setSkullHud(null);
+    if (SFX_ON && FART_TRIAL) stopFart();
+    setRaceOn(false);
+    closeRace();
+    setMenuOpen(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [closeRace]);
+
+  const askQuitRace = useCallback(() => {
+    const rc = raceRef.current;
+    if (!rc || rc.ended) return;
+    // Soru açıkken saat durur; "Devam et" ile kaldığı yerden sürer.
+    if (!rc.pausedAt) rc.pausedAt = Date.now();
+    const resume = () => {
+      const r = raceRef.current;
+      if (r && r.pausedAt) { r.pausedTotal += Date.now() - r.pausedAt; r.pausedAt = 0; }
+    };
+    Alert.alert(
+      "Yarıştan çıkılsın mı?",
+      rc.matchID ? "Yarış yarıda kalır, arkadaşına sonuç gitmez." : "Bu yarış sayılmaz.",
+      [
+        { text: "Devam et", style: "cancel", onPress: resume },
+        { text: "Çık", style: "destructive", onPress: quitRace },
+      ],
+      { cancelable: true, onDismiss: resume },
+    );
+  }, [quitRace]);
+
+  // Uygulama arka plandayken yarış saati durur.
+  useEffect(() => {
+    const sub = AppState.addEventListener("change", (st) => {
+      const rc = raceRef.current;
+      if (!rc || rc.ended) return;
+      if (st !== "active") {
+        if (!rc.pausedAt) rc.pausedAt = Date.now();
+      } else if (rc.pausedAt) {
+        rc.pausedTotal += Date.now() - rc.pausedAt;
+        rc.pausedAt = 0;
+      }
+    });
+    return () => sub.remove();
+  }, []);
+
+  // MEYDAN OKUMA: bu koşunun kodunu paylaş / kod gir / serbest oyuna dön.
+  const shareChallenge = useCallback(() => {
+    const code = makeCode(seedRef.current, scoreRef.current);
+    Share.share({ message: shareText(code, scoreRef.current, gcPlayer?.displayName ?? "") }).catch(() => {});
+  }, [gcPlayer]);
+  const startChallenge = useCallback(() => {
+    const parsed = parseCode(codeText);
+    if (!parsed) { setCodeError("Kod okunamadı. Örnek: 1K9Z0QX-37"); return; }
+    const c: Challenge = { seed: parsed.seed, target: parsed.target, from: "" };
+    challengeRef.current = c;
+    setChallenge(c);
+    setCodeOpen(false);
+    setCodeError("");
+    setCodeText("");
+    restart();
+  }, [codeText, restart]);
+  const playIncoming = useCallback((c: GameCenter.FriendChallenge) => {
+    const ghost = YARIS_ON ? decodeRace(c.race) : null;
+    if (ghost) {
+      setIncoming((list) => list.filter((x) => x.matchID !== c.matchID));
+      startRace({ seed: c.seed >>> 0, ghost, oppName: c.from, matchID: c.matchID });
+      return;
+    }
+    const ch: Challenge = { seed: c.seed >>> 0, target: c.score, from: c.from, matchID: c.matchID };
+    challengeRef.current = ch;
+    setChallenge(ch);
+    setIncoming((list) => list.filter((x) => x.matchID !== c.matchID));
+    restart();
+  }, [restart, startRace]);
+  // Kullanıcı: "meydan okumada direk arkadaş listesi açılmalı" -> kendi arkadaş listemiz.
+  const askChallenge = useCallback(async () => {
+    setFriendSheet(true);
+    setFriendsMsg("Arkadaşların yükleniyor…");
+    setFriends([]);
+    let p = gcPlayer;
+    if (!p?.authenticated) { p = await GameCenter.authenticate(); setGcPlayer(p); }
+    if (!p.authenticated) { setFriendsMsg("Arkadaşlarını görmek için Game Center'a gir."); return; }
+    const r = await GameCenter.loadFriends(LEADERBOARD_ID);
+    if (r.status !== "ok") { setFriendsMsg(r.status === "error" ? "Arkadaş listesi açılamadı. Ayarlar'dan Game Center arkadaş izni verilmiş mi?" : "Arkadaş listesi açılamadı."); return; }
+    setFriends(r.friends);
+    setFriendsMsg(r.friends.length ? null : "Game Center'da henüz arkadaşın yok. Kodu paylaşarak meydan okuyabilirsin.");
+  }, [gcPlayer]);
+  const sendToFriend = useCallback(async (f: GameCenter.GameCenterFriend) => {
+    setSendingTo(f.id);
+    const rr = sheetMode === "race" ? raceResult : null;
+    const r = rr
+      ? await GameCenter.challengePlayer(f.id, rr.seed, rr.me.far, gcNameRef.current, rr.race)
+      : await GameCenter.challengePlayer(f.id, seedRef.current, scoreRef.current, gcNameRef.current);
+    setSendingTo(null);
+    if (r.status === "sent") { setFriendSheet(false); showToast(rr ? `🏁 ${f.alias || f.name} yarışa çağrıldı!` : `⚔️ ${f.alias || f.name} kişisine meydan okundu!`); }
+    else showToast("Gönderilemedi: " + (r.message ?? ""));
+  }, [showToast, sheetMode, raceResult]);
+
+  const leaveChallenge = useCallback(() => {
+    challengeRef.current = null;
+    setChallenge(null);
+    restart();
+  }, [restart]);
 
   const switchMode = useCallback((next: "free" | "daily") => {
     modeRef.current = next;
@@ -1238,6 +1810,7 @@ export default function Game() {
       // a no-op tap while not IDLE.
       poseOverride.value = -1;
       if (running.value !== 1 || phase.value !== PHASE.IDLE) return;
+      if (doorLock.value === 1) return; // PİJAMA ANI: kapı animasyonu sürerken şarj başlamaz
       touchStartedAt.value = startedAt;
       charge.value = 0;
       firstChargeFrameSeen.value = 0;
@@ -1291,6 +1864,7 @@ export default function Game() {
         }
       }
       if (mode > 0) runOnJS(onSpecialLaunch)(mode);
+      if (raceLive.value === 1) runOnJS(onRaceLaunch)();
       // Defense in depth alongside onPressIn above: also clear right at
       // launch, so the pose is guaranteed to track real charge/idle for the
       // jump that is about to play out, regardless of anything set earlier.
@@ -1434,6 +2008,22 @@ export default function Game() {
     // GAZ trial clock: ticks only while a puff can still be on screen.
     if (FART_TRIAL && frame.timestamp - fartLastEmit.value < FART_LIFE + 300) fartNow.value = frame.timestamp;
 
+    // KURUKAFA: ileride alınmamış ilk kurukafayı göster.
+    if (KURUKAFA_ON) {
+      let found = 0;
+      for (let i = 0; i < list.length; i++) {
+        const q = list[i];
+        if (q.skull && q.id > lastLandedId.value && q.id !== skullTaken.value) {
+          skullX.value = q.skull.x;
+          skullY.value = q.skull.y;
+          skullOwner.value = q.id;
+          found = 1;
+          break;
+        }
+      }
+      skullVis.value = found;
+    }
+
     // --- airborne physics ---
     if (phase.value === PHASE.AIRBORNE) {
       const prevX = px.value;
@@ -1459,8 +2049,24 @@ export default function Game() {
       }
       const newBottom = py.value + PH / 2;
 
+      // KURUKAFA: uçarken değerse al (yalnız görüntü/etki; yörünge değişmez).
+      if (KURUKAFA_ON && skullVis.value === 1) {
+        // Amcanın çizilen gövdesi: ayak çizgisinden FART_CHAR_H yukarı, gövde genişliği kadar.
+        const feetY = py.value + PH / 2;
+        const bodyCx = px.value + SOLE_CENTER_OFFSET;
+        if (skullTouches(skullX.value, skullY.value, SKULL_SIZE * SKULL_HIT_R, bodyCx - CHAR_BODY_HALF_W, feetY - FART_CHAR_H, bodyCx + CHAR_BODY_HALF_W, feetY)) {
+          skullTaken.value = skullOwner.value;
+          skullVis.value = 0;
+          const fx = rollSkullEffect(runSeed.value, skullOwner.value);
+          effectK.value = fx.k;
+          effectLeft.value = fx.jumps;
+          runOnJS(onSkull)(fx.k, fx.jumps);
+        }
+      }
+
       if (vy.value > 0) {
-        const contact = findFootLanding(list, prevX, px.value, prevBottom, newBottom, CHARACTER_WIDTH * 0.8);
+        const landList = KURUKAFA_ON && effectLeft.value > 0 ? scaledPlatforms(list, effectK.value) : list;
+        const contact = findFootLanding(landList, prevX, px.value, prevBottom, newBottom, CHARACTER_WIDTH * 0.8);
         if (contact) {
           const p = list[contact.index];
           const cx = contact.x;
@@ -1522,7 +2128,47 @@ export default function Game() {
               burst.value = 0;
               burst.value = withTiming(1, { duration: 620 });
             }
-            runOnJS(onLanding)(perfect, towersCrossed, p.id);
+            // PİJAMA ANI: gecenin başladığı ilk iniş (Ortaköy). Yalnız çizim; fizik aynı.
+            if (PIJAMA_ON && DURAK_SEFER && pajama.value === 0 && stopsPassed(p.id - towersCrossed) < (PIJAMA_TEST_EARLY ? 1 : NIGHT_STOP) && stopsPassed(p.id) >= (PIJAMA_TEST_EARLY ? 1 : NIGHT_STOP)) {
+              // HAYALET YARIŞ: kullanıcı "pijama giymesi değiştirilmemeli, ikisi için de aynı süre geçecek" -> kapı anı yarışta da aynı.
+              doorLock.value = 1;
+              const doorCx = p.x + p.width / 2; // kapı kulenin ortasında
+              const dx = doorCx - px.value;
+              doorX.value = doorCx;
+              doorBottom.value = p.topY + DOOR_H * DOOR_SINK;
+              doorOpen.value = 0;
+              const M = DOOR_MS;
+              doorOp.value = withSequence(withTiming(1, { duration: M.appear }), withDelay(M.doorOut[0] - M.appear, withTiming(0, { duration: M.doorOut[1] - M.doorOut[0] })));
+              doorOpen.value = withDelay(M.open, withTiming(1, { duration: 80 }));
+              // 2 adımla kapıya, sonra 2 adımla indiği yere: x kayar, her adımda hafif sıçrama.
+              walkX.value = 0;
+              walkX.value = withSequence(
+                withDelay(M.walkIn[0], withTiming(dx, { duration: M.walkIn[1] - M.walkIn[0], easing: Easing.inOut(Easing.quad) })),
+                withDelay(M.walkOut[0] - M.walkIn[1], withTiming(0, { duration: M.walkOut[1] - M.walkOut[0], easing: Easing.inOut(Easing.quad) })),
+              );
+              const half = (M.walkIn[1] - M.walkIn[0]) / 4;
+              const halfOut = (M.walkOut[1] - M.walkOut[0]) / 4;
+              walkY.value = 0;
+              walkY.value = withSequence(
+                withDelay(M.walkIn[0], withTiming(-STEP_LIFT, { duration: half })), withTiming(0, { duration: half }),
+                withTiming(-STEP_LIFT, { duration: half }), withTiming(0, { duration: half }),
+                withDelay(M.walkOut[0] - M.walkIn[1], withTiming(-STEP_LIFT, { duration: halfOut })), withTiming(0, { duration: halfOut }),
+                withTiming(-STEP_LIFT, { duration: halfOut }), withTiming(0, { duration: halfOut }),
+              );
+              charOp.value = withSequence(
+                withDelay(M.charOut[0], withTiming(0, { duration: M.charOut[1] - M.charOut[0] })),
+                withDelay(M.charIn[0] - M.charOut[1], withTiming(1, { duration: M.charIn[1] - M.charIn[0] })),
+              );
+              pajama.value = withDelay(M.swap, withTiming(1, { duration: 0 }));
+              if (SPLAT_ON) dirty.value = withDelay(M.swap, withTiming(0, { duration: 0 })); // temiz pijama
+              doorLock.value = withDelay(M.unlock, withTiming(0, { duration: 0 }));
+            }
+            if (KURUKAFA_ON && effectLeft.value > 0) {
+              effectLeft.value -= 1;
+              if (effectLeft.value === 0) effectK.value = 1;
+              runOnJS(onSkullTick)(effectK.value, effectLeft.value);
+            }
+            runOnJS(onLanding)(perfect, towersCrossed, p.id, (cx - p.x) / p.width);
           }
         }
       }
@@ -1689,6 +2335,47 @@ export default function Game() {
   // compensation). poseOverride (declared above, near `charge`) >= 0 is a
   // __DEV__-only visual freeze; it never touches `charge`.
   const poseCharge = useDerivedValue(() => (poseOverride.value >= 0 ? poseOverride.value : charge.value));
+  // Soluk amca: tek görsel (duruş pozu), kutusu açık boyutlu (sıfır boyutlu kapsayıcıda görünmüyordu).
+  const GHOST_POSE = CHARGE_POSES[0];
+  const GHOST_SCALE = SPRITE_SCALE * GLOBAL_VISUAL_SCALE * CHAR_SIZE_TRIAL;
+  const GHOST_FEET_DX = SOLE_CENTER_OFFSET + ANCHOR_SHIFT_PX * SPRITE_SCALE;
+  // Aynı kulede dururken hayalet senin amcanın tam arkasında kalıp görünmüyordu: biraz geride durur.
+  const GHOST_SIDE = GHOST_POSE.w * GHOST_SCALE * 0.55;
+  // HAYALET YARIŞ: rakibin amcası kendi haritamızda, kule kimliği + kule üstündeki oranla konumlanır.
+  const ghostPos = useDerivedValue(() => {
+    if (gOn.value === 0) return { x: -99999, y: -99999, vis: 0 };
+    const list = platforms.value;
+    const a = platformById(list, gFromId.value);
+    if (!a) return { x: -99999, y: -99999, vis: 0 };
+    const ax = a.x + a.width * gFromR.value;
+    const ay = a.topY - PH / 2;
+    const t = gProg.value;
+    if (gMode.value === 1) {
+      const b = platformById(list, gToId.value);
+      if (!b) return { x: ax, y: ay, vis: 0 };
+      const bx = b.x + b.width * gToR.value;
+      const by = b.topY - PH / 2;
+      const arc = 90 + Math.abs(bx - ax) * 0.3;
+      return { x: ax + (bx - ax) * t, y: ay + (by - ay) * t - arc * 4 * t * (1 - t), vis: 1 };
+    }
+    if (gMode.value === 2) return { x: ax + 170 * t, y: ay - 140 * t + 1100 * t * t, vis: 1 - t };
+    const same = a.id === standingPlatformId.value && phase.value !== PHASE.AIRBORNE;
+    return { x: ax - (same ? GHOST_SIDE : 0), y: ay, vis: 1 };
+  });
+  const ghostBodyStyle = useAnimatedStyle(() => ({
+    opacity: ghostPos.value.vis * 0.5,
+    transform: [
+      { translateX: ghostPos.value.x + GHOST_FEET_DX - GHOST_POSE.pivotX * GHOST_SCALE },
+      { translateY: ghostPos.value.y + PH / 2 - GHOST_POSE.pivotY * GHOST_SCALE },
+    ],
+  }));
+  const ghostLabelStyle = useAnimatedStyle(() => ({
+    opacity: ghostPos.value.vis,
+    transform: [
+      { translateX: ghostPos.value.x + GHOST_FEET_DX - 110 },
+      { translateY: ghostPos.value.y + PH / 2 - GHOST_POSE.h * GHOST_SCALE - 70 },
+    ],
+  }));
 
   // GORSEL-018 sartname 5: one glow for the whole course, parked on the next
   // tower's cap only while charging; opacity follows the charge (non-layout).
@@ -1707,6 +2394,31 @@ export default function Game() {
       transform: [{ translateX: splatX.value }, { translateY: splatY.value }, { scale: 0.4 + k * 1.3 }],
     };
   });
+  const doorStyle = useAnimatedStyle(() => ({
+    opacity: doorOp.value,
+    transform: [{ translateX: doorX.value - DOOR_W / 2 }, { translateY: doorBottom.value - DOOR_H }],
+  }));
+  const doorOpenStyle = useAnimatedStyle(() => ({ opacity: doorOpen.value }));
+  const skullStyle = useAnimatedStyle(() => {
+    const a = skullBob.value * Math.PI * 2;
+    return {
+      opacity: skullVis.value,
+      transform: [
+        { translateX: skullX.value - SKULL_SIZE / 2 },
+        { translateY: skullY.value - SKULL_SIZE / 2 + Math.sin(a) * 5 },
+        { rotate: `${Math.sin(a) * 8}deg` },
+      ],
+    };
+  });
+  const charOpStyle = useAnimatedStyle(() => ({ opacity: charOp.value }));
+  // KURUKAFA: etki sürerken amcanın başının üstünde rozet (kullanıcı: "aktif olduğunda yazı/emoji/ibare olmalı").
+  const skullBadgeStyle = useAnimatedStyle(() => ({
+    opacity: KURUKAFA_ON && effectLeft.value > 0 ? 1 : 0,
+    transform: [
+      { translateX: px.value + SOLE_CENTER_OFFSET - SKULL_BADGE_W / 2 },
+      { translateY: py.value + PH / 2 - FART_CHAR_H - SKULL_BADGE_H - 8 + Math.sin(skullBob.value * Math.PI * 2) * 3 },
+    ],
+  }));
   const fliesStyle = useAnimatedStyle(() => ({
     opacity: dirty.value,
     transform: [{ translateX: px.value + FART_FEET_DX }, { translateY: py.value + PH / 2 - FART_CHAR_H * 0.98 }],
@@ -2203,6 +2915,15 @@ export default function Game() {
             <View style={styles.puPageFold} />
           </Animated.View>
         )}
+        {/* PİJAMA ANI: kapı evlerin arkasında, alt kısmı çatı tepesinin altında kalır. */}
+        {PIJAMA_ON && (
+          <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, width: DOOR_W, height: DOOR_H }, doorStyle]}>
+            <Image source={DOOR_CLOSED_SOURCE} resizeMode="stretch" fadeDuration={0} style={{ position: "absolute", left: 0, top: 0, width: "100%", height: "100%" }} />
+            <Animated.View style={[{ position: "absolute", left: 0, top: 0, right: 0, bottom: 0 }, doorOpenStyle]}>
+              <Image source={DOOR_OPEN_SOURCE} resizeMode="stretch" fadeDuration={0} style={{ width: "100%", height: "100%" }} />
+            </Animated.View>
+          </Animated.View>
+        )}
         {!USE_FIXED_PANEL_COURSE && POOL_IDX.map((i) => (POPUP
           ? <PopupHouseView key={`pu-house-${i}`} index={i} platforms={platforms} styles={styles} />
           : <PlatformHouseView key={`house-${i}`} index={i} platforms={HOUSE_AB_FROZEN ? housePlatformsFrozen : platforms} styles={styles} probe={houseProbe} />
@@ -2218,6 +2939,7 @@ export default function Game() {
             onArtLoad={markArtLoaded}
             onArtStart={markArtStarted}
             onArtError={failArt}
+            effectK={KURUKAFA_ON ? effectK : undefined}
           />
         ))}
         {HEDEF_PARILTI && (
@@ -2278,7 +3000,37 @@ export default function Game() {
             ))}
           </Animated.View>
         )}
+        {KURUKAFA_ON && (
+          <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, width: SKULL_SIZE, height: SKULL_SIZE }, skullStyle]}>
+            <Image source={SKULL_SOURCE} resizeMode="stretch" fadeDuration={0} style={{ width: "100%", height: "100%" }} />
+          </Animated.View>
+        )}
+        {KURUKAFA_ON && (
+          <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, width: SKULL_BADGE_W, height: SKULL_BADGE_H, alignItems: "center", justifyContent: "center" }, skullBadgeStyle]}>
+            {skullHud && (
+              <View style={[styles.skullBadge, skullHud.k > 1 ? styles.skullChipUp : styles.skullChipDown]}>
+                <Text style={styles.skullBadgeText}>{skullHud.k > 1 ? "⬅️➡️" : "➡️⬅️"} {skullHud.left}</Text>
+              </View>
+            )}
+          </Animated.View>
+        )}
+        {YARIS_ON && raceOn && raceRef.current?.ghost && (
+          <>
+            <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, width: GHOST_POSE.w * GHOST_SCALE, height: GHOST_POSE.h * GHOST_SCALE }, ghostBodyStyle]}>
+              <CachedImage source={GHOST_POSE.source} cachePolicy="memory-disk" transition={0} contentFit="fill" style={{ width: "100%", height: "100%" }} />
+            </Animated.View>
+            <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, width: 220, alignItems: "center" }, ghostLabelStyle]}>
+              <View style={{ paddingHorizontal: 14, paddingVertical: 4, borderRadius: 18, backgroundColor: "rgba(60,40,120,0.75)" }}>
+                <Text style={{ color: "#fff", fontSize: 28, fontWeight: "800" }} numberOfLines={1}>👻 {raceRef.current.oppName || "Rakip"}</Text>
+              </View>
+            </Animated.View>
+          </>
+        )}
+        <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0 }, charOpStyle]}>
         <ChargePoses
+          pajama={PIJAMA_ON ? pajama : undefined}
+          offsetX={PIJAMA_ON ? walkX : undefined}
+          offsetY={PIJAMA_ON ? walkY : undefined}
           px={px}
           py={py}
           poseCharge={poseCharge}
@@ -2299,6 +3051,7 @@ export default function Game() {
           onLoad={() => { poseLoads.current += 1; if (poseLoads.current >= CHARGE_POSES.length) markArtLoaded("character"); }}
           onError={failArt}
         />
+        </Animated.View>
 
       </Animated.View>
 
@@ -2314,7 +3067,7 @@ export default function Game() {
       <View
         testID="charge-surface"
         style={styles.touch}
-        onStartShouldSetResponder={() => !gameOver && assetsReady}
+        onStartShouldSetResponder={() => !gameOver && assetsReady && !menuOpen}
         onResponderGrant={onPressIn}
         onResponderRelease={onPressOut}
         onResponderTerminate={cancelCharge}
@@ -2335,21 +3088,40 @@ export default function Game() {
           testID="sfx-toggle"
           accessibilityRole="button"
           accessibilityLabel={sfxMuted ? "Sesi aç" : "Sesi kapat"}
-          onPress={toggleSfx}
+          onPress={() => { toggleSfx(); showToast(sfxMuted ? "Ses açık" : "Ses kapalı"); }}
           hitSlop={12}
-          style={[styles.sfxBtn, { top: insets.top + 30 }]}
+          style={({ pressed }) => [styles.sfxBtn, sfxMuted && styles.sfxBtnMuted, { top: insets.top + 30 }, pressed && styles.playBtnPressed]}
         >
-          <Text style={styles.sfxBtnText}>{sfxMuted ? "🔇" : "🔊"}</Text>
+          {/* Kullanıcı: "belirsiz" + "o simgeyi değiştirelim" -> iOS hoparlör simgesi; dokununca kısa yazı. */}
+          <Ico name={sfxMuted ? "speaker.slash.fill" : "speaker.wave.2.fill"} size={18} color="#fff8ec" />
+        </Pressable>
+      )}
+      {YARIS_ON && raceOn && (
+        <Pressable
+          testID="race-quit"
+          accessibilityRole="button"
+          accessibilityLabel="Yarıştan çık"
+          onPress={askQuitRace}
+          hitSlop={12}
+          style={({ pressed }) => [styles.sfxBtn, { right: undefined, left: 14, top: insets.top + 30 }, pressed && styles.playBtnPressed]}
+        >
+          <Ico name="xmark" size={18} color="#fff8ec" />
         </Pressable>
       )}
       {/* Score HUD */}
-      {!gameOver && assetsReady && <View style={[styles.hud, { top: insets.top + 24 }]}>
+      {!gameOver && assetsReady && !menuOpen && !raceResult && <View style={[styles.hud, { top: insets.top + 24 }]}>
         <Text style={[styles.scoreText, POPUP && styles.puScoreText]} testID="score-value">
           {score}
         </Text>
         <Text style={[styles.bestText, POPUP && styles.puBestText]} testID="best-value">
           {FAZ1_UI ? (mode === "daily" ? "GÜNÜN REKORU" : "REKOR") : "BEST"} {best}
         </Text>
+        {MEYDAN_ON && challenge && <Text style={styles.challengeChip}>⚔️ Hedef {challenge.target}</Text>}
+        {KURUKAFA_ON && skullHud && (
+          <Text style={[styles.skullChip, skullHud.k > 1 ? styles.skullChipUp : styles.skullChipDown]} testID="skull-hud">
+            💀 {skullHud.k > 1 ? "GENİŞ kuleler" : "DAR kuleler"} %{Math.round(Math.abs(skullHud.k - 1) * 100)} · {skullHud.left} zıplama
+          </Text>
+        )}
         {DAILY_MAP && mode === "daily" && score > 0 && <Text style={styles.dailyChip}>📅 Günün haritası · {todayLabel()}</Text>}
       </View>}
 
@@ -2386,7 +3158,7 @@ export default function Game() {
         </View>
       )}
       {/* Hint (only before first jump) */}
-      {score === 0 && !gameOver && assetsReady && (
+      {score === 0 && !gameOver && assetsReady && !raceOn && !menuOpen && !raceResult && (
         <View style={styles.hint}>
           {FAZ1_UI ? (
             <View style={styles.hintPill}>
@@ -2406,6 +3178,34 @@ export default function Game() {
             {stopBanner.sub !== "" && <Text style={[styles.stopSignSub, stopBanner.pier && styles.stopSignSubPier]}>{stopBanner.sub}</Text>}
           </View>
         </Animated.View>
+      )}
+      {toast && (
+        <Animated.View entering={FadeIn.duration(200)} exiting={FadeOut.duration(300)} pointerEvents="none" style={[styles.toastWrap, { top: insets.top + 64 }]}>
+          <Text style={styles.toastText}>{toast}</Text>
+        </Animated.View>
+      )}
+      {POSTCARDS_ON && arrivalCard !== null && POSTCARDS[arrivalCard - 1] && !gameOver && (
+        <Animated.View key={`arr-${arrivalCard}`} entering={FadeIn.duration(220)} exiting={FadeOut.duration(300)} pointerEvents="none"
+          style={[styles.arrivalCard, { top: insets.top + 96 }]}>
+          <View style={styles.arrivalImg}>
+            <CachedImage source={POSTCARDS[arrivalCard - 1].source} style={{ position: "absolute", left: 0, top: 0, width: "100%", height: "100%" }} contentFit="fill" transition={0} cachePolicy="memory-disk" />
+          </View>
+          <Text style={styles.arrivalText}>📮 {POSTCARDS[arrivalCard - 1].name}</Text>
+        </Animated.View>
+      )}
+      {DURAK_SEFER && bridgeStrip && !gameOver && (
+        <View pointerEvents="none" style={[styles.bridgeWrap, { top: insets.top + 176 }]} testID="bridge-strip">
+          <View style={styles.bridgePill}>
+            <Text style={styles.bridgeName}>🌉 {bridgeStrip.name}</Text>
+            <View style={styles.bridgeRow}>
+              <Text style={styles.bridgeSide}>{bridgeStrip.from}</Text>
+              <View style={styles.bridgeTrack}>
+                <View style={[styles.bridgeFill, { width: `${Math.round(bridgeStrip.progress * 100)}%` }]} />
+              </View>
+              <Text style={styles.bridgeSide}>{bridgeStrip.to}</Text>
+            </View>
+          </View>
+        </View>
       )}
       {DURAK_SEFER && pierFx > 0 && !gameOver && <PierConfetti key={`pier-${pierFx}`} W={W} H={H} onDone={() => setPierFx(0)} />}
       {/* PERFECT! popup */}
@@ -2434,72 +3234,325 @@ export default function Game() {
         </View>
       )}
 
-      {/* Game Over */}
+      {/* Game Over — KARTPOSTAL (2026-11-16) */}
       {gameOver && FAZ1_UI && (
         <View style={styles.overlay} testID="game-over-overlay">
-          <View style={styles.trCard}>
-            <View style={styles.kilimRow}>
-              {KILIM_DOTS.map((c, i) => <View key={i} style={[styles.kilimDot, { backgroundColor: c }]} />)}
-            </View>
-            <Text style={styles.statLabel}>{DAILY_MAP && mode === "daily" ? `GÜNÜN HARİTASI · ${todayLabel()}` : "SKOR"}</Text>
-            <Text style={styles.trScore} testID="final-score">
-              {score}
-            </Text>
-            {goInfo.newRecord ? (
-              <View style={styles.recordBadge}><Text style={styles.recordBadgeText}>YENİ REKOR!</Text></View>
-            ) : (
-              <Text style={styles.trBest} testID="final-best">
-                Rekor {best}{best - score > 0 ? ` · ${best - score} puan kaldı` : best === score && score > 0 ? " · rekora eşitledin" : ""}
-              </Text>
-            )}
-            {DURAK_SEFER && (
-              <View style={styles.stopCardBox} testID="stop-summary">
-                <Text style={styles.stopCardMain}>{runEnd.stops > 0 ? `En uzak durak: ${stopName(runEnd.stops)}` : "Henüz durağa varmadın"}</Text>
-                <Text style={styles.stopCardSub}>{nextStopLine(runEnd.lastTower)}</Text>
+          <Animated.View entering={FadeInDown.duration(380)} style={styles.pcWrap}>
+            <View style={styles.pcTilt}>
+            <View style={styles.pcCard}>
+              <View style={styles.pcAirmail}>
+                {Array.from({ length: 18 }).map((_, k) => <View key={k} style={[styles.pcStripe, { backgroundColor: k % 2 ? "#1f4e79" : "#c0472b" }]} />)}
+              </View>
+              <View style={styles.pcInner}>
+                <Text style={styles.pcGreeting} numberOfLines={1} adjustsFontSizeToFit>İstanbul'dan selamlar</Text>
+                <Text style={styles.pcLabel}>{DAILY_MAP && mode === "daily" ? `GÜNÜN HARİTASI · ${todayLabel()}` : "SKOR"}</Text>
+                <CountUp to={score} style={styles.pcScore} />
+                <Text style={styles.pcBest} testID="final-best">
+                  {goInfo.newRecord
+                    ? `Önceki rekor ${goInfo.prevBest}`
+                    : `Rekor ${best}${best - score > 0 ? ` · ${best - score} puan kaldı` : best === score && score > 0 ? " · rekora eşitledin" : ""}`}
+                </Text>
+            {MEYDAN_ON && challenge ? (
+              <View style={[styles.goInfoPill, score > challenge.target ? styles.challengeWin : styles.challengeLose]} testID="challenge-result">
+                <Text style={styles.goInfoMain}>
+                  {score > challenge.target ? `⚔️ Geçtin! ${score} > ${challenge.target} 🎉` : score === challenge.target ? `⚔️ Berabere: ${score}` : `⚔️ Hedef ${challenge.target} · ${challenge.target - score} puan eksik`}
+                </Text>
+              </View>
+            ) : DURAK_SEFER ? (
+              <View style={styles.pcLine} testID="stop-summary">
+                <Text style={styles.pcHand} numberOfLines={1} adjustsFontSizeToFit>
+                  📍 {runEnd.stops > 0 ? `${stopName(runEnd.stops)} · ` : ""}{nextStopLine(runEnd.lastTower)}
+                </Text>
                 {POSTCARDS_ON && runNewCards.length > 0 && (
-                  <Text style={styles.stopCardNew}>📮 Yeni kartpostal: {runNewCards.map((k) => POSTCARDS[k - 1]?.name).join(", ")}</Text>
+                  <Text style={styles.goInfoNew}>📮 Yeni kartpostal: {runNewCards.map((k) => POSTCARDS[k - 1]?.name).join(", ")}</Text>
                 )}
               </View>
+            ) : null}
+            {MEYDAN_ON && incoming.length > 0 && (
+              <Pressable style={({ pressed }) => [styles.friendPill, pressed && styles.playBtnPressed]} onPress={() => playIncoming(incoming[0])} testID="incoming-challenge">
+                <Text style={styles.friendPillText}>{incoming[0].race ? `🏁 ${incoming[0].from || "Bir arkadaşın"} seni 2 dk yarışa çağırdı: ${incoming[0].score}. kule` : `⚔️ ${incoming[0].from || "Bir arkadaşın"} sana meydan okudu: ${incoming[0].score} puan`}</Text>
+                <Text style={styles.friendPillGo}>Oyna ›</Text>
+              </Pressable>
+            )}
+            {MEYDAN_ON && friendResults.length > 0 && (
+              <Pressable
+                style={({ pressed }) => [styles.goInfoPill, raceOutcome(friendResults[0]) < 0 ? styles.challengeLose : styles.challengeWin, pressed && styles.playBtnPressed]}
+                onPress={() => { GameCenter.removeChallenge(friendResults[0].matchID); setFriendResults((l) => l.slice(1)); }}
+                testID="friend-result"
+              >
+                <Text style={styles.goInfoMain}>
+                  {friendResults[0].race
+                    ? `🏁 ${friendResults[0].replier || "Arkadaşın"} yarışını oynadı: ${friendResults[0].reply ?? 0}. kule (sen ${friendResults[0].score}) — ${raceOutcome(friendResults[0]) < 0 ? "seni geçti!" : raceOutcome(friendResults[0]) === 0 ? "berabere" : "geçemedi 🎉"}`
+                    : `⚔️ ${friendResults[0].replier || "Arkadaşın"} senin ${friendResults[0].score} puanını oynadı: ${friendResults[0].reply ?? 0} — ${(friendResults[0].reply ?? 0) > friendResults[0].score ? "seni geçti!" : (friendResults[0].reply ?? 0) === friendResults[0].score ? "berabere" : "geçemedi 🎉"}`}
+                </Text>
+                <Text style={styles.goInfoNew}>tamam ✓</Text>
+              </Pressable>
             )}
             {QUIP_ON && <View style={styles.bubble}>
               <Text style={styles.bubbleText} testID="game-over-line">{quip}</Text>
               <View style={styles.bubbleTail} />
             </View>}
-            <Pressable
-              testID="play-again-button"
-              style={({ pressed }) => [styles.trPlayBtn, pressed && styles.playBtnPressed]}
-              onPress={restart}
-            >
-              <Text style={styles.playBtnText}>Bir daha</Text>
+                <Pressable
+                  testID="play-again-button"
+                  style={({ pressed }) => [styles.trPlayBtn, styles.pcTicket, { marginTop: 12 }, pressed && styles.playBtnPressed]}
+                  onPress={restart}
+                >
+                  <View pointerEvents="none" style={[styles.pcNotch, { left: -9 }]} /><View pointerEvents="none" style={[styles.pcNotch, { right: -9 }]} />
+                  <Text style={styles.playBtnText}>{MEYDAN_ON && challenge ? "Aynı haritada tekrar" : "Bir daha"}</Text>
+                </Pressable>
+                {MEYDAN_ON && challenge && (
+                  <Pressable onPress={leaveChallenge} hitSlop={8}>
+                    <Text style={styles.goLink}>Serbest oyuna dön</Text>
+                  </Pressable>
+                )}
+                <View style={styles.pcIconRow}>
+                  {MEYDAN_ON && (
+                    <Pressable testID="challenge-share" style={({ pressed }) => [styles.pcIconBtn, pressed && styles.playBtnPressed]} onPress={() => { setSheetMode("score"); askChallenge(); }}>
+                      <View style={styles.pcIconCircle}><Ico name="flag.2.crossed.fill" size={22} color="#c0472b" /></View>
+                      <Text style={styles.pcIconLabel}>Meydan oku</Text>
+                    </Pressable>
+                  )}
+                  {YARIS_ON && (
+                    <Pressable testID="race-start" style={({ pressed }) => [styles.pcIconBtn, pressed && styles.playBtnPressed]} onPress={() => startRace({})}>
+                      <View style={styles.pcIconCircle}><Ico name="flag.checkered" size={22} color="#1f4e79" /></View>
+                      <Text style={styles.pcIconLabel}>2 dk yarış</Text>
+                    </Pressable>
+                  )}
+                  {GAME_CENTER_ON && GameCenter.gameCenterAvailable && (
+                    <Pressable testID="leaderboard-button" style={({ pressed }) => [styles.pcIconBtn, pressed && styles.playBtnPressed]} onPress={openLeaderboard}>
+                      <View style={styles.pcIconCircle}><Ico name="trophy.fill" size={22} color="#b8862b" /></View>
+                      <Text style={styles.pcIconLabel}>Sıralama</Text>
+                    </Pressable>
+                  )}
+                </View>
+                {MENU_ON && (
+                  <Pressable onPress={() => { restart(); setMenuOpen(true); }} hitSlop={8} testID="go-menu" style={styles.linkRow}>
+                    <Ico name="house.fill" size={14} color="#c0472b" />
+                    <Text style={[styles.goLink, { marginTop: 0 }]}>Ana menü</Text>
+                  </Pressable>
+                )}
+              </View>
+            </View>
+            {/* Pul: mevcut Galata kartpostalı */}
+            <View pointerEvents="none" style={styles.pcStamp}>
+              <CachedImage source={PC_STAMP} contentFit="cover" style={{ width: "100%", height: "100%" }} />
+            </View>
+            {/* Amcanın ifadeli kafası, çıkartma */}
+            <View pointerEvents="none" style={styles.pcSticker}>
+              <CachedImage
+                source={goInfo.newRecord ? PC_STICKER.rec : score === 0 || score < best * 0.3 ? PC_STICKER.low : PC_STICKER.mid}
+                contentFit="fill"
+                style={{ position: "absolute", width: 100, height: 100 * 1103 / 516, left: -8, top: -6 }}
+              />
+            </View>
+            {goInfo.newRecord && <Postmark delay={countUpMs(score)} styles={styles} />}
+            </View>
+          </Animated.View>
+        </View>
+      )}
+      {MENU_ON && menuOpen && assetsReady && !gameOver && (
+        <View style={[styles.menuOverlay, { paddingTop: insets.top + 46 }]} testID="start-menu">
+          {/* TASARIM 2026-11-16: başlık gökyüzünde, kart küçük; amca ve kuleler aşağıda görünür kalır. */}
+          <Text style={styles.menuTitle}>BYZANTION</Text>
+          <Text style={styles.menuSub}>Amcayla İstanbul çatılarında</Text>
+          {BUILD_TAG !== "" && <Text style={styles.menuTag}>{BUILD_TAG}</Text>}
+          {/* KARTPOSTAL MENÜ (2026-11-16): oyun sonuyla aynı dil — hava postası şeridi, pul, bilet "Oyna". */}
+          <Animated.View entering={FadeInDown.duration(380)} style={styles.pcWrap}>
+            <View style={styles.pcTiltR}>
+              <View style={styles.pcCard}>
+                <View style={styles.pcAirmail}>
+                  {Array.from({ length: 18 }).map((_, k) => <View key={k} style={[styles.pcStripe, { backgroundColor: k % 2 ? "#1f4e79" : "#c0472b" }]} />)}
+                </View>
+                <View style={[styles.pcInner, { paddingTop: 10, paddingBottom: 8 }]}>
+                  <Text style={[styles.pcHand, styles.pcMenuNote]} numberOfLines={1} adjustsFontSizeToFit>Sevgili amca, bugün hangi durağa?</Text>
+                  {best > 0 && <Text style={[styles.pcBest, styles.pcMenuNote, { marginBottom: 0 }]}>Rekor {best}</Text>}
+                  {MEYDAN_ON && incoming.length > 0 && (
+                    <Pressable style={({ pressed }) => [styles.friendPill, pressed && styles.playBtnPressed]} onPress={() => playIncoming(incoming[0])} testID="menu-incoming">
+                      <Text style={styles.friendPillText}>{incoming[0].race ? `${incoming[0].from || "Bir arkadaşın"} seni 2 dk yarışa çağırdı: ${incoming[0].score}. kule` : `${incoming[0].from || "Bir arkadaşın"} sana meydan okudu: ${incoming[0].score} puan`}</Text>
+                      <Text style={styles.friendPillGo}>Oyna ›</Text>
+                    </Pressable>
+                  )}
+                  <Pressable testID="menu-play" style={({ pressed }) => [styles.trPlayBtn, styles.iconBtn, styles.pcTicket, { marginTop: 8 }, pressed && styles.playBtnPressed]} onPress={() => setMenuOpen(false)}>
+                    <View pointerEvents="none" style={[styles.pcNotch, { left: -9 }]} /><View pointerEvents="none" style={[styles.pcNotch, { right: -9 }]} />
+                    <Ico name="play.fill" size={20} color="#fff8ec" />
+                    <Text style={styles.playBtnText}>Oyna</Text>
+                  </Pressable>
+                  {YARIS_ON && (
+                    <Pressable testID="menu-race" style={({ pressed }) => [styles.modeBtn, styles.iconBtn, pressed && styles.playBtnPressed]} onPress={() => startRace({})}>
+                      <Ico name="flag.checkered" size={18} color="#1f4e79" />
+                      <Text style={[styles.modeBtnText, { color: "#1f4e79" }]}>2 dk yarış</Text>
+                    </Pressable>
+                  )}
+                  <View style={[styles.pcIconRow, { marginTop: 10 }]}>
+                    {MEYDAN_ON && (
+                      <Pressable testID="menu-code" style={({ pressed }) => [styles.pcIconBtn, pressed && styles.playBtnPressed]} onPress={() => { setCodeError(""); setCodeOpen(true); }}>
+                        <View style={[styles.pcIconCircle, styles.pcIconCircleSm]}><Ico name="key.fill" size={22} color="#6e4632" /></View>
+                        <Text style={styles.pcIconLabel}>Kod gir</Text>
+                      </Pressable>
+                    )}
+                    {GAME_CENTER_ON && GameCenter.gameCenterAvailable && (
+                      <Pressable testID="menu-leaderboard" style={({ pressed }) => [styles.pcIconBtn, pressed && styles.playBtnPressed]} onPress={openLeaderboard}>
+                        <View style={[styles.pcIconCircle, styles.pcIconCircleSm]}><Ico name="trophy.fill" size={22} color="#b8862b" /></View>
+                        <Text style={styles.pcIconLabel}>Sıralama</Text>
+                      </Pressable>
+                    )}
+                    {POSTCARDS_ON && (
+                      <Pressable testID="menu-album" style={({ pressed }) => [styles.pcIconBtn, pressed && styles.playBtnPressed]} onPress={() => setAlbumOpen(true)}>
+                        <View style={[styles.pcIconCircle, styles.pcIconCircleSm]}><Ico name="envelope.fill" size={22} color="#c0472b" /></View>
+                        <Text style={styles.pcIconLabel}>Kartpostal {unlocked.length}/{POSTCARDS.length}</Text>
+                      </Pressable>
+                    )}
+                  </View>
+                </View>
+              </View>
+              <View pointerEvents="none" style={styles.pcStamp}>
+                <CachedImage source={PC_STAMP} contentFit="cover" style={{ width: "100%", height: "100%" }} />
+              </View>
+            </View>
+          </Animated.View>
+        </View>
+      )}
+      {YARIS_ON && raceOn && (
+        <RaceHud raceRef={raceRef} ghostRef={ghostRef} towerRef={lastTowerRef} tick={advanceGhost} onTimeUp={endRace} bottom={insets.bottom + 14} />
+      )}
+      {YARIS_ON && raceResult && (
+        <View style={styles.overlay} testID="race-result">
+          {/* KARTPOSTAL YARIŞ SONU (2026-11-16): iki küçük kartpostal, kazanana damga. */}
+          <Animated.View entering={FadeInDown.duration(380)} style={styles.pcWrap}>
+            <View style={styles.pcTilt}>
+              <View style={styles.pcCard}>
+                <View style={styles.pcAirmail}>
+                  {Array.from({ length: 18 }).map((_, k) => <View key={k} style={[styles.pcStripe, { backgroundColor: k % 2 ? "#1f4e79" : "#c0472b" }]} />)}
+                </View>
+                <View style={styles.pcInner}>
+                  {(() => {
+                    const { me, opp, oppName } = raceResult;
+                    const out = opp ? compareRace(me, opp) : 0;
+                    const title = !opp ? "Yarış bitti" : out > 0 ? "Kazandın!" : out < 0 ? `${oppName || "Rakip"} kazandı` : "Berabere";
+                    const color = !opp ? "#2a1b12" : out > 0 ? "#2f7d32" : out < 0 ? "#c0472b" : "#6e4632";
+                    const mini = (who: string, r: RaceSummary, win: boolean, ghost: boolean, tilt: string) => (
+                      <View style={[styles.pcMini, { transform: [{ rotate: tilt }] }, ghost && { opacity: 0.8 }]}>
+                        <Text style={styles.pcMiniWho} numberOfLines={1}>{ghost ? "👻 " : ""}{who}</Text>
+                        <Text style={styles.pcMiniBig} numberOfLines={1} adjustsFontSizeToFit>{r.far}. kule</Text>
+                        <Text style={styles.pcMiniSmall}>en iyi {r.best} puan</Text>
+                        <Text style={styles.pcMiniSmall}>{r.runs} deneme</Text>
+                        {win && <Postmark delay={250} styles={styles} label="KAZANDI" small />}
+                      </View>
+                    );
+                    return (
+                      <>
+                        <Text style={styles.pcGreetingC} numberOfLines={1} adjustsFontSizeToFit>2 dakikalık sefer</Text>
+                        <Text style={[styles.pcVerdict, { color }]} numberOfLines={1} adjustsFontSizeToFit>{title}</Text>
+                        {!opp && <Text style={[styles.pcHand, { fontSize: 16 }]}>Arkadaşına gönder, hayaletinle yarışsın</Text>}
+                        <View style={styles.pcMiniRow}>
+                          {mini("Sen", me, !!opp && out > 0, false, "-3deg")}
+                          {opp && mini(oppName || "Rakip", opp, out < 0, true, "3deg")}
+                        </View>
+                        <Text style={styles.raceNote}>Kazanan: tek koşuda en uzak kule · eşitlikte en iyi puan</Text>
+                      </>
+                    );
+                  })()}
+                  {MEYDAN_ON && (
+                    <Pressable style={({ pressed }) => [styles.trPlayBtn, styles.iconBtn, styles.pcTicket, { marginTop: 12 }, pressed && styles.playBtnPressed]} onPress={() => { setSheetMode("race"); askChallenge(); }} testID="race-send">
+                      <View pointerEvents="none" style={[styles.pcNotch, { left: -9 }]} /><View pointerEvents="none" style={[styles.pcNotch, { right: -9 }]} />
+                      <Ico name="paperplane.fill" size={18} color="#fff8ec" />
+                      <Text style={styles.playBtnText}>Arkadaşına gönder</Text>
+                    </Pressable>
+                  )}
+                  <View style={styles.pcIconRow}>
+                    <Pressable style={({ pressed }) => [styles.pcIconBtn, pressed && styles.playBtnPressed]} onPress={() => startRace({ seed: raceResult.seed, ghost: decodeRace(raceResult.race), oppName: "Önceki sen" })} testID="race-self-ghost">
+                      <View style={styles.pcIconCircle}><Ico name="arrow.counterclockwise" size={22} color="#6e4632" /></View>
+                      <Text style={styles.pcIconLabel}>Hayaletinle tekrar</Text>
+                    </Pressable>
+                    <Pressable style={({ pressed }) => [styles.pcIconBtn, pressed && styles.playBtnPressed]} onPress={() => startRace({})} testID="race-new">
+                      <View style={styles.pcIconCircle}><Ico name="flag.checkered" size={22} color="#1f4e79" /></View>
+                      <Text style={styles.pcIconLabel}>Yeni yarış</Text>
+                    </Pressable>
+                  </View>
+                  <Pressable onPress={() => { closeRace(); setMenuOpen(true); }} hitSlop={8} testID="race-close" style={styles.linkRow}>
+                    <Ico name="house.fill" size={14} color="#c0472b" />
+                    <Text style={[styles.goLink, { marginTop: 0 }]}>Ana menü</Text>
+                  </Pressable>
+                </View>
+              </View>
+              <View pointerEvents="none" style={styles.pcStamp}>
+                <CachedImage source={PC_STAMP} contentFit="cover" style={{ width: "100%", height: "100%" }} />
+              </View>
+            </View>
+          </Animated.View>
+        </View>
+      )}
+      {MEYDAN_ON && friendSheet && (
+        <View style={styles.albumOverlay} testID="friend-sheet">
+          <View style={styles.albumCard}>
+            <Text style={styles.albumTitle}>Kime meydan okuyalım?</Text>
+            <Text style={styles.albumSub}>{sheetMode === "race" && raceResult ? `2 dk yarışını (${raceResult.me.far}. kule) ve hayaletini gönder` : `${score} puanını ve bu haritayı gönder`}</Text>
+            <ScrollView style={{ maxHeight: 360, marginTop: 8 }}>
+              {friendsMsg && <Text style={styles.friendMsg}>{friendsMsg}</Text>}
+              {friends.map((f) => (
+                <Pressable key={f.id} disabled={sendingTo !== null} style={({ pressed }) => [styles.friendRow, pressed && styles.playBtnPressed]} onPress={() => sendToFriend(f)}>
+                  <View style={styles.friendAvatar}><Text style={styles.friendAvatarText}>{(f.alias || f.name || "?").slice(0, 1).toUpperCase()}</Text></View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.friendName} numberOfLines={1}>{f.alias || f.name}</Text>
+                    {f.score != null && <Text style={styles.friendScore}>🏆 En yüksek: {f.score} puan</Text>}
+                  </View>
+                  <Text style={styles.friendGo}>{sendingTo === f.id ? "…" : "Gönder ›"}</Text>
+                </Pressable>
+              ))}
+            </ScrollView>
+            {sheetMode === "score" && (
+              <View style={styles.goCodeRow} testID="challenge-code-show">
+                <Text style={styles.goCodeLabel}>Harita kodu</Text>
+                <Text style={styles.goCodeValue} selectable>{makeCode(seedRef.current, score)}</Text>
+                <Pressable
+                  testID="copy-code"
+                  hitSlop={10}
+                  style={({ pressed }) => [styles.goCopyBtn, pressed && styles.playBtnPressed]}
+                  onPress={() => {
+                    const ok = GameCenter.copyText(makeCode(seedRef.current, score));
+                    setCopied(ok);
+                    if (copiedTimer.current) clearTimeout(copiedTimer.current);
+                    copiedTimer.current = setTimeout(() => setCopied(false), 1500);
+                  }}
+                >
+                  <Ico name={copied ? "checkmark" : "doc.on.doc"} size={16} />
+                </Pressable>
+              </View>
+            )}
+            <Pressable style={({ pressed }) => [styles.modeBtn, styles.iconBtn, pressed && styles.playBtnPressed]} onPress={() => { setFriendSheet(false); shareChallenge(); }}>
+              <Ico name="square.and.arrow.up" size={17} color="#c0472b" />
+              <Text style={styles.modeBtnText}>Kodu paylaş (WhatsApp, mesaj…)</Text>
             </Pressable>
-            {GAME_CENTER_ON && GameCenter.gameCenterAvailable && (
-              <Pressable
-                testID="leaderboard-button"
-                style={({ pressed }) => [styles.modeBtn, pressed && styles.playBtnPressed]}
-                onPress={openLeaderboard}
-              >
-                <Text style={styles.modeBtnText}>{gcPlayer?.authenticated ? "🏆 Arkadaşlarla sıralama" : "🏆 Game Center'a gir"}</Text>
-              </Pressable>
-            )}
-            {POSTCARDS_ON && (
-              <Pressable
-                testID="album-button"
-                style={({ pressed }) => [styles.modeBtn, pressed && styles.playBtnPressed]}
-                onPress={() => setAlbumOpen(true)}
-              >
-                <Text style={styles.modeBtnText}>📮 Kartpostallar {unlocked.length}/{POSTCARDS.length}</Text>
-              </Pressable>
-            )}
-            {DAILY_MAP && (
-              <Pressable
-                testID="mode-switch-button"
-                style={({ pressed }) => [styles.modeBtn, pressed && styles.playBtnPressed]}
-                onPress={() => switchMode(mode === "daily" ? "free" : "daily")}
-              >
-                <Text style={styles.modeBtnText}>{mode === "daily" ? "🎲 Serbest oyun" : `📅 Günün haritası · ${todayLabel()}`}</Text>
-              </Pressable>
-            )}
-            {BUILD_TAG !== "" && <Text style={styles.trBuildTag}>{BUILD_TAG}</Text>}
+            <Pressable style={({ pressed }) => [styles.modeBtn, pressed && styles.playBtnPressed]} onPress={() => setFriendSheet(false)}>
+              <Text style={styles.modeBtnText}>Kapat</Text>
+            </Pressable>
+          </View>
+        </View>
+      )}
+      {MEYDAN_ON && codeOpen && (
+        <View style={styles.albumOverlay} testID="code-modal">
+          <View style={styles.albumCard}>
+            <Text style={styles.albumTitle}>🔑 Meydan okuma kodu</Text>
+            <Text style={styles.albumSub}>Arkadaşının gönderdiği kodu yaz ya da mesajın tamamını yapıştır (örn. 1K9Z0QX-37)</Text>
+            <TextInput
+              value={codeText}
+              onChangeText={(t) => { setCodeText(t); setCodeError(""); }}
+              autoCapitalize="characters"
+              autoCorrect={false}
+              placeholder="KOD-PUAN"
+              placeholderTextColor="#b8a17e"
+              style={styles.codeInput}
+              onSubmitEditing={startChallenge}
+              returnKeyType="go"
+              autoFocus
+            />
+            {codeError !== "" && <Text style={styles.codeError}>{codeError}</Text>}
+            <Pressable style={({ pressed }) => [styles.trPlayBtn, pressed && styles.playBtnPressed]} onPress={startChallenge}>
+              <Text style={styles.playBtnText}>Aynı haritada başla</Text>
+            </Pressable>
+            <Pressable style={({ pressed }) => [styles.modeBtn, pressed && styles.playBtnPressed]} onPress={() => setCodeOpen(false)}>
+              <Text style={styles.modeBtnText}>Vazgeç</Text>
+            </Pressable>
           </View>
         </View>
       )}
@@ -2512,24 +3565,39 @@ export default function Game() {
               {POSTCARDS.map((pc) => {
                 const open = unlocked.includes(pc.stop);
                 return (
-                  <View key={pc.stop} style={styles.albumItem}>
+                  <Pressable key={pc.stop} style={styles.albumItem} disabled={!open} onPress={() => setBigCard(pc.stop)}>
                     {open ? (
                       <View style={styles.albumImg}>
-                        <Image source={pc.source} style={{ position: "absolute", left: 0, top: 0, width: "100%", height: "100%" }} resizeMode="stretch" fadeDuration={0} />
+                        <CachedImage source={pc.source} style={{ position: "absolute", left: 0, top: 0, width: "100%", height: "100%" }} contentFit="fill" transition={0} cachePolicy="memory-disk" />
                       </View>
                     ) : (
                       <View style={[styles.albumImg, styles.albumLocked]}><Text style={styles.albumLockedText}>?</Text></View>
                     )}
                     <Text style={styles.albumName}>{open ? pc.name : `${stopTowerId(pc.stop)}. kule`}</Text>
-                  </View>
+                  </Pressable>
                 );
               })}
             </ScrollView>
-            <Pressable style={({ pressed }) => [styles.trPlayBtn, pressed && styles.playBtnPressed]} onPress={() => setAlbumOpen(false)}>
+            <Pressable style={({ pressed }) => [styles.trPlayBtn, pressed && styles.playBtnPressed]} onPress={() => { setBigCard(null); setAlbumOpen(false); }}>
               <Text style={styles.playBtnText}>Kapat</Text>
             </Pressable>
           </View>
         </View>
+      )}
+      {POSTCARDS_ON && albumOpen && bigCard !== null && POSTCARDS[bigCard - 1] && (
+        <Pressable style={styles.bigCardOverlay} onPress={() => setBigCard(null)} testID="big-card">
+          <View style={styles.bigCardFrame}>
+            <View style={styles.bigCardImg}>
+              <CachedImage source={POSTCARDS[bigCard - 1].source} style={{ position: "absolute", left: 0, top: 0, width: "100%", height: "100%" }} contentFit="fill" transition={0} cachePolicy="memory-disk" />
+              <View style={styles.bigCardStamp}>
+                <Text style={styles.bigCardName}>{POSTCARDS[bigCard - 1].name}</Text>
+                <Text style={styles.bigCardSub}>{POSTCARDS[bigCard - 1].sub}</Text>
+              </View>
+            </View>
+            <Text style={styles.bigCardNote}>“{POSTCARDS[bigCard - 1].note}”</Text>
+            <Text style={styles.bigCardSign}>— Amcadan selamlar</Text>
+          </View>
+        </Pressable>
       )}
       {gameOver && !FAZ1_UI && (
         <View style={styles.overlay} testID="game-over-overlay">
@@ -2623,7 +3691,7 @@ function StartCover({ W, H }: { W: number; H: number }) {
       </>
     );
   }
-  const camX0 = CONFIG.widthWide.max / 2 - (CONFIG.cameraStartFraction * W) / s;
+  const camX0 = CONFIG.startTowerWidth / 2 - (CONFIG.cameraStartFraction * W) / s;
   const bgScale = Math.max(W / BG_IMG_W, H / BG_IMG_H) * BG_FAR_OVERSCAN;
   const bgW = BG_IMG_W * bgScale;
   const bgH = BG_IMG_H * bgScale;
@@ -2943,7 +4011,20 @@ const PopupHouseView = memo(function PopupHouseView({ index, platforms, styles }
   );
 });
 
-const PlatformView = memo(function PlatformView({ index, platforms, styles, onArtLoad, onArtStart, onArtError }: any) {
+const PlatformView = memo(function PlatformView({ index, platforms, styles, onArtLoad, onArtStart, onArtError, effectK }: any) {
+  // KURUKAFA: etki sürerken iniş yüzeyinin yeni genişliği tepede şeritle gösterilir
+  // (büyüdüyse altın, küçüldüyse kırmızı). Yalnız çizim; çatı silüeti değişmez.
+  const effectStyle = useAnimatedStyle(() => {
+    const p = slotPlatform(platforms.value, index);
+    const k = effectK ? effectK.value : 1;
+    if (!p || k === 1) return { opacity: 0, transform: [{ translateX: -99999 }, { translateY: -99999 }] };
+    return {
+      opacity: 0.95,
+      width: p.width * k,
+      backgroundColor: k > 1 ? "#f2b632" : "#d8432f",
+      transform: [{ translateX: p.x + (p.width * (1 - k)) / 2 }, { translateY: p.topY - 10 }],
+    };
+  });
   const style = useAnimatedStyle(() => {
     const p = slotPlatform(platforms.value, index);
     if (!p) {
@@ -3038,6 +4119,7 @@ const PlatformView = memo(function PlatformView({ index, platforms, styles, onAr
           </Animated.View>
         </>
       )}
+      {effectK && <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, height: 12, borderRadius: 6, borderWidth: 2, borderColor: "#fff8ec" }, effectStyle]} />}
     </>
   );
 });
@@ -3290,8 +4372,9 @@ const useStyles = makeStyles((colors) => ({
     backgroundColor: colors.perfect,
   },
 
-  sfxBtn: { position: "absolute", right: 16, width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center", backgroundColor: "rgba(255,250,241,0.72)", borderWidth: 1.5, borderColor: "rgba(42,27,18,0.35)", zIndex: 60 },
-  sfxBtnText: { fontSize: 18 },
+  sfxBtn: { position: "absolute", right: 14, width: 40, height: 40, borderRadius: 20, flexDirection: "row", alignItems: "center", justifyContent: "center", backgroundColor: "rgba(42,27,18,0.78)", borderWidth: 1.5, borderColor: "rgba(255,250,241,0.6)", zIndex: 60 },
+  sfxBtnMuted: { backgroundColor: "rgba(192,71,43,0.9)" },
+  sfxBtnText: { fontSize: 14, fontWeight: "800", color: "#fff" },
   hud: { position: "absolute", left: 0, right: 0, alignItems: "center", pointerEvents: "none" },
   scoreText: {
     fontSize: 56,
@@ -3374,7 +4457,18 @@ const useStyles = makeStyles((colors) => ({
   albumSub: { fontSize: 13, fontWeight: "700", color: "#7a5a44", textAlign: "center", marginTop: 2, marginBottom: 10 },
   albumGrid: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", paddingBottom: 10 },
   albumItem: { width: "48%", marginBottom: 12, alignItems: "center" },
-  albumImg: { width: "100%", aspectRatio: 4 / 3, borderRadius: 4 },
+  albumImg: { width: "100%", aspectRatio: 10 / 7 }, // overflow:hidden telefonda resmi köşede minicik kırpıyordu (kullanıcı ekran görüntüsü 14:04)
+  bigCardOverlay: { position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundColor: "rgba(10,6,3,0.7)", alignItems: "center", justifyContent: "center", zIndex: 90 },
+  bigCardFrame: { width: "94%", maxWidth: 520, backgroundColor: "#f6eedc", borderRadius: 6, padding: 10, paddingBottom: 14, transform: [{ rotate: "-1.5deg" }] },
+  bigCardImg: { width: "100%", aspectRatio: 10 / 7 },
+  bigCardStamp: { position: "absolute", left: 10, top: 10, backgroundColor: "rgba(246,238,220,0.92)", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4 },
+  bigCardName: { fontSize: 20, fontWeight: "900", color: "#50281e" },
+  bigCardSub: { fontSize: 12, fontWeight: "600", color: "#6e4632" },
+  bigCardNote: { marginTop: 10, fontSize: 16, fontStyle: "italic", color: "#3b2418", textAlign: "center" },
+  bigCardSign: { marginTop: 4, fontSize: 13, color: "#6e4632", textAlign: "right" },
+  arrivalCard: { position: "absolute", right: 14, width: 132, backgroundColor: "#f6eedc", borderRadius: 4, padding: 5, paddingBottom: 6, zIndex: 41, transform: [{ rotate: "-6deg" }], shadowColor: "#000", shadowOpacity: 0.3, shadowRadius: 6, shadowOffset: { width: 0, height: 3 } },
+  arrivalImg: { width: "100%", aspectRatio: 10 / 7 },
+  arrivalText: { marginTop: 3, fontSize: 11, fontWeight: "800", color: "#50281e", textAlign: "center" },
   albumLocked: { backgroundColor: "#e8dcc6", borderWidth: 2, borderColor: "#cdbb9c", borderStyle: "dashed", alignItems: "center", justifyContent: "center" },
   albumLockedText: { fontSize: 30, fontWeight: "900", color: "#b8a17e" },
   albumName: { marginTop: 4, fontSize: 14, fontWeight: "800", color: "#2a1b12" },
@@ -3386,6 +4480,109 @@ const useStyles = makeStyles((colors) => ({
   stopSignPier: { backgroundColor: "#e2a33a", borderColor: "#2a1b12", paddingHorizontal: 22, paddingVertical: 9 },
   stopTitlePier: { color: "#2a1b12", fontSize: 28 },
   stopSignSubPier: { color: "#2a1b12" },
+  challengeBox: { width: "100%", borderRadius: 14, padding: 10, marginBottom: 10, alignItems: "center" },
+  challengeWin: { backgroundColor: "#e3f2d6" },
+  challengeLose: { backgroundColor: "#f6e0d6" },
+  challengeTitle: { fontSize: 13, fontWeight: "800", color: "#6e4632" },
+  challengeMain: { fontSize: 18, fontWeight: "900", color: "#2a1b12", marginTop: 2 },
+  friendRow: { flexDirection: "row", alignItems: "center", paddingVertical: 10, paddingHorizontal: 8, borderRadius: 12, marginBottom: 6, backgroundColor: "#fff", borderWidth: 1, borderColor: "#ead8c0" },
+  friendAvatar: { width: 34, height: 34, borderRadius: 17, backgroundColor: "#3c2878", alignItems: "center", justifyContent: "center", marginRight: 10 },
+  friendAvatarText: { color: "#fff", fontWeight: "900", fontSize: 16 },
+  friendName: { flex: 1, fontSize: 16, fontWeight: "800", color: "#2a1b12" },
+  pcWrap: { width: "86%", maxWidth: 370 },
+  pcTilt: { transform: [{ rotate: "-2deg" }] },
+  pcTiltR: { transform: [{ rotate: "1.5deg" }] },
+  pcTicket: { overflow: "visible" },
+  pcNotch: { position: "absolute", top: "50%", marginTop: -9, width: 18, height: 18, borderRadius: 9, backgroundColor: "#fbf3e2" },
+  pcMenuNote: { fontSize: 18, alignSelf: "stretch", marginRight: 56, textAlign: "left", marginBottom: 2 },
+  pcGreetingC: { fontFamily: PC_SCRIPT, fontSize: 20, color: "#1f4e79", alignSelf: "stretch", marginRight: 56, marginLeft: 6 },
+  pcVerdict: { fontFamily: PC_TYPE, fontSize: 30, marginTop: 4, alignSelf: "stretch", marginRight: 58, textAlign: "left" },
+  pcMiniRow: { flexDirection: "row", gap: 10, marginTop: 12, alignSelf: "stretch", justifyContent: "center" },
+  pcMini: { flex: 1, maxWidth: 160, alignItems: "center", paddingVertical: 12, paddingHorizontal: 6, backgroundColor: "#fff", borderWidth: 1.5, borderStyle: "dashed", borderColor: "#c9a77c", borderRadius: 4, shadowColor: "#2a1b12", shadowOpacity: 0.15, shadowRadius: 4, shadowOffset: { width: 0, height: 2 } },
+  pcMiniWho: { fontFamily: PC_HAND, fontSize: 17, color: "#1f4e79" },
+  pcMiniBig: { fontFamily: PC_TYPE, fontSize: 24, color: "#2a1b12", marginTop: 2 },
+  pcMiniSmall: { fontFamily: PC_TYPE, fontSize: 11, color: "#8a6a4a" },
+  pcPostmarkSm: { width: 70, height: 70, borderRadius: 35, right: -14, top: undefined, bottom: -18 },
+  pcPostmarkInnerSm: { width: 60, height: 60, borderRadius: 30, paddingHorizontal: 4 },
+  pcCard: { backgroundColor: "#fbf3e2", borderRadius: 6, overflow: "hidden", shadowColor: "#2a1b12", shadowOpacity: 0.35, shadowRadius: 14, shadowOffset: { width: 0, height: 8 } },
+  pcAirmail: { flexDirection: "row", height: 10, overflow: "hidden" },
+  pcStripe: { width: 26, height: 10, transform: [{ skewX: "-35deg" }], marginRight: -4 },
+  pcInner: { margin: 10, marginTop: 8, paddingTop: 14, paddingBottom: 12, paddingHorizontal: 16, borderWidth: 2, borderStyle: "dashed", borderColor: "#c9a77c", borderRadius: 4, alignItems: "center" },
+  pcGreeting: { fontFamily: PC_SCRIPT, fontSize: 20, color: "#1f4e79", marginBottom: 2, alignSelf: "stretch", marginLeft: 48, marginRight: 52 },
+  pcLabel: { fontFamily: PC_TYPE, fontSize: 12, letterSpacing: 3, color: "#9b7a5c", marginTop: 4 },
+  pcScore: { fontFamily: PC_TYPE, fontSize: 76, color: "#2a1b12", lineHeight: 86 },
+  pcBest: { fontFamily: PC_TYPE, fontSize: 14, color: "#7a5a44", marginBottom: 6 },
+  pcLine: { alignSelf: "stretch", borderBottomWidth: 1.5, borderBottomColor: "#d9c3a3", borderStyle: "dotted", paddingVertical: 4, marginTop: 4 },
+  pcHand: { fontFamily: PC_HAND, fontSize: 19, color: "#1f4e79", textAlign: "center" },
+  pcIconRow: { flexDirection: "row", justifyContent: "center", gap: 18, marginTop: 14 },
+  pcIconBtn: { alignItems: "center" },
+  pcIconCircle: { width: 54, height: 54, borderRadius: 27, backgroundColor: "#fff", borderWidth: 2, borderColor: "#e6cdb0", alignItems: "center", justifyContent: "center" },
+  pcIconCircleSm: { width: 46, height: 46, borderRadius: 23 },
+  pcIconLabel: { marginTop: 4, fontSize: 12, fontWeight: "800", color: "#6e4632" },
+  pcStamp: { position: "absolute", right: 18, top: 22, width: 54, height: 64, borderWidth: 4, borderColor: "#fff", borderRadius: 2, transform: [{ rotate: "6deg" }], shadowColor: "#000", shadowOpacity: 0.25, shadowRadius: 3, shadowOffset: { width: 0, height: 2 }, backgroundColor: "#fff" },
+  pcSticker: { position: "absolute", left: -18, top: -26, width: 84, height: 84, borderRadius: 42, overflow: "hidden", borderWidth: 3, borderColor: "#fff", backgroundColor: "#f3d9b0", transform: [{ rotate: "-8deg" }] },
+  pcPostmark: { position: "absolute", right: 2, top: 96, width: 106, height: 106, borderRadius: 53, borderWidth: 3, borderColor: "rgba(140,30,70,0.9)", alignItems: "center", justifyContent: "center" },
+  pcPostmarkInner: { width: 90, height: 90, borderRadius: 45, paddingHorizontal: 8, borderWidth: 1.5, borderColor: "rgba(140,30,70,0.9)", alignItems: "center", justifyContent: "center" },
+  pcPostmarkBig: { fontFamily: PC_TYPE, fontSize: 14, color: "rgba(140,30,70,0.95)", marginVertical: 2 },
+  pcPostmarkSmall: { fontFamily: PC_TYPE, fontSize: 8, color: "rgba(140,30,70,0.95)", letterSpacing: 1 },
+  menuOverlay: { ...absoluteFill(), alignItems: "center", backgroundColor: "rgba(20,48,58,0.12)" },
+  menuTitle: { fontSize: 42, fontWeight: "900", color: "#fff8ec", letterSpacing: 3, textShadowColor: "rgba(42,27,18,0.65)", textShadowOffset: { width: 0, height: 3 }, textShadowRadius: 8 },
+  menuTag: { fontSize: 9, color: "rgba(255,248,236,0.7)", marginTop: -8, marginBottom: 6 },
+  menuSub: { fontSize: 16, fontWeight: "800", color: "#fff8ec", marginTop: 2, marginBottom: 10, textShadowColor: "rgba(42,27,18,0.6)", textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 4 },
+  menuCard: { paddingTop: 14, paddingBottom: 10 },
+  iconBtn: { flexDirection: "row", justifyContent: "center", gap: 8 },
+  linkRow: { flexDirection: "row", alignItems: "center", alignSelf: "center", gap: 6, marginTop: 10 },
+  raceCols: { flexDirection: "row", gap: 8, marginTop: 10, width: "100%" },
+  raceCol: { flex: 1, alignItems: "center", paddingVertical: 10, paddingHorizontal: 6, borderRadius: 14, backgroundColor: "#fff", borderWidth: 2, borderColor: "#ead8c0" },
+  raceColWin: { borderColor: "#e2a33a", borderWidth: 3, backgroundColor: "#fff6df" },
+  raceBig: { fontSize: 24, fontWeight: "900", color: "#2a1b12", marginTop: 2 },
+  raceSmall: { fontSize: 12, fontWeight: "700", color: "#8a6a4a" },
+  raceVerdict: { fontSize: 30, fontWeight: "900", textAlign: "center", marginTop: 2 },
+  raceRow: { flexDirection: "row", alignItems: "center", marginTop: 8, paddingVertical: 8, paddingHorizontal: 10, borderRadius: 12, backgroundColor: "#fff", borderWidth: 1, borderColor: "#ead8c0" },
+  raceWho: { fontSize: 15, fontWeight: "900", color: "#2a1b12" },
+  raceStat: { flex: 1, fontSize: 14, fontWeight: "800", color: "#6e4632", textAlign: "right" },
+  raceNote: { fontSize: 11, color: "#8a6a4a", textAlign: "center", marginTop: 8 },
+  friendScore: { fontSize: 12, fontWeight: "700", color: "#8a6a4a", marginTop: 1 },
+  friendGo: { fontSize: 14, fontWeight: "900", color: "#c0472b" },
+  friendMsg: { fontSize: 14, color: "#6e4632", textAlign: "center", marginVertical: 12 },
+  friendPill: { width: "100%", marginTop: 10, borderRadius: 12, paddingVertical: 8, paddingHorizontal: 10, flexDirection: "row", alignItems: "center", justifyContent: "space-between", backgroundColor: "#3c2878" },
+  friendPillText: { flex: 1, fontSize: 14, fontWeight: "800", color: "#fff" },
+  friendPillGo: { marginLeft: 8, fontSize: 15, fontWeight: "900", color: "#ffd66b" },
+  toastWrap: { position: "absolute", left: 16, right: 16, alignItems: "center", zIndex: 95 },
+  toastText: { backgroundColor: "rgba(30,20,60,0.92)", color: "#fff", fontSize: 15, fontWeight: "800", paddingHorizontal: 14, paddingVertical: 8, borderRadius: 14, overflow: "hidden", textAlign: "center" },
+  goInfoPill: { width: "100%", marginTop: 10, borderRadius: 12, paddingVertical: 7, paddingHorizontal: 10, alignItems: "center", backgroundColor: "rgba(192,71,43,0.08)" },
+  goInfoMain: { fontSize: 14, fontWeight: "800", color: "#2a1b12", textAlign: "center" },
+  goInfoNew: { marginTop: 3, fontSize: 13, fontWeight: "700", color: "#9a5a1e", textAlign: "center" },
+  goLink: { marginTop: 8, fontSize: 14, fontWeight: "800", color: "#c0472b", textAlign: "center" },
+  goIconRow: { flexDirection: "row", justifyContent: "space-between", width: "100%", marginTop: 14 },
+  goIcon: { flex: 1, marginHorizontal: 3, alignItems: "center", paddingVertical: 8, borderRadius: 14, backgroundColor: "#fff8ec", borderWidth: 2, borderColor: "#e6cdb0" },
+  goIconEmoji: { fontSize: 24 },
+  goIconLabel: { marginTop: 2, fontSize: 11, fontWeight: "800", color: "#6e4632" },
+  goCodeRow: { flexDirection: "row", alignItems: "center", justifyContent: "center", marginTop: 12 },
+  goCodeLabel: { fontSize: 12, fontWeight: "700", color: "#9b7a5c", marginRight: 8 },
+  goCodeValue: { fontSize: 17, fontWeight: "900", letterSpacing: 1.5, color: "#2a1b12" },
+  goCopyBtn: { marginLeft: 8, width: 34, height: 34, borderRadius: 17, alignItems: "center", justifyContent: "center", backgroundColor: "#fff8ec", borderWidth: 2, borderColor: "#e6cdb0" },
+  goCopyText: { fontSize: 16 },
+  codeShow: { width: "100%", marginTop: 10, borderRadius: 12, borderWidth: 2, borderStyle: "dashed", borderColor: "#c0472b", paddingVertical: 6, alignItems: "center", backgroundColor: "#fffdf6" },
+  codeShowLabel: { fontSize: 12, fontWeight: "700", color: "#6e4632" },
+  codeShowValue: { fontSize: 24, fontWeight: "900", letterSpacing: 2, color: "#2a1b12" },
+  challengeRow: { flexDirection: "row", justifyContent: "space-between", width: "100%" },
+  challengeHalf: { width: "48%" },
+  challengeChip: { marginTop: 6, alignSelf: "center", paddingHorizontal: 12, paddingVertical: 4, borderRadius: 12, overflow: "hidden", fontSize: 15, fontWeight: "900", color: "#fff", backgroundColor: "rgba(60,40,120,0.85)" },
+  codeInput: { marginTop: 12, marginBottom: 6, borderWidth: 2, borderColor: "#c0472b", borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, fontSize: 24, fontWeight: "800", letterSpacing: 2, color: "#2a1b12", backgroundColor: "#fff", textAlign: "center" },
+  codeError: { color: "#b23a2a", fontWeight: "700", textAlign: "center", marginBottom: 6 },
+  skullChip: { marginTop: 6, alignSelf: "center", paddingHorizontal: 14, paddingVertical: 5, borderRadius: 14, overflow: "hidden", fontSize: 17, fontWeight: "900", color: "#fff" },
+  skullBadge: { paddingHorizontal: 18, paddingVertical: 8, borderRadius: 30, borderWidth: 5, borderColor: "#fff8ec" },
+  skullBadgeText: { fontSize: 46, fontWeight: "900", color: "#fff" },
+  skullChipUp: { backgroundColor: "rgba(196,140,32,0.9)" },
+  skullChipDown: { backgroundColor: "rgba(178,48,40,0.9)" },
+  bridgeWrap: { position: "absolute", left: 0, right: 0, alignItems: "center", zIndex: 39 },
+  bridgePill: { backgroundColor: "rgba(20,40,70,0.78)", borderRadius: 12, paddingHorizontal: 14, paddingVertical: 6, alignItems: "center" },
+  bridgeName: { color: "#f4ead8", fontSize: 13, fontWeight: "700", marginBottom: 4 },
+  bridgeRow: { flexDirection: "row", alignItems: "center" },
+  bridgeSide: { color: "#f4ead8", fontSize: 11, fontWeight: "600" },
+  bridgeTrack: { width: 120, height: 6, borderRadius: 3, backgroundColor: "rgba(244,234,216,0.3)", marginHorizontal: 8, overflow: "hidden" },
+  bridgeFill: { height: 6, borderRadius: 3, backgroundColor: "#e8a33d" },
   stopSignSub: { color: "#f4ead8", fontSize: 13, fontWeight: "800", textAlign: "center", marginTop: 1 },
   stopSubPill: { marginTop: 6, backgroundColor: "rgba(255,248,236,0.88)", borderRadius: 999, paddingHorizontal: 12, paddingVertical: 3 },
   stopSub: { color: "#2a1b12", fontSize: 16, fontWeight: "800" },

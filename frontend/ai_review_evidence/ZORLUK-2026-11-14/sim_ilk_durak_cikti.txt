@@ -1,0 +1,7 @@
+(a) ZORLUK_KADEMESI=false, 15 koşu x 100 kule HEAD ile aynı: true
+(b) ŞU AN      : 1-14. kule, 420 zıplama | ulaşılamayan 0 | ort. pencere 72.0 ms | en dar 37 ms | <40ms %0.7 | dar kule %2
+(b) TASLAK KOLAY: 1-14. kule, 420 zıplama | ulaşılamayan 0 | ort. pencere 75.5 ms | en dar 50 ms | <40ms %0.0 | dar kule %0
+(c) genişlik x0.8  : 1-14. kule, 420 zıplama | ulaşılamayan 0 | ort. pencere 65.0 ms | en dar 29 ms | <40ms %2.1 | dar kule %2
+(c) genişlik x0.9  : 1-14. kule, 420 zıplama | ulaşılamayan 0 | ort. pencere 68.5 ms | en dar 34 ms | <40ms %1.7 | dar kule %2
+(c) genişlik x1.1  : 1-14. kule, 420 zıplama | ulaşılamayan 0 | ort. pencere 75.4 ms | en dar 39 ms | <40ms %0.2 | dar kule %2
+(c) genişlik x1.2  : 1-14. kule, 420 zıplama | ulaşılamayan 0 | ort. pencere 78.7 ms | en dar 41 ms | <40ms %0.0 | dar kule %2

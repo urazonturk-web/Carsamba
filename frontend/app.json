@@ -12,7 +12,8 @@
       "bundleIdentifier": "com.urazonturk.carsamba",
       "infoPlist": {
         "CFBundleDisplayName": "Byzantion",
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSGKFriendListUsageDescription": "Arkadaşlarına meydan okuyabilmen için Game Center arkadaş listeni gösteriyoruz."
       },
       "entitlements": {
         "com.apple.developer.game-center": true

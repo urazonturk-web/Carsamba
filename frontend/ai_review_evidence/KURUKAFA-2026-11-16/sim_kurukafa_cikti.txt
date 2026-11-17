@@ -1,0 +1,5 @@
+120 tohum × 200 kule: kurukafa 1906 (her 12.6 kulede bir), en erken kule 19
+ortadan atlayınca alınabilen: %100.0; alıp bir kuleye inilebilen: %100.0; ort. alma penceresi 124 ms basış
+genişlik ×0.8: 15-100. kule, 1020 zıplama, ulaşılamayan 0, ort. pencere 60.2 ms, en dar 23 ms
+genişlik ×1.2: 15-100. kule, 1020 zıplama, ulaşılamayan 0, ort. pencere 74.8 ms, en dar 28 ms
+

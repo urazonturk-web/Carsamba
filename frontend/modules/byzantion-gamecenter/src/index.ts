@@ -8,7 +8,20 @@ type Native = {
   authenticate(): Promise<GameCenterPlayer>;
   submitScore(score: number, leaderboardId: string): Promise<boolean>;
   showLeaderboard(leaderboardId: string): Promise<boolean>;
+  copyText?(text: string): boolean;
+  challengeFriend?(seed: number, score: number, from: string): Promise<ChallengeSendResult>;
+  loadChallenges?(): Promise<{ incoming: FriendChallenge[]; results: FriendChallenge[] }>;
+  finishChallenge?(matchID: string, score: number, name: string): Promise<{ status: string; message?: string }>;
+  removeChallenge?(matchID: string): Promise<boolean>;
+  loadFriends?(leaderboardId: string): Promise<{ status: string; message?: string; friends: GameCenterFriend[] }>;
+  challengePlayer?(playerID: string, seed: number, score: number, from: string, race: string): Promise<ChallengeSendResult>;
+  finishChallengeRace?(matchID: string, score: number, name: string, race: string, outcome: number): Promise<{ status: string; message?: string }>;
+  addListener?(event: string, cb: (e: FriendChallenge) => void): { remove(): void };
 };
+
+export type GameCenterFriend = { id: string; name: string; alias: string; score?: number };
+export type FriendChallenge = { matchID: string; seed: number; score: number; from: string; reply?: number; replier?: string; race?: string; replyRace?: string };
+export type ChallengeSendResult = { status: "sent" | "cancelled" | "error" | "not_signed_in" | "replaced"; matchID?: string; message?: string };
 
 // Optional: null on Android/web or in a binary built before this module existed,
 // so the game never crashes just because Game Center is missing.
@@ -43,4 +56,53 @@ export async function showLeaderboard(leaderboardId: string): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+/** Metni panoya kopyalar (iOS). Eski bir derlemede işlev yoksa false döner. */
+export function copyText(text: string): boolean {
+  if (!native || typeof native.copyText !== "function") return false;
+  try {
+    return native.copyText(text);
+  } catch {
+    return false;
+  }
+}
+
+/** MEYDAN OKUMA · ARKADAŞ: Game Center arkadaş seçme ekranı (sıra tabanlı maç). */
+export async function challengeFriend(seed: number, score: number, from: string): Promise<ChallengeSendResult> {
+  if (!native || typeof native.challengeFriend !== "function") return { status: "error", message: "unavailable" };
+  try { return await native.challengeFriend(seed, Math.floor(score), from); } catch (e: any) { return { status: "error", message: String(e?.message ?? e) }; }
+}
+export async function loadChallenges(): Promise<{ incoming: FriendChallenge[]; results: FriendChallenge[] }> {
+  if (!native || typeof native.loadChallenges !== "function") return { incoming: [], results: [] };
+  try { return await native.loadChallenges(); } catch { return { incoming: [], results: [] }; }
+}
+export async function finishChallenge(matchID: string, score: number, name: string) {
+  if (!native || typeof native.finishChallenge !== "function") return { status: "error" };
+  try { return await native.finishChallenge(matchID, Math.floor(score), name); } catch (e: any) { return { status: "error", message: String(e?.message ?? e) }; }
+}
+export async function removeChallenge(matchID: string) {
+  if (!native || typeof native.removeChallenge !== "function") return false;
+  try { return await native.removeChallenge(matchID); } catch { return false; }
+}
+export function onChallenge(event: "onChallenge" | "onChallengeResult", cb: (c: FriendChallenge) => void): () => void {
+  if (!native || typeof native.addListener !== "function") return () => {};
+  const sub = native.addListener(event, cb);
+  return () => sub.remove();
+}
+
+/** Game Center arkadaş listesi (ilk seferde iOS izin sorar). */
+export async function loadFriends(leaderboardId: string): Promise<{ status: string; message?: string; friends: GameCenterFriend[] }> {
+  if (!native || typeof native.loadFriends !== "function") return { status: "unavailable", friends: [] };
+  try { return await native.loadFriends(leaderboardId); } catch (e: any) { return { status: "error", message: String(e?.message ?? e), friends: [] }; }
+}
+/** Seçilen arkadaşa doğrudan meydan okuma gönderir (Apple ekranı açılmaz). */
+export async function challengePlayer(playerID: string, seed: number, score: number, from: string, race = ""): Promise<ChallengeSendResult> {
+  if (!native || typeof native.challengePlayer !== "function") return { status: "error", message: "unavailable" };
+  try { return await native.challengePlayer(playerID, seed, Math.floor(score), from, race); } catch (e: any) { return { status: "error", message: String(e?.message ?? e) }; }
+}
+/** HAYALET YARIŞ: yarışın sonucunu ve kaydını maça yazıp bitirir (outcome: 1 kazandım, -1 kaybettim, 0 berabere). */
+export async function finishChallengeRace(matchID: string, score: number, name: string, race: string, outcome: number) {
+  if (!native || typeof native.finishChallengeRace !== "function") return { status: "error" };
+  try { return await native.finishChallengeRace(matchID, Math.floor(score), name, race, outcome); } catch (e: any) { return { status: "error", message: String(e?.message ?? e) }; }
 }

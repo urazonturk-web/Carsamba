@@ -10,6 +10,7 @@ const LIVE_RN_IMAGE = true as boolean;
 import Animated, { useAnimatedStyle, type SharedValue } from "react-native-reanimated";
 
 import { CHARGE_POSES, poseOpacity } from "./character-pose";
+import { HAT_BOX, HAT_SOURCE, SLIPPER_BOXES, SLIPPER_SOURCE } from "./pijama";
 
 type Props = {
   px: SharedValue<number>;
@@ -35,6 +36,11 @@ type Props = {
   strain?: SharedValue<number>;
   // PATLAMA (2026-11-12): 1 = amca bu tur lekeli (kahverengi lekeler, yalnız opaklık).
   dirty?: SharedValue<number>;
+  // PİJAMA ANI (2026-11-16): 1 = gece külahı + terlik görünür (yalnız opaklık).
+  pajama?: SharedValue<number>;
+  // PİJAMA ANI: kapıya yürüme için yalnız görüntü kayması (fizik px/py değişmez).
+  offsetX?: SharedValue<number>;
+  offsetY?: SharedValue<number>;
   onLoad?: () => void;
   onLoadStart?: () => void;
   onError?: () => void;
@@ -50,7 +56,7 @@ const DIRT_SPOTS = [
 ];
 const DIRT_COLORS = ["rgba(150,104,48,0.92)", "rgba(126,86,40,0.92)", "rgba(171,124,62,0.9)"];
 
-function PoseLayer({ i, px, py, poseCharge, scale, feetCenterOffset, feetHalf, landPulse, halo, strain, dirty, ...cb }: Props & { i: number }) {
+function PoseLayer({ i, px, py, poseCharge, scale, feetCenterOffset, feetHalf, landPulse, halo, strain, dirty, pajama, offsetX, offsetY, ...cb }: Props & { i: number }) {
   const pose = CHARGE_POSES[i];
   const style = useAnimatedStyle(() => {
     // Squash toward the FOOT line (feetHalf), not the sprite's own center,
@@ -69,14 +75,16 @@ function PoseLayer({ i, px, py, poseCharge, scale, feetCenterOffset, feetHalf, l
     return {
       opacity: poseOpacity(i, poseCharge.value),
       transform: [
-        { translateX: px.value + feetCenterOffset - pose.pivotX * scale + jitter },
-        { translateY: py.value + feetHalf - pose.pivotY * scale + extraY },
+        { translateX: px.value + feetCenterOffset - pose.pivotX * scale + jitter + (offsetX ? offsetX.value : 0) },
+        { translateY: py.value + feetHalf - pose.pivotY * scale + extraY + (offsetY ? offsetY.value : 0) },
         { scaleY: sq },
         { scaleX: bulge * swell },
       ],
     };
   });
   const dirtStyle = useAnimatedStyle(() => ({ opacity: dirty ? dirty.value : 0 }));
+  const pajamaStyle = useAnimatedStyle(() => ({ opacity: pajama ? pajama.value : 0 }));
+  const slip = SLIPPER_BOXES[i];
   return (
     <Animated.View
       testID={`charge-pose-${i}`}
@@ -123,6 +131,16 @@ function PoseLayer({ i, px, py, poseCharge, scale, feetCenterOffset, feetHalf, l
           {DIRT_SPOTS.map((d, k) => (
             <View key={k} style={{ position: "absolute", left: `${(d.x - d.d / 2) * 100}%`, top: `${(d.y - d.d / 3) * 100}%`, width: `${d.d * 100}%`, aspectRatio: 1.25, borderRadius: 999, borderWidth: 1, borderColor: "rgba(60,36,16,0.7)", backgroundColor: DIRT_COLORS[k % 3] }} />
           ))}
+        </Animated.View>
+      ) : null}
+      {pajama ? (
+        <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, right: 0, bottom: 0 }, pajamaStyle]}>
+          {slip.map((b, k) => (
+            <Image key={`t${k}`} source={SLIPPER_SOURCE} resizeMode="stretch" fadeDuration={0}
+              style={{ position: "absolute", left: b.x * scale, top: b.y * scale, width: b.w * scale, height: b.h * scale }} />
+          ))}
+          <Image source={HAT_SOURCE} resizeMode="stretch" fadeDuration={0}
+            style={{ position: "absolute", left: HAT_BOX.x * scale, top: HAT_BOX.y * scale, width: HAT_BOX.w * scale, height: HAT_BOX.h * scale }} />
         </Animated.View>
       ) : null}
     </Animated.View>

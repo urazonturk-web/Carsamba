@@ -1,0 +1,19 @@
+=== 0) Fizik/kamera/boşluk sabitleri farkı: YOK (aynı)
+
+=== 1) ESKİ (HEAD): 30 koşu x 90 kule, uyarlanan oyuncu (başarılı pencere araması)
+  bir sonraki kuleye hiç ulaşılamayan zıplama: 0 / 2700; en dar pencere: 32 ms { W: 440, seed: 909, id: 20, cat: 2, width: 45.5, dy: -186, gap: 125 }
+  pencere < 25 ms: %0.0 | < 40 ms: %0.3 (tüm zıplamalar)
+  1-14 (durak öncesi)      ort. basış penceresi 72.0 ms | dar kule %2 | ort. tepe genişliği 76.3
+  16-29 (Karaköy sonrası)  ort. basış penceresi 70.0 ms | dar kule %15 | ort. tepe genişliği 72.7
+  31-44                    ort. basış penceresi 70.4 ms | dar kule %19 | ort. tepe genişliği 68.9
+  46-59                    ort. basış penceresi 67.5 ms | dar kule %29 | ort. tepe genişliği 63.2
+  61-90 (iskele sonrası)   ort. basış penceresi 68.9 ms | dar kule %32 | ort. tepe genişliği 61.7
+
+=== 1) YENİ (ZORLUK KADEMESİ 1): 30 koşu x 90 kule, uyarlanan oyuncu (başarılı pencere araması)
+  bir sonraki kuleye hiç ulaşılamayan zıplama: 0 / 2700; en dar pencere: 14 ms { W: 440, seed: 17, id: 7, cat: 2, width: 40.6, dy: -218, gap: 125 }
+  pencere < 25 ms: %0.2 | < 40 ms: %1.6 (tüm zıplamalar)
+  1-14 (durak öncesi)      ort. basış penceresi 67.2 ms | dar kule %9 | ort. tepe genişliği 68.1
+  16-29 (Karaköy sonrası)  ort. basış penceresi 66.0 ms | dar kule %21 | ort. tepe genişliği 65.6
+  31-44                    ort. basış penceresi 66.8 ms | dar kule %22 | ort. tepe genişliği 62.4
+  46-59                    ort. basış penceresi 64.0 ms | dar kule %36 | ort. tepe genişliği 56.8
+  61-90 (iskele sonrası)   ort. basış penceresi 66.2 ms | dar kule %35 | ort. tepe genişliği 57.1

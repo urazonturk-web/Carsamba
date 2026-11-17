@@ -1,0 +1,32 @@
+W=402, 200 tohum, 2800 zıplama, başarısız 0
+pencere ms   p10/p50/p90: 60 73 89
+gereken basış ms p10/p50/p90: 195 246 290
+ardışık zıplamada basış farkı ms p50/p90/max: 32 83 155
+iki yanda da ölüm (kısa VE uzun basış düşürür): %100
+
+En zor %20 vs en kolay %20 (pencereye göre):
+  win       zor    59 | kolay    91
+  w         zor    64 | kolay    86
+  gap       zor   236 | kolay   146
+  dy        zor   -61 | kolay    64
+  mid       zor   275 | kolay   199
+  standOff  zor    43 | kolay    41
+
+Yükseklik farkına göre ort. pencere (dy<0 = hedef daha yüksek):
+  dy -200..-100: n=450, pencere 64 ms
+  dy -100..-30: n=654, pencere 71 ms
+  dy -30..30: n=603, pencere 74 ms
+  dy 30..100: n=589, pencere 78 ms
+  dy 100..200: n=504, pencere 80 ms
+
+Tepe genişliğine göre:
+  genişlik 50-62: n=466, pencere 64 ms
+  genişlik 62-70: n=567, pencere 68 ms
+  genişlik 70-80: n=327, pencere 75 ms
+  genişlik 80-97: n=1440, pencere 79 ms
+
+Basış farkı (bir önceki zıplamaya göre) kovaları:
+  0-30 ms: %46
+  30-80 ms: %42
+  80-150 ms: %12
+  150-450 ms: %0
