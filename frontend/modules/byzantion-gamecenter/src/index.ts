@@ -16,6 +16,7 @@ type Native = {
   loadFriends?(leaderboardId: string): Promise<{ status: string; message?: string; friends: GameCenterFriend[] }>;
   challengePlayer?(playerID: string, seed: number, score: number, from: string, race: string): Promise<ChallengeSendResult>;
   finishChallengeRace?(matchID: string, score: number, name: string, race: string, outcome: number): Promise<{ status: string; message?: string }>;
+  battery?(): Promise<{ level: number; state: number }>;
   addListener?(event: string, cb: (e: FriendChallenge) => void): { remove(): void };
 };
 
@@ -105,4 +106,15 @@ export async function challengePlayer(playerID: string, seed: number, score: num
 export async function finishChallengeRace(matchID: string, score: number, name: string, race: string, outcome: number) {
   if (!native || typeof native.finishChallengeRace !== "function") return { status: "error" };
   try { return await native.finishChallengeRace(matchID, Math.floor(score), name, race, outcome); } catch (e: any) { return { status: "error", message: String(e?.message ?? e) }; }
+}
+
+/** Pil: level 0..1 (-1 bilinmiyor), charging = takılı/dolu. Modül yoksa null. */
+export async function battery(): Promise<{ level: number; charging: boolean } | null> {
+  if (!native?.battery) return null;
+  try {
+    const b = await native.battery();
+    return { level: b.level, charging: b.state === 2 || b.state === 3 };
+  } catch {
+    return null;
+  }
 }

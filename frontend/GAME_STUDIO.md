@@ -1860,3 +1860,13 @@ TESLIM_HAZIR: YARIS-CIKIS — yarış sırasında X ile çıkış (app/index.tsx
 ### YARATICI FİKİRLER — 2026-11-17
 Kullanıcı: gerçek zamanlı İstanbul havası + yaratıcı fikirler, editörlerle rapor. Codex + Claude editörü danışıldı. Ortak öneri: 1) gerçek saat/gün batımı/ay evresi, 2) yalnız görsel hava katmanı (veri kaynağı: Apple WeatherKit önerildi, Open-Meteo ücretsiz katmanı ticari değil), 3) pil = amcanın şarjı. Rapor: ai_review_evidence/YARATICI-FIKIR-2026-11-17/RAPOR.md. Kod değişikliği yok.
 TESLIM_HAZIR: YARATICI-FIKIR — gerçek hava ve İstanbul fikirleri raporu (ai_review_evidence/YARATICI-FIKIR-2026-11-17/RAPOR.md); kullanıcı hangi fikirlerle başlanacağını seçecek.
+
+### GERÇEK İSTANBUL v1 — 2026-11-17
+Kullanıcı: "bu şekliyle kaydedelim … ilk üçünü yapalım". Önce mevcut durum commit edildi (b01bf04, push yok). Sonra raporun ilk üç adımı:
+1) Gerçek saat: gün doğumu/batımı İstanbul için internetsiz hesap (src/game/istanbul.ts); gökyüzü en az gerçek saatin tonunda (gece ise koşu baştan gece, ay ve yıldızlarla). Gece skor yazısı açık renk.
+2) Ay evresi + dolunay yakamozu (src/game/WeatherLayer.tsx SkyWeather).
+3) Hava katmanı (yalnız görünüş): yağmur, kar, sis, kapalı, lodos, poyraz; menü kartında "17 Kasım · Kapalı · 15°"; günün ilk "Oyna"sında tek satır. Kaynak şimdilik Open-Meteo (anahtarsız, TestFlight denemesi); App Store'dan önce WeatherKit'e geçiş için hesap onayı gerekir. Çevrimdışı: son kayıt (6 saat), yoksa açık hava.
+4) Pil = amcanın şarjı: Game Center modülüne battery() (UIDevice, izin istemez); pil %15 altı -> menüde balon + ilk oyunda "Senin şarjın da bitiyor, benim de…"; şarjda -> "Şarja takıldık, çay demleniyor."
+Deneme: menüdeki hava satırına dokun -> hava türleri; uzun bas -> gece+dolunay+pil az, tekrar -> şarjda, tekrar -> kapalı.
+Fizik/kamera/çatı değişmedi. Simülatörde gerçek hava (kapalı 15°), yağmur, kar, sis, lodos, gece+dolunay+yakamoz, pil balonu görüldü (ai_review_evidence/GERCEK-ISTANBUL-2026-11-17/). Telefona kuruldu, BUILD_TAG "GERCEK ISTANBUL v1 (HAVA+AY+PIL)"; telefonda denenmedi; bu değişiklikler commit edilmedi.
+TESLIM_HAZIR: GERCEK-ISTANBUL-v1 — gerçek saat/ay/hava/pil (src/game/istanbul.ts, src/game/WeatherLayer.tsx, app/index.tsx); kullanıcı telefonda denemesi ve WeatherKit kararı bekleniyor.

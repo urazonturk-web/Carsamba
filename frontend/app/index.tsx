@@ -56,6 +56,8 @@ import { jumpVelocity, advanceFlight } from "../src/game/jump";
 import { findFootLanding } from "../src/game/landing";
 import { MEYDAN_ON, makeCode, parseCode, shareText, type Challenge } from "../src/game/meydan";
 import { SymbolView } from "expo-symbols";
+import { ISTANBUL_ON, WEATHER_TEST_TAP, WEATHER_CACHE_KEY, WEATHER_TOAST_KEY, WEATHER_STALE_MS, WEATHER_REFRESH_MS, WEATHER_TEST_CYCLE, realSkyStep, moonInfo, fetchWeather, parseWeather, weatherStamp, weatherLine, trDayKey, type IstWeather } from "../src/game/istanbul";
+import { SkyWeather, PrecipLayer } from "../src/game/WeatherLayer";
 import { YARIS_ON, RACE_MS, RESPAWN_MS, EV_LAUNCH, EV_LAND, EV_FALL, EV_RESPAWN, pushEvent, encodeRace, decodeRace, compareRace, clockText, type RaceData, type RaceLog, type RaceSummary } from "../src/game/yaris";
 const MENU_ON = true; // açılış menüsü
 import { KURUKAFA_ON, SKULL_SOURCE, SKULL_SIZE, SKULL_HIT_R, skullTouches, skullAfter, skullLift, skullPoint, scaledPlatforms, rollSkullEffect } from "../src/game/kurukafa";
@@ -325,7 +327,7 @@ const AnimatedImage = Animated.createAnimatedComponent(Image);
 const BG_SCROLL_TEST = true as boolean;
 const BG_SCROLL_RATIO = 0.45;
 const BG_SCROLL_TILES = 4;
-const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "KARTPOSTAL v2 + YARIS CIKIS") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
+const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "GERCEK ISTANBUL v1 (HAVA+AY+PIL)") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
 const DIAG_MAX_EXAMPLES = 6;
 const HOUSE_AB_FROZEN = false as boolean;
 // REVIZYON-066 experiment (one variable): expo-linear-gradient's iOS layer
@@ -555,6 +557,8 @@ const DOOR_H = FART_CHAR_H * DOOR_HEIGHT_RATIO;
 // KURUKAFA: amcanın gövdesinin yarı genişliği (çizilen pozun ~%60'ı, kollar dahil).
 const SKULL_BADGE_W = 280; // dünya birimi (kamera 0,4 -> ~110 nokta)
 const SKULL_BADGE_H = 100;
+const BUBBLE_W = 560; // dünya birimi (kamera ~0,4)
+const BUBBLE_H = 260;
 const CHAR_BODY_HALF_W = (CHARGE_POSES[0].w * SPRITE_SCALE * GLOBAL_VISUAL_SCALE * CHAR_SIZE_TRIAL * 0.6) / 2;
 const DOOR_W = DOOR_H * DOOR_ASPECT;
 const FART_FEET_DX = SOLE_CENTER_OFFSET + ANCHOR_SHIFT_PX * SPRITE_SCALE;
@@ -594,6 +598,7 @@ const PC_STAMP = require("@/assets/postcards/kartpostal-galata.jpg");
 const PC_HAND = Platform.OS === "ios" ? "Noteworthy-Bold" : undefined;
 const PC_TYPE = Platform.OS === "ios" ? "AmericanTypewriter-Bold" : undefined;
 const PC_SCRIPT = Platform.OS === "ios" ? "SnellRoundhand-Bold" : undefined;
+const TR_MONTHS_TITLE = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
 const TR_MONTHS = ["OCAK", "ŞUBAT", "MART", "NİSAN", "MAYIS", "HAZİRAN", "TEMMUZ", "AĞUSTOS", "EYLÜL", "EKİM", "KASIM", "ARALIK"];
 const countUpMs = (n: number) => (n <= 0 ? 0 : Math.min(900, 300 + n * 12));
 function CountUp({ to, style }: { to: number; style: any }) {
@@ -774,6 +779,14 @@ export default function Game() {
   const [gameOver, setGameOver] = useState(false);
   // AÇILIŞ MENÜSÜ (2026-11-16): kullanıcı "oyunun ilk açılışında bir menü olmalı, hemen oyun açılıyor".
   const [menuOpen, setMenuOpen] = useState(MENU_ON);
+  // GERÇEK İSTANBUL (2026-11-17): hava, saat, ay, pil.
+  const [istWeather, setIstWeather] = useState<IstWeather | null>(null);
+  const [weatherTest, setWeatherTest] = useState(-1); // -1 = gerçek hava
+  const [sceneTest, setSceneTest] = useState(0); // uzun basış: 0 kapalı, 1 gece+dolunay+pil az, 2 şarjda
+  const [battery, setBattery] = useState<{ level: number; charging: boolean } | null>(null);
+  const [clockTick, setClockTick] = useState(0);
+  const realSkyRef = useRef(ISTANBUL_ON ? realSkyStep() : 0);
+  const lowBatteryToldRef = useRef(false);
   const [gcPlayer, setGcPlayer] = useState<GameCenter.GameCenterPlayer | null>(null);
   const gcNameRef = useRef("");
   useEffect(() => { gcNameRef.current = gcPlayer?.displayName ?? ""; }, [gcPlayer]);
@@ -1034,6 +1047,75 @@ export default function Game() {
   // Perfect-landing particle burst
   const burst = useSharedValue(0);
   const skyStep = useSharedValue(START_SKY);
+  const nightAmt = useDerivedValue(() => Math.max(0, Math.min(1, skyStep.value - 3)));
+
+  // GERÇEK İSTANBUL: saat (dakikada bir), hava (önbellek + 30 dk'da bir), pil (dakikada bir).
+  useEffect(() => {
+    if (!ISTANBUL_ON) return;
+    const tick = () => {
+      const real = sceneTest === 1 ? 4 : realSkyStep();
+      realSkyRef.current = real;
+      // Koşu sırasında yalnız kararabilir; menüde/başta doğrudan gerçek saate.
+      if (real > skyStep.value) skyStep.value = withTiming(real, { duration: 1200 });
+      else if (scoreRef.current === 0 && !raceRef.current) skyStep.value = withTiming(Math.max(START_SKY, real), { duration: 1200 });
+      setClockTick((n) => n + 1);
+    };
+    tick();
+    const id = setInterval(tick, 60_000);
+    return () => clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sceneTest]);
+  useEffect(() => {
+    if (!ISTANBUL_ON) return;
+    let alive = true;
+    const refresh = async () => {
+      const cached = parseWeather(await storage.getItem<string>(WEATHER_CACHE_KEY, ""));
+      if (alive && cached && Date.now() - cached.at < WEATHER_STALE_MS) setIstWeather((w) => w ?? cached);
+      if (cached && Date.now() - cached.at < WEATHER_REFRESH_MS) return;
+      const fresh = await fetchWeather();
+      if (!alive) return;
+      if (fresh) {
+        setIstWeather(fresh);
+        storage.setItem(WEATHER_CACHE_KEY, JSON.stringify(fresh));
+      } else if (!cached || Date.now() - cached.at >= WEATHER_STALE_MS) {
+        setIstWeather(null); // çevrimdışı ve bilgi eski: açık hava + gerçek saat
+      }
+    };
+    const pollBattery = async () => { const b = await GameCenter.battery(); if (alive) setBattery(b); };
+    refresh();
+    pollBattery();
+    const id = setInterval(() => { refresh(); pollBattery(); }, 60_000);
+    const sub = AppState.addEventListener("change", (st) => { if (st === "active") { refresh(); pollBattery(); } });
+    return () => { alive = false; clearInterval(id); sub.remove(); };
+  }, []);
+  const shownWeather: IstWeather | null = weatherTest >= 0
+    ? { ...WEATHER_TEST_CYCLE[weatherTest], temp: istWeather?.temp ?? 14, at: Date.now(), test: true }
+    : istWeather;
+  const moon = useMemo(() => {
+    const m = moonInfo();
+    return sceneTest === 1 ? { ...m, illum: 1, full: true, waxing: true, name: "Dolunay" } : m;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clockTick, sceneTest]);
+  const shownBattery = sceneTest === 1 ? { level: 0.1, charging: false } : sceneTest === 2 ? { level: 0.6, charging: true } : battery;
+  const batteryMood: "low" | "charging" | null = !ISTANBUL_ON || !shownBattery || shownBattery.level < 0 ? null
+    : shownBattery.charging ? "charging" : shownBattery.level < 0.15 ? "low" : null;
+  const isNightNow = (sceneTest === 1 ? 4 : realSkyRef.current) >= 4;
+  // Gece (gerçek saat ya da gece durakları): skor koyu gökte okunsun diye açık renk.
+  const nightHud = ISTANBUL_ON && (isNightNow || (DURAK_SEFER && stopsPassed(lastTowerRef.current) >= NIGHT_STOP));
+  // Günün ilk koşusunda bir satır İstanbul havası; pil azsa (oturumda bir kez) amcanın şarj şakası öncelikli.
+  const announceDay = useCallback(async () => {
+    if (!ISTANBUL_ON) return;
+    if (batteryMood === "low" && !lowBatteryToldRef.current) {
+      lowBatteryToldRef.current = true;
+      showToast("Amca: Senin şarjın da bitiyor, benim de…");
+      return;
+    }
+    const today = trDayKey();
+    const w = shownWeather ?? { kind: "acik" as const, wind: null, temp: 0, at: 0 };
+    if (!shownWeather?.test && (await storage.getItem<string>(WEATHER_TOAST_KEY, "")) === today) return;
+    if (!shownWeather?.test) storage.setItem(WEATHER_TOAST_KEY, today);
+    showToast(weatherLine(w, isNightNow, moon.full));
+  }, [batteryMood, shownWeather, isNightNow, moon.full, showToast]);
   const overT = useSharedValue(-1); // patlama eşiği ilerlemesi (-1 = pencere yok)
   const dirty = useSharedValue(0); // 1 = amca bu tur lekeli
   // PİJAMA ANI (2026-11-16): gece başlarken çatı kapısı + gece külahı/terlik.
@@ -1338,7 +1420,7 @@ export default function Game() {
         if (pier && SFX_ON) setTimeout(() => playSfx("record"), 650);
         // İSKELE ANI konfetisi artık yalnız finalde (kilim renkleri).
         if (finale && !raceRef.current) setPierFx(landedId); // yarışta konfeti yok
-        skyStep.value = withTiming(skyStepForStops(after), { duration: 900 });
+        skyStep.value = withTiming(Math.max(skyStepForStops(after), realSkyRef.current), { duration: 900 });
       }
     }
     const gained =
@@ -1502,7 +1584,7 @@ export default function Game() {
     runNewCardsRef.current = [];
     setRunNewCards([]);
     setAlbumOpen(false);
-    skyStep.value = START_SKY;
+    skyStep.value = Math.max(START_SKY, realSkyRef.current);
     setStopBanner(null);
     setBridgeStrip(null);
     setArrivalCard(null);
@@ -2419,6 +2501,13 @@ export default function Game() {
       { translateY: py.value + PH / 2 - FART_CHAR_H - SKULL_BADGE_H - 8 + Math.sin(skullBob.value * Math.PI * 2) * 3 },
     ],
   }));
+  // PİL = AMCANIN ŞARJI: menüde amcanın başının üstünde konuşma balonu.
+  const bubbleStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateX: px.value + SOLE_CENTER_OFFSET + 70 },
+      { translateY: py.value + PH / 2 - FART_CHAR_H * 0.98 },
+    ],
+  }));
   const fliesStyle = useAnimatedStyle(() => ({
     opacity: dirty.value,
     transform: [{ translateX: px.value + FART_FEET_DX }, { translateY: py.value + PH / 2 - FART_CHAR_H * 0.98 }],
@@ -2652,6 +2741,9 @@ export default function Game() {
             <View key={i} style={{ position: "absolute", left: `${st.x}%`, top: `${st.y}%`, width: st.r, height: st.r, borderRadius: st.r / 2, backgroundColor: "#fff6d8", opacity: st.o }} />
           ))}
         </Animated.View>
+      )}
+      {ISTANBUL_ON && !POPUP && (
+        <SkyWeather W={W} H={H} weather={shownWeather} night={nightAmt} moon={moon} active={assetsReady} />
       )}
       {AMBIENT_ON && !POPUP && (
         <AmbientEvents W={W} H={H} active={assetsReady && !gameOver} onHorn={() => { if (SFX_ON) playSfx("horn_far"); }} />
@@ -3005,6 +3097,14 @@ export default function Game() {
             <Image source={SKULL_SOURCE} resizeMode="stretch" fadeDuration={0} style={{ width: "100%", height: "100%" }} />
           </Animated.View>
         )}
+        {ISTANBUL_ON && batteryMood && menuOpen && (
+          <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, width: BUBBLE_W, height: BUBBLE_H, justifyContent: "flex-start" }, bubbleStyle]} testID="amca-bubble">
+            <View style={styles.amcaBubble}>
+              <Ico name={batteryMood === "low" ? "battery.25" : "cup.and.saucer.fill"} size={56} color={batteryMood === "low" ? "#c0472b" : "#6e4632"} />
+              <Text style={styles.amcaBubbleText}>{batteryMood === "low" ? "Senin şarjın da bitiyor, benim de…" : "Şarja takıldık, çay demleniyor."}</Text>
+            </View>
+          </Animated.View>
+        )}
         {KURUKAFA_ON && (
           <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, width: SKULL_BADGE_W, height: SKULL_BADGE_H, alignItems: "center", justifyContent: "center" }, skullBadgeStyle]}>
             {skullHud && (
@@ -3079,6 +3179,7 @@ export default function Game() {
         </View>
       )}
       {PERF_PROBE && <PerfProbeOverlay top={insets.top + 4} sv={{ pFrames, pHitch, pHitchBig, pAirFrames, pAirHitch, pListAir, pHitchNearList, pMaxMs, pHitchIdle, pHitchCharge, pHitchDead, pEvAppear, pEvGone, pEvMove, pListNoHouse, pHitchAppear, pHitchGone, pHitchMove, pHitchListOnly, pHitchNoEvent }} />}
+      {ISTANBUL_ON && !POPUP && <PrecipLayer W={W} H={H} weather={shownWeather} active={assetsReady} />}
       {GORUNUM_REV && !POPUP && (
         <LinearGradient pointerEvents="none" colors={["rgba(58,36,24,0)", "rgba(58,36,24,0.38)"]}
           style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: "16%" }} />
@@ -3110,10 +3211,10 @@ export default function Game() {
       )}
       {/* Score HUD */}
       {!gameOver && assetsReady && !menuOpen && !raceResult && <View style={[styles.hud, { top: insets.top + 24 }]}>
-        <Text style={[styles.scoreText, POPUP && styles.puScoreText]} testID="score-value">
+        <Text style={[styles.scoreText, (POPUP || nightHud) && styles.puScoreText]} testID="score-value">
           {score}
         </Text>
-        <Text style={[styles.bestText, POPUP && styles.puBestText]} testID="best-value">
+        <Text style={[styles.bestText, (POPUP || nightHud) && styles.puBestText]} testID="best-value">
           {FAZ1_UI ? (mode === "daily" ? "GÜNÜN REKORU" : "REKOR") : "BEST"} {best}
         </Text>
         {MEYDAN_ON && challenge && <Text style={styles.challengeChip}>⚔️ Hedef {challenge.target}</Text>}
@@ -3365,14 +3466,32 @@ export default function Game() {
                 </View>
                 <View style={[styles.pcInner, { paddingTop: 10, paddingBottom: 8 }]}>
                   <Text style={[styles.pcHand, styles.pcMenuNote]} numberOfLines={1} adjustsFontSizeToFit>Sevgili amca, bugün hangi durağa?</Text>
-                  {best > 0 && <Text style={[styles.pcBest, styles.pcMenuNote, { marginBottom: 0 }]}>Rekor {best}</Text>}
+                  <View style={styles.pcMenuRow}>
+                  {best > 0 && <Text style={[styles.pcBest, { marginBottom: 0, fontSize: 17 }]}>Rekor {best}</Text>}
+                  {ISTANBUL_ON && (
+                    <Pressable
+                      testID="menu-weather"
+                      disabled={!WEATHER_TEST_TAP}
+                      hitSlop={6}
+                      onPress={() => setWeatherTest((i) => (i + 1 >= WEATHER_TEST_CYCLE.length ? -1 : i + 1))}
+                      onLongPress={() => setSceneTest((k) => (k + 1) % 3)}
+                      style={styles.pcWeatherRow}
+                    >
+                      <Ico name={shownWeather?.kind === "yagmur" ? "cloud.rain.fill" : shownWeather?.kind === "kar" ? "cloud.snow.fill" : shownWeather?.kind === "sis" ? "cloud.fog.fill"
+                        : shownWeather?.wind ? "wind" : shownWeather?.kind === "bulutlu" ? "cloud.fill" : isNightNow ? (moon.full ? "moon.stars.fill" : "moon.fill") : "sun.max.fill"} size={16} color="#1f4e79" />
+                      <Text style={styles.pcWeatherText} numberOfLines={1} adjustsFontSizeToFit>
+                        {shownWeather ? weatherStamp(shownWeather, TR_MONTHS_TITLE) : "İstanbul"}{isNightNow && moon.full ? " · Dolunay" : ""}{shownWeather?.test || sceneTest ? " (deneme)" : ""}
+                      </Text>
+                    </Pressable>
+                  )}
+                  </View>
                   {MEYDAN_ON && incoming.length > 0 && (
                     <Pressable style={({ pressed }) => [styles.friendPill, pressed && styles.playBtnPressed]} onPress={() => playIncoming(incoming[0])} testID="menu-incoming">
                       <Text style={styles.friendPillText}>{incoming[0].race ? `${incoming[0].from || "Bir arkadaşın"} seni 2 dk yarışa çağırdı: ${incoming[0].score}. kule` : `${incoming[0].from || "Bir arkadaşın"} sana meydan okudu: ${incoming[0].score} puan`}</Text>
                       <Text style={styles.friendPillGo}>Oyna ›</Text>
                     </Pressable>
                   )}
-                  <Pressable testID="menu-play" style={({ pressed }) => [styles.trPlayBtn, styles.iconBtn, styles.pcTicket, { marginTop: 8 }, pressed && styles.playBtnPressed]} onPress={() => setMenuOpen(false)}>
+                  <Pressable testID="menu-play" style={({ pressed }) => [styles.trPlayBtn, styles.iconBtn, styles.pcTicket, { marginTop: 8 }, pressed && styles.playBtnPressed]} onPress={() => { setMenuOpen(false); announceDay(); }}>
                     <View pointerEvents="none" style={[styles.pcNotch, { left: -9 }]} /><View pointerEvents="none" style={[styles.pcNotch, { right: -9 }]} />
                     <Ico name="play.fill" size={20} color="#fff8ec" />
                     <Text style={styles.playBtnText}>Oyna</Text>
@@ -4494,6 +4613,11 @@ const useStyles = makeStyles((colors) => ({
   pcTiltR: { transform: [{ rotate: "1.5deg" }] },
   pcTicket: { overflow: "visible" },
   pcNotch: { position: "absolute", top: "50%", marginTop: -9, width: 18, height: 18, borderRadius: 9, backgroundColor: "#fbf3e2" },
+  pcMenuRow: { flexDirection: "row", alignItems: "center", alignSelf: "stretch", marginRight: 56, gap: 12, marginBottom: 2 },
+  pcWeatherRow: { flexDirection: "row", alignItems: "center", flexShrink: 1, gap: 5 },
+  pcWeatherText: { flexShrink: 1, fontFamily: "Noteworthy-Bold", fontSize: 15, color: "#1f4e79" },
+  amcaBubble: { flexDirection: "row", alignItems: "center", gap: 14, paddingHorizontal: 30, paddingVertical: 18, borderRadius: 40, backgroundColor: "#fff8ec", borderWidth: 5, borderColor: "#6e4632" },
+  amcaBubbleText: { fontSize: 40, fontWeight: "800", color: "#4a2c1c", flexShrink: 1 },
   pcMenuNote: { fontSize: 18, alignSelf: "stretch", marginRight: 56, textAlign: "left", marginBottom: 2 },
   pcGreetingC: { fontFamily: PC_SCRIPT, fontSize: 20, color: "#1f4e79", alignSelf: "stretch", marginRight: 56, marginLeft: 6 },
   pcVerdict: { fontFamily: PC_TYPE, fontSize: 30, marginTop: 4, alignSelf: "stretch", marginRight: 58, textAlign: "left" },

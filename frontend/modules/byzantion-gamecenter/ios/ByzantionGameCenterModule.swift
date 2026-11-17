@@ -336,6 +336,13 @@ public class ByzantionGameCenterModule: Module {
     // Installs the authenticate handler once. iOS shows its own Game Center
     // sign-in sheet if needed (only when the handler hands us a controller);
     // a player who already uses Game Center gets the small "Welcome back" banner.
+    // PİL = AMCANIN ŞARJI (2026-11-17): izin istemez. level 0..1 (-1 bilinmiyor), state: 1 takılı değil, 2 şarjda, 3 dolu.
+    AsyncFunction("battery") { (promise: Promise) in
+      let dev = UIDevice.current
+      dev.isBatteryMonitoringEnabled = true
+      promise.resolve(["level": Double(dev.batteryLevel), "state": dev.batteryState.rawValue])
+    }.runOnQueue(.main)
+
     AsyncFunction("authenticate") { (promise: Promise) in
       if GKLocalPlayer.local.isAuthenticated {
         promise.resolve(self.playerInfo())
