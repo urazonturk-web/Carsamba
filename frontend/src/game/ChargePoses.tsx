@@ -11,6 +11,9 @@ import Animated, { useAnimatedStyle, type SharedValue } from "react-native-reani
 
 import { CHARGE_POSES, poseOpacity } from "./character-pose";
 import { HAT_BOX, HAT_SOURCE, SLIPPER_BOXES, SLIPPER_SOURCE } from "./pijama";
+import { RAIN_POSE_SOURCES, RAIN_CAP_SOURCE, RAIN_CAP_BOX } from "./yagmur";
+import { UMB_OPEN, UMB_CLOSED, UMB_FABRIC, UMB_FABRIC_LIGHT, UMB_LINE, UMB_WOOD } from "./semsiye";
+import { WINTER_HAT_BOX, WINTER_HAT_SOURCE, WINTER_SCARF_BOX, WINTER_SCARF_SOURCE, SNOW_A, SNOW_B, SNOW_C, SNOW_D, NOSE_RED, BREATH, type SnowBlob } from "./kis";
 
 type Props = {
   px: SharedValue<number>;
@@ -38,6 +41,18 @@ type Props = {
   dirty?: SharedValue<number>;
   // PİJAMA ANI (2026-11-16): 1 = gece külahı + terlik görünür (yalnız opaklık).
   pajama?: SharedValue<number>;
+  // KIŞ (2026-11-17): 1 = bere + atkı. Gece külahı (pajama) bereyi gizler, atkı kalır.
+  winter?: SharedValue<number>;
+  // KARLI AMCA (2026-11-17): snow 0..1 birikmiş kar, nose 0..1 soğuktan kızarma, breath 0..1 buhar puf ilerlemesi.
+  snow?: SharedValue<number>;
+  nose?: SharedValue<number>;
+  breath?: SharedValue<number>;
+  // YAĞMUR KIYAFETİ (2026-11-17): 1 = kasket + mont (montlu poz görseli özgün pozun üstüne biner).
+  rain?: SharedValue<number>;
+  // ŞEMSİYE (2026-11-17): umbrella 1 = yağmurda şemsiye var; umbOpen 0..1 açılma; umbFlip 0..1 kumaşın ters dönmesi.
+  umbrella?: SharedValue<number>;
+  umbOpen?: SharedValue<number>;
+  umbFlip?: SharedValue<number>;
   // PİJAMA ANI: kapıya yürüme için yalnız görüntü kayması (fizik px/py değişmez).
   offsetX?: SharedValue<number>;
   offsetY?: SharedValue<number>;
@@ -56,7 +71,7 @@ const DIRT_SPOTS = [
 ];
 const DIRT_COLORS = ["rgba(150,104,48,0.92)", "rgba(126,86,40,0.92)", "rgba(171,124,62,0.9)"];
 
-function PoseLayer({ i, px, py, poseCharge, scale, feetCenterOffset, feetHalf, landPulse, halo, strain, dirty, pajama, offsetX, offsetY, ...cb }: Props & { i: number }) {
+function PoseLayer({ i, px, py, poseCharge, scale, feetCenterOffset, feetHalf, landPulse, halo, strain, dirty, pajama, winter, snow, nose, breath, rain, umbrella, umbOpen, umbFlip, offsetX, offsetY, ...cb }: Props & { i: number }) {
   const pose = CHARGE_POSES[i];
   const style = useAnimatedStyle(() => {
     // Squash toward the FOOT line (feetHalf), not the sprite's own center,
@@ -84,13 +99,46 @@ function PoseLayer({ i, px, py, poseCharge, scale, feetCenterOffset, feetHalf, l
   });
   const dirtStyle = useAnimatedStyle(() => ({ opacity: dirty ? dirty.value : 0 }));
   const pajamaStyle = useAnimatedStyle(() => ({ opacity: pajama ? pajama.value : 0 }));
+  const scarfStyle = useAnimatedStyle(() => ({ opacity: winter ? winter.value : 0 }));
+  const winterHatStyle = useAnimatedStyle(() => ({ opacity: winter ? winter.value * (1 - (pajama ? pajama.value : 0)) * (1 - (rain ? rain.value : 0)) : 0 }));
+  const rainBodyStyle = useAnimatedStyle(() => ({ opacity: rain ? rain.value : 0 }));
+  const rainCapStyle = useAnimatedStyle(() => ({ opacity: rain ? rain.value * (1 - (pajama ? pajama.value : 0)) : 0 }));
   const slip = SLIPPER_BOXES[i];
+  // R062 kuralı: SharedValue her güncelleyicinin kendi kapanışında okunmalı (iç içe worklet'e saklanırsa abone olunmaz).
+  const snowA = useAnimatedStyle(() => ({ opacity: Math.max(0, Math.min(1, ((snow ? snow.value : 0) - 0.1) * 5)) }));
+  const snowB = useAnimatedStyle(() => ({ opacity: Math.max(0, Math.min(1, ((snow ? snow.value : 0) - 0.45) * 5)) }));
+  const snowC = useAnimatedStyle(() => ({ opacity: Math.max(0, Math.min(1, ((snow ? snow.value : 0) - 0.7) * 5)) }));
+  const snowD = useAnimatedStyle(() => ({ opacity: Math.max(0, Math.min(1, ((snow ? snow.value : 0) - 0.92) * 5)) }));
+  const noseStyle = useAnimatedStyle(() => ({ opacity: (nose ? nose.value : 0) * 0.32 }));
+  const breathStyle = useAnimatedStyle(() => {
+    const b = breath ? breath.value : 0;
+    return { opacity: b > 0 && b < 1 ? (b < 0.2 ? b * 5 : (1 - b) / 0.8) * 0.85 : 0,
+      transform: [{ translateX: b * 46 * scale }, { translateY: -b * 22 * scale }, { scale: 0.6 + b * 0.9 }] };
+  });
+  // ŞEMSİYE: her güncelleyici SharedValue'ları kendi içinde okur (R062).
+  const umbClosedStyle = useAnimatedStyle(() => {
+    const on = umbrella ? umbrella.value : 0;
+    const o = umbOpen ? umbOpen.value : 0;
+    return { opacity: on * Math.max(0, 1 - o * 3) };
+  });
+  const umbOpenStyle = useAnimatedStyle(() => {
+    const on = umbrella ? umbrella.value : 0;
+    const o = umbOpen ? umbOpen.value : 0;
+    const pulse = landPulse ? landPulse.value : 0;
+    return { opacity: on * Math.min(1, o * 4), transform: [{ rotate: `${pulse * 7}deg` }] };
+  });
+  const umbCanopyStyle = useAnimatedStyle(() => {
+    const o = umbOpen ? umbOpen.value : 0;
+    const f = umbFlip ? umbFlip.value : 0;
+    return { transform: [{ scaleX: 0.18 + 0.82 * o }, { scaleY: (0.35 + 0.65 * Math.min(1, o)) * (1 - 1.35 * f) }] };
+  });
   return (
     <Animated.View
       testID={`charge-pose-${i}`}
       pointerEvents="none"
       style={[{ position: "absolute", left: 0, top: 0, width: pose.w * scale, height: pose.h * scale }, style]}
     >
+      {umbrella ? <Umbrella scale={scale} closedStyle={umbClosedStyle} openStyle={umbOpenStyle} canopyStyle={umbCanopyStyle} /> : null}
       {halo && LIVE_RN_IMAGE
         ? HALO_OFFSETS.map(([dx, dy], k) => (
             <Image
@@ -126,11 +174,53 @@ function PoseLayer({ i, px, py, poseCharge, scale, feetCenterOffset, feetHalf, l
           onError={cb.onError}
         />
       )}
+      {rain ? (
+        <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, right: 0, bottom: 0 }, rainBodyStyle]}>
+          <Image source={RAIN_POSE_SOURCES[i]} resizeMode="stretch" fadeDuration={0} style={{ width: "100%", height: "100%" }} />
+        </Animated.View>
+      ) : null}
       {dirty ? (
         <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, right: 0, bottom: 0 }, dirtStyle]}>
           {DIRT_SPOTS.map((d, k) => (
             <View key={k} style={{ position: "absolute", left: `${(d.x - d.d / 2) * 100}%`, top: `${(d.y - d.d / 3) * 100}%`, width: `${d.d * 100}%`, aspectRatio: 1.25, borderRadius: 999, borderWidth: 1, borderColor: "rgba(60,36,16,0.7)", backgroundColor: DIRT_COLORS[k % 3] }} />
           ))}
+        </Animated.View>
+      ) : null}
+      {winter ? (
+        <>
+          <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, right: 0, bottom: 0 }, scarfStyle]}>
+            <Image source={WINTER_SCARF_SOURCE} resizeMode="stretch" fadeDuration={0}
+              style={{ position: "absolute", left: WINTER_SCARF_BOX.x * scale, top: WINTER_SCARF_BOX.y * scale, width: WINTER_SCARF_BOX.w * scale, height: WINTER_SCARF_BOX.h * scale }} />
+          </Animated.View>
+          <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, right: 0, bottom: 0 }, winterHatStyle]}>
+            <Image source={WINTER_HAT_SOURCE} resizeMode="stretch" fadeDuration={0}
+              style={{ position: "absolute", left: WINTER_HAT_BOX.x * scale, top: WINTER_HAT_BOX.y * scale, width: WINTER_HAT_BOX.w * scale, height: WINTER_HAT_BOX.h * scale }} />
+          </Animated.View>
+        </>
+      ) : null}
+      {rain ? (
+        <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, right: 0, bottom: 0 }, rainCapStyle]}>
+          <Image source={RAIN_CAP_SOURCE} resizeMode="stretch" fadeDuration={0}
+            style={{ position: "absolute", left: RAIN_CAP_BOX.x * scale, top: RAIN_CAP_BOX.y * scale, width: RAIN_CAP_BOX.w * scale, height: RAIN_CAP_BOX.h * scale }} />
+        </Animated.View>
+      ) : null}
+      {nose && i < 4 ? (
+        <Animated.View pointerEvents="none" style={[{ position: "absolute", left: NOSE_RED.x * scale, top: NOSE_RED.y * scale, width: NOSE_RED.d * scale, height: NOSE_RED.d * 0.8 * scale,
+          borderRadius: NOSE_RED.d * scale, backgroundColor: "rgb(232,60,60)" }, noseStyle]} />
+      ) : null}
+      {snow ? (
+        <>
+          {([[SNOW_A, snowA], [SNOW_B, snowB], [SNOW_C, snowC], [SNOW_D, snowD]] as const).map(([blobs, st], k) => (
+            <Animated.View key={`s${k}`} pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, right: 0, bottom: 0 }, st]}>
+              {(blobs as SnowBlob[]).map((b, j) => <SnowLump key={j} b={b} scale={scale} />)}
+            </Animated.View>
+          ))}
+        </>
+      ) : null}
+      {breath ? (
+        <Animated.View pointerEvents="none" style={[{ position: "absolute", left: BREATH.x * scale, top: BREATH.y * scale, width: 70 * scale, height: 50 * scale }, breathStyle]}>
+          <View style={{ position: "absolute", left: 0, top: 10 * scale, width: 38 * scale, height: 30 * scale, borderRadius: 20 * scale, backgroundColor: "rgba(250,252,255,0.9)" }} />
+          <View style={{ position: "absolute", left: 24 * scale, top: 0, width: 44 * scale, height: 36 * scale, borderRadius: 22 * scale, backgroundColor: "rgba(250,252,255,0.8)" }} />
         </Animated.View>
       ) : null}
       {pajama ? (
@@ -144,6 +234,65 @@ function PoseLayer({ i, px, py, poseCharge, scale, feetCenterOffset, feetHalf, l
         </Animated.View>
       ) : null}
     </Animated.View>
+  );
+}
+
+// ŞEMSİYE prototipi (kodla çizim, amcanın ARKASINDA): kapalı hâl sırtta çapraz, açık kubbe başın üstünde.
+// Kubbe kabı 2*h yüksekliğinde, kubbe üst yarıda: scaleY kabın ortasına (= kubbe alt kenarı) göre işler,
+// eksi değerde kumaş yukarı doğru ters döner.
+function Umbrella({ scale, closedStyle, openStyle, canopyStyle }: { scale: number; closedStyle: any; openStyle: any; canopyStyle: any }) {
+  const O = UMB_OPEN, C = UMB_CLOSED, s = scale;
+  const lw = Math.max(1, 9 * s);
+  const r = O.w / 2;
+  return (
+    <>
+      <Animated.View pointerEvents="none" style={[{ position: "absolute", left: (C.cx - C.w) * s, top: (C.cy - C.len / 2) * s, width: C.w * 2 * s, height: C.len * s,
+        transform: [{ rotate: `${C.rot}deg` }] }, closedStyle]}>
+        {/* kıvrık sap (üstte) */}
+        <View style={{ position: "absolute", left: -C.w * 0.2 * s, top: 0, width: C.w * 1.4 * s, height: C.w * 1.4 * s, borderRadius: C.w * s,
+          borderWidth: 12 * s, borderColor: UMB_WOOD, borderBottomColor: "transparent", borderLeftColor: "transparent", transform: [{ rotate: "-45deg" }] }} />
+        <View style={{ position: "absolute", left: (C.w - 6) * s, top: C.w * 0.6 * s, width: 12 * s, height: C.len * 0.3 * s, backgroundColor: UMB_WOOD, borderRadius: 6 * s }} />
+        {/* sarılı kumaş */}
+        <View style={{ position: "absolute", left: C.w * 0.45 * s, top: C.len * 0.3 * s, width: C.w * 1.1 * s, height: C.len * 0.62 * s,
+          borderRadius: C.w * 0.55 * s, borderBottomLeftRadius: C.w * 0.2 * s, borderBottomRightRadius: C.w * 0.2 * s, backgroundColor: UMB_FABRIC, borderWidth: lw, borderColor: UMB_LINE }} />
+      </Animated.View>
+      <Animated.View pointerEvents="none" style={[{ position: "absolute", left: (O.cx - r) * s, top: (O.bottom - O.h - 40) * s, width: O.w * s, height: (O.shaftBottom - O.bottom + O.h + 40) * s }, openStyle]}>
+        {/* sap: kubbenin tepesinden başın arkasına */}
+        <View style={{ position: "absolute", left: (r - 6) * s, top: 0, width: 12 * s, height: (O.shaftBottom - O.bottom + O.h + 40) * s, backgroundColor: UMB_WOOD, borderRadius: 6 * s,
+          borderWidth: Math.max(0.5, 3 * s), borderColor: UMB_LINE }} />
+        <Animated.View style={[{ position: "absolute", left: 0, top: 40 * s, width: O.w * s, height: O.h * 2 * s }, canopyStyle]}>
+          <View style={{ position: "absolute", left: 0, top: 0, width: O.w * s, height: O.h * s, overflow: "hidden" }}>
+            <View style={{ position: "absolute", left: 0, top: 0, width: O.w * s, height: O.h * 2 * s, borderRadius: r * s, backgroundColor: UMB_FABRIC, borderWidth: lw, borderColor: UMB_LINE }} />
+            <View style={{ position: "absolute", left: (r - O.w * 0.17) * s, top: 0, width: O.w * 0.34 * s, height: O.h * 2 * s, borderRadius: O.w * 0.17 * s,
+              backgroundColor: UMB_FABRIC_LIGHT, borderWidth: Math.max(0.5, 5 * s), borderColor: UMB_LINE }} />
+          </View>
+          {/* alt kenar + uç tıkaçları */}
+          <View style={{ position: "absolute", left: 0, top: (O.h - 5) * s, width: O.w * s, height: lw, backgroundColor: UMB_LINE }} />
+          {[0, 0.17, 0.5, 0.83, 1].map((t, k) => (
+            <View key={k} style={{ position: "absolute", left: (t * O.w - 9) * s, top: (O.h - 9) * s, width: 18 * s, height: 18 * s, borderRadius: 9 * s, backgroundColor: UMB_LINE }} />
+          ))}
+          <View style={{ position: "absolute", left: (r - 7) * s, top: -30 * s, width: 14 * s, height: 36 * s, borderRadius: 7 * s, backgroundColor: UMB_LINE }} />
+        </Animated.View>
+      </Animated.View>
+    </>
+  );
+}
+
+// Kar yığını: yüzeye biraz gömülü üç daire (ortadaki büyük); ince gri-mavi kontur karlı çatıda da seçilsin diye.
+function SnowLump({ b, scale }: { b: SnowBlob; scale: number }) {
+  const parts = [
+    { dx: -0.3, d: 0.46 }, { dx: 0.3, d: 0.42 }, { dx: 0, d: 0.62 },
+  ];
+  return (
+    <>
+      {parts.map((q, k) => {
+        const d = b.w * q.d;
+        const left = (b.cx + q.dx * b.w - d / 2) * scale;
+        const top = (b.by - d * 0.78) * scale; // dairenin alt %22'si yüzeyin altında kalır
+        return <View key={k} style={{ position: "absolute", left, top, width: d * scale, height: d * scale, borderRadius: (d * scale) / 2,
+          backgroundColor: "rgba(255,255,255,0.98)", borderWidth: Math.max(0.5, 2 * scale), borderColor: "rgba(120,145,180,0.55)" }} />;
+      })}
+    </>
   );
 }
 

@@ -63,9 +63,39 @@ export function moonInfo(now = Date.now()) {
 
 export type WeatherKind = "acik" | "bulutlu" | "yagmur" | "kar" | "sis";
 export type WindKind = "lodos" | "poyraz" | null;
-export type IstWeather = { kind: WeatherKind; wind: WindKind; temp: number; at: number; test?: boolean };
+export type IstWeather = { kind: WeatherKind; wind: WindKind; temp: number; at: number; test?: boolean; light?: boolean;
+  /** "apple" = WeatherKit (ekranda  Weather atfı zorunlu), "om" = Open-Meteo (yalnız deneme yedeği). */
+  src?: "apple" | "om"; legalUrl?: string };
 
-export const WEATHER_CACHE_KEY = "byz.weather.v1";
+/** 2026-11-17: kaynak Apple WeatherKit. Open-Meteo yalnız WeatherKit yanıt vermezse yedek (ücretsiz katmanı ticari
+ *  olmayan kullanım içindir) -> App Store'dan önce false yapılmalı. */
+export const OPEN_METEO_FALLBACK = true as boolean;
+
+const WIND_FROM = (windKmh: number, windDir: number): WindKind =>
+  windKmh < 20 ? null : windDir >= 190 && windDir <= 255 ? "lodos" : windDir >= 15 && windDir <= 75 ? "poyraz" : null;
+
+/** Apple WeatherKit condition (WeatherCondition.rawValue) -> oyun havası. */
+export function mapAppleCondition(cond: string, windKmh: number, windDir: number): { kind: WeatherKind; wind: WindKind; light: boolean } {
+  const SNOW = ["snow", "heavySnow", "flurries", "sunFlurries", "blizzard", "blowingSnow", "sleet", "wintryMix", "freezingRain"];
+  const RAIN = ["rain", "heavyRain", "drizzle", "freezingDrizzle", "sunShowers", "hail", "isolatedThunderstorms",
+    "scatteredThunderstorms", "thunderstorms", "strongStorms", "tropicalStorm", "hurricane"];
+  const LIGHT = ["drizzle", "freezingDrizzle", "sunShowers"];
+  let kind: WeatherKind = "acik";
+  if (SNOW.includes(cond)) kind = "kar";
+  else if (RAIN.includes(cond)) kind = "yagmur";
+  else if (cond === "foggy" || cond === "haze" || cond === "smoky") kind = "sis";
+  else if (cond === "cloudy" || cond === "mostlyCloudy") kind = "bulutlu";
+  return { kind, wind: WIND_FROM(windKmh, windDir), light: kind === "yagmur" && LIGHT.includes(cond) };
+}
+
+/** WeatherKit sonucu (yerel modülden) -> IstWeather. */
+export function fromApple(r: { ok: boolean; condition?: string; temp?: number; windKmh?: number; windDir?: number; legalUrl?: string } | null): IstWeather | null {
+  if (!r || !r.ok || !r.condition) return null;
+  const m = mapAppleCondition(r.condition, +(r.windKmh ?? 0), +(r.windDir ?? 0));
+  return { ...m, temp: Math.round(+(r.temp ?? 0)), at: Date.now(), src: "apple", legalUrl: r.legalUrl };
+}
+
+export const WEATHER_CACHE_KEY = "byz.weather.v2"; // v2: kaynak Apple WeatherKit
 export const WEATHER_TOAST_KEY = "byz.weatherToastDay.v1";
 export const WEATHER_STALE_MS = 6 * 3_600_000;
 export const WEATHER_REFRESH_MS = 30 * 60_000;
@@ -73,7 +103,7 @@ export const WEATHER_REFRESH_MS = 30 * 60_000;
 const KIND_NAME: Record<WeatherKind, string> = { acik: "Açık", bulutlu: "Kapalı", yagmur: "Yağmurlu", kar: "Karlı", sis: "Sisli" };
 
 /** WMO hava kodu + rüzgâr -> oyun havası. Rüzgâr yönü: esmeye başladığı yön (derece). */
-export function mapWeather(code: number, windKmh: number, windDir: number): { kind: WeatherKind; wind: WindKind } {
+export function mapWeather(code: number, windKmh: number, windDir: number): { kind: WeatherKind; wind: WindKind; light: boolean } {
   let kind: WeatherKind = "acik";
   if ((code >= 71 && code <= 77) || code === 85 || code === 86) kind = "kar";
   else if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82) || code >= 95) kind = "yagmur";
@@ -84,7 +114,9 @@ export function mapWeather(code: number, windKmh: number, windDir: number): { ki
     if (windDir >= 190 && windDir <= 255) wind = "lodos"; // güneybatı
     else if (windDir >= 15 && windDir <= 75) wind = "poyraz"; // kuzeydoğu
   }
-  return { kind, wind };
+  // Çisenti / hafif sağanak (WMO 51, 53, 56, 61, 80): "Hafif yağmurlu", daha az damla.
+  const light = kind === "yagmur" && [51, 53, 56, 61, 80].includes(code);
+  return { kind, wind, light };
 }
 
 export async function fetchWeather(): Promise<IstWeather | null> {
@@ -100,7 +132,7 @@ export async function fetchWeather(): Promise<IstWeather | null> {
     const c = j?.current;
     if (!c || typeof c.weather_code !== "number") return null;
     const m = mapWeather(c.weather_code, +c.wind_speed_10m || 0, +c.wind_direction_10m || 0);
-    return { ...m, temp: Math.round(+c.temperature_2m || 0), at: Date.now() };
+    return { ...m, temp: Math.round(+c.temperature_2m || 0), at: Date.now(), src: "om" };
   } catch {
     return null;
   }
@@ -111,26 +143,28 @@ export function parseWeather(raw: unknown): IstWeather | null {
   try {
     const w = JSON.parse(raw);
     if (!w || !(w.kind in KIND_NAME)) return null;
-    return { kind: w.kind, wind: w.wind === "lodos" || w.wind === "poyraz" ? w.wind : null, temp: +w.temp || 0, at: +w.at || 0 };
+    return { kind: w.kind, wind: w.wind === "lodos" || w.wind === "poyraz" ? w.wind : null, temp: +w.temp || 0, at: +w.at || 0, light: !!w.light,
+      src: w.src === "apple" ? "apple" : "om", legalUrl: typeof w.legalUrl === "string" ? w.legalUrl : undefined };
   } catch {
     return null;
   }
 }
 
-/** Menü kartpostalındaki damga: "17 Kasım · Lodos · 14°". */
+/** Menü kartpostalındaki damga: "17 Kasım, Lodos, 14°". 2026-11-17 kullanıcı: el yazısında "·" eksi gibi
+ *  görünüp "-15°" sanılıyordu -> virgülle ayrılır; eksi yalnız sıcaklık gerçekten sıfırın altındaysa görünür. */
 export function weatherStamp(w: IstWeather, months: readonly string[], now = Date.now()) {
   const d = new Date(now + TR_OFFSET_MS);
   const parts = [`${d.getUTCDate()} ${months[d.getUTCMonth()]}`];
   if (w.wind) parts.push(w.wind === "lodos" ? "Lodos" : "Poyraz");
-  if (w.kind !== "acik" || !w.wind) parts.push(KIND_NAME[w.kind]);
+  if (w.kind !== "acik" || !w.wind) parts.push(w.light ? "Hafif yağmurlu" : KIND_NAME[w.kind]);
   parts.push(`${w.temp}°`);
-  return parts.join(" · ");
+  return parts.join(", ");
 }
 
 /** Günün ilk koşusunda tek satır. */
 export function weatherLine(w: IstWeather, night: boolean, fullMoon: boolean) {
   if (w.kind === "kar") return "İstanbul'a kar yağıyor! Okullar tatil mi acaba?";
-  if (w.kind === "yagmur") return "Bugün İstanbul'da yağmur var, şemsiyeni unutma!";
+  if (w.kind === "yagmur") return w.light ? "İstanbul'da hafif yağmur çiseliyor, şemsiyeni unutma!" : "Bugün İstanbul'da yağmur var, şemsiyeni unutma!";
   if (w.kind === "sis") return "Boğaz'da sis var, vapurlar düdük çalıyor.";
   if (w.wind === "lodos") return "Bugün İstanbul'da lodos var, çamaşırları topla!";
   if (w.wind === "poyraz") return "Poyraz esiyor, atkını tak amca!";
@@ -139,10 +173,23 @@ export function weatherLine(w: IstWeather, night: boolean, fullMoon: boolean) {
   return night ? "İstanbul'da gece, yıldızlar çatıların üstünde." : "Bugün İstanbul'da hava açık, tam zıplamalık!";
 }
 
-/** Deneme sırası (menüde dokununca). */
-export const WEATHER_TEST_CYCLE: Array<{ kind: WeatherKind; wind: WindKind }> = [
-  { kind: "yagmur", wind: null }, { kind: "kar", wind: null }, { kind: "sis", wind: null },
-  { kind: "acik", wind: "lodos" }, { kind: "bulutlu", wind: "poyraz" }, { kind: "bulutlu", wind: null }, { kind: "acik", wind: null },
+// MEVSİM (2026-11-17, kullanıcı: "mevsimine göre de"; ai_review_evidence/MEVSIM-2026-11-17/RAPOR.md):
+// takvim temel, gerçek sıcaklık düzeltir (>= 26 °C yaz, <= 7 °C kış). Yalnız görünüş.
+export type Season = "ilkbahar" | "yaz" | "sonbahar" | "kis";
+export const SEASON_NAME: Record<Season, string> = { ilkbahar: "İlkbahar", yaz: "Yaz", sonbahar: "Sonbahar", kis: "Kış" };
+export function seasonFor(now = Date.now(), temp?: number | null): Season {
+  if (temp != null && temp >= 26) return "yaz";
+  if (temp != null && temp <= 7) return "kis";
+  const m = new Date(now + TR_OFFSET_MS).getUTCMonth(); // 0 = Ocak
+  return m <= 1 || m === 11 ? "kis" : m <= 4 ? "ilkbahar" : m <= 7 ? "yaz" : "sonbahar";
+}
+
+/** Deneme sırası (menüde dokununca). season verilmişse mevsim de denenir. */
+export const WEATHER_TEST_CYCLE: Array<{ kind: WeatherKind; wind: WindKind; season?: Season; light?: boolean }> = [
+  { kind: "yagmur", wind: null }, { kind: "kar", wind: null, season: "kis" }, { kind: "sis", wind: null },
+  { kind: "acik", wind: "lodos" }, { kind: "bulutlu", wind: "poyraz" }, { kind: "bulutlu", wind: null },
+  { kind: "acik", wind: null, season: "ilkbahar" }, { kind: "acik", wind: null, season: "yaz" },
+  { kind: "acik", wind: null, season: "sonbahar" }, { kind: "acik", wind: null, season: "kis" },
 ];
 
 /** Türkiye saatiyle bugünün anahtarı. */

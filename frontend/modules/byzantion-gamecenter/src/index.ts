@@ -17,6 +17,7 @@ type Native = {
   challengePlayer?(playerID: string, seed: number, score: number, from: string, race: string): Promise<ChallengeSendResult>;
   finishChallengeRace?(matchID: string, score: number, name: string, race: string, outcome: number): Promise<{ status: string; message?: string }>;
   battery?(): Promise<{ level: number; state: number }>;
+  istanbulWeather?(): Promise<AppleWeather>;
   addListener?(event: string, cb: (e: FriendChallenge) => void): { remove(): void };
 };
 
@@ -116,5 +117,16 @@ export async function battery(): Promise<{ level: number; charging: boolean } | 
     return { level: b.level, charging: b.state === 2 || b.state === 3 };
   } catch {
     return null;
+  }
+}
+
+export type AppleWeather = { ok: boolean; condition?: string; temp?: number; windKmh?: number; windDir?: number; legalUrl?: string; message?: string };
+/** Apple WeatherKit ile İstanbul'un şu anki havası. Modül yoksa/eski ikilide null. */
+export async function istanbulWeather(): Promise<AppleWeather | null> {
+  if (!native?.istanbulWeather) return null;
+  try {
+    return await native.istanbulWeather();
+  } catch (e: any) {
+    return { ok: false, message: String(e?.message ?? e) };
   }
 }

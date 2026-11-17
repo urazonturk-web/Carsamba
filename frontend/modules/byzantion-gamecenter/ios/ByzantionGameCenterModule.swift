@@ -1,6 +1,8 @@
 import ExpoModulesCore
 import GameKit
 import UIKit
+import WeatherKit
+import CoreLocation
 
 // Dismisses the Game Center sheet when the player taps Done.
 final class GameCenterDismisser: NSObject, GKGameCenterControllerDelegate {
@@ -336,6 +338,28 @@ public class ByzantionGameCenterModule: Module {
     // Installs the authenticate handler once. iOS shows its own Game Center
     // sign-in sheet if needed (only when the handler hands us a controller);
     // a player who already uses Game Center gets the small "Welcome back" banner.
+    // GERÇEK İSTANBUL HAVASI (2026-11-17, kullanıcı: "apple'da bir kez açıyorsak tamam"): Apple WeatherKit.
+    // Sabit İstanbul koordinatı (kullanıcı konumu istenmez). JS tarafı condition'ı oyun havasına çevirir.
+    AsyncFunction("istanbulWeather") { (promise: Promise) in
+      Task {
+        do {
+          let loc = CLLocation(latitude: 41.0082, longitude: 28.9784)
+          let cur = try await WeatherService.shared.weather(for: loc, including: .current)
+          let attr = try? await WeatherService.shared.attribution
+          promise.resolve([
+            "ok": true,
+            "condition": cur.condition.rawValue,
+            "temp": cur.temperature.converted(to: .celsius).value,
+            "windKmh": cur.wind.speed.converted(to: .kilometersPerHour).value,
+            "windDir": cur.wind.direction.converted(to: .degrees).value,
+            "legalUrl": attr?.legalPageURL.absoluteString ?? "https://weatherkit.apple.com/legal-attribution.html",
+          ])
+        } catch {
+          promise.resolve(["ok": false, "message": "\(error)"])
+        }
+      }
+    }
+
     // PİL = AMCANIN ŞARJI (2026-11-17): izin istemez. level 0..1 (-1 bilinmiyor), state: 1 takılı değil, 2 şarjda, 3 dolu.
     AsyncFunction("battery") { (promise: Promise) in
       let dev = UIDevice.current

@@ -10,6 +10,7 @@ import {
   Pressable,
   Alert,
   AppState,
+  Linking,
   ScrollView,
   Share,
   Text,
@@ -25,6 +26,7 @@ import Animated, {
   useDerivedValue,
   useFrameCallback,
   useSharedValue,
+  type SharedValue,
   withTiming,
   withSpring,
   withSequence,
@@ -56,9 +58,31 @@ import { jumpVelocity, advanceFlight } from "../src/game/jump";
 import { findFootLanding } from "../src/game/landing";
 import { MEYDAN_ON, makeCode, parseCode, shareText, type Challenge } from "../src/game/meydan";
 import { SymbolView } from "expo-symbols";
+import * as SplashScreen from "expo-splash-screen";
+import { KIS_ON, WINTER_HAT_SOURCE, WINTER_SCARF_SOURCE } from "../src/game/kis";
+import { YAGMUR_ON } from "../src/game/yagmur";
+import { SEMSIYE_ON, SEMSIYE_TEST, umbrellaMode } from "../src/game/semsiye";
+import { OPEN_METEO_FALLBACK, fromApple, seasonFor, SEASON_NAME, type Season } from "../src/game/istanbul";
 import { ISTANBUL_ON, WEATHER_TEST_TAP, WEATHER_CACHE_KEY, WEATHER_TOAST_KEY, WEATHER_STALE_MS, WEATHER_REFRESH_MS, WEATHER_TEST_CYCLE, realSkyStep, moonInfo, fetchWeather, parseWeather, weatherStamp, weatherLine, trDayKey, type IstWeather } from "../src/game/istanbul";
 import { SkyWeather, PrecipLayer } from "../src/game/WeatherLayer";
 import { YARIS_ON, RACE_MS, RESPAWN_MS, EV_LAUNCH, EV_LAND, EV_FALL, EV_RESPAWN, pushEvent, encodeRace, decodeRace, compareRace, clockText, type RaceData, type RaceLog, type RaceSummary } from "../src/game/yaris";
+// AÇILIŞ (2026-11-17, kullanıcı videosu 10-52-11: "ilk 2 saniye kötü gözüküyor"): iPhone açılış ekranındaki
+// görsel küçük bir kutuda çıkıyor, ardından eski, farklı ölçekli bulanık bir geçiş görseli geliyordu. Artık açılış
+// ekranı ve yükleme örtüsü aynı düz gökyüzü rengi (ios SplashScreen.storyboard, SplashScreenBackground); sahne ve
+// menü bu renkten yumuşakça belirir. (Açılış ekranında görsel simülatörde güvenilir çizilmedi.)
+const OPENING_SKY = "#70c7f2"; // = SplashScreenBackground (kök görünüm de bu renkte)
+// 2026-11-17 kullanıcı (video 11-14-07): "direk menü ekranı açılmalı". iPhone açılış ekranı, menü ve sahne
+// tamamen hazır olana kadar ekranda kalır (otomatik kapanmaz); sonra kısa bir geçişle doğrudan menü görünür.
+// Aradaki çıplak arka plan karesi ve ikinci mavi ekran böylece görünmez.
+SplashScreen.preventAutoHideAsync().catch(() => {});
+try { SplashScreen.setOptions({ fade: true, duration: 250 }); } catch {}
+let openingHidden = false;
+function hideOpening() {
+  if (openingHidden) return;
+  openingHidden = true;
+  SplashScreen.hideAsync().catch(() => {});
+}
+setTimeout(hideOpening, 6000); // güvenlik: bir şey takılırsa açılış ekranında kalmasın
 const MENU_ON = true; // açılış menüsü
 import { KURUKAFA_ON, SKULL_SOURCE, SKULL_SIZE, SKULL_HIT_R, skullTouches, skullAfter, skullLift, skullPoint, scaledPlatforms, rollSkullEffect } from "../src/game/kurukafa";
 import { referencePlatform, referenceTowerWidth } from "../src/game/reference-course";
@@ -283,6 +307,12 @@ const FART_LOBES = [
   { x: 0.48, y: 0.32, d: 0.5, c: "rgba(206,214,138,0.97)", b: 1 },
   { x: 0.22, y: 0.3, d: 0.36, c: "rgba(236,240,190,0.9)", b: 0 }, // highlight
 ];
+// KARLI ÇATI: iniş tozu beyaz kar pufu olur (biraz daha iri).
+const DUST_SNOW_BASE = [
+  { a: 195, r: 30, d: 17 }, { a: 228, r: 22, d: 14 }, { a: 255, r: 15, d: 12 },
+  { a: 285, r: 15, d: 12 }, { a: 312, r: 22, d: 14 }, { a: 345, r: 30, d: 17 },
+];
+const DUST_SNOW = DUST_SNOW_BASE.map((q, i) => ({ ...q, c: i % 2 ? "rgba(236,243,252,0.95)" : "rgba(255,255,255,0.97)" }));
 const DUST_PUFFS = [
   { a: 200, r: 26, d: 13, c: "rgba(236,220,194,0.95)" },
   { a: 230, r: 20, d: 11, c: "rgba(198,112,72,0.9)" },
@@ -327,7 +357,7 @@ const AnimatedImage = Animated.createAnimatedComponent(Image);
 const BG_SCROLL_TEST = true as boolean;
 const BG_SCROLL_RATIO = 0.45;
 const BG_SCROLL_TILES = 4;
-const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "GERCEK ISTANBUL v1 (HAVA+AY+PIL)") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
+const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "YAGMUR KASKET + MONT") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
 const DIAG_MAX_EXAMPLES = 6;
 const HOUSE_AB_FROZEN = false as boolean;
 // REVIZYON-066 experiment (one variable): expo-linear-gradient's iOS layer
@@ -400,6 +430,14 @@ const BG_SKY_TOP_COLOR = "#3EB8F2"; // measured top rows of the master (62,184,2
 const MASTER_NEIGHBORHOOD_SOURCE = require("@/assets/environment/bosphorus-rooftop-day-master-v1.png");
 // REVIZYON-056: hazed continuation of the master's bottom roof band (941x748).
 const BG_LOW_SIL_SOURCE = require("@/assets/environment/bosphorus-low-silhouette.jpg");
+// MEVSİM ARKA PLANI (2026-11-17, kullanıcı: "arka planlar eskisi gibi duruyor, sadece kolonlarda mevsimsel hareket
+// yapıyoruz; tutarlılığa aykırı"). Onaylı arka plandan renk işlemiyle türetildi (scripts/mevsim-arkaplan.py, yeni çizim
+// yok); asıl görselin üstüne aynı yerleşimle, yumuşak geçişle biner. Kar yağarken "kar", değilse mevsim.
+const BG_VARIANTS = {
+  kar: { m: require("@/assets/environment/mevsim/master-kar.jpg"), a: require("@/assets/environment/mevsim/alt-kar.jpg") },
+  sonbahar: { m: require("@/assets/environment/mevsim/master-sonbahar.jpg"), a: require("@/assets/environment/mevsim/alt-sonbahar.jpg") },
+  kis: { m: require("@/assets/environment/mevsim/master-kis.jpg"), a: require("@/assets/environment/mevsim/alt-kis.jpg") },
+} as const;
 const BG_LOW_SIL_H = 748;
 // REVIZYON-023: start decoding every first-scene bitmap at module load (before
 // the component mounts) into expo-image's memory cache, so the live scene and
@@ -409,6 +447,7 @@ const PRELOAD_MODULES: number[] = [
   PU_ROOF_MID_SOURCE, PU_ROOF_HIP_L_SOURCE, PU_ROOF_HIP_R_SOURCE, PU_WALL_SOURCE, PU_BACKDROP_SOURCE, PU_SUN_SOURCE, PU_CLOUD_A_SOURCE, PU_CLOUD_B_SOURCE, PU_CLOUD_C_SOURCE, PU_ERASER_SOURCE, PU_ERASED_SOURCE,
   ...CHARGE_POSES.map((p) => p.source),
   ...(PIJAMA_ON ? [HAT_SOURCE, SLIPPER_SOURCE, DOOR_CLOSED_SOURCE, DOOR_OPEN_SOURCE] : []),
+  ...(KIS_ON ? [WINTER_HAT_SOURCE, WINTER_SCARF_SOURCE] : []),
   ...(KURUKAFA_ON ? [SKULL_SOURCE] : []),
 ];
 (async () => {
@@ -552,12 +591,36 @@ const SOLE_CENTER_OFFSET = ((SOLE_LEFT + SOLE_RIGHT) / 2 - 0.5) * SOLE_BODY_WIDT
 const SPRITE_SCALE = ((SOLE_RIGHT - SOLE_LEFT) * SOLE_BODY_WIDTH) / POSE_FEET_SPAN_PX;
 // GAZ trial: puffs leave from the hips, a little behind the body.
 const FART_CHAR_H = CHARGE_POSES[0].h * SPRITE_SCALE * GLOBAL_VISUAL_SCALE * CHAR_SIZE_TRIAL;
+// KALKIŞTA SİLKELENME: 8 kar tanesi, dünya biriminde (amca boyuna göre), ~0,8 sn yerçekimiyle düşer.
+const SHED_FLAKES = Array.from({ length: 8 }, (_, i) => {
+  const h = (n: number) => ((Math.sin(i * 31.7 + n * 17.3) * 7919.3) % 1 + 1) % 1;
+  const H = CHARGE_POSES[0].h * SPRITE_SCALE * GLOBAL_VISUAL_SCALE * CHAR_SIZE_TRIAL;
+  return { ox: (h(1) - 0.5) * H * 0.3, vx: (h(2) - 0.65) * H * 0.9, vy: -(0.15 + h(3) * 0.45) * H, d: H * (0.022 + h(4) * 0.02) };
+});
+function ShedFlake({ f, shed, shedX, shedY, shedAmt }: { f: (typeof SHED_FLAKES)[number]; shed: SharedValue<number>; shedX: SharedValue<number>; shedY: SharedValue<number>; shedAmt: SharedValue<number> }) {
+  const H = CHARGE_POSES[0].h * SPRITE_SCALE * GLOBAL_VISUAL_SCALE * CHAR_SIZE_TRIAL;
+  const st = useAnimatedStyle(() => {
+    const t = shed.value;
+    const T = t * 0.8;
+    return {
+      opacity: t > 0 && t < 1 ? (1 - t) * Math.min(1, shedAmt.value * 2.2) : 0,
+      transform: [{ translateX: shedX.value + f.ox + f.vx * T }, { translateY: shedY.value + f.vy * T + 2.2 * H * T * T }],
+    };
+  });
+  return <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, width: f.d, height: f.d, borderRadius: f.d / 2,
+    backgroundColor: "#ffffff", borderWidth: 1, borderColor: "rgba(110,135,170,0.6)" }, st]} />;
+}
 // PİJAMA ANI: çatı kapısı ayaktaki amcadan ~%30 uzun (dünya birimi).
 const DOOR_H = FART_CHAR_H * DOOR_HEIGHT_RATIO;
 // KURUKAFA: amcanın gövdesinin yarı genişliği (çizilen pozun ~%60'ı, kollar dahil).
 const SKULL_BADGE_W = 280; // dünya birimi (kamera 0,4 -> ~110 nokta)
 const SKULL_BADGE_H = 100;
-const BUBBLE_W = 560; // dünya birimi (kamera ~0,4)
+const BUBBLE_W = 560;
+// Saçak buz sarkıtları (kar): yüzde konum, uzunluk/genişlik dünya birimi; sabit yerleşim.
+const ICICLES = Array.from({ length: 11 }, (_, i) => {
+  const h = (n: number) => ((Math.sin(i * 19.19 + n * 7.7) * 4373.1) % 1 + 1) % 1;
+  return { x: 3 + (i / 11) * 92 + h(1) * 4, h: 12 + Math.round(h(2) * 22), w: 4 + Math.round(h(3) * 3) };
+}); // dünya birimi (kamera ~0,4)
 const BUBBLE_H = 260;
 const CHAR_BODY_HALF_W = (CHARGE_POSES[0].w * SPRITE_SCALE * GLOBAL_VISUAL_SCALE * CHAR_SIZE_TRIAL * 0.6) / 2;
 const DOOR_W = DOOR_H * DOOR_ASPECT;
@@ -839,7 +902,12 @@ export default function Game() {
   const assetsReady = gameReady && ((loadedArt.background && districtReady && loadedArt.character) || artError);
 
   useEffect(() => {
-    if (assetsReady) coverOpacity.value = withTiming(0, { duration: 220 }, (done) => { if (done) runOnJS(setCoverMounted)(false); });
+    if (assetsReady) {
+      // Örtüyü anında kaldır, menü bir kare çizilince açılış ekranını kapat -> doğrudan menü.
+      coverOpacity.value = 0;
+      setCoverMounted(false);
+      requestAnimationFrame(() => requestAnimationFrame(hideOpening));
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [assetsReady]);
 
@@ -1072,7 +1140,8 @@ export default function Game() {
       const cached = parseWeather(await storage.getItem<string>(WEATHER_CACHE_KEY, ""));
       if (alive && cached && Date.now() - cached.at < WEATHER_STALE_MS) setIstWeather((w) => w ?? cached);
       if (cached && Date.now() - cached.at < WEATHER_REFRESH_MS) return;
-      const fresh = await fetchWeather();
+      // Önce Apple WeatherKit; yanıt yoksa (yetki/ağ) deneme süresince Open-Meteo yedeği.
+      const fresh = fromApple(await GameCenter.istanbulWeather()) ?? (OPEN_METEO_FALLBACK ? await fetchWeather() : null);
       if (!alive) return;
       if (fresh) {
         setIstWeather(fresh);
@@ -1098,8 +1167,13 @@ export default function Game() {
   }, [clockTick, sceneTest]);
   const shownBattery = sceneTest === 1 ? { level: 0.1, charging: false } : sceneTest === 2 ? { level: 0.6, charging: true } : battery;
   const batteryMood: "low" | "charging" | null = !ISTANBUL_ON || !shownBattery || shownBattery.level < 0 ? null
-    : shownBattery.charging ? "charging" : shownBattery.level < 0.15 ? "low" : null;
+    : shownBattery.charging ? "charging" : shownBattery.level < 0.21 ? "low" : null;
   const isNightNow = (sceneTest === 1 ? 4 : realSkyRef.current) >= 4;
+  // MEVSİM + kolonlara hava izi (2026-11-17): takvim temel, gerçek sıcaklık düzeltir; denemede test girdisi.
+  const testEntry = weatherTest >= 0 ? WEATHER_TEST_CYCLE[weatherTest] : null;
+  const season: Season = testEntry?.season ?? seasonFor(Date.now(), istWeather ? istWeather.temp : null);
+  const roofWx: "kar" | "yagmur" | null = !ISTANBUL_ON ? null : shownWeather?.kind === "kar" ? "kar" : shownWeather?.kind === "yagmur" ? "yagmur" : null;
+  const bgVariant: keyof typeof BG_VARIANTS | null = !ISTANBUL_ON ? null : roofWx === "kar" ? "kar" : season === "sonbahar" ? "sonbahar" : season === "kis" ? "kis" : null;
   // Gece (gerçek saat ya da gece durakları): skor koyu gökte okunsun diye açık renk.
   const nightHud = ISTANBUL_ON && (isNightNow || (DURAK_SEFER && stopsPassed(lastTowerRef.current) >= NIGHT_STOP));
   // Günün ilk koşusunda bir satır İstanbul havası; pil azsa (oturumda bir kez) amcanın şarj şakası öncelikli.
@@ -1120,6 +1194,44 @@ export default function Game() {
   const dirty = useSharedValue(0); // 1 = amca bu tur lekeli
   // PİJAMA ANI (2026-11-16): gece başlarken çatı kapısı + gece külahı/terlik.
   const pajama = useSharedValue(0); // 1 = gece kıyafeti
+  const winterWear = useSharedValue(0); // 1 = kış bere + atkı (koşu başında belirlenir)
+  // KARLI AMCA (2026-11-17): birikmiş kar, burun kızarması, buhar, kalkışta dökülen taneler.
+  const snowAmt = useSharedValue(0);
+  const noseRed = useSharedValue(0);
+  const breath = useSharedValue(0);
+  const snowingSV = useSharedValue(0);
+  const coldSV = useSharedValue(0);
+  const shed = useSharedValue(1);
+  const shedX = useSharedValue(0);
+  const shedY = useSharedValue(0);
+  const shedAmt = useSharedValue(0);
+  // ŞEMSİYE (2026-11-17): umbMode 0 yok / 1 yağmur / 2 hafif yağmur; umbArmed 1 = bu uçuşta açıldı; umbV0 = kalkış |vy|.
+  const umbMode = useSharedValue(0);
+  const umbVis = useSharedValue(0);
+  const umbOpen = useSharedValue(0);
+  const umbFlip = useSharedValue(0);
+  const umbArmed = useSharedValue(0);
+  const umbV0 = useSharedValue(1);
+  const seasonRef = useRef<Season>(season);
+  seasonRef.current = season;
+  // Kıyafet koşu ortasında değişmez: yalnız koşu başlamadan (skor 0) ya da yeniden başlarken uygulanır.
+  useEffect(() => {
+    if (!KIS_ON) return;
+    if (scoreRef.current === 0) winterWear.value = season === "kis" ? 1 : 0;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [season]);
+  // YAĞMUR KIYAFETİ (2026-11-17): yağmurda kasket + mont; koşu başında belirlenir (kış kıyafeti gibi).
+  const rainWear = useSharedValue(0);
+  const rainingNow = YAGMUR_ON && ISTANBUL_ON && shownWeather?.kind === "yagmur";
+  const rainingRef = useRef(rainingNow);
+  rainingRef.current = rainingNow;
+  const [rainMounted, setRainMounted] = useState(rainingNow);
+  useEffect(() => {
+    if (!YAGMUR_ON) return;
+    if (rainingNow) setRainMounted(true);
+    if (scoreRef.current === 0) rainWear.value = rainingNow ? 1 : 0;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rainingNow]);
   const doorLock = useSharedValue(0); // 1 = kapı anı sürüyor, dokunma yok sayılır
   const doorOp = useSharedValue(0);
   const doorOpen = useSharedValue(0);
@@ -1313,6 +1425,7 @@ export default function Game() {
       headTilt.value = 0;
       headVelocity.value = 0;
       landPulse.value = 0;
+      if (SEMSIYE_ON) { cancelAnimation(umbOpen); cancelAnimation(umbFlip); umbOpen.value = 0; umbFlip.value = 0; umbArmed.value = 0; }
       baseY.value = first.topY;
       phase.value = PHASE.IDLE;
 
@@ -1594,6 +1707,8 @@ export default function Game() {
     }
     if (PIJAMA_ON) {
       cancelAnimation(doorOp); cancelAnimation(doorOpen); cancelAnimation(charOp); cancelAnimation(pajama); cancelAnimation(doorLock); cancelAnimation(walkX); cancelAnimation(walkY);
+      if (KIS_ON) winterWear.value = seasonRef.current === "kis" ? 1 : 0;
+      if (YAGMUR_ON) rainWear.value = rainingRef.current ? 1 : 0;
       pajama.value = 0; doorOp.value = 0; doorOpen.value = 0; charOp.value = 1; doorLock.value = 0; walkX.value = 0; walkY.value = 0;
     }
     scoreRef.current = 0;
@@ -1907,8 +2022,72 @@ export default function Game() {
 
   // mode: 0 normal, 1 tam kıvam, 2 dayanamadı (zorla). Hem parmak kalkınca hem
   // pencere dolunca kare döngüsünden çağrılır.
+  // KARLI AMCA: kar yağarken beklerken birikir, yağmıyorsa erir; soğukta burun kızarır, arada nefes buharı.
+  const umbModeNow = ISTANBUL_ON ? umbrellaMode(shownWeather) : 0;
+  useEffect(() => {
+    umbMode.value = umbModeNow;
+    umbVis.value = umbModeNow > 0 ? 1 : 0;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [umbModeNow]);
+  // GEÇİCİ (SEMSIYE_TEST): beklerken kapalı -> açık -> yarı ters -> tam ters döngüsü, ekran görüntüsü için.
+  useEffect(() => {
+    if (!SEMSIYE_TEST) return;
+    let k = 0;
+    const id = setInterval(() => {
+      k = (k + 1) % 4;
+      runOnUI((step: number) => {
+        "worklet";
+        if (phase.value !== PHASE.IDLE) return;
+        umbOpen.value = step === 0 ? 0 : 1;
+        umbFlip.value = step === 3 ? 1 : step === 2 ? 0.45 : 0;
+      })(k);
+    }, 2500);
+    return () => clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const snowingNow = KIS_ON && ISTANBUL_ON && shownWeather?.kind === "kar";
+  const coldNow = KIS_ON && (season === "kis" || snowingNow);
+  useEffect(() => {
+    if (!KIS_ON) return;
+    snowingSV.value = snowingNow ? 1 : 0;
+    coldSV.value = coldNow ? 1 : 0;
+    let n = 0;
+    const snowingF = snowingNow ? 1 : 0;
+    const coldF = coldNow ? 1 : 0;
+    // Okuma-yazma UI thread'inde (kalkış/iniş de orada değiştiriyor; JS tarafı okuması bayat kalabiliyor).
+    const tickUI = (puff: number) => {
+      "worklet";
+      const air = phase.value === PHASE.AIRBORNE;
+      const s1 = Math.max(0, Math.min(1, snowAmt.value + (snowingF ? (air ? 0 : 0.02) : -0.03)));
+      snowAmt.value = s1;
+      noseRed.value = Math.max(0, Math.min(1, noseRed.value + (coldF ? 0.02 : -0.04)));
+      if (puff && coldF && !air && phase.value !== PHASE.CHARGING) {
+        breath.value = 0;
+        breath.value = withTiming(1, { duration: 900 });
+      }
+    };
+    const id = setInterval(() => {
+      n += 1;
+      runOnUI(tickUI)(n % 6 === 0 ? 1 : 0);
+    }, 500);
+    return () => clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [snowingNow, coldNow]);
+
   const doLaunch = (endedAt: number, mode: number) => {
     "worklet";
+    if (KIS_ON) {
+      // Silkelenme: biriken karın çoğu kalkışta dökülür, taneler arkada savrulur; soğuksa "hıh!" buharı.
+      if (snowAmt.value > 0.08) {
+        shedAmt.value = snowAmt.value;
+        shedX.value = px.value + SOLE_CENTER_OFFSET;
+        shedY.value = py.value + PH / 2 - FART_CHAR_H * 0.92;
+        shed.value = 0;
+        shed.value = withTiming(1, { duration: 800 });
+      }
+      snowAmt.value = snowAmt.value * 0.35;
+      if (coldSV.value > 0) { breath.value = 0; breath.value = withTiming(1, { duration: 700 }); }
+    }
     {
       const heldSeconds = Math.max(0, endedAt - touchStartedAt.value) / 1000;
       const c = mode === 2 ? 1 : Math.min(1, heldSeconds / CONFIG.maxChargeDuration);
@@ -1922,6 +2101,7 @@ export default function Game() {
       if (__DEV__) runOnJS(reportJump)(heldSeconds * 1000, c, launch.vx, launch.vy, W, lastLandedId.value, lastVisualCharge, pressToFirstFrameMs);
       vx.value = launch.vx;
       vy.value = launch.vy;
+      if (SEMSIYE_ON) { cancelAnimation(umbOpen); umbOpen.value = 0; umbFlip.value = 0; umbArmed.value = 0; umbV0.value = Math.max(1, Math.abs(launch.vy)); }
       headVelocity.value = -65 - c * 55;
       releasedCharge.value = c;
       phase.value = PHASE.AIRBORNE;
@@ -2114,6 +2294,15 @@ export default function Game() {
       px.value = flight.x;
       py.value = flight.y;
       vy.value = flight.vy;
+      // ŞEMSİYE: düşüşe geçince "pat" diye açılır (hafif yağmurda düşüşün ikinci yarısında); hızlandıkça kumaş ters döner.
+      if (SEMSIYE_ON && umbMode.value > 0 && vy.value > 0) {
+        const fall = vy.value / umbV0.value; // 0 = tepe, ~1 = kalkış hızına ulaştı
+        if (umbArmed.value === 0 && (umbMode.value === 1 || fall > 0.45)) {
+          umbArmed.value = 1;
+          umbOpen.value = withSequence(withTiming(1.12, { duration: 90 }), withTiming(1, { duration: 60 }));
+        }
+        if (umbArmed.value === 1) umbFlip.value = Math.max(0, Math.min(1, (fall - 0.45) / 0.9));
+      }
       if (FART_TRIAL && fartOn.value === 1) {
         const now = frame.timestamp;
         if (fartLaunchAt.value < 0) fartLaunchAt.value = now;
@@ -2186,6 +2375,11 @@ export default function Game() {
             fartCut.value = frame.timestamp;
             if (SFX_ON) runOnJS(stopFart)();
           }
+          if (SEMSIYE_ON && umbArmed.value === 1) {
+            umbArmed.value = 0;
+            umbFlip.value = withTiming(0, { duration: 120 });
+            umbOpen.value = withDelay(300, withTiming(0, { duration: 160 }));
+          }
           landPulse.value = withSequence(
             withTiming(1, { duration: 35 }),
             withTiming(-0.2, { duration: 75 }),
@@ -2198,6 +2392,7 @@ export default function Game() {
           if (p.id > lastLandedId.value) {
             const towersCrossed = p.id - lastLandedId.value;
             lastLandedId.value = p.id;
+            if (KIS_ON && snowingSV.value > 0) snowAmt.value = Math.min(1, snowAmt.value + 0.06);
             if (FAZ2_DUST) {
               dustX.value = cx;
               dustY.value = p.topY;
@@ -2691,9 +2886,17 @@ export default function Game() {
                 onError={k === 0 ? failArt : undefined}
                 style={{ width: "100%", height: "100%" }}
               />
+              {bgVariant && (
+                <CachedImage source={BG_VARIANTS[bgVariant].m} cachePolicy="memory-disk" transition={700} contentFit="fill"
+                  style={{ position: "absolute", left: 0, top: 0, width: "100%", height: "100%" }} />
+              )}
               {!SHOW_BACK_DISTRICT && (
                 <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: "100%", marginTop: -1, aspectRatio: BG_IMG_W / BG_LOW_SIL_H }}>
                   <Image source={BG_LOW_SIL_SOURCE} style={{ width: "100%", height: "100%" }} resizeMode="stretch" fadeDuration={0} />
+                  {bgVariant && (
+                    <CachedImage source={BG_VARIANTS[bgVariant].a} cachePolicy="memory-disk" transition={700} contentFit="fill"
+                      style={{ position: "absolute", left: 0, top: 0, width: "100%", height: "100%" }} />
+                  )}
                 </View>
               )}
             </View>
@@ -2743,7 +2946,7 @@ export default function Game() {
         </Animated.View>
       )}
       {ISTANBUL_ON && !POPUP && (
-        <SkyWeather W={W} H={H} weather={shownWeather} night={nightAmt} moon={moon} active={assetsReady} />
+        <SkyWeather W={W} H={H} weather={shownWeather} night={nightAmt} moon={moon} active={assetsReady} season={season} />
       )}
       {AMBIENT_ON && !POPUP && (
         <AmbientEvents W={W} H={H} active={assetsReady && !gameOver} onHorn={() => { if (SFX_ON) playSfx("horn_far"); }} />
@@ -3018,7 +3221,7 @@ export default function Game() {
         )}
         {!USE_FIXED_PANEL_COURSE && POOL_IDX.map((i) => (POPUP
           ? <PopupHouseView key={`pu-house-${i}`} index={i} platforms={platforms} styles={styles} />
-          : <PlatformHouseView key={`house-${i}`} index={i} platforms={HOUSE_AB_FROZEN ? housePlatformsFrozen : platforms} styles={styles} probe={houseProbe} />
+          : <PlatformHouseView key={`house-${i}`} index={i} platforms={HOUSE_AB_FROZEN ? housePlatformsFrozen : platforms} styles={styles} probe={houseProbe} roofWx={roofWx} />
         ))}
 
         {/* Platforms (fixed pool, positioned by the worklet) */}
@@ -3045,9 +3248,10 @@ export default function Game() {
             <View style={styles.flagCloth}><Text style={styles.flagText}>REKOR</Text></View>
           </Animated.View>
         )}
+        {KIS_ON && SHED_FLAKES.map((f, i) => <ShedFlake key={`shed${i}`} f={f} shed={shed} shedX={shedX} shedY={shedY} shedAmt={shedAmt} />)}
         {FAZ2_DUST && (
           <Animated.View style={[styles.burst, dustStyle]}>
-            {DUST_PUFFS.map((q, i) => {
+            {(roofWx === "kar" ? DUST_SNOW : DUST_PUFFS).map((q, i) => {
               const ang = (q.a * Math.PI) / 180;
               return <View key={i} style={{ position: "absolute", width: q.d, height: q.d, borderRadius: q.d / 2, backgroundColor: q.c,
                 left: Math.cos(ang) * q.r - q.d / 2, top: Math.sin(ang) * q.r * 0.45 - q.d / 2 }} />;
@@ -3129,6 +3333,14 @@ export default function Game() {
         <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0 }, charOpStyle]}>
         <ChargePoses
           pajama={PIJAMA_ON ? pajama : undefined}
+          snow={KIS_ON ? snowAmt : undefined}
+          nose={KIS_ON ? noseRed : undefined}
+          breath={KIS_ON ? breath : undefined}
+          winter={KIS_ON ? winterWear : undefined}
+          rain={YAGMUR_ON && rainMounted ? rainWear : undefined}
+          umbrella={SEMSIYE_ON ? umbVis : undefined}
+          umbOpen={SEMSIYE_ON ? umbOpen : undefined}
+          umbFlip={SEMSIYE_ON ? umbFlip : undefined}
           offsetX={PIJAMA_ON ? walkX : undefined}
           offsetY={PIJAMA_ON ? walkY : undefined}
           px={px}
@@ -3158,7 +3370,7 @@ export default function Game() {
       {/* REVIZYON-022: opaque asset-ready cover; blocks the first frame (and
           input, see charge-surface) until background/district/character loaded. */}
       {coverMounted && (
-        <Animated.View testID="asset-ready-cover" pointerEvents={assetsReady ? "none" : "auto"} style={[{ position: "absolute", left: 0, top: 0, right: 0, bottom: 0, backgroundColor: "#4f9ec4", overflow: "hidden" }, coverStyle]}>
+        <Animated.View testID="asset-ready-cover" pointerEvents={assetsReady ? "none" : "auto"} style={[{ position: "absolute", left: 0, top: 0, right: 0, bottom: 0, backgroundColor: OPENING_SKY, overflow: "hidden" }, coverStyle]}>
           <StartCover W={W} H={H} />
         </Animated.View>
       )}
@@ -3179,7 +3391,7 @@ export default function Game() {
         </View>
       )}
       {PERF_PROBE && <PerfProbeOverlay top={insets.top + 4} sv={{ pFrames, pHitch, pHitchBig, pAirFrames, pAirHitch, pListAir, pHitchNearList, pMaxMs, pHitchIdle, pHitchCharge, pHitchDead, pEvAppear, pEvGone, pEvMove, pListNoHouse, pHitchAppear, pHitchGone, pHitchMove, pHitchListOnly, pHitchNoEvent }} />}
-      {ISTANBUL_ON && !POPUP && <PrecipLayer W={W} H={H} weather={shownWeather} active={assetsReady} />}
+      {ISTANBUL_ON && !POPUP && <PrecipLayer W={W} H={H} weather={shownWeather} active={assetsReady} season={season} />}
       {GORUNUM_REV && !POPUP && (
         <LinearGradient pointerEvents="none" colors={["rgba(58,36,24,0)", "rgba(58,36,24,0.38)"]}
           style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: "16%" }} />
@@ -3458,7 +3670,7 @@ export default function Game() {
           <Text style={styles.menuSub}>Amcayla İstanbul çatılarında</Text>
           {BUILD_TAG !== "" && <Text style={styles.menuTag}>{BUILD_TAG}</Text>}
           {/* KARTPOSTAL MENÜ (2026-11-16): oyun sonuyla aynı dil — hava postası şeridi, pul, bilet "Oyna". */}
-          <Animated.View entering={FadeInDown.duration(380)} style={styles.pcWrap}>
+          <Animated.View style={styles.pcWrap}>
             <View style={styles.pcTiltR}>
               <View style={styles.pcCard}>
                 <View style={styles.pcAirmail}>
@@ -3480,8 +3692,13 @@ export default function Game() {
                       <Ico name={shownWeather?.kind === "yagmur" ? "cloud.rain.fill" : shownWeather?.kind === "kar" ? "cloud.snow.fill" : shownWeather?.kind === "sis" ? "cloud.fog.fill"
                         : shownWeather?.wind ? "wind" : shownWeather?.kind === "bulutlu" ? "cloud.fill" : isNightNow ? (moon.full ? "moon.stars.fill" : "moon.fill") : "sun.max.fill"} size={16} color="#1f4e79" />
                       <Text style={styles.pcWeatherText} numberOfLines={1} adjustsFontSizeToFit>
-                        {shownWeather ? weatherStamp(shownWeather, TR_MONTHS_TITLE) : "İstanbul"}{isNightNow && moon.full ? " · Dolunay" : ""}{shownWeather?.test || sceneTest ? " (deneme)" : ""}
+                        {shownWeather ? weatherStamp(shownWeather, TR_MONTHS_TITLE) : "İstanbul"}{isNightNow && moon.full ? ", Dolunay" : ""}{testEntry?.season ? `, ${SEASON_NAME[testEntry.season]}` : ""}{shownWeather?.test || sceneTest ? " (deneme)" : ""}
                       </Text>
+                    </Pressable>
+                  )}
+                  {ISTANBUL_ON && shownWeather?.src === "apple" && !shownWeather.test && (
+                    <Pressable hitSlop={6} onPress={() => Linking.openURL(shownWeather.legalUrl || "https://weatherkit.apple.com/legal-attribution.html").catch(() => {})} testID="weather-attribution">
+                      <Text style={styles.pcWeatherAttr}>{"\uF8FF"}Weather</Text>
                     </Pressable>
                   )}
                   </View>
@@ -3810,6 +4027,7 @@ function StartCover({ W, H }: { W: number; H: number }) {
       </>
     );
   }
+  if (OPENING_SKY) return null; // AÇILIŞ 2026-11-17: düz gökyüzü rengi (örtünün kendi rengi)
   const camX0 = CONFIG.startTowerWidth / 2 - (CONFIG.cameraStartFraction * W) / s;
   const bgScale = Math.max(W / BG_IMG_W, H / BG_IMG_H) * BG_FAR_OVERSCAN;
   const bgW = BG_IMG_W * bgScale;
@@ -3873,7 +4091,7 @@ function PierConfetti({ W, H, onDone }: { W: number; H: number; onDone: () => vo
   );
 }
 
-const PlatformHouseView = memo(function PlatformHouseView({ index, platforms, styles, probe }: any) {
+const PlatformHouseView = memo(function PlatformHouseView({ index, platforms, styles, probe, roofWx }: any) {
   // REVIZYON-062: every updater passes its SharedValue's .value itself. Reanimated
   // only subscribes a mapper to SharedValues found directly in the updater's
   // closure (extractInputs does not look inside nested worklet functions), so
@@ -3997,6 +4215,10 @@ const PlatformHouseView = memo(function PlatformHouseView({ index, platforms, st
     const g = houseGeom.value;
     return { transform: [{ scaleX: g ? g.fw / HOUSE_GRAD_W : 1 }] };
   });
+  const iciclesStyle = useAnimatedStyle(() => {
+    const g = houseGeom.value;
+    return g ? { top: g.rise + HOUSE_GUTTER_H - HOUSE_GUTTER_OVERLAP - 2, width: g.fw } : { width: 0 };
+  });
   return (
     <Animated.View pointerEvents="none" style={[styles.house, houseStyle]}>
       <Animated.View style={[styles.houseFacade, facadeStyle]}>
@@ -4024,6 +4246,7 @@ const PlatformHouseView = memo(function PlatformHouseView({ index, platforms, st
           </>
         )}
         {KONTUR_PARILTI ? <View style={styles.houseShadeStrip} /> : null}
+        {roofWx === "yagmur" && <View style={styles.houseWet} />}
         <View style={styles.houseEdgeL} />
         <View style={styles.houseEdgeR} />
       </Animated.View>
@@ -4033,6 +4256,17 @@ const PlatformHouseView = memo(function PlatformHouseView({ index, platforms, st
             <Animated.View style={[styles.houseRoofClipR, ROOF_MASK_OFF, clipRStyle]}>
               <View style={styles.houseRoofUnR}>
                 <AnimatedImage source={HOUSE_ROOF_SOURCE} style={[styles.houseRoofImg, roofImgStyle]} resizeMode="stretch" fadeDuration={0} />
+                {/* HAVA İZİ (2026-11-17): kar örtüsü / ıslak kiremit, çatı yüzünün kendi kırpmasıyla (iniş çizgisinin altında). */}
+                {roofWx === "kar" && (
+                  <Animated.View style={[styles.houseRoofImg, roofImgStyle]}>
+                    <LinearGradient colors={["rgba(250,252,255,0.97)", "rgba(244,248,255,0.9)", "rgba(240,246,255,0.35)"]} locations={[0, 0.45, 1]} style={styles.houseGradFill} />
+                  </Animated.View>
+                )}
+                {roofWx === "yagmur" && (
+                  <Animated.View style={[styles.houseRoofImg, roofImgStyle, { backgroundColor: "rgba(28,36,58,0.22)" }]}>
+                    <LinearGradient colors={["rgba(255,255,255,0)", "rgba(230,240,255,0.32)", "rgba(255,255,255,0)"]} locations={[0.25, 0.42, 0.6]} style={styles.houseGradFill} />
+                  </Animated.View>
+                )}
               </View>
             </Animated.View>
           </View>
@@ -4042,7 +4276,13 @@ const PlatformHouseView = memo(function PlatformHouseView({ index, platforms, st
       </Animated.View>
       <Animated.View style={[styles.houseClip, { left: -3, height: HOUSE_GUTTER_H }, gutterStyle]}>
         <AnimatedImage source={HOUSE_GUTTER_SOURCE} style={[styles.houseGutterImg, gutterImgStyle]} resizeMode="stretch" fadeDuration={0} />
+        {roofWx === "kar" && <View style={styles.houseSnowLip} />}
       </Animated.View>
+      {roofWx === "kar" && (
+        <Animated.View style={[styles.houseIcicles, iciclesStyle]}>
+          {ICICLES.map((c, i) => <View key={i} style={[styles.houseIcicle, { left: `${c.x}%`, borderTopWidth: c.h, borderLeftWidth: c.w, borderRightWidth: c.w }]} />)}
+        </Animated.View>
+      )}
     </Animated.View>
   );
 });
@@ -4475,6 +4715,10 @@ const useStyles = makeStyles((colors) => ({
   houseHipLine: { position: "absolute", top: 0, width: 3, backgroundColor: "#3a2218", borderColor: "rgba(226,150,108,0.65)" },
   houseHipLineL: { transformOrigin: "0% 0%", transform: [{ rotate: HOUSE_HIP_DEG }], borderRightWidth: 1 },
   houseHipLineR: { transformOrigin: "100% 0%", transform: [{ rotate: HOUSE_HIP_NEG_DEG }], borderLeftWidth: 1 },
+  houseSnowLip: { position: "absolute", left: 0, right: 0, top: 0, height: 9, borderRadius: 5, backgroundColor: "rgba(250,252,255,0.96)" },
+  houseIcicles: { position: "absolute", left: 0, height: 40 },
+  houseIcicle: { position: "absolute", top: 0, width: 0, height: 0, borderLeftColor: "transparent", borderRightColor: "transparent", borderTopColor: "rgba(226,240,255,0.95)" },
+  houseWet: { position: "absolute", left: 0, top: 0, right: 0, bottom: 0, backgroundColor: "rgba(22,32,58,0.13)" },
   houseGutterImg: { position: "absolute", top: 0, width: HOUSE_GUTTER_W, height: HOUSE_GUTTER_H },
   playableChimneyCap: { position: "absolute", left: 0, top: 0, height: 8, borderTopLeftRadius: 3, borderTopRightRadius: 3, backgroundColor: "#9f573d", borderWidth: 1.25, borderColor: "rgba(74,42,34,0.78)", overflow: "hidden" },
   playableChimneyCapHighlight: { position: "absolute", left: 2, right: 2, top: 1, height: 2, backgroundColor: "rgba(239,171,121,0.76)" },
@@ -4615,6 +4859,7 @@ const useStyles = makeStyles((colors) => ({
   pcNotch: { position: "absolute", top: "50%", marginTop: -9, width: 18, height: 18, borderRadius: 9, backgroundColor: "#fbf3e2" },
   pcMenuRow: { flexDirection: "row", alignItems: "center", alignSelf: "stretch", marginRight: 56, gap: 12, marginBottom: 2 },
   pcWeatherRow: { flexDirection: "row", alignItems: "center", flexShrink: 1, gap: 5 },
+  pcWeatherAttr: { fontSize: 10, fontWeight: "600", color: "#7a5a44", textDecorationLine: "underline" },
   pcWeatherText: { flexShrink: 1, fontFamily: "Noteworthy-Bold", fontSize: 15, color: "#1f4e79" },
   amcaBubble: { flexDirection: "row", alignItems: "center", gap: 14, paddingHorizontal: 30, paddingVertical: 18, borderRadius: 40, backgroundColor: "#fff8ec", borderWidth: 5, borderColor: "#6e4632" },
   amcaBubbleText: { fontSize: 40, fontWeight: "800", color: "#4a2c1c", flexShrink: 1 },

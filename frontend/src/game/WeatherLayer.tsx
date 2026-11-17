@@ -5,12 +5,16 @@ import { LinearGradient } from "expo-linear-gradient";
 import { memo, useEffect } from "react";
 import { View } from "react-native";
 import Animated, { Easing, cancelAnimation, useAnimatedStyle, useSharedValue, withRepeat, withTiming, type SharedValue } from "react-native-reanimated";
-import type { IstWeather } from "./istanbul";
+import type { IstWeather, Season } from "./istanbul";
 
 const hash = (i: number, n: number) => ((Math.sin(i * 12.9898 + n * 78.233) * 43758.5453) % 1 + 1) % 1;
 
 const RAIN = Array.from({ length: 150 }, (_, i) => ({ x: hash(i, 1) * 120 - 10, y: hash(i, 2), len: 18 + hash(i, 3) * 18, o: 0.35 + hash(i, 4) * 0.35 }));
 const SNOW = Array.from({ length: 46 }, (_, i) => ({ x: hash(i, 5) * 110 - 5, y: hash(i, 6), r: 3 + Math.round(hash(i, 7) * 3), o: 0.55 + hash(i, 8) * 0.4 }));
+// Mevsim parçacıkları: sonbaharda sarı/turuncu yaprak, ilkbaharda erguvan yaprağı (seyrek, küçük).
+const FLAKE = Array.from({ length: 10 }, (_, i) => ({ x: hash(i, 21) * 100, y: hash(i, 22), r: Math.round(hash(i, 23) * 180), s: 0.8 + hash(i, 24) * 0.6, c: i % 3 }));
+const LEAF_COLORS = ["#d98b2b", "#c4581e", "#e2b33a"];
+const PETAL_COLORS = ["#ee9cc4", "#e07fb0", "#f8c7dd"];
 const GUST = Array.from({ length: 22 }, (_, i) => ({ x: hash(i, 9), y: 4 + hash(i, 10) * 58, w: 50 + hash(i, 11) * 90, o: 0.35 + hash(i, 12) * 0.4 }));
 // Yakamoz: aşağı indikçe genişleyen, dağınık kısa parıltılar (3 grup, ayrı ayrı yanıp söner).
 const GLINT = Array.from({ length: 34 }, (_, i) => {
@@ -37,14 +41,16 @@ const TINT: Record<string, string> = {
 /** Dünyanın arkası: hava tonu, sis bandı, rüzgâr çizgileri, ay ve dolunay yakamozu. `night` 0..1 (yıldızlarla aynı). */
 export const SkyWeather = memo(function SkyWeather(props: {
   W: number; H: number; weather: IstWeather | null; night: SharedValue<number>;
-  moon: { illum: number; waxing: boolean; full: boolean } | null; active: boolean;
+  moon: { illum: number; waxing: boolean; full: boolean } | null; active: boolean; season?: Season;
 }) {
-  const { W, H, weather, night, moon, active } = props;
+  const { W, H, weather, night, moon, active, season } = props;
   const kind = weather?.kind ?? "acik";
   const wind = weather?.wind ?? null;
   const gust = useLoop(wind === "lodos" ? 2600 : 3200, active && wind != null);
   const breathe = useLoop(7000, active && (kind === "sis" || !!moon?.full));
   const nightStyle = useAnimatedStyle(() => ({ opacity: night.value }));
+  const dayStyle = useAnimatedStyle(() => ({ opacity: 1 - night.value }));
+  const dry = kind === "acik" || kind === "bulutlu";
   const gustStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: wind === "poyraz" ? -gust.value * W : (gust.value - 1) * W }],
   }));
@@ -61,6 +67,18 @@ export const SkyWeather = memo(function SkyWeather(props: {
     <View pointerEvents="none" style={{ position: "absolute", left: 0, top: 0, width: W, height: H }}>
       {kind !== "acik" && <View style={{ position: "absolute", left: 0, top: 0, width: W, height: H, backgroundColor: TINT[kind] }} />}
       {wind && <View style={{ position: "absolute", left: 0, top: 0, width: W, height: H, backgroundColor: TINT[wind] }} />}
+      {/* MEVSİM: yazın açık günde güneş parıltısı, kışın açık günde serin ton (gece söner). */}
+      {season === "yaz" && kind === "acik" && (
+        <Animated.View style={[{ position: "absolute", left: 0, top: 0, width: W, height: H }, dayStyle]}>
+          <LinearGradient colors={["rgba(255,236,170,0.6)", "rgba(255,214,140,0.2)", "rgba(255,214,140,0)"]} locations={[0, 0.35, 0.7]}
+            start={{ x: 1, y: 0 }} end={{ x: 0.2, y: 0.6 }} style={{ flex: 1 }} />
+          {/* köşede yumuşak yaz güneşi: dış hale + iç disk */}
+          <View style={{ position: "absolute", left: W - 150, top: -120, width: 300, height: 300, borderRadius: 150, backgroundColor: "rgba(255,232,160,0.22)" }} />
+          <View style={{ position: "absolute", left: W - 95, top: -65, width: 190, height: 190, borderRadius: 95, backgroundColor: "rgba(255,240,190,0.38)" }} />
+          <View style={{ position: "absolute", left: W - 55, top: -25, width: 110, height: 110, borderRadius: 55, backgroundColor: "rgba(255,250,225,0.85)" }} />
+        </Animated.View>
+      )}
+      {season === "kis" && dry && <View style={{ position: "absolute", left: 0, top: 0, width: W, height: H, backgroundColor: "rgba(200,220,245,0.12)" }} />}
       {kind === "sis" && (
         <Animated.View style={[{ position: "absolute", left: 0, top: H * 0.12, width: W, height: H * 0.5 }, fogStyle]}>
           <LinearGradient colors={["rgba(236,239,243,0)", "rgba(236,239,243,0.86)", "rgba(236,239,243,0.9)", "rgba(236,239,243,0)"]}
@@ -99,19 +117,41 @@ export const SkyWeather = memo(function SkyWeather(props: {
 });
 
 /** Dünyanın önü: ince yağmur ya da kar. */
-export const PrecipLayer = memo(function PrecipLayer(props: { W: number; H: number; weather: IstWeather | null; active: boolean }) {
-  const { W, H, weather, active } = props;
+export const PrecipLayer = memo(function PrecipLayer(props: { W: number; H: number; weather: IstWeather | null; active: boolean; season?: Season }) {
+  const { W, H, weather, active, season } = props;
   const kind = weather?.kind;
   const rain = kind === "yagmur";
   const snow = kind === "kar";
+  // Yağış yokken sonbahar yaprağı / ilkbahar çiçek yaprağı.
+  const drift = !rain && !snow && kind !== "sis" && (season === "sonbahar" || season === "ilkbahar");
   const t = useLoop(rain ? 650 : 11000, active && (rain || snow));
-  const t2 = useLoop(17000, active && snow);
+  const t2 = useLoop(drift ? 15000 : 17000, active && (snow || drift));
+  const windDir = weather?.wind === "poyraz" ? -1 : 1;
+  const driftStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: t2.value * H }, { translateX: windDir * (t2.value * 60) + Math.sin(t2.value * Math.PI * 4) * 18 }],
+  }));
   const slant = weather?.wind === "poyraz" ? -1 : 1;
   const sheet = useAnimatedStyle(() => ({ transform: [{ translateY: t.value * H }] }));
   const sheet2 = useAnimatedStyle(() => ({ transform: [{ translateY: t2.value * H }, { translateX: Math.sin(t2.value * Math.PI * 2) * 12 }] }));
+  if (drift) {
+    const cols = season === "sonbahar" ? LEAF_COLORS : PETAL_COLORS;
+    const pieces = (half: number) => FLAKE.map((f, i) => (
+      <View key={`${half}-${i}`} style={{ position: "absolute", left: `${f.x}%`, top: (f.y + half) * H, width: 10 * f.s, height: 6 * f.s, borderRadius: 5,
+        backgroundColor: cols[f.c], opacity: 0.85, transform: [{ rotate: `${f.r}deg` }] }} />
+    ));
+    return (
+      <View pointerEvents="none" style={{ position: "absolute", left: 0, top: 0, width: W, height: H, overflow: "hidden", zIndex: 30 }}>
+        <Animated.View style={[{ position: "absolute", left: 0, top: -H, width: W, height: 2 * H }, driftStyle]}>
+          {pieces(0)}
+          {pieces(1)}
+        </Animated.View>
+      </View>
+    );
+  }
   if (!rain && !snow) return null;
+  const rainDrops = weather?.light ? RAIN.filter((_, i) => i % 3 === 0) : RAIN; // hafif yağmurda üçte bir
   const drops = (half: number) => rain
-    ? RAIN.map((d, i) => <View key={`${half}-${i}`} style={{ position: "absolute", left: `${d.x}%`, top: (d.y + half) * H, width: 2, height: d.len, borderRadius: 1, backgroundColor: "#e8f0ff", opacity: d.o }} />)
+    ? rainDrops.map((d, i) => <View key={`${half}-${i}`} style={{ position: "absolute", left: `${d.x}%`, top: (d.y + half) * H, width: 2, height: d.len, borderRadius: 1, backgroundColor: "#e8f0ff", opacity: d.o }} />)
     : SNOW.map((d, i) => <View key={`${half}-${i}`} style={{ position: "absolute", left: `${d.x}%`, top: (d.y + half) * H, width: d.r, height: d.r, borderRadius: d.r / 2, backgroundColor: "#ffffff", opacity: d.o }} />);
   return (
     <View pointerEvents="none" style={{ position: "absolute", left: 0, top: 0, width: W, height: H, overflow: "hidden", zIndex: 30 }}>
