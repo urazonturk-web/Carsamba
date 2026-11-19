@@ -399,6 +399,33 @@ public class ByzantionGameCenterModule: Module {
       }
     }
 
+    // PAYLAŞIM KARTPOSTALI (2026-11-18): ekrandaki kartın dikdörtgenini (nokta, pencere koordinatı)
+    // görüntü olarak alır, JPEG'e yazar ve iOS paylaşım sayfasını açar. Yeni paket gerekmez.
+    AsyncFunction("shareSnapshot") { (x: Double, y: Double, w: Double, h: Double, message: String, promise: Promise) in
+      guard let presenter = self.appContext?.utilities?.currentViewController(),
+            let window = presenter.view.window ?? UIApplication.shared.connectedScenes
+              .compactMap({ ($0 as? UIWindowScene)?.windows.first(where: { $0.isKeyWindow }) }).first else {
+        promise.resolve("error")
+        return
+      }
+      let rect = CGRect(x: x, y: y, width: w, height: h)
+      let fmt = UIGraphicsImageRendererFormat()
+      fmt.scale = max(2, window.screen.scale)
+      let image = UIGraphicsImageRenderer(size: rect.size, format: fmt).image { _ in
+        window.drawHierarchy(in: CGRect(x: -rect.minX, y: -rect.minY, width: window.bounds.width, height: window.bounds.height), afterScreenUpdates: false)
+      }
+      guard let data = image.jpegData(compressionQuality: 0.9) else { promise.resolve("error"); return }
+      let url = FileManager.default.temporaryDirectory.appendingPathComponent("byzantion-kartpostal.jpg")
+      do { try data.write(to: url, options: .atomic) } catch { promise.resolve("error"); return }
+      var items: [Any] = [url]
+      if !message.isEmpty { items.append(message) }
+      let vc = UIActivityViewController(activityItems: items, applicationActivities: nil)
+      vc.popoverPresentationController?.sourceView = presenter.view
+      vc.popoverPresentationController?.sourceRect = rect
+      vc.completionWithItemsHandler = { _, completed, _, _ in promise.resolve(completed ? "shared" : "cancelled") }
+      presenter.present(vc, animated: true)
+    }.runOnQueue(.main)
+
     AsyncFunction("showLeaderboard") { (leaderboardId: String, promise: Promise) in
       guard let presenter = self.appContext?.utilities?.currentViewController() else {
         promise.resolve(false)

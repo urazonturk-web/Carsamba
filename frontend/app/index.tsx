@@ -50,7 +50,7 @@ import { ANCHOR_SHIFT_PX, GLOBAL_VISUAL_SCALE, POSE_FEET_SPAN_PX } from "../src/
 import { AMBIENT_ON, AmbientEvents } from "../src/game/AmbientEvents";
 import { POSTCARDS, POSTCARDS_KEY, POSTCARDS_ON, parseUnlocked } from "../src/game/postcards";
 import { DAILY_KEY, DAILY_MAP, dailySeed, todayKey, todayLabel, type DailyRecord } from "../src/game/daily";
-import { DURAK_SEFER, nextStopLine, stopName, stopTowerId, stopsPassed, NIGHT_STOP, FINAL_STOP, bridgeAt, bridgeFromFoot, bridgeArrivingAt, skyStepForStops } from "../src/game/stops";
+import { DURAK_SEFER, nextStopLine, reachedLine, stopName, stopTowerId, stopsPassed, NIGHT_STOP, FINAL_STOP, bridgeAt, bridgeFromFoot, bridgeArrivingAt, skyStepForStops } from "../src/game/stops";
 const START_SKY = DURAK_SEFER ? skyStepForStops(stopsPassed(TEST_START_TOWER)) : 0;
 import { SFX_ON, initSfx, playFart, playSfx, setSfxMuted, stopFart, stopSfx } from "../src/game/sfx";
 import { GAME_OVER_LINE, QUIP_ON, multiJumpShout, pickQuip, quipContext } from "../src/game/copy";
@@ -61,6 +61,9 @@ import { SymbolView } from "expo-symbols";
 import * as SplashScreen from "expo-splash-screen";
 import { KIS_ON, WINTER_HAT_SOURCE, WINTER_SCARF_SOURCE } from "../src/game/kis";
 import { YAGMUR_ON } from "../src/game/yagmur";
+import { SHARE_CARD_ON, ShareSheet } from "../src/game/ShareCard";
+const HAVA_GALERI = false as boolean; // GEÇİCİ: hava ekran görüntüleri için (gündüz); iş bitince false
+const HAVA_GALERI_DONGU = false as boolean; // GEÇİCİ: oyunda hava 4 sn'de bir değişsin
 import { SEMSIYE_ON, SEMSIYE_TEST, umbrellaMode } from "../src/game/semsiye";
 import { OPEN_METEO_FALLBACK, fromApple, seasonFor, SEASON_NAME, type Season } from "../src/game/istanbul";
 import { ISTANBUL_ON, WEATHER_TEST_TAP, WEATHER_CACHE_KEY, WEATHER_TOAST_KEY, WEATHER_STALE_MS, WEATHER_REFRESH_MS, WEATHER_TEST_CYCLE, realSkyStep, moonInfo, fetchWeather, parseWeather, weatherStamp, weatherLine, trDayKey, type IstWeather } from "../src/game/istanbul";
@@ -357,7 +360,7 @@ const AnimatedImage = Animated.createAnimatedComponent(Image);
 const BG_SCROLL_TEST = true as boolean;
 const BG_SCROLL_RATIO = 0.45;
 const BG_SCROLL_TILES = 4;
-const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "YAGMUR KASKET + MONT") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
+const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "YAGMUR + RUZGAR v2") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
 const DIAG_MAX_EXAMPLES = 6;
 const HOUSE_AB_FROZEN = false as boolean;
 // REVIZYON-066 experiment (one variable): expo-linear-gradient's iOS layer
@@ -916,6 +919,7 @@ export default function Game() {
   const [landingSub, setLandingSub] = useState("");
   const [quip, setQuip] = useState(GAME_OVER_LINE);
   const [goInfo, setGoInfo] = useState({ prevBest: 0, newRecord: false });
+  const [shareOpen, setShareOpen] = useState(false); // PAYLAŞIM KARTPOSTALI (2026-11-18)
   const [debug, setDebug] = useState({
     charge: 0, vx: 0, vy: 0, dist: 0, width: 0, offset: 0, fps: 0, p50: 0, p95: 0, dropped: 0,
   });
@@ -1121,7 +1125,7 @@ export default function Game() {
   useEffect(() => {
     if (!ISTANBUL_ON) return;
     const tick = () => {
-      const real = sceneTest === 1 ? 4 : realSkyStep();
+      const real = HAVA_GALERI ? 1 : sceneTest === 1 ? 4 : realSkyStep();
       realSkyRef.current = real;
       // Koşu sırasında yalnız kararabilir; menüde/başta doğrudan gerçek saate.
       if (real > skyStep.value) skyStep.value = withTiming(real, { duration: 1200 });
@@ -1157,6 +1161,12 @@ export default function Game() {
     const sub = AppState.addEventListener("change", (st) => { if (st === "active") { refresh(); pollBattery(); } });
     return () => { alive = false; clearInterval(id); sub.remove(); };
   }, []);
+  // GEÇİCİ (HAVA_GALERI): editör değerlendirmesi için oyunda hava 4 sn'de bir sırayla değişir, gökyüzü gündüz.
+  useEffect(() => {
+    if (!HAVA_GALERI || !HAVA_GALERI_DONGU || menuOpen) return;
+    const id = setInterval(() => setWeatherTest((i) => (i + 1 >= WEATHER_TEST_CYCLE.length ? 0 : i + 1)), 7000);
+    return () => clearInterval(id);
+  }, [menuOpen]);
   const shownWeather: IstWeather | null = weatherTest >= 0
     ? { ...WEATHER_TEST_CYCLE[weatherTest], temp: istWeather?.temp ?? 14, at: Date.now(), test: true }
     : istWeather;
@@ -1298,11 +1308,11 @@ export default function Game() {
     });
     const offIn = GameCenter.onChallenge("onChallenge", (c) => {
       setIncoming((list) => (list.some((x) => x.matchID === c.matchID) ? list : [...list, c]));
-      showToast(c.race ? `🏁 ${c.from || "Bir arkadaşın"} seni 2 dk yarışa çağırdı: ${c.score}. kule` : `⚔️ ${c.from || "Bir arkadaşın"} sana meydan okudu: ${c.score} puan`);
+      showToast(c.race ? `🏁 ${c.from || "Bir arkadaşın"} sana 2 dakikalık meydan okudu: ${c.score}. kule` : `⚔️ ${c.from || "Bir arkadaşın"} sana meydan okudu: ${c.score} puan`);
     });
     const offRes = GameCenter.onChallenge("onChallengeResult", (c) => {
       setFriendResults((list) => (list.some((x) => x.matchID === c.matchID) ? list : [...list, c]));
-      showToast(c.race ? `🏁 ${c.replier || "Arkadaşın"} yarışını oynadı: ${c.reply ?? 0}. kule` : `⚔️ ${c.replier || "Arkadaşın"} meydan okumanı oynadı: ${c.reply ?? 0} puan`);
+      showToast(c.race ? `🏁 ${c.replier || "Arkadaşın"} meydan okumanı oynadı: ${c.reply ?? 0}. kule` : `⚔️ ${c.replier || "Arkadaşın"} meydan okumanı oynadı: ${c.reply ?? 0} puan`);
     });
     return () => {
       alive = false;
@@ -1963,9 +1973,16 @@ export default function Game() {
       ? await GameCenter.challengePlayer(f.id, rr.seed, rr.me.far, gcNameRef.current, rr.race)
       : await GameCenter.challengePlayer(f.id, seedRef.current, scoreRef.current, gcNameRef.current);
     setSendingTo(null);
-    if (r.status === "sent") { setFriendSheet(false); showToast(rr ? `🏁 ${f.alias || f.name} yarışa çağrıldı!` : `⚔️ ${f.alias || f.name} kişisine meydan okundu!`); }
+    if (r.status === "sent") { setFriendSheet(false); showToast(rr ? `🏁 ${f.alias || f.name} kişisine meydan okundu!` : `⚔️ ${f.alias || f.name} kişisine meydan okundu!`); }
     else showToast("Gönderilemedi: " + (r.message ?? ""));
   }, [showToast, sheetMode, raceResult]);
+
+  // MEYDAN OKUMA = 2 DK YARIŞ (2026-11-18, kullanıcı: "2 dakkalık oyunu kaldırıp meydan okumanın içine yerleştirelim").
+  // Meydan oku: 2 dakikalık sefer başlar; bitince "Arkadaşına gönder" ile arkadaş senin hayaletinle yarışır.
+  const startMeydan = useCallback(() => {
+    startRace({});
+    showToast("⚔️ Meydan okuma: 2 dakikada en uzak kuleye git, sonra arkadaşına gönder!");
+  }, [startRace, showToast]);
 
   const leaveChallenge = useCallback(() => {
     challengeRef.current = null;
@@ -3583,7 +3600,7 @@ export default function Game() {
             ) : null}
             {MEYDAN_ON && incoming.length > 0 && (
               <Pressable style={({ pressed }) => [styles.friendPill, pressed && styles.playBtnPressed]} onPress={() => playIncoming(incoming[0])} testID="incoming-challenge">
-                <Text style={styles.friendPillText}>{incoming[0].race ? `🏁 ${incoming[0].from || "Bir arkadaşın"} seni 2 dk yarışa çağırdı: ${incoming[0].score}. kule` : `⚔️ ${incoming[0].from || "Bir arkadaşın"} sana meydan okudu: ${incoming[0].score} puan`}</Text>
+                <Text style={styles.friendPillText}>{incoming[0].race ? `🏁 ${incoming[0].from || "Bir arkadaşın"} sana 2 dakikalık meydan okudu: ${incoming[0].score}. kule` : `⚔️ ${incoming[0].from || "Bir arkadaşın"} sana meydan okudu: ${incoming[0].score} puan`}</Text>
                 <Text style={styles.friendPillGo}>Oyna ›</Text>
               </Pressable>
             )}
@@ -3595,7 +3612,7 @@ export default function Game() {
               >
                 <Text style={styles.goInfoMain}>
                   {friendResults[0].race
-                    ? `🏁 ${friendResults[0].replier || "Arkadaşın"} yarışını oynadı: ${friendResults[0].reply ?? 0}. kule (sen ${friendResults[0].score}) — ${raceOutcome(friendResults[0]) < 0 ? "seni geçti!" : raceOutcome(friendResults[0]) === 0 ? "berabere" : "geçemedi 🎉"}`
+                    ? `🏁 ${friendResults[0].replier || "Arkadaşın"} meydan okumanı oynadı: ${friendResults[0].reply ?? 0}. kule (sen ${friendResults[0].score}) — ${raceOutcome(friendResults[0]) < 0 ? "seni geçti!" : raceOutcome(friendResults[0]) === 0 ? "berabere" : "geçemedi 🎉"}`
                     : `⚔️ ${friendResults[0].replier || "Arkadaşın"} senin ${friendResults[0].score} puanını oynadı: ${friendResults[0].reply ?? 0} — ${(friendResults[0].reply ?? 0) > friendResults[0].score ? "seni geçti!" : (friendResults[0].reply ?? 0) === friendResults[0].score ? "berabere" : "geçemedi 🎉"}`}
                 </Text>
                 <Text style={styles.goInfoNew}>tamam ✓</Text>
@@ -3619,16 +3636,16 @@ export default function Game() {
                   </Pressable>
                 )}
                 <View style={styles.pcIconRow}>
-                  {MEYDAN_ON && (
-                    <Pressable testID="challenge-share" style={({ pressed }) => [styles.pcIconBtn, pressed && styles.playBtnPressed]} onPress={() => { setSheetMode("score"); askChallenge(); }}>
-                      <View style={styles.pcIconCircle}><Ico name="flag.2.crossed.fill" size={22} color="#c0472b" /></View>
-                      <Text style={styles.pcIconLabel}>Meydan oku</Text>
+                  {SHARE_CARD_ON && Platform.OS === "ios" && (
+                    <Pressable testID="share-card" style={({ pressed }) => [styles.pcIconBtn, pressed && styles.playBtnPressed]} onPress={() => setShareOpen(true)}>
+                      <View style={styles.pcIconCircle}><Ico name="square.and.arrow.up" size={22} color="#2f7d4f" /></View>
+                      <Text style={styles.pcIconLabel}>Paylaş</Text>
                     </Pressable>
                   )}
-                  {YARIS_ON && (
-                    <Pressable testID="race-start" style={({ pressed }) => [styles.pcIconBtn, pressed && styles.playBtnPressed]} onPress={() => startRace({})}>
-                      <View style={styles.pcIconCircle}><Ico name="flag.checkered" size={22} color="#1f4e79" /></View>
-                      <Text style={styles.pcIconLabel}>2 dk yarış</Text>
+                  {MEYDAN_ON && (
+                    <Pressable testID="challenge-share" style={({ pressed }) => [styles.pcIconBtn, pressed && styles.playBtnPressed]} onPress={YARIS_ON ? startMeydan : () => { setSheetMode("score"); askChallenge(); }}>
+                      <View style={styles.pcIconCircle}><Ico name="flag.2.crossed.fill" size={22} color="#c0472b" /></View>
+                      <Text style={styles.pcIconLabel}>Meydan oku</Text>
                     </Pressable>
                   )}
                   {GAME_CENTER_ON && GameCenter.gameCenterAvailable && (
@@ -3663,6 +3680,26 @@ export default function Game() {
           </Animated.View>
         </View>
       )}
+
+      {/* PAYLAŞIM KARTPOSTALI (2026-11-18): oyun sonu kartının üstünde, ekranın tamamı */}
+      {SHARE_CARD_ON && gameOver && shareOpen && (() => {
+        const k = runEnd.stops;
+        const trNow = new Date(Date.now() + 3 * 3600 * 1000);
+        const hh = String(trNow.getUTCHours()).padStart(2, "0");
+        const mm = String(trNow.getUTCMinutes()).padStart(2, "0");
+        return (
+          <ShareSheet
+            score={score}
+            newRecord={goInfo.newRecord}
+            place={reachedLine(k)}
+            photo={POSTCARDS_ON && k >= 1 && k <= POSTCARDS.length ? POSTCARDS[k - 1].source : PC_STAMP}
+            sticker={goInfo.newRecord ? PC_STICKER.rec : score === 0 || score < best * 0.3 ? PC_STICKER.low : PC_STICKER.mid}
+            stamp={shownWeather && !shownWeather.test ? weatherStamp(shownWeather, TR_MONTHS_TITLE) : `${trNow.getUTCDate()} ${TR_MONTHS_TITLE[trNow.getUTCMonth()]}, İstanbul`}
+            time={`${hh}:${mm}`}
+            onClose={() => setShareOpen(false)}
+          />
+        );
+      })()}
       {MENU_ON && menuOpen && assetsReady && !gameOver && (
         <View style={[styles.menuOverlay, { paddingTop: insets.top + 46 }]} testID="start-menu">
           {/* TASARIM 2026-11-16: başlık gökyüzünde, kart küçük; amca ve kuleler aşağıda görünür kalır. */}
@@ -3704,7 +3741,7 @@ export default function Game() {
                   </View>
                   {MEYDAN_ON && incoming.length > 0 && (
                     <Pressable style={({ pressed }) => [styles.friendPill, pressed && styles.playBtnPressed]} onPress={() => playIncoming(incoming[0])} testID="menu-incoming">
-                      <Text style={styles.friendPillText}>{incoming[0].race ? `${incoming[0].from || "Bir arkadaşın"} seni 2 dk yarışa çağırdı: ${incoming[0].score}. kule` : `${incoming[0].from || "Bir arkadaşın"} sana meydan okudu: ${incoming[0].score} puan`}</Text>
+                      <Text style={styles.friendPillText}>{incoming[0].race ? `${incoming[0].from || "Bir arkadaşın"} sana 2 dakikalık meydan okudu: ${incoming[0].score}. kule` : `${incoming[0].from || "Bir arkadaşın"} sana meydan okudu: ${incoming[0].score} puan`}</Text>
                       <Text style={styles.friendPillGo}>Oyna ›</Text>
                     </Pressable>
                   )}
@@ -3713,10 +3750,10 @@ export default function Game() {
                     <Ico name="play.fill" size={20} color="#fff8ec" />
                     <Text style={styles.playBtnText}>Oyna</Text>
                   </Pressable>
-                  {YARIS_ON && (
-                    <Pressable testID="menu-race" style={({ pressed }) => [styles.modeBtn, styles.iconBtn, pressed && styles.playBtnPressed]} onPress={() => startRace({})}>
-                      <Ico name="flag.checkered" size={18} color="#1f4e79" />
-                      <Text style={[styles.modeBtnText, { color: "#1f4e79" }]}>2 dk yarış</Text>
+                  {YARIS_ON && MEYDAN_ON && (
+                    <Pressable testID="menu-race" style={({ pressed }) => [styles.modeBtn, styles.iconBtn, pressed && styles.playBtnPressed]} onPress={startMeydan}>
+                      <Ico name="flag.2.crossed.fill" size={18} color="#c0472b" />
+                      <Text style={[styles.modeBtnText, { color: "#c0472b" }]}>Meydan oku · 2 dakika</Text>
                     </Pressable>
                   )}
                   <View style={[styles.pcIconRow, { marginTop: 10 }]}>
@@ -3777,7 +3814,7 @@ export default function Game() {
                     );
                     return (
                       <>
-                        <Text style={styles.pcGreetingC} numberOfLines={1} adjustsFontSizeToFit>2 dakikalık sefer</Text>
+                        <Text style={styles.pcGreetingC} numberOfLines={1} adjustsFontSizeToFit>2 dakikalık meydan okuma</Text>
                         <Text style={[styles.pcVerdict, { color }]} numberOfLines={1} adjustsFontSizeToFit>{title}</Text>
                         {!opp && <Text style={[styles.pcHand, { fontSize: 16 }]}>Arkadaşına gönder, hayaletinle yarışsın</Text>}
                         <View style={styles.pcMiniRow}>
@@ -3802,7 +3839,7 @@ export default function Game() {
                     </Pressable>
                     <Pressable style={({ pressed }) => [styles.pcIconBtn, pressed && styles.playBtnPressed]} onPress={() => startRace({})} testID="race-new">
                       <View style={styles.pcIconCircle}><Ico name="flag.checkered" size={22} color="#1f4e79" /></View>
-                      <Text style={styles.pcIconLabel}>Yeni yarış</Text>
+                      <Text style={styles.pcIconLabel}>Yeni meydan okuma</Text>
                     </Pressable>
                   </View>
                   <Pressable onPress={() => { closeRace(); setMenuOpen(true); }} hitSlop={8} testID="race-close" style={styles.linkRow}>
@@ -3822,7 +3859,7 @@ export default function Game() {
         <View style={styles.albumOverlay} testID="friend-sheet">
           <View style={styles.albumCard}>
             <Text style={styles.albumTitle}>Kime meydan okuyalım?</Text>
-            <Text style={styles.albumSub}>{sheetMode === "race" && raceResult ? `2 dk yarışını (${raceResult.me.far}. kule) ve hayaletini gönder` : `${score} puanını ve bu haritayı gönder`}</Text>
+            <Text style={styles.albumSub}>{sheetMode === "race" && raceResult ? `2 dakikalık meydan okumanı (${raceResult.me.far}. kule) ve hayaletini gönder` : `${score} puanını ve bu haritayı gönder`}</Text>
             <ScrollView style={{ maxHeight: 360, marginTop: 8 }}>
               {friendsMsg && <Text style={styles.friendMsg}>{friendsMsg}</Text>}
               {friends.map((f) => (
@@ -4738,7 +4775,7 @@ const useStyles = makeStyles((colors) => ({
   sfxBtn: { position: "absolute", right: 14, width: 40, height: 40, borderRadius: 20, flexDirection: "row", alignItems: "center", justifyContent: "center", backgroundColor: "rgba(42,27,18,0.78)", borderWidth: 1.5, borderColor: "rgba(255,250,241,0.6)", zIndex: 60 },
   sfxBtnMuted: { backgroundColor: "rgba(192,71,43,0.9)" },
   sfxBtnText: { fontSize: 14, fontWeight: "800", color: "#fff" },
-  hud: { position: "absolute", left: 0, right: 0, alignItems: "center", pointerEvents: "none" },
+  hud: { position: "absolute", left: 0, right: 0, alignItems: "center", pointerEvents: "none", zIndex: 35 }, // yağış (30) skorun arkasında kalsın
   scoreText: {
     fontSize: 56,
     fontWeight: "800",

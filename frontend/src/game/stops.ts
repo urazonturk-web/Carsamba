@@ -96,6 +96,13 @@ export function stopName(k: number) {
   return `Gece seferi ${k - FINAL_STOP}`;
 }
 
+/** Paylaşım kartpostalı için: "Üsküdar'a kadar geldim" (k = geçilen durak sayısı). */
+export function reachedLine(k: number) {
+  if (k <= 0) return null;
+  if (k <= STOP_DATIVE.length) return `${STOP_DATIVE[k - 1]} kadar geldim`;
+  return `Rumeli Feneri'ni geçtim, gece seferindeyim`;
+}
+
 /** Sonuç kartı için: "Galata'ya 4 kule kaldı" satırı. */
 export function nextStopLine(lastTowerId: number) {
   const k = stopsPassed(lastTowerId) + 1;

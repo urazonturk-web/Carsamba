@@ -18,6 +18,7 @@ type Native = {
   finishChallengeRace?(matchID: string, score: number, name: string, race: string, outcome: number): Promise<{ status: string; message?: string }>;
   battery?(): Promise<{ level: number; state: number }>;
   istanbulWeather?(): Promise<AppleWeather>;
+  shareSnapshot?(x: number, y: number, w: number, h: number, message: string): Promise<string>;
   addListener?(event: string, cb: (e: FriendChallenge) => void): { remove(): void };
 };
 
@@ -129,4 +130,10 @@ export async function istanbulWeather(): Promise<AppleWeather | null> {
   } catch (e: any) {
     return { ok: false, message: String(e?.message ?? e) };
   }
+}
+
+/** PAYLAŞIM KARTPOSTALI: ekrandaki dikdörtgeni (pencere koordinatı, nokta) görüntü olarak paylaşır. */
+export async function shareSnapshot(x: number, y: number, w: number, h: number, message: string): Promise<"shared" | "cancelled" | "error" | "unavailable"> {
+  if (!native?.shareSnapshot) return "unavailable";
+  try { return (await native.shareSnapshot(x, y, w, h, message)) as any; } catch { return "error"; }
 }
