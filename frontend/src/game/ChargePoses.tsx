@@ -49,6 +49,9 @@ type Props = {
   breath?: SharedValue<number>;
   // YAĞMUR KIYAFETİ (2026-11-17): 1 = kasket + mont (montlu poz görseli özgün pozun üstüne biner).
   rain?: SharedValue<number>;
+  // 2026-11-20 düzeltme: rain her zaman verilir (stil ilk çizimden itibaren aynı değeri izlesin);
+  // görseller yalnız rainLayers true olunca bağlanır. Önce rain sonradan verilince kıyafet hiç görünmüyordu.
+  rainLayers?: boolean;
   // ŞEMSİYE (2026-11-17): umbrella 1 = yağmurda şemsiye var; umbOpen 0..1 açılma; umbFlip 0..1 kumaşın ters dönmesi.
   umbrella?: SharedValue<number>;
   umbOpen?: SharedValue<number>;
@@ -71,7 +74,7 @@ const DIRT_SPOTS = [
 ];
 const DIRT_COLORS = ["rgba(150,104,48,0.92)", "rgba(126,86,40,0.92)", "rgba(171,124,62,0.9)"];
 
-function PoseLayer({ i, px, py, poseCharge, scale, feetCenterOffset, feetHalf, landPulse, halo, strain, dirty, pajama, winter, snow, nose, breath, rain, umbrella, umbOpen, umbFlip, offsetX, offsetY, ...cb }: Props & { i: number }) {
+function PoseLayer({ i, px, py, poseCharge, scale, feetCenterOffset, feetHalf, landPulse, halo, strain, dirty, pajama, winter, snow, nose, breath, rain, rainLayers, umbrella, umbOpen, umbFlip, offsetX, offsetY, ...cb }: Props & { i: number }) {
   const pose = CHARGE_POSES[i];
   const style = useAnimatedStyle(() => {
     // Squash toward the FOOT line (feetHalf), not the sprite's own center,
@@ -174,7 +177,7 @@ function PoseLayer({ i, px, py, poseCharge, scale, feetCenterOffset, feetHalf, l
           onError={cb.onError}
         />
       )}
-      {rain ? (
+      {rain && rainLayers ? (
         <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, right: 0, bottom: 0 }, rainBodyStyle]}>
           <Image source={RAIN_POSE_SOURCES[i]} resizeMode="stretch" fadeDuration={0} style={{ width: "100%", height: "100%" }} />
         </Animated.View>
@@ -198,7 +201,7 @@ function PoseLayer({ i, px, py, poseCharge, scale, feetCenterOffset, feetHalf, l
           </Animated.View>
         </>
       ) : null}
-      {rain ? (
+      {rain && rainLayers ? (
         <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, right: 0, bottom: 0 }, rainCapStyle]}>
           <Image source={RAIN_CAP_SOURCE} resizeMode="stretch" fadeDuration={0}
             style={{ position: "absolute", left: RAIN_CAP_BOX.x * scale, top: RAIN_CAP_BOX.y * scale, width: RAIN_CAP_BOX.w * scale, height: RAIN_CAP_BOX.h * scale }} />

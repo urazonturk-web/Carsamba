@@ -1,0 +1,259 @@
+OpenAI Codex v0.167.0-alpha.3.2
+--------
+workdir: /Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend
+model: gpt-6-luna
+provider: openai
+approval: never
+sandbox: read-only
+reasoning effort: medium
+reasoning summaries: none
+session id: 01a1f8e3-fa1e-7170-8c76-52842c91606b
+--------
+user
+# Byzantion — Yeni yaratıcı fikirler + oyunun bugünkü puanı (brif)
+
+## Oyun (bağlam)
+Byzantion: Expo/React Native iPhone oyunu (Android sonra). Tek dokunuşlu "basılı tut - bırak - zıpla": bıyıklı, kırmızı eşofmanlı İstanbullu bir amca İstanbul çatıları/kuleleri arasında zıplar. Karikatür çizgi, resimli İstanbul arka planı (Boğaz, vapurlar, tarihi yarımada), Türkçe arayüz. TestFlight'ta birkaç arkadaşla deneniyor, App Store'da yok. Geliştirici tek kişi (kod: Claude Code; görseller: bir görsel üretim aracı, her görsel ayrı onayla).
+
+Değişmez kural: zıplama fiziği, kamera, çatı silueti ve çarpışma değişmez. Kullanıcı daha önce "günün haritası" modunu beğenmedi ("bu oyun tekrara düşmemeli") — tekrar eden günlük harita önerme.
+
+## Şu an oyunda olanlar
+- Patlama: aşırı basınca amca patlar; koşu boyunca lekeli ve sinekli kalır, osuruk sesleri.
+- Her 15 kulede bir durak/semt + güzergâh (üç köprü, Rumeli Feneri'ne kadar), 12 kartpostal koleksiyonu (albüm).
+- Gece pijama anı; kurukafa (kuleleri büyütüp küçülten tuhaf olay); martı sürüsü, uzak vapur düdüğü.
+- Game Center: rekor tablosu, arkadaş sıralaması, arkadaşa "Meydan oku" = 2 dakikalık sefer + hayalet yarış (arkadaşın koşusu hayalet olarak görünür).
+- Paylaşım kartpostalı: oyun sonunda skor, ulaşılan durak, günün havası/saati damgalı kartpostal, WhatsApp/Instagram'a tek dokunuş.
+- Gerçek İstanbul: gerçek saat (şafak/gün/gün batımı/gece), gerçek ay evresi ve yakamoz, gerçek hava (yağmur, kar, sis, lodos, poyraz, kapalı): çatılarda kar ve buz sarkıtı, ıslaklık, arka planın mevsim varyantları; pil şakası (pil azsa amca da yorgun).
+- Mevsim kıyafeti: kışın bere + atkı, karda kar biriken amca (silkelenir, burnu kızarır, nefesi buhar), yağmurda kasket + mont.
+- Açılışta amca rozeti, ses aç/kapa.
+
+## Daha önce önerilmiş fikirler (TEKRAR ETME; istersen geliştirerek bahset)
+Lodosta vapur iptali, kar tatili manşeti, gece yarısı amcası, yaz kıyafeti (atlet+don), martı vergisi, teyzenin sepeti (reddedildi), çay molası (reddedildi), günlük seri, günlük görev, takvim etkinlikleri (yılbaşı, 29 Ekim, Hıdrellez), hayalette kıyafet görünmesi, durakta İstanbul bilmecesi, sokak sesleri, İstanbul takvimi (erguvan, lüfer, kestane), şemsiye (denendi, iptal).
+
+## Görev
+### A. Yeni yaratıcı fikirler (en az 8, en fazla 12)
+Gerçekten yaratıcı, İstanbul'a ve bu amcaya özgü, başka zıplama oyunlarında olmayan fikirler istiyoruz. Oyuncuyu güldüren, şaşırtan, geri getiren veya arkadaşına göstermek isteyeceği anlar. Her fikir için: tek cümle ne olduğu, oyuncuya neden iyi gelir, efor (küçük/orta/büyük), kod mu yeni görsel mi, risk. Sonunda en iyi 3'ünü sırala.
+
+### B. Oyunu şu hâliyle puanla
+Ekteki ekran görüntülerine ve yukarıdaki özellik listesine göre oyunu 10 üzerinden puanla — ayrı ayrı: görsel, oynanış/his, özgünlük/kimlik, eğlence/mizah, geri gelme isteği (retention), paylaşılabilirlik, App Store'a hazırlık; sonra genel puan. Her puanın kısa gerekçesi. App Store'daki benzer tek dokunuşlu oyunlarla (ör. zıplama/stick-hero türü) kıyasla. "Puanı 1 artırmak için en etkili 3 iş" ile bitir.
+
+Türkçe, başlıklı ve öz yaz (en fazla ~1000 kelime). Kod değiştirme, yalnız görüş.
+
+warning: Under-development features enabled: chronicle. Under-development features are incomplete and may behave unpredictably. To suppress this warning, set `suppress_unstable_features_warning = true` in /Users/bekirurazonturk/.codex/config.toml.
+codex
+Byzantion için önceki oyun yönü notlarını hızlıca kontrol edip ardından ekran görüntülerini ve güncel App Store benzerlerini birlikte değerlendireceğim; yalnızca görüş ve fikir sunacağım.
+exec
+/bin/zsh -lc 'rg -n -i "Byzantion|zıplama|overpress|postcard|kartpostal" /Users/bekirurazonturk/.codex/memories/MEMORY.md' in /Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend
+ succeeded in 0ms:
+205:- On Nov 20 a session reported a commit covering postcard, challenge, fog, rain and wind, a clean workspace and no push; this supersedes the earlier uncommitted checkpoint only as a reported status. Verify actual checkout and remote. [Task 1] [skysight memory]
+208:- Rain was reported translucent and multilayered, wind lines short, wavy and more visible; the build was installed on the phone, but the last wind-visibility adjustment was not separately verified on device. Fog, challenge and postcard changes were then uncommitted; check current Git and device state. [Task 1] [skysight memory]
+214:# Task Group: Carsamba shareable score postcard and push status
+216:scope: Byzantion game-over share card and November 18 GitHub Desktop push.
+219:## Task 1: Paylaşım kartpostalı and real-device sharing
+229:- Paylaşım kartpostalı, ShareCard.tsx, JPEG, iOS share sheet, WhatsApp, d12848d, GitHub Desktop, ios/ untracked
+269:# Task Group: Byzantion weather, winter effects and startup feedback
+287:- Byzantion, WeatherKit, istanbul.ts, WeatherLayer.tsx, b01bf04, bere, atkı, kar, seasonal backgrounds, physical phone
+298:- BYZANTION, splash, blue screen, character head, temperature separator, battery, 21%
+317:- The user requested “BYZANTION” and the character’s head on the blue startup screen, battery response below 21% instead of 15%, and flagged an ambiguous temperature minus sign; verify implementation. [Task 2] [skysight memory]
+375:# Task Group: Byzantion three-bridge route, postcards and multiplayer testing
+377:scope: Recent phone feedback and decisions for the Istanbul route, power-up, postcards and friend challenges.
+380:## Task 1: Three-bridge route, night transition and postcards
+388:- GUZERGAH-2026-11-16, PIJAMA-2026-11-16, Boğaziçi Köprüsü, Fatih Sultan Mehmet Köprüsü, Yavuz Sultan Selim Köprüsü, kartpostal, Ortaköy, 75. kule, kurukafa
+403:## Task 3: Opening menu, postcard screens and safe race exit
+413:- açılış menüsü, yarı saydam hayalet, ses kapatma, kartpostal, posta damgası, yarıştan çıkış, Devam et, Çık, kartpostal-uclu.png
+417:- The user approved a 12-stop Kadıköy-to-Rumeli Feneri route via the three named bridges, and postcards with different character activities related to each destination. [Task 1] [skysight memory]
+422:- The user wanted a menu before gameplay, a visible sound toggle, and a translucent ghost character instead of only the opponent name. They found menu/end screens insufficiently lively and approved postcard/postmark styling extending to menu and race screens. [Task 3] [skysight memory]
+427:- Three postcard-style screens were reported simulator-tested; TestFlight 1.0.0 (4) appeared available to Ekip and Arkadaşlar. Verify current distribution and phone behavior. [Task 3] [skysight memory]
+428:- Night transition was tested from tower 73 and triggered at tower 75 near Ortaköy; the user requested a centered roof door and a brief walk into it and back. Twelve postcard assets were reported connected and a phone build installed; visual layout fixes were still pending. [Task 1] [skysight memory]
+559:# Task Group: Byzantion Game Center and one-step difficulty adjustment
+580:- Byzantion, Game Center, 362ba26, TestFlight, Arkadaşlar, 1.0.0 (3), src/game/config.ts, difficulty, typecheck
+775:# Task Group: Carsamba stops, postcard album and iOS distribution preparation
+780:## Task 1: Stops, postcard album and device recording
+789:- Çarşamba, sonsuz sefer, durak, stops.ts, procedural-course.ts, kartpostal albümü, Karaköy, Galata, 2d53690, TestFlight
+791:## Task 2: Byzantion naming and TestFlight follow-up
+804:- Byzantion, com.urazonturk.carsamba, TestFlight 1.0.0 (1), 1.0.0 (2), Arkadaşlar, Waiting for Review, 16e9dac, aşırı basma, İstanbul gizemi, 21
+808:- User chose a continuous journey with regular stops over stage transitions, tied stops to tower count rather than score, and retained the first 15 towers' difficulty. User subsequently selected Byzantion and favored a lighter mystery linked to Istanbul’s history; story details remained open. [Task 1] [skysight memory]
+812:- Stops were 15 Karaköy, 30 Galata, 45 Sirkeci and 60 Eminönü İskelesi. A later phone test reportedly triggered Karaköy and confirmed the sound button controlled game audio. Postcard album showed 2/5 unlocked; a phone recording was submitted for evaluation, with no final product decision observed. [Task 1] [skysight memory]
+815:- The user reported TestFlight 1.0.0 (1) worked on the phone. Overpress feedback, where the round continues with an in-game consequence, was reported pushed as `16e9dac` after web preview; the earlier TestFlight build did not contain it. A later invitation appeared without evidence of device testing; verify current build and Git state. [Task 2] [skysight memory]
+816:- On November 13, `1.0.0 (2)` was `Waiting for Review` in the `Arkadaşlar` external group; the internal-test email did not establish access. On November 14 approval and an enabled public beta link were reported, and the user shared it with two testers. Recheck live group/build status; device validation of the overpress change remains unverified. [Task 2] [skysight memory]
+
+exec
+/bin/zsh -lc "sed -n '375,420p' /Users/bekirurazonturk/.codex/memories/MEMORY.md" in /Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend
+ succeeded in 0ms:
+# Task Group: Byzantion three-bridge route, postcards and multiplayer testing
+
+scope: Recent phone feedback and decisions for the Istanbul route, power-up, postcards and friend challenges.
+applies_to: cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend; reuse_rule=observed activity through 2026-11-16; verify the current checkout, builds and device results before claiming implementation or release.
+
+## Task 1: Three-bridge route, night transition and postcards
+
+### rollout_summary_files
+
+- extensions/skysight/resources/2026-11-16T06-00-00-wHbS-6h-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-16T06-00-00-wHbS-6h-memory-summary.md, updated_at=2026-11-16T12:00:00+00:00, activity overview) [skysight memory]
+
+### keywords
+
+- GUZERGAH-2026-11-16, PIJAMA-2026-11-16, Boğaziçi Köprüsü, Fatih Sultan Mehmet Köprüsü, Yavuz Sultan Selim Köprüsü, kartpostal, Ortaköy, 75. kule, kurukafa
+
+## Task 2: Game Center friend challenge and ghost race
+
+### rollout_summary_files
+
+- extensions/skysight/resources/2026-11-16T13-10-00-irCg-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-16T13-10-00-irCg-10min-memory-summary.md, updated_at=2026-11-16T13:10:00+00:00, race duration decision) [skysight memory]
+- extensions/skysight/resources/2026-11-16T12-50-00-JCoi-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-16T12-50-00-JCoi-10min-memory-summary.md, updated_at=2026-11-16T12:50:00+00:00, ghost-race direction) [skysight memory]
+- extensions/skysight/resources/2026-11-16T12-10-00-RHwr-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-16T12-10-00-RHwr-10min-memory-summary.md, updated_at=2026-11-16T12:10:00+00:00, send side observed; receive untested) [skysight memory]
+- extensions/skysight/resources/2026-11-16T12-00-00-BBBX-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-16T12-00-00-BBBX-10min-memory-summary.md, updated_at=2026-11-16T12:00:00+00:00, TestFlight group selection) [skysight memory]
+
+### keywords
+
+- Game Center, Arkadaşlar, TestFlight 1.0.0 (4), arkadaş meydan okuma, otomatik eşleşme, hayalet yarış, iki dakika, skor
+
+## Task 3: Opening menu, postcard screens and safe race exit
+
+### rollout_summary_files
+
+- extensions/skysight/resources/2026-11-16T12-00-00-ufcu-6h-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-16T12-00-00-ufcu-6h-memory-summary.md, updated_at=2026-11-16T18:00:00+00:00, activity overview) [skysight memory]
+- extensions/skysight/resources/2026-11-16T17-00-00-GzEr-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-16T17-00-00-GzEr-10min-memory-summary.md, updated_at=2026-11-16T17:00:00+00:00, simulator status reported) [skysight memory]
+- extensions/skysight/resources/2026-11-16T20-10-00-avRv-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-16T20-10-00-avRv-10min-memory-summary.md, updated_at=2026-11-16T20:10:00+00:00, earlier simulator status viewed; phone test and commit not observed) [skysight memory]
+
+### keywords
+
+- açılış menüsü, yarı saydam hayalet, ses kapatma, kartpostal, posta damgası, yarıştan çıkış, Devam et, Çık, kartpostal-uclu.png
+
+## User preferences
+
+- The user approved a 12-stop Kadıköy-to-Rumeli Feneri route via the three named bridges, and postcards with different character activities related to each destination. [Task 1] [skysight memory]
+- For kurukafa, the user wants challenges hard but reachable, not immediately consecutive, and clear in-game indication of active widening/narrowing. Phone feedback said early columns remained too narrow and the effect appeared to extend continually. [Task 1] [skysight memory]
+- Friend challenge should open the friend list directly, rank friends with scores first, and show each person's high score; the user approved removing automatic matching with strangers. [Task 2] [skysight memory]
+- User selected recorded ghost racing as the first step toward multiplayer and subsequently chose two minutes; preserve the existing pajama behavior and apply equal time to both players. Starting point and score versus distance remained open. [Task 2] [skysight memory]
+
+web search: 
+web search: site:apps.apple.com Stick Hero game App Store ...
+codex
+Ekranlarda görsel kimlik güçlü; puan tablosu metnindeki olası biçim kusurları ve hava efektlerinin okunurluğu da dikkat çekiyor. App Store kıyasını, benzer oyunların mağaza sayfalarındaki sunum ve özelliklerle sınırlı tutacağım; Byzantion’un gerçek cihaz performansı veya mağaza uygunluğu bu görsellerden doğrulanamaz.
+exec
+/bin/zsh -lc "nl -ba /Users/bekirurazonturk/.codex/memories/MEMORY.md | sed -n '386,416p'" in /Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend
+ succeeded in 0ms:
+   386	### keywords
+   387	
+   388	- GUZERGAH-2026-11-16, PIJAMA-2026-11-16, Boğaziçi Köprüsü, Fatih Sultan Mehmet Köprüsü, Yavuz Sultan Selim Köprüsü, kartpostal, Ortaköy, 75. kule, kurukafa
+   389	
+   390	## Task 2: Game Center friend challenge and ghost race
+   391	
+   392	### rollout_summary_files
+   393	
+   394	- extensions/skysight/resources/2026-11-16T13-10-00-irCg-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-16T13-10-00-irCg-10min-memory-summary.md, updated_at=2026-11-16T13:10:00+00:00, race duration decision) [skysight memory]
+   395	- extensions/skysight/resources/2026-11-16T12-50-00-JCoi-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-16T12-50-00-JCoi-10min-memory-summary.md, updated_at=2026-11-16T12:50:00+00:00, ghost-race direction) [skysight memory]
+   396	- extensions/skysight/resources/2026-11-16T12-10-00-RHwr-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-16T12-10-00-RHwr-10min-memory-summary.md, updated_at=2026-11-16T12:10:00+00:00, send side observed; receive untested) [skysight memory]
+   397	- extensions/skysight/resources/2026-11-16T12-00-00-BBBX-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-16T12-00-00-BBBX-10min-memory-summary.md, updated_at=2026-11-16T12:00:00+00:00, TestFlight group selection) [skysight memory]
+   398	
+   399	### keywords
+   400	
+   401	- Game Center, Arkadaşlar, TestFlight 1.0.0 (4), arkadaş meydan okuma, otomatik eşleşme, hayalet yarış, iki dakika, skor
+   402	
+   403	## Task 3: Opening menu, postcard screens and safe race exit
+   404	
+   405	### rollout_summary_files
+   406	
+   407	- extensions/skysight/resources/2026-11-16T12-00-00-ufcu-6h-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-16T12-00-00-ufcu-6h-memory-summary.md, updated_at=2026-11-16T18:00:00+00:00, activity overview) [skysight memory]
+   408	- extensions/skysight/resources/2026-11-16T17-00-00-GzEr-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-16T17-00-00-GzEr-10min-memory-summary.md, updated_at=2026-11-16T17:00:00+00:00, simulator status reported) [skysight memory]
+   409	- extensions/skysight/resources/2026-11-16T20-10-00-avRv-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-16T20-10-00-avRv-10min-memory-summary.md, updated_at=2026-11-16T20:10:00+00:00, earlier simulator status viewed; phone test and commit not observed) [skysight memory]
+   410	
+   411	### keywords
+   412	
+   413	- açılış menüsü, yarı saydam hayalet, ses kapatma, kartpostal, posta damgası, yarıştan çıkış, Devam et, Çık, kartpostal-uclu.png
+   414	
+   415	## User preferences
+   416	
+
+codex
+# Byzantion: Yeni fikirler ve bugünkü puan
+
+*Puanlar, verdiğin özellik listesi ve altı ekran görüntüsüne dayanıyor. Görseller sonradan eklenen efektleri ve menüyü gösteriyor; gerçek cihaz performansını, uzun süreli oynanışı veya mağaza ön incelemesini kanıtlamıyor.*
+
+## A. Yeni yaratıcı fikirler
+
+| Fikir | Oyuncuya katkısı | Efor | Kod / yeni görsel | Risk |
+|---|---|---:|---|---|
+| **Boğaz’ın ses haritası:** Semte göre vapur, martı ve iskele sesleri değişsin; bazen ses yanlış yönden gelip oyuncuyu şaşırtsın. | İstanbul’u yalnızca fonda değil, kulaklıkta da hissettirir. | Orta | Kod + ses | Sesler üst üste binerse yorabilir. |
+| **Mahalle pencereleri:** Bazı pencerelerde kısa, sessiz komik sahneler görünsün: halı silkeleyen biri, merakla bakan kedi, balkondan maçı izleyen komşu. | Her koşuda bakılacak küçük bir sürpriz verir. | Orta | Kod + birkaç görsel | Yoğun sahneler dikkati oyundan çekebilir. |
+| **Amcanın cebinden çıkanlar:** Koşu başında veya durakta cebinden beklenmedik bir eşya belirip kısa süre sallansın; örneğin eski bir vapur bileti ya da mandal. | Karaktere özgü, paylaşmaya değer anlar yaratır. | Küçük | Kod + eşya görselleri | Şaka tekrarlanırsa çabuk bayatlar. |
+| **Yanlış vapur anonsu:** Uzak bir anons, ciddi bir iskele duyurusuyla başlayıp amcanın lakabını veya hayali varış noktasını söylesin. | İstanbul vapur kültürünü mizaha bağlar. | Küçük | Kod + ses kaydı | Sesli oynayamayanlar espriyi kaçırabilir. |
+| **Çatıdaki komşu kedisi:** Bazı çatılarda kedi belirir; amca geçince göz ucuyla takip eder, bazen kuyruğunu çatı kenarından çeker. | Mevcut kedi/çatı dünyasına sıcak bir mikro hikâye ekler. | Orta | Kod + animasyon | Sık çıkarsa görsel kalabalık yaratır. |
+| **Semt lakabı damgası:** Oyuncunun o koşudaki tarzına göre kartpostala “Galata’da temkinli”, “Üsküdar’da aceleci” gibi tek seferlik bir lakap basılsın. | Skoru kişisel ve paylaşımı daha konuşulur kılar. | Küçük | Kod + metin | Lakaplar adil ve anlaşılır olmalı. |
+| **Amcanın iç sesi:** Belirli olaylarda tek satırlık düşünce balonu çıksın: “Bu çatı biraz yamuk sanki.” | Başka oyunlarda olmayan karakter mizahı sağlar. | Küçük | Kod + metin | Sık metin, ritmi ve ekranı bölebilir. |
+| **Şehir kartpostalı damgası:** Ulaşılan semt ve o koşuda görülen hava/saat, kartta küçük bir posta damgası gibi birleşsin. | Var olan paylaşım kartını daha koleksiyonluk ve kişiye özel yapar. | Orta | Kod + damga görsel seti | Fazla bilgi kartı okunmaz hâle getirebilir. |
+| **Kulelerin gölge oyunu:** Günün saatine göre minare ve kule gölgeleri arka planda uzayıp kısalsın; oyun alanına karışmasın. | Gerçek zaman özelliğini görünür, zarif bir İstanbul ayrıntısına çevirir. | Orta | Kod + arka plan uyarlaması | Kontrast ve performans kontrolü gerekir. |
+
+**En iyi üç:** Mahalle pencereleri, semt lakabı damgası, amcanın iç sesi. İlki dünyayı canlandırır; diğer ikisi küçük üretim maliyetiyle karakteri ve paylaşım değerini güçlendirir. Bunlar zıplama fiziğine, kameraya, çatı siluetine veya çarpışmaya dokunmadan uygulanabilir.
+
+## B. Bugünkü puan
+
+| Alan | Puan | Kısa gerekçe |
+|---|---:|---|
+| Görsel | **8,5/10** | Boğaz, çatılar ve karakter tek bakışta ayırt ediliyor; mevsim/hava varyasyonları güçlü. Yağmur ekranındaki çizgiler yoğun, bazı üst arayüz öğeleri de efektlerle yarışıyor. |
+| Oynanış / his | **7/10** | “Basılı tut–bırak” anlaşılır ve tek dokunuşlu tür için uygun. Ekran görüntüsü kontrolün hassasiyetini veya zıplamanın adilliğini ölçmeye yetmiyor. |
+| Özgünlük / kimlik | **9/10** | İstanbullu amca, Boğaz, semt güzergâhı, hava ve kartpostal birleşimi güçlü bir kimlik kuruyor. |
+| Eğlence / mizah | **8/10** | Patlama, lekeli kalma ve amcanın görünüşü komik bir ton veriyor; mizahın koşu boyunca ne kadar iyi zamanlandığı görsellerden anlaşılamıyor. |
+| Geri gelme isteği | **7/10** | Rekor, albüm, duraklar ve arkadaş meydan okuması iyi hedefler. Uzun vadeli dönüşü sağlayacak içerik çeşitliliği ve ilerleme dengesi henüz kanıtlı değil. |
+| Paylaşılabilirlik | **8,5/10** | Kartpostal fikri oyunun dünyasıyla uyumlu; skor, durak, hava ve saat paylaşım için hazır bir hikâye veriyor. |
+| App Store’a hazırlık | **6,5/10** | Görsel sunum mağaza vitrini için umut verici; fakat verilenler TestFlight bağlamı ve ekran görüntüleri. Teknik preflight, erişilebilirlik, cihaz uyumu, gizlilik metinleri ve mağaza materyallerinin tamamı hakkında kanıt yok. |
+| **Genel** | **8/10** | Güçlü ve kendine ait bir tema; puanı aşağı çeken ana belirsizlik, tek dokunuşlu temel hissin ve uzun vadeli tekrar oynanabilirliğin gerçek oyuncu verisiyle doğrulanmamış olması. |
+
+### Benzer oyunlarla kıyas
+
+**Stick Hero** tek parmakla kolay anlaşılır temel fikriyle, **Mr Jump** ise zorlu tek dokunuşlu platform yapısı ve arkadaş skorlarıyla kıyas için iyi örnekler. **Doodle Jump** da basit kontrolleri liderlik tabloları, güçlendirmeler ve farklı dünyalarla genişletiyor. Byzantion’un ayırt edici tarafı kontrol şemasından çok İstanbul’a özgü atmosferi, karakter mizahı ve koşuyu kartpostala dönüştürmesi. Bu özellik listesi doğru çalışıyorsa tema/kimlikte benzerlerinin önüne geçebilir; temel oynanış hissi ve tekrar oynama motivasyonu ise ancak doğrudan oynama ve oyuncu geri bildirimiyle kıyaslanabilir. [Stick Hero](https://apps.apple.com/us/app/stick-hero/id918338898), [Mr Jump](https://apps.apple.com/us/app/mr-jump/id955157084), [Doodle Jump](https://apps.apple.com/us/app/doodle-jump/id307727765)
+
+### Puanı 1 artırmak için en etkili 3 iş
+
+1. **İlk dakikayı ve ilk birkaç koşuyu parlat:** kontrolün ne kadar erken kavrandığını, başarısızlığın adil hissedilip hissedilmediğini ve yeniden başlama isteğini TestFlight oyuncularından ölç.
+2. **Küçük karakter anlarını çeşitlendir:** pencere sahneleri veya iç ses gibi seyrek sürprizler ekle; mevcut efektlerin üzerine yeni görsel kalabalık bindirme.
+3. **Mağaza öncesi görünür kusurları temizle:** yağmur ekranındaki `REKOR_0` yazımı ve Lodos görüntüsündeki tekil turuncu şekil gibi olası arayüz/efekt kusurlarını gerçek cihazda doğrula; ardından teknik ve mağaza varlıkları kontrolünü ayrıca yap.
+
+
+tokens used
+65.749
+# Byzantion: Yeni fikirler ve bugünkü puan
+
+*Puanlar, verdiğin özellik listesi ve altı ekran görüntüsüne dayanıyor. Görseller sonradan eklenen efektleri ve menüyü gösteriyor; gerçek cihaz performansını, uzun süreli oynanışı veya mağaza ön incelemesini kanıtlamıyor.*
+
+## A. Yeni yaratıcı fikirler
+
+| Fikir | Oyuncuya katkısı | Efor | Kod / yeni görsel | Risk |
+|---|---|---:|---|---|
+| **Boğaz’ın ses haritası:** Semte göre vapur, martı ve iskele sesleri değişsin; bazen ses yanlış yönden gelip oyuncuyu şaşırtsın. | İstanbul’u yalnızca fonda değil, kulaklıkta da hissettirir. | Orta | Kod + ses | Sesler üst üste binerse yorabilir. |
+| **Mahalle pencereleri:** Bazı pencerelerde kısa, sessiz komik sahneler görünsün: halı silkeleyen biri, merakla bakan kedi, balkondan maçı izleyen komşu. | Her koşuda bakılacak küçük bir sürpriz verir. | Orta | Kod + birkaç görsel | Yoğun sahneler dikkati oyundan çekebilir. |
+| **Amcanın cebinden çıkanlar:** Koşu başında veya durakta cebinden beklenmedik bir eşya belirip kısa süre sallansın; örneğin eski bir vapur bileti ya da mandal. | Karaktere özgü, paylaşmaya değer anlar yaratır. | Küçük | Kod + eşya görselleri | Şaka tekrarlanırsa çabuk bayatlar. |
+| **Yanlış vapur anonsu:** Uzak bir anons, ciddi bir iskele duyurusuyla başlayıp amcanın lakabını veya hayali varış noktasını söylesin. | İstanbul vapur kültürünü mizaha bağlar. | Küçük | Kod + ses kaydı | Sesli oynayamayanlar espriyi kaçırabilir. |
+| **Çatıdaki komşu kedisi:** Bazı çatılarda kedi belirir; amca geçince göz ucuyla takip eder, bazen kuyruğunu çatı kenarından çeker. | Mevcut kedi/çatı dünyasına sıcak bir mikro hikâye ekler. | Orta | Kod + animasyon | Sık çıkarsa görsel kalabalık yaratır. |
+| **Semt lakabı damgası:** Oyuncunun o koşudaki tarzına göre kartpostala “Galata’da temkinli”, “Üsküdar’da aceleci” gibi tek seferlik bir lakap basılsın. | Skoru kişisel ve paylaşımı daha konuşulur kılar. | Küçük | Kod + metin | Lakaplar adil ve anlaşılır olmalı. |
+| **Amcanın iç sesi:** Belirli olaylarda tek satırlık düşünce balonu çıksın: “Bu çatı biraz yamuk sanki.” | Başka oyunlarda olmayan karakter mizahı sağlar. | Küçük | Kod + metin | Sık metin, ritmi ve ekranı bölebilir. |
+| **Şehir kartpostalı damgası:** Ulaşılan semt ve o koşuda görülen hava/saat, kartta küçük bir posta damgası gibi birleşsin. | Var olan paylaşım kartını daha koleksiyonluk ve kişiye özel yapar. | Orta | Kod + damga görsel seti | Fazla bilgi kartı okunmaz hâle getirebilir. |
+| **Kulelerin gölge oyunu:** Günün saatine göre minare ve kule gölgeleri arka planda uzayıp kısalsın; oyun alanına karışmasın. | Gerçek zaman özelliğini görünür, zarif bir İstanbul ayrıntısına çevirir. | Orta | Kod + arka plan uyarlaması | Kontrast ve performans kontrolü gerekir. |
+
+**En iyi üç:** Mahalle pencereleri, semt lakabı damgası, amcanın iç sesi. İlki dünyayı canlandırır; diğer ikisi küçük üretim maliyetiyle karakteri ve paylaşım değerini güçlendirir. Bunlar zıplama fiziğine, kameraya, çatı siluetine veya çarpışmaya dokunmadan uygulanabilir.
+
+## B. Bugünkü puan
+
+| Alan | Puan | Kısa gerekçe |
+|---|---:|---|
+| Görsel | **8,5/10** | Boğaz, çatılar ve karakter tek bakışta ayırt ediliyor; mevsim/hava varyasyonları güçlü. Yağmur ekranındaki çizgiler yoğun, bazı üst arayüz öğeleri de efektlerle yarışıyor. |
+| Oynanış / his | **7/10** | “Basılı tut–bırak” anlaşılır ve tek dokunuşlu tür için uygun. Ekran görüntüsü kontrolün hassasiyetini veya zıplamanın adilliğini ölçmeye yetmiyor. |
+| Özgünlük / kimlik | **9/10** | İstanbullu amca, Boğaz, semt güzergâhı, hava ve kartpostal birleşimi güçlü bir kimlik kuruyor. |
+| Eğlence / mizah | **8/10** | Patlama, lekeli kalma ve amcanın görünüşü komik bir ton veriyor; mizahın koşu boyunca ne kadar iyi zamanlandığı görsellerden anlaşılamıyor. |
+| Geri gelme isteği | **7/10** | Rekor, albüm, duraklar ve arkadaş meydan okuması iyi hedefler. Uzun vadeli dönüşü sağlayacak içerik çeşitliliği ve ilerleme dengesi henüz kanıtlı değil. |
+| Paylaşılabilirlik | **8,5/10** | Kartpostal fikri oyunun dünyasıyla uyumlu; skor, durak, hava ve saat paylaşım için hazır bir hikâye veriyor. |
+| App Store’a hazırlık | **6,5/10** | Görsel sunum mağaza vitrini için umut verici; fakat verilenler TestFlight bağlamı ve ekran görüntüleri. Teknik preflight, erişilebilirlik, cihaz uyumu, gizlilik metinleri ve mağaza materyallerinin tamamı hakkında kanıt yok. |
+| **Genel** | **8/10** | Güçlü ve kendine ait bir tema; puanı aşağı çeken ana belirsizlik, tek dokunuşlu temel hissin ve uzun vadeli tekrar oynanabilirliğin gerçek oyuncu verisiyle doğrulanmamış olması. |
+
+### Benzer oyunlarla kıyas
+
+**Stick Hero** tek parmakla kolay anlaşılır temel fikriyle, **Mr Jump** ise zorlu tek dokunuşlu platform yapısı ve arkadaş skorlarıyla kıyas için iyi örnekler. **Doodle Jump** da basit kontrolleri liderlik tabloları, güçlendirmeler ve farklı dünyalarla genişletiyor. Byzantion’un ayırt edici tarafı kontrol şemasından çok İstanbul’a özgü atmosferi, karakter mizahı ve koşuyu kartpostala dönüştürmesi. Bu özellik listesi doğru çalışıyorsa tema/kimlikte benzerlerinin önüne geçebilir; temel oynanış hissi ve tekrar oynama motivasyonu ise ancak doğrudan oynama ve oyuncu geri bildirimiyle kıyaslanabilir. [Stick Hero](https://apps.apple.com/us/app/stick-hero/id918338898), [Mr Jump](https://apps.apple.com/us/app/mr-jump/id955157084), [Doodle Jump](https://apps.apple.com/us/app/doodle-jump/id307727765)
+
+### Puanı 1 artırmak için en etkili 3 iş
+
+1. **İlk dakikayı ve ilk birkaç koşuyu parlat:** kontrolün ne kadar erken kavrandığını, başarısızlığın adil hissedilip hissedilmediğini ve yeniden başlama isteğini TestFlight oyuncularından ölç.
+2. **Küçük karakter anlarını çeşitlendir:** pencere sahneleri veya iç ses gibi seyrek sürprizler ekle; mevcut efektlerin üzerine yeni görsel kalabalık bindirme.
+3. **Mağaza öncesi görünür kusurları temizle:** yağmur ekranındaki `REKOR_0` yazımı ve Lodos görüntüsündeki tekil turuncu şekil gibi olası arayüz/efekt kusurlarını gerçek cihazda doğrula; ardından teknik ve mağaza varlıkları kontrolünü ayrıca yap.
+
+

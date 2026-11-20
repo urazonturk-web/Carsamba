@@ -1973,3 +1973,23 @@ TESLIM_HAZIR: SIS-v2 — yeni sis telefona kuruldu; kullanıcının görmesi ve 
 ### YAĞMUR + RÜZGÂR v2 — 2026-11-18
 Kullanıcı: "Yağmur ve rüzgâr" (HAVA-GORSEL raporu). src/game/WeatherLayer.tsx: yağmur 3 derinlikte (uzak ince/kısa/yavaş, orta, yakın kalın/hızlı/seyrek), yarı saydam (0,2–0,52); yağmurda gök gri degrade (aşağı doğru hafifler); rüzgâr çizgileri kısa, iki ucu sivri yarı saydam degrade, hafif eğik, 3 dalga hâlinde, skor bandından (%6–21) geçmez; rüzgâr tonu yalnız gök/deniz/uzak katmanda (mahalleye inerken söner); poyrazda yaprak yok; yapraklar yaprak biçiminde. app/index.tsx: skor HUD zIndex 35 (yağış 30 skorun arkasında). Simülatörde gündüz görüldü (ai_review_evidence/HAVA-GORSEL-2026-11-18/yagmur-ruzgar-once-sonra.jpg; rüzgârın son belirginlik ayarı simülatörde ayrıca görülmedi). Telefona "YAGMUR + RUZGAR v2" etiketiyle kuruldu. Yapılmadı: çatıda yağmur sıçraması, kiremitte ıslak parlama.
 TESLIM_HAZIR: YAGMUR-RUZGAR-v2 — telefona kuruldu; kullanıcının görmesi bekleniyor.
+
+## FIKIR-PUAN — yeni fikirler ve oyunun puanı (2026-11-20)
+Codex ve Claude editörü yeni fikir verdi ve oyunu puanladı (Codex 8/10, Claude editörü 7/10). Rapor: ai_review_evidence/FIKIR-PUAN-2026-11-20/RAPOR.md. Kod değişmedi.
+
+TESLIM_HAZIR: FIKIR-PUAN-RAPOR — ai_review_evidence/FIKIR-PUAN-2026-11-20/RAPOR.md; kullanıcının hangi fikirle başlanacağı kararı bekleniyor.
+
+## CIHAZ-BOYUT — farklı iPhone/iPad boyutlarında ekran denetimi (2026-11-20)
+12 simülatörde menü/oyun/oyun sonu görüntüleri ve tablo. Bulgular: yağmur kıyafeti hava geç gelince çıkmıyor (hata), iPad yatayda arka plan bozuk, iPhone Duo kapalıda ses düğmesi kayıp, açılış uyarısı skoru örtüyor. Rapor: ai_review_evidence/CIHAZ-BOYUT-2026-11-20/RAPOR.md. Kod değişmedi.
+
+TESLIM_HAZIR: CIHAZ-BOYUT — ai_review_evidence/CIHAZ-BOYUT-2026-11-20/RAPOR.md; kullanıcının hangi düzeltmeyle başlanacağı ve iPad kararı bekleniyor.
+
+## YAGMUR-KIYAFET-DUZELTME (2026-11-20)
+Hava uygulama açıldıktan sonra gelince yağmur kıyafeti hiç görünmüyordu. Düzeltme: ChargePoses `rain` değeri her zaman verilir, görseller yeni `rainLayers` ile bağlanır (src/game/ChargePoses.tsx, app/index.tsx). iPhone 17e simülatöründe sıfır kurulumla doğrulandı (ai_review_evidence/CIHAZ-BOYUT-2026-11-20/duzeltme-17e-sifir-kurulum.png); telefona "YAGMUR KIYAFET DUZELTME" kuruldu.
+
+TESLIM_HAZIR: YAGMUR-KIYAFET-DUZELTME — telefona kuruldu; kullanıcının telefonda görmesi ve iPad kararı bekleniyor.
+
+## IPAD-DIKEY-KILIT (2026-11-20)
+Kullanıcı: "Dikeye kilitle". iPad yalnız dikey + tam ekran (app.json ios.requireFullScreen ve infoPlist; ios/frontend/Info.plist). iPad mini simülatöründe döndürerek doğrulandı. Telefon davranışı değişmez.
+
+TESLIM_HAZIR: IPAD-DIKEY-KILIT — app.json + Info.plist; iPad simülatöründe doğrulandı, commit bekleniyor.

@@ -13,11 +13,16 @@
       "infoPlist": {
         "CFBundleDisplayName": "Byzantion",
         "ITSAppUsesNonExemptEncryption": false,
-        "NSGKFriendListUsageDescription": "Arkadaşlarına meydan okuyabilmen için Game Center arkadaş listeni gösteriyoruz."
+        "NSGKFriendListUsageDescription": "Arkadaşlarına meydan okuyabilmen için Game Center arkadaş listeni gösteriyoruz.",
+        "UISupportedInterfaceOrientations~ipad": [
+          "UIInterfaceOrientationPortrait",
+          "UIInterfaceOrientationPortraitUpsideDown"
+        ]
       },
       "entitlements": {
         "com.apple.developer.game-center": true
-      }
+      },
+      "requireFullScreen": true
     },
     "android": {
       "adaptiveIcon": {
