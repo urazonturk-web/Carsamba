@@ -9,7 +9,7 @@ import { View } from "react-native";
 const LIVE_RN_IMAGE = true as boolean;
 import Animated, { useAnimatedStyle, type SharedValue } from "react-native-reanimated";
 
-import { CHARGE_POSES, poseOpacity } from "./character-pose";
+import { CHARGE_POSES, poseOpacity, REACTION_POSES, reactionVisible } from "./character-pose";
 import { HAT_BOX, HAT_SOURCE, SLIPPER_BOXES, SLIPPER_SOURCE } from "./pijama";
 import { RAIN_POSE_SOURCES, RAIN_CAP_SOURCE, RAIN_CAP_BOX } from "./yagmur";
 import { UMB_OPEN, UMB_CLOSED, UMB_FABRIC, UMB_FABRIC_LIGHT, UMB_LINE, UMB_WOOD } from "./semsiye";
@@ -61,6 +61,9 @@ type Props = {
   // PİJAMA ANI: kapıya yürüme için yalnız görüntü kayması (fizik px/py değişmez).
   offsetX?: SharedValue<number>;
   offsetY?: SharedValue<number>;
+  // BEDEN DİLİ (2026-11-23): tepki 0 yok, 1 silkele, 2 denge, 3 oh be; phase = PHASE (0 yerde).
+  tepki?: SharedValue<number>;
+  phase?: SharedValue<number>;
   onLoad?: () => void;
   onLoadStart?: () => void;
   onError?: () => void;
@@ -76,7 +79,7 @@ const DIRT_SPOTS = [
 ];
 const DIRT_COLORS = ["rgba(150,104,48,0.92)", "rgba(126,86,40,0.92)", "rgba(171,124,62,0.9)"];
 
-function PoseLayer({ i, px, py, poseCharge, scale, feetCenterOffset, feetHalf, landPulse, halo, strain, dirty, pajama, winter, snow, nose, breath, rain, rainLayers, eventHat, umbrella, umbOpen, umbFlip, offsetX, offsetY, ...cb }: Props & { i: number }) {
+function PoseLayer({ i, px, py, poseCharge, scale, feetCenterOffset, feetHalf, landPulse, halo, strain, dirty, pajama, winter, snow, nose, breath, rain, rainLayers, eventHat, umbrella, umbOpen, umbFlip, offsetX, offsetY, tepki, phase, ...cb }: Props & { i: number }) {
   const pose = CHARGE_POSES[i];
   const style = useAnimatedStyle(() => {
     // Squash toward the FOOT line (feetHalf), not the sprite's own center,
@@ -92,8 +95,14 @@ function PoseLayer({ i, px, py, poseCharge, scale, feetCenterOffset, feetHalf, l
     const k = strain ? strain.value : -1;
     const jitter = k >= 0 ? Math.sin(k * 95) * (1.5 + 5 * k) : 0;
     const swell = k >= 0 ? 1 + 0.035 * k + 0.015 * Math.sin(k * 40) : 1;
+    // BEDEN DİLİ: tepki pozu görünürken şarj/idle pozları çizilmez (aynı anda iki gövde yok).
+    const tk = tepki ? tepki.value : 0;
+    const ph = phase ? phase.value : 0;
+    const outfit = Math.max(rain ? rain.value : 0, winter ? winter.value : 0, pajama ? pajama.value : 0, dirty ? dirty.value : 0,
+      umbrella ? umbrella.value : 0, snow ? snow.value : 0, eventHat ? 1 : 0);
+    const hideAll = reactionVisible(tk, ph, outfit); // tepki varken hiçbir şarj/idle pozu çizilmez
     return {
-      opacity: poseOpacity(i, poseCharge.value),
+      opacity: hideAll ? 0 : poseOpacity(i, poseCharge.value),
       transform: [
         { translateX: px.value + feetCenterOffset - pose.pivotX * scale + jitter + (offsetX ? offsetX.value : 0) },
         { translateY: py.value + feetHalf - pose.pivotY * scale + extraY + (offsetY ? offsetY.value : 0) },
@@ -308,12 +317,51 @@ function SnowLump({ b, scale }: { b: SnowBlob; scale: number }) {
   );
 }
 
+// BEDEN DİLİ: tepki pozu katmanı (k = 1..3). PoseLayer ile aynı dönüşüm ve hale; kıyafet katmanı yok
+// (kıyafet görünürken reactionVisible false olur, tepki hiç çizilmez).
+function ReactionLayer({ k, px, py, poseCharge, scale, feetCenterOffset, feetHalf, landPulse, halo, dirty, pajama, winter, snow, rain, eventHat, umbrella, offsetX, offsetY, tepki, phase }: Props & { k: number }) {
+  const pose = REACTION_POSES[k - 1];
+  const style = useAnimatedStyle(() => {
+    const tk = tepki ? tepki.value : 0;
+    const ph = phase ? phase.value : 0;
+    const outfit = Math.max(rain ? rain.value : 0, winter ? winter.value : 0, pajama ? pajama.value : 0, dirty ? dirty.value : 0,
+      umbrella ? umbrella.value : 0, snow ? snow.value : 0, eventHat ? 1 : 0);
+    const on = tk === k && reactionVisible(tk, ph, outfit);
+    const pulse = landPulse ? landPulse.value : 0;
+    const sq = 1 - pulse * 0.14;
+    const bulge = 1 + pulse * 0.08;
+    const height = pose.h * scale;
+    const extraY = (height * (1 - sq)) / 2;
+    return {
+      opacity: on ? 1 : 0,
+      transform: [
+        { translateX: px.value + feetCenterOffset - pose.pivotX * scale + (offsetX ? offsetX.value : 0) },
+        { translateY: py.value + feetHalf - pose.pivotY * scale + extraY + (offsetY ? offsetY.value : 0) },
+        { scaleY: sq },
+        { scaleX: bulge },
+      ],
+    };
+  });
+  return (
+    <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, width: pose.w * scale, height: pose.h * scale }, style]}>
+      {halo && LIVE_RN_IMAGE
+        ? HALO_OFFSETS.map(([dx, dy], j) => (
+            <Image key={`h${j}`} source={pose.source} resizeMode="stretch" fadeDuration={0} tintColor={HALO_COLOR}
+              style={{ position: "absolute", left: dx * HALO_PX * scale, top: dy * HALO_PX * scale, width: "100%", height: "100%" }} />
+          ))
+        : null}
+      <Image source={pose.source} resizeMode="stretch" fadeDuration={0} style={{ width: "100%", height: "100%" }} />
+    </Animated.View>
+  );
+}
+
 export function ChargePoses(props: Props) {
   return (
     <>
       {CHARGE_POSES.map((_, i) => (
         <PoseLayer key={i} i={i} {...props} />
       ))}
+      {props.tepki ? REACTION_POSES.map((_, j) => <ReactionLayer key={`t${j}`} k={j + 1} {...props} />) : null}
     </>
   );
 }

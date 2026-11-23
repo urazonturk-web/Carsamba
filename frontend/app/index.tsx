@@ -368,7 +368,7 @@ const AnimatedImage = Animated.createAnimatedComponent(Image);
 const BG_SCROLL_TEST = true as boolean;
 const BG_SCROLL_RATIO = 0.45;
 const BG_SCROLL_TILES = 4;
-const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "MAHALLE SESLERI KAPALI") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
+const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "AMCA BEDEN DILI") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
 const DIAG_MAX_EXAMPLES = 6;
 const HOUSE_AB_FROZEN = false as boolean;
 // REVIZYON-066 experiment (one variable): expo-linear-gradient's iOS layer
@@ -887,6 +887,8 @@ function kargaGeom(list: any[], id: number) {
   return { p, r, rise: r * HOUSE_HIP_SLOPE, fw: p.width + 2 * r };
 }
 const OYUN_SONU_TEST = false as boolean; // GEÇİCİ: toast/çip konum denemesi (teslimde false)
+const BEDEN_ON = true as boolean; // amcanın inişten sonraki beden dili pozları (2026-11-23)
+const BEDEN_TEST = false as boolean; // GEÇİCİ: her inişte sırayla 3 poz (simülatör denemesi); teslimde false
 const KARGA_POOL_IDX = Array.from({ length: KARGA_HAVUZ }, (_, i) => i);
 const KARGA_POOL_SRC = [KARGA_TUNEMIS, KARGA_BAKIS, KARGA_HAVALANMA];
 
@@ -1301,6 +1303,8 @@ export default function Game() {
   const vx = useSharedValue(0);
   const vy = useSharedValue(0);
   const phase = useSharedValue<number>(PHASE.IDLE);
+  const tepki = useSharedValue(0); // BEDEN DİLİ: 0 yok, 1 silkele, 2 denge, 3 oh be
+  const bedenTest = useRef(0);
   const charge = useSharedValue(0);
   // __DEV__-only visual pose freeze (0/25/50/75/100 % screenshot QA), never
   // touches `charge` itself. Declared here (not next to poseCharge below)
@@ -1912,6 +1916,16 @@ export default function Game() {
     }
     if (SFX_ON && towersCrossed > 1) playSfx("multi");
     if (SFX_ON) mahalleSes({ tur: "inis", perfect, ratio, towersCrossed });
+    if (BEDEN_ON) {
+      // İniş başına tek karar (öncelik: 3+ kule > kıl payı > kusursuz); çoğu inişte tepki yok.
+      let k = towersCrossed >= 3 ? 3 : ratio <= 0.12 || ratio >= 0.88 ? 2 : perfect > 0 ? 1 : 0;
+      if (BEDEN_TEST) { bedenTest.current = (bedenTest.current % 3) + 1; k = bedenTest.current; }
+      if (k > 0) {
+        cancelAnimation(tepki);
+        tepki.value = k;
+        tepki.value = withDelay(k === 3 ? 1100 : 900, withTiming(0, { duration: 0 }));
+      }
+    }
     if (perfect && Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
     }
@@ -2091,6 +2105,8 @@ export default function Game() {
     catWoken.value = -1;
     neighborLook.value = -1;
     kGone.value = [];
+    cancelAnimation(tepki);
+    tepki.value = 0;
     kPool.value = [];
     // Hanım bildirimi yeni koşuya geçerken de süresini doldurur (video: hızlı "Bir daha" onu hiç göstermiyordu).
     runNewCardsRef.current = [];
@@ -3773,6 +3789,8 @@ export default function Game() {
           halo={FAZ2_HALO}
           strain={OVERCHARGE ? overT : undefined}
           dirty={SPLAT_ON ? dirty : undefined}
+          tepki={BEDEN_ON ? tepki : undefined}
+          phase={phase}
           onLoadStart={() => markArtStarted("character")}
           onLoad={() => { poseLoads.current += 1; if (poseLoads.current >= CHARGE_POSES.length) markArtLoaded("character"); }}
           onError={failArt}

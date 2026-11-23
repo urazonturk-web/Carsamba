@@ -77,3 +77,21 @@ export function poseOpacity(i: number, c: number) {
   const idx = Math.round(Math.min(1, Math.max(0, c)) * (CHARGE_POSES.length - 1));
   return idx === i ? 1 : 0;
 }
+
+// BEDEN DİLİ (2026-11-23, Kıvılcım, kullanıcı "Kabul, bağla"): inişten sonra kısa tepki pozları.
+// Ölçek charge-000 ile aynı; pivotX = ölçülen ayak ortası + 86 (charge-000: 222 → 308 sabit çapa), pivotY = ayak tabanı.
+// Dizi sırası tepki kodu 1..3: 1 silkele (kusursuz), 2 denge (kıl payı), 3 oh be (3+ kule).
+export const REACTION_POSES = [
+  { source: require("@/assets/characters/beden/amca-silkele.png"), w: 516, h: 1103, pivotX: 306, pivotY: 1103 },
+  { source: require("@/assets/characters/beden/amca-denge.png"), w: 1100, h: 1103, pivotX: 629, pivotY: 1103 },
+  { source: require("@/assets/characters/beden/amca-ohbe.png"), w: 1100, h: 1103, pivotX: 636, pivotY: 1103 },
+] as const;
+
+/** Tepki pozu şu an görünür mü? Yalnız yerde (PHASE.IDLE) ve hiçbir kıyafet/efekt katmanı görünmüyorken.
+ *  İnişten sonraki çömelme toparlanmasını (poseCharge'ın sıfıra inişi) BEKLEMEZ: tepki iniş anında başlar,
+ *  o sırada bütün şarj pozları gizlenir; yeni şarj (PHASE.CHARGING) ya da havalanma tepkiyi anında bitirir.
+ *  (Son kontrol bulgusu: eskiden poseCharge ≤ 0,001 beklendiği için 900 ms'lik poz ~0,5 sn görünüyordu.) */
+export function reactionVisible(t: number, phase: number, outfit: number) {
+  "worklet";
+  return t > 0 && phase === 0 && outfit <= 0.01;
+}
