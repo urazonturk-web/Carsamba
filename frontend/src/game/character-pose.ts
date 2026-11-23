@@ -97,6 +97,27 @@ export function reactionPivotFix(pivotX: number, pivotY: number, w: number, h: n
   "worklet";
   return { dx: -(pivotX - w / 2) * scale * (SX - 1), dy: -(pivotY - h / 2) * scale * (SY - 1) };
 }
+// DÜŞÜŞ (2026-11-23, plan AMCA-DUSUS): düşüş kesinleşince iki karelik "eyvah" çırpınması. 1100×1103, ölçek charge-000 ile
+// aynı; pivot baş hizasından ölçüldü (charge-000 baş ağırlık merkezi pivotun 45 px solunda, tepe y=1; burada baş x≈544, tepe y≈6).
+export const FALL_POSES = [
+  { source: require("@/assets/characters/beden/amca-dusus-1.png"), w: 1100, h: 1103, pivotX: 590, pivotY: 1108 },
+  { source: require("@/assets/characters/beden/amca-dusus-2.png"), w: 1100, h: 1103, pivotX: 590, pivotY: 1108 },
+] as const;
+export const DUSUS_KARE_MS = 110;
+// giysi = max(yağmur, kış, pijama, şemsiye, özel şapka). Kir ve kar düşüşü engellemez (plan DUSUS-03).
+export function fallVisible(d: number, giysi: number) {
+  "worklet";
+  return d > 0 && giysi <= 0.01;
+}
+// Düşüş kesin mi: yukarıdan aşağı inerken ayak çizgisi, inişte kullanılan listenin TÜM platform yüzeylerinin altındaysa
+// (findFootLanding yalnız bir topY'yi yukarıdan geçerken iniş bulur) artık hiçbir yere inilemez.
+export function dususKesin(vy: number, feetY: number, list: readonly { topY: number }[]) {
+  "worklet";
+  if (vy <= 0 || list.length === 0) return false;
+  let maxTop = -1e12;
+  for (let i = 0; i < list.length; i++) if (list[i].topY > maxTop) maxTop = list[i].topY;
+  return feetY > maxTop;
+}
 export function reactionVisible(t: number, phase: number, outfit: number) {
   "worklet";
   return t > 0 && phase === 0 && outfit <= 0.01;

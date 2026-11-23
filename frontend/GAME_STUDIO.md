@@ -2038,3 +2038,5 @@ TESLIM_HAZIR: MAHALLE-SESLERI-KAPALI — kullanıcı sesleri reddetti ve takılm
 TESLIM_HAZIR: AMCA-BEDEN-DILI — inişten sonra silkele (kusursuz), denge (kıl payı), oh be (3+ kule) pozları; kıyafet açıkken çıkmaz; plan/kayıt ai_review_evidence/AMCA-BEDEN-2026-11-23/; oh be ve kıyafet durumu simülatörde doğrulanamadı, telefon videosu bekleniyor.
 
 TESLIM_HAZIR: KARGA-DONGU-2026-11-23 — kargalarda periyotsuz bekleme (yem/bakış), kaçış zinciri kırıldı, amca tepki pozuna yerleşme; ai_review_evidence/KARGA-DONGU-2026-11-23/RAPOR.md; telefonda kullanıcı videosu bekleniyor.
+
+TESLIM_HAZIR: AMCA-DUSUS-2026-11-23 — düşüş kesinleşince iki karelik "eyvah" çırpınması; ai_review_evidence/AMCA-DUSUS-2026-11-23/RAPOR.md; telefonda kullanıcı videosu bekleniyor.

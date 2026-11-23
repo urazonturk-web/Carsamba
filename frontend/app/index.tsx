@@ -44,7 +44,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AmbientBirds } from "../src/game/AmbientBirds";
 import { NO_IMAGE_CLIP, NoClipImage as Image } from "../src/game/NoClipImage";
 import { ChargePoses } from "../src/game/ChargePoses";
-import { CHARGE_POSES, FAZ2_IFADE } from "../src/game/character-pose";
+import { CHARGE_POSES, FAZ2_IFADE, dususKesin, DUSUS_KARE_MS } from "../src/game/character-pose";
 import { PIJAMA_ON, HAT_SOURCE, SLIPPER_SOURCE, DOOR_CLOSED_SOURCE, DOOR_OPEN_SOURCE, DOOR_ASPECT, DOOR_HEIGHT_RATIO, DOOR_MS, DOOR_SINK, STEP_LIFT, PIJAMA_TEST_EARLY, TEST_START_TOWER } from "../src/game/pijama";
 import { ANCHOR_SHIFT_PX, GLOBAL_VISUAL_SCALE, POSE_FEET_SPAN_PX } from "../src/game/character-pose";
 import { AMBIENT_ON, AmbientEvents } from "../src/game/AmbientEvents";
@@ -368,7 +368,7 @@ const AnimatedImage = Animated.createAnimatedComponent(Image);
 const BG_SCROLL_TEST = true as boolean;
 const BG_SCROLL_RATIO = 0.45;
 const BG_SCROLL_TILES = 4;
-const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "KARGA DONGU + YERLESME") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
+const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "DUSUS EYVAH") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
 const DIAG_MAX_EXAMPLES = 6;
 const HOUSE_AB_FROZEN = false as boolean;
 // REVIZYON-066 experiment (one variable): expo-linear-gradient's iOS layer
@@ -887,6 +887,7 @@ function kargaGeom(list: any[], id: number) {
   return { p, r, rise: r * HOUSE_HIP_SLOPE, fw: p.width + 2 * r };
 }
 const OYUN_SONU_TEST = false as boolean; // GEÇİCİ: toast/çip konum denemesi (teslimde false)
+const DUSUS_ON = true as boolean; // düşüş kesinleşince "eyvah" çırpınması (2026-11-23, plan AMCA-DUSUS)
 const BEDEN_ON = true as boolean; // amcanın inişten sonraki beden dili pozları (2026-11-23)
 const BEDEN_TEST = false as boolean; // GEÇİCİ: her inişte sırayla 3 poz (simülatör denemesi); teslimde false
 const KARGA_POOL_IDX = Array.from({ length: KARGA_HAVUZ }, (_, i) => i);
@@ -1310,6 +1311,8 @@ export default function Game() {
   const vy = useSharedValue(0);
   const phase = useSharedValue<number>(PHASE.IDLE);
   const tepki = useSharedValue(0); // BEDEN DİLİ: 0 yok, 1 silkele, 2 denge, 3 oh be
+  const dusus = useSharedValue(0); // DÜŞÜŞ: 0 yok, 1/2 çırpınma karesi
+  const dususAt = useSharedValue(0);
   const tepkiP = useSharedValue(1); // tepki pozunun yerleşme ilerlemesi (0→1, 180 ms)
   const bedenTest = useRef(0);
   const charge = useSharedValue(0);
@@ -2119,6 +2122,7 @@ export default function Game() {
     tepki.value = 0;
     cancelAnimation(tepkiP);
     tepkiP.value = 1;
+    dusus.value = 0;
     kPool.value = [];
     // Hanım bildirimi yeni koşuya geçerken de süresini doldurur (video: hızlı "Bir daha" onu hiç göstermiyordu).
     runNewCardsRef.current = [];
@@ -2538,6 +2542,7 @@ export default function Game() {
       if (SEMSIYE_ON) { cancelAnimation(umbOpen); umbOpen.value = 0; umbFlip.value = 0; umbArmed.value = 0; umbV0.value = Math.max(1, Math.abs(launch.vy)); }
       headVelocity.value = -65 - c * 55;
       releasedCharge.value = c;
+      dusus.value = 0;
       phase.value = PHASE.AIRBORNE;
       charge.value = 0;
       if (SFX_ON) runOnJS(stopSfx)("charge");
@@ -2882,6 +2887,17 @@ export default function Game() {
             }
             runOnJS(onLanding)(perfect, towersCrossed, p.id, (cx - p.x) / p.width);
           }
+        }
+      }
+
+      // DÜŞÜŞ (yalnız görüntü): ayak, inişin kullandığı listedeki tüm yüzeylerin altına indiyse düşüş kesin → çırpınma.
+      if (DUSUS_ON && phase.value === PHASE.AIRBORNE) {
+        if (dusus.value === 0) {
+          const ll = KURUKAFA_ON && effectLeft.value > 0 ? scaledPlatforms(list, effectK.value) : list;
+          if (dususKesin(vy.value, py.value + PH / 2, ll)) { dusus.value = 1; dususAt.value = frame.timestamp; }
+        } else {
+          const kare = 1 + (Math.floor((frame.timestamp - dususAt.value) / DUSUS_KARE_MS) % 2);
+          if (kare !== dusus.value) dusus.value = kare;
         }
       }
 
@@ -3803,6 +3819,7 @@ export default function Game() {
           dirty={SPLAT_ON ? dirty : undefined}
           tepki={BEDEN_ON ? tepki : undefined}
           tepkiP={BEDEN_ON ? tepkiP : undefined}
+          dusus={DUSUS_ON ? dusus : undefined}
           phase={phase}
           onLoadStart={() => markArtStarted("character")}
           onLoad={() => { poseLoads.current += 1; if (poseLoads.current >= CHARGE_POSES.length) markArtLoaded("character"); }}
