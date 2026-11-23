@@ -2046,3 +2046,5 @@ TESLIM_HAZIR: VIDEO-2026-11-23e — oyun başında havada kalan osuruk dumanı g
 TESLIM_HAZIR: AMCA-DUSUS-YAGMUR-2026-11-23 — yağmurda da "eyvah" çırpınması (yağmurluklu 2 kare); ai_review_evidence/AMCA-DUSUS-2026-11-23/RAPOR.md; şemsiyeli/kış/pijama düşüşü hâlâ eski görünüm.
 
 TESLIM_HAZIR: AMCA-DUSUS-KIS-2026-11-23 — kışta da "eyvah" çırpınması (bere + atkılı 2 kare); ai_review_evidence/AMCA-DUSUS-2026-11-23/RAPOR.md; pijama/şemsiye/özel şapka düşüşü hâlâ eski görünüm.
+
+TESLIM_HAZIR: AMCA-DUSUS-DIGER-2026-11-23 — pijama ve özel gün aksesuarlarıyla düşüş, şemsiyeli kareler (şemsiye kapalı olduğundan pasif); ai_review_evidence/AMCA-DUSUS-2026-11-23/RAPOR.md.

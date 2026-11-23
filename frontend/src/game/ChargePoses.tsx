@@ -9,7 +9,7 @@ import { View } from "react-native";
 const LIVE_RN_IMAGE = true as boolean;
 import Animated, { useAnimatedStyle, type SharedValue } from "react-native-reanimated";
 
-import { CHARGE_POSES, poseOpacity, REACTION_POSES, reactionVisible, reactionPivotFix, FALL_POSES, FALL_POSES_YAGMUR, FALL_POSES_KIS, FALL_KIS_H, FALL_KIS_TOP, fallVisible } from "./character-pose";
+import { CHARGE_POSES, poseOpacity, REACTION_POSES, reactionVisible, reactionPivotFix, FALL_POSES, FALL_POSES_YAGMUR, FALL_POSES_KIS, FALL_KIS_H, FALL_KIS_TOP, FALL_POSES_SEMSIYE, FALL_SEMSIYE_H, FALL_SEMSIYE_TOP, FALL_BOXES, fallVisible } from "./character-pose";
 import { HAT_BOX, HAT_SOURCE, SLIPPER_BOXES, SLIPPER_SOURCE } from "./pijama";
 import { RAIN_POSE_SOURCES, RAIN_CAP_SOURCE, RAIN_CAP_BOX } from "./yagmur";
 import { UMB_OPEN, UMB_CLOSED, UMB_FABRIC, UMB_FABRIC_LIGHT, UMB_LINE, UMB_WOOD } from "./semsiye";
@@ -53,7 +53,7 @@ type Props = {
   // görseller yalnız rainLayers true olunca bağlanır. Önce rain sonradan verilince kıyafet hiç görünmüyordu.
   rainLayers?: boolean;
   // ÖZEL GÜN (2026-11-20): o güne özel başlık (yılbaşı/cadı şapkası); varsa bere ve yağmur kasketi gizlenir.
-  eventHat?: { source: any; box: { x: number; y: number; w: number; h: number }; keepCaps?: boolean } | null;
+  eventHat?: { source: any; box: { x: number; y: number; w: number; h: number }; keepCaps?: boolean; dusus?: string } | null;
   // ŞEMSİYE (2026-11-17): umbrella 1 = yağmurda şemsiye var; umbOpen 0..1 açılma; umbFlip 0..1 kumaşın ters dönmesi.
   umbrella?: SharedValue<number>;
   umbOpen?: SharedValue<number>;
@@ -102,7 +102,7 @@ function PoseLayer({ i, px, py, poseCharge, scale, feetCenterOffset, feetHalf, l
     const ph = phase ? phase.value : 0;
     const outfit = Math.max(rain ? rain.value : 0, winter ? winter.value : 0, pajama ? pajama.value : 0, dirty ? dirty.value : 0,
       umbrella ? umbrella.value : 0, snow ? snow.value : 0, eventHat ? 1 : 0);
-    const giysi = Math.max(pajama ? pajama.value : 0, umbrella ? umbrella.value : 0, eventHat ? 1 : 0);
+    const giysi = 0; // hiçbir kıyafet düşüşü engellemez
     const hideAll = reactionVisible(tk, ph, outfit) || fallVisible(dusus ? dusus.value : 0, giysi); // tepki/düşüş varken şarj/idle pozu çizilmez
     return {
       opacity: hideAll ? 0 : poseOpacity(i, poseCharge.value),
@@ -329,7 +329,7 @@ function ReactionLayer({ k, px, py, poseCharge, scale, feetCenterOffset, feetHal
     const ph = phase ? phase.value : 0;
     const outfit = Math.max(rain ? rain.value : 0, winter ? winter.value : 0, pajama ? pajama.value : 0, dirty ? dirty.value : 0,
       umbrella ? umbrella.value : 0, snow ? snow.value : 0, eventHat ? 1 : 0);
-    const giysi = Math.max(pajama ? pajama.value : 0, umbrella ? umbrella.value : 0, eventHat ? 1 : 0);
+    const giysi = 0; // hiçbir kıyafet düşüşü engellemez
     const on = tk === k && reactionVisible(tk, ph, outfit) && !fallVisible(dusus ? dusus.value : 0, giysi);
     const pulse = landPulse ? landPulse.value : 0;
     const sq = 1 - pulse * 0.14;
@@ -367,7 +367,7 @@ function FallLayer({ k, px, py, scale, feetCenterOffset, feetHalf, halo, pajama,
   const pose = FALL_POSES[k - 1];
   const style = useAnimatedStyle(() => {
     const d = dusus ? dusus.value : 0;
-    const giysi = Math.max(pajama ? pajama.value : 0, umbrella ? umbrella.value : 0, eventHat ? 1 : 0);
+    const giysi = 0; // hiçbir kıyafet düşüşü engellemez
     return {
       opacity: d === k && fallVisible(d, giysi) ? 1 : 0,
       transform: [
@@ -376,11 +376,25 @@ function FallLayer({ k, px, py, scale, feetCenterOffset, feetHalf, halo, pajama,
       ],
     };
   });
-  // Yağmurda yağmurluklu, kışta bere+atkılı kare (kıyafet geçişiyle aynı oranda karışır). Yağmur kışın önüne geçer
-  // (oyundaki gibi: yağmurda bere görünmez).
-  const plainStyle = useAnimatedStyle(() => ({ opacity: (1 - (rain ? rain.value : 0)) * (1 - (winter ? winter.value : 0)) }));
-  const rainStyle = useAnimatedStyle(() => ({ opacity: rain ? rain.value : 0 }));
-  const kisStyle = useAnimatedStyle(() => ({ opacity: (winter ? winter.value : 0) * (1 - (rain ? rain.value : 0)) }));
+  // Kıyafete göre gövde karesi (kıyafet geçişiyle aynı oranda karışır). Öncelik oyundakiyle aynı: şemsiye > yağmur > kış.
+  // Pijamada (gece külahı) ve başlığı değiştiren özel gün şapkasında başlıksız eşofmanlı kare + bindirme kullanılır.
+  const capsOff = !!(eventHat && !eventHat.keepCaps);
+  const hatBox = eventHat && eventHat.dusus ? FALL_BOXES[k - 1][eventHat.dusus] : undefined;
+  // Yağmurluk kareleri şapkalı günde de kullanılır (normal pozdaki gibi yağmurluk kalır; şapka kasketin üstüne biner);
+  // bere ve şemsiye kareleri yalnız başlığı değiştirmeyen günlerde.
+  const plainStyle = useAnimatedStyle(() => {
+    const Xp = 1 - (pajama ? pajama.value : 0), Xc = capsOff ? 0 : 1;
+    const u = umbrella ? umbrella.value : 0, R = rain ? rain.value : 0, W = winter ? winter.value : 0;
+    return { opacity: Math.max(0, 1 - u * Xp * Xc - R * (1 - u * Xc) * Xp - W * (1 - R) * (1 - u) * Xp * Xc) };
+  });
+  const semsiyeStyle = useAnimatedStyle(() => ({ opacity: (umbrella ? umbrella.value : 0) * (1 - (pajama ? pajama.value : 0)) * (capsOff ? 0 : 1) }));
+  const rainStyle = useAnimatedStyle(() => ({ opacity: (rain ? rain.value : 0) * (1 - (umbrella ? umbrella.value : 0) * (capsOff ? 0 : 1)) * (1 - (pajama ? pajama.value : 0)) }));
+  const kisStyle = useAnimatedStyle(() => ({ opacity: (winter ? winter.value : 0) * (1 - (rain ? rain.value : 0)) * (1 - (umbrella ? umbrella.value : 0)) * (1 - (pajama ? pajama.value : 0)) * (capsOff ? 0 : 1) }));
+  const fallPajamaStyle = useAnimatedStyle(() => ({ opacity: pajama ? pajama.value : 0 }));
+  const fallHatStyle = useAnimatedStyle(() => ({ opacity: 1 - (pajama ? pajama.value : 0) }));
+  const B = FALL_BOXES[k - 1];
+  const boxStyle = (b: { x: number; y: number; w: number; h: number; rot: number }) =>
+    ({ position: "absolute" as const, left: b.x * scale, top: b.y * scale, width: b.w * scale, height: b.h * scale, transform: [{ rotate: `${b.rot}deg` }] });
   return (
     <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, width: pose.w * scale, height: pose.h * scale }, style]}>
       {halo && LIVE_RN_IMAGE
@@ -392,6 +406,19 @@ function FallLayer({ k, px, py, scale, feetCenterOffset, feetHalf, halo, pajama,
       <Animated.Image source={pose.source} resizeMode="stretch" fadeDuration={0} style={[{ position: "absolute", left: 0, top: 0, width: "100%", height: "100%" }, plainStyle]} />
       {winter ? <Animated.Image source={FALL_POSES_KIS[k - 1]} resizeMode="stretch" fadeDuration={0} style={[{ position: "absolute", left: 0, top: FALL_KIS_TOP * scale, width: "100%", height: FALL_KIS_H * scale }, kisStyle]} /> : null}
       {rain ? <Animated.Image source={FALL_POSES_YAGMUR[k - 1]} resizeMode="stretch" fadeDuration={0} style={[{ position: "absolute", left: 0, top: 0, width: "100%", height: "100%" }, rainStyle]} /> : null}
+      {umbrella ? <Animated.Image source={FALL_POSES_SEMSIYE[k - 1]} resizeMode="stretch" fadeDuration={0} style={[{ position: "absolute", left: 0, top: FALL_SEMSIYE_TOP * scale, width: "100%", height: FALL_SEMSIYE_H * scale }, semsiyeStyle]} /> : null}
+      {hatBox ? (
+        <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, right: 0, bottom: 0 }, fallHatStyle]}>
+          <Image source={eventHat!.source} resizeMode="stretch" fadeDuration={0} style={boxStyle(hatBox)} />
+        </Animated.View>
+      ) : null}
+      {pajama ? (
+        <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, right: 0, bottom: 0 }, fallPajamaStyle]}>
+          <Image source={SLIPPER_SOURCE} resizeMode="stretch" fadeDuration={0} style={boxStyle(B["terlik-sol"])} />
+          <Image source={SLIPPER_SOURCE} resizeMode="stretch" fadeDuration={0} style={boxStyle(B["terlik-sag"])} />
+          <Image source={HAT_SOURCE} resizeMode="stretch" fadeDuration={0} style={boxStyle(B["gece-kulahi"])} />
+        </Animated.View>
+      ) : null}
     </Animated.View>
   );
 }

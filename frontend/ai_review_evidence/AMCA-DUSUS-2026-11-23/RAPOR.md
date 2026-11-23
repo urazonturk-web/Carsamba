@@ -39,3 +39,11 @@ Kıvılcım, kullanıcının sohbette verdiği "diğer hava durumları içinde g
 - Katman/öncelik: eşofman (1−yağmur)(1−kış), yağmurluk = yağmur, kış = kış·(1−yağmur) — oyundaki gibi yağmur kışın önüne geçer.
 - Kural: kış artık düşüşü engellemiyor; pijama, şemsiye ve özel gün şapkası hâlâ engelliyor.
 - Kanıt: simülatörde test havası "Karlı, Kış" ile kasıtlı ıskalama → `sim-kista-dusus.png` (bere + atkıyla iki çırpınma karesi). tsc temiz; worklet sıra testi ve düşüş simülasyonu PASS. Telefonda doğrulanmadı.
+
+## Ek — şemsiye, pijama, özel gün (2026-11-23 gece)
+Kıvılcım AMCA-DUSUS-DIGER (kullanıcı "Evet, iste" → "Kabul, bağla"):
+- Şemsiye: 2 yeni görsel. Kıvılcım'ın çıktısında amca ~%10 küçük ve 110–130 px aşağıdaydı; Claude yağmurluk karelerine göre yeniden ölçekledi (1,11 / 1,06) ve taşıdı (yüz rengi ağırlık merkezi + silüet IoU araması; IoU 0,85 / 0,72), tuval 1100×1603, poz 500 px aşağıda. **Not:** `SEMSIYE_ON = false` (2026-11-17 kullanıcı: şemsiye iptal) — bu kareler şu an oyunda hiç görünmez; şemsiye yeniden açılırsa devreye girer.
+- Pijama ve 6 özel gün aksesuarı: yeni görsel yok; `FALL_BOXES` (character-pose.ts) ile düşüş karelerine bindirme (kutu + dönüş). `ozelGun.ts` aksesuarlarına `dusus` anahtarı eklendi. Önizleme: `onizleme-aksesuar.png`.
+- Kıyafet önceliği: şemsiye > yağmur > kış > eşofman; pijamada eşofman + gece külahı + terlik; başlığı değiştiren özel gün şapkasında bere/şemsiye kareleri kapanır, yağmurluk kalır (normal pozdaki gibi) ve şapka bindirilir. Ağırlıkların toplamı her köşe durumda 1 (python denetimi).
+- Artık hiçbir kıyafet düşüşü engellemiyor.
+- Kanıt: simülatörde yılbaşı testi + yağmurda kasıtlı ıskalama → `sim-yilbasi-dusus.png` (şapka düşüş karelerine oturuyor). Bu denemede yağmurluk düşüşte eşofmana dönüyordu; düzeltildi (yağmurluk şapkalı günde de kalır), düzeltme simülatörde yeniden görüntülenmedi. Pijama düşüşü simülatörde denenmedi (yalnız önizleme). tsc temiz, worklet sıra testi PASS. Telefona kuruldu, cihazda doğrulanmadı.

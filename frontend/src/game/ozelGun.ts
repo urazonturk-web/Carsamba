@@ -10,7 +10,7 @@ export const OZEL_GUN_ON = true as boolean;
 export const OZEL_GUN_TEST_TAP = true as boolean;
 
 export type HatBox = { x: number; y: number; w: number; h: number }; // 516 px poz tuvalinde
-export type EventHat = { source: any; box: HatBox; keepCaps?: boolean }; // keepCaps: gözlük gibi; bere/kasket kalır
+export type EventHat = { source: any; box: HatBox; keepCaps?: boolean; dusus?: string }; // dusus: FALL_BOXES anahtarı // keepCaps: gözlük gibi; bere/kasket kalır
 
 export type OzelGun = {
   id: string;
@@ -19,13 +19,13 @@ export type OzelGun = {
   hanim: string[]; // Hanım'ın o güne özel mesajları ({N} = skor)
 };
 
-const HAT_YILBASI: EventHat = { source: require("@/assets/characters/ozel/ozel-yilbasi-sapka.png"), box: { x: -30, y: -150, w: 560, h: 301 } };
-const HAT_CADI: EventHat = { source: require("@/assets/characters/ozel/ozel-cadilar-sapka.png"), box: { x: -30, y: -215, w: 560, h: 361 } };
+const HAT_YILBASI: EventHat = { source: require("@/assets/characters/ozel/ozel-yilbasi-sapka.png"), box: { x: -30, y: -150, w: 560, h: 301 }, dusus: "yilbasi" };
+const HAT_CADI: EventHat = { source: require("@/assets/characters/ozel/ozel-cadilar-sapka.png"), box: { x: -30, y: -215, w: 560, h: 361 }, dusus: "cadilar" };
 // Tur 2 (kullanıcı 2026-11-20: "Kabul, bağla")
-const HAT_PASKALYA: EventHat = { source: require("@/assets/characters/ozel/ozel-paskalya-kulak.png"), box: { x: 80, y: -195, w: 360, h: 324 } };
-const HAT_BAHAR: EventHat = { source: require("@/assets/characters/ozel/ozel-bahar-tac.png"), box: { x: -20, y: -25, w: 540, h: 202 } };
-const HAT_23NISAN: EventHat = { source: require("@/assets/characters/ozel/ozel-23nisan-sapka.png"), box: { x: -20, y: -110, w: 560, h: 281 } };
-const GOZLUK_SEVGILI: EventHat = { source: require("@/assets/characters/ozel/ozel-sevgili-gozluk.png"), box: { x: 250, y: 165, w: 300, h: 105 }, keepCaps: true };
+const HAT_PASKALYA: EventHat = { source: require("@/assets/characters/ozel/ozel-paskalya-kulak.png"), box: { x: 80, y: -195, w: 360, h: 324 }, dusus: "paskalya" };
+const HAT_BAHAR: EventHat = { source: require("@/assets/characters/ozel/ozel-bahar-tac.png"), box: { x: -20, y: -25, w: 540, h: 202 }, dusus: "bahar" };
+const HAT_23NISAN: EventHat = { source: require("@/assets/characters/ozel/ozel-23nisan-sapka.png"), box: { x: -20, y: -110, w: 560, h: 281 }, dusus: "23nisan" };
+const GOZLUK_SEVGILI: EventHat = { source: require("@/assets/characters/ozel/ozel-sevgili-gozluk.png"), box: { x: 250, y: 165, w: 300, h: 105 }, keepCaps: true, dusus: "sevgili-gozluk" };
 
 export const OZEL_GUNLER: Record<string, OzelGun> = {
   yilbasi: { id: "yilbasi", title: "🎄 Yeni yılın kutlu olsun!", hat: HAT_YILBASI,

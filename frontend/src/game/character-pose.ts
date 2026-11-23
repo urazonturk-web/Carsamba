@@ -116,8 +116,22 @@ export const FALL_POSES_KIS = [
 ] as const;
 export const FALL_KIS_H = 1203;
 export const FALL_KIS_TOP = -100;
+// Şemsiyeli hâli (Kıvılcım; amca yağmurluk karelerine göre ölçek 1,11/1,06 ile hizalandı): tuval 1100×1603, poz 500 px aşağıda.
+export const FALL_POSES_SEMSIYE = [
+  require("@/assets/characters/beden/amca-dusus-1-semsiye.png"),
+  require("@/assets/characters/beden/amca-dusus-2-semsiye.png"),
+] as const;
+export const FALL_SEMSIYE_H = 1603;
+export const FALL_SEMSIYE_TOP = -500;
+// Pijama (gece külahı + terlik) ve özel gün aksesuarlarının düşüş karelerindeki kutuları (1100×1103 tuval pikseli; rot derece,
+// kutu merkezine göre). Kıvılcım AMCA-DUSUS-DIGER, kullanıcı kabulü "Kabul, bağla" (2026-11-23).
+export type FallBox = { x: number; y: number; w: number; h: number; rot: number };
+export const FALL_BOXES: Record<string, FallBox>[] = [
+  { "gece-kulahi": { x: 250, y: -60, w: 530, h: 454, rot: -7 }, "terlik-sol": { x: 185, y: 805, w: 230, h: 113, rot: 28 }, "terlik-sag": { x: 785, y: 780, w: 230, h: 113, rot: -32 }, "yilbasi": { x: 270, y: -118, w: 560, h: 301, rot: -6 }, "cadilar": { x: 265, y: -182, w: 560, h: 361, rot: -7 }, "paskalya": { x: 385, y: -170, w: 360, h: 324, rot: -7 }, "bahar": { x: 282, y: -10, w: 540, h: 202, rot: -6 }, "23nisan": { x: 270, y: -105, w: 560, h: 281, rot: -6 }, "sevgili-gozluk": { x: 495, y: 160, w: 300, h: 105, rot: 3 } },
+  { "gece-kulahi": { x: 255, y: -60, w: 530, h: 454, rot: -7 }, "terlik-sol": { x: 255, y: 855, w: 230, h: 113, rot: 30 }, "terlik-sag": { x: 760, y: 610, w: 230, h: 113, rot: -55 }, "yilbasi": { x: 275, y: -118, w: 560, h: 301, rot: -6 }, "cadilar": { x: 270, y: -182, w: 560, h: 361, rot: -7 }, "paskalya": { x: 390, y: -170, w: 360, h: 324, rot: -7 }, "bahar": { x: 287, y: -10, w: 540, h: 202, rot: -6 }, "23nisan": { x: 275, y: -105, w: 560, h: 281, rot: -6 }, "sevgili-gozluk": { x: 500, y: 160, w: 300, h: 105, rot: 3 } },
+];
 export const DUSUS_KARE_MS = 110;
-// giysi = max(pijama, şemsiye, özel şapka). Yağmur ve kış artık engellemez (kendi kareleri var); kir ve kar da engellemez.
+// Artık hiçbir kıyafet düşüşü engellemez (her biri için kare ya da bindirme var); giysi parametresi geriye uyum için 0 verilir.
 export function fallVisible(d: number, giysi: number) {
   "worklet";
   return d > 0 && giysi <= 0.01;
