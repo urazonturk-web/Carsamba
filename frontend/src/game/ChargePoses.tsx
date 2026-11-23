@@ -9,7 +9,7 @@ import { View } from "react-native";
 const LIVE_RN_IMAGE = true as boolean;
 import Animated, { useAnimatedStyle, type SharedValue } from "react-native-reanimated";
 
-import { CHARGE_POSES, poseOpacity, REACTION_POSES, reactionVisible, reactionPivotFix, FALL_POSES, FALL_POSES_YAGMUR, fallVisible } from "./character-pose";
+import { CHARGE_POSES, poseOpacity, REACTION_POSES, reactionVisible, reactionPivotFix, FALL_POSES, FALL_POSES_YAGMUR, FALL_POSES_KIS, FALL_KIS_H, FALL_KIS_TOP, fallVisible } from "./character-pose";
 import { HAT_BOX, HAT_SOURCE, SLIPPER_BOXES, SLIPPER_SOURCE } from "./pijama";
 import { RAIN_POSE_SOURCES, RAIN_CAP_SOURCE, RAIN_CAP_BOX } from "./yagmur";
 import { UMB_OPEN, UMB_CLOSED, UMB_FABRIC, UMB_FABRIC_LIGHT, UMB_LINE, UMB_WOOD } from "./semsiye";
@@ -102,7 +102,7 @@ function PoseLayer({ i, px, py, poseCharge, scale, feetCenterOffset, feetHalf, l
     const ph = phase ? phase.value : 0;
     const outfit = Math.max(rain ? rain.value : 0, winter ? winter.value : 0, pajama ? pajama.value : 0, dirty ? dirty.value : 0,
       umbrella ? umbrella.value : 0, snow ? snow.value : 0, eventHat ? 1 : 0);
-    const giysi = Math.max(winter ? winter.value : 0, pajama ? pajama.value : 0, umbrella ? umbrella.value : 0, eventHat ? 1 : 0);
+    const giysi = Math.max(pajama ? pajama.value : 0, umbrella ? umbrella.value : 0, eventHat ? 1 : 0);
     const hideAll = reactionVisible(tk, ph, outfit) || fallVisible(dusus ? dusus.value : 0, giysi); // tepki/düşüş varken şarj/idle pozu çizilmez
     return {
       opacity: hideAll ? 0 : poseOpacity(i, poseCharge.value),
@@ -329,7 +329,7 @@ function ReactionLayer({ k, px, py, poseCharge, scale, feetCenterOffset, feetHal
     const ph = phase ? phase.value : 0;
     const outfit = Math.max(rain ? rain.value : 0, winter ? winter.value : 0, pajama ? pajama.value : 0, dirty ? dirty.value : 0,
       umbrella ? umbrella.value : 0, snow ? snow.value : 0, eventHat ? 1 : 0);
-    const giysi = Math.max(winter ? winter.value : 0, pajama ? pajama.value : 0, umbrella ? umbrella.value : 0, eventHat ? 1 : 0);
+    const giysi = Math.max(pajama ? pajama.value : 0, umbrella ? umbrella.value : 0, eventHat ? 1 : 0);
     const on = tk === k && reactionVisible(tk, ph, outfit) && !fallVisible(dusus ? dusus.value : 0, giysi);
     const pulse = landPulse ? landPulse.value : 0;
     const sq = 1 - pulse * 0.14;
@@ -367,7 +367,7 @@ function FallLayer({ k, px, py, scale, feetCenterOffset, feetHalf, halo, pajama,
   const pose = FALL_POSES[k - 1];
   const style = useAnimatedStyle(() => {
     const d = dusus ? dusus.value : 0;
-    const giysi = Math.max(winter ? winter.value : 0, pajama ? pajama.value : 0, umbrella ? umbrella.value : 0, eventHat ? 1 : 0);
+    const giysi = Math.max(pajama ? pajama.value : 0, umbrella ? umbrella.value : 0, eventHat ? 1 : 0);
     return {
       opacity: d === k && fallVisible(d, giysi) ? 1 : 0,
       transform: [
@@ -376,9 +376,11 @@ function FallLayer({ k, px, py, scale, feetCenterOffset, feetHalf, halo, pajama,
       ],
     };
   });
-  // Yağmurda yağmurluklu kare (kıyafet geçişiyle aynı oranda karışır).
-  const plainStyle = useAnimatedStyle(() => ({ opacity: 1 - (rain ? rain.value : 0) }));
+  // Yağmurda yağmurluklu, kışta bere+atkılı kare (kıyafet geçişiyle aynı oranda karışır). Yağmur kışın önüne geçer
+  // (oyundaki gibi: yağmurda bere görünmez).
+  const plainStyle = useAnimatedStyle(() => ({ opacity: (1 - (rain ? rain.value : 0)) * (1 - (winter ? winter.value : 0)) }));
   const rainStyle = useAnimatedStyle(() => ({ opacity: rain ? rain.value : 0 }));
+  const kisStyle = useAnimatedStyle(() => ({ opacity: (winter ? winter.value : 0) * (1 - (rain ? rain.value : 0)) }));
   return (
     <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, width: pose.w * scale, height: pose.h * scale }, style]}>
       {halo && LIVE_RN_IMAGE
@@ -388,6 +390,7 @@ function FallLayer({ k, px, py, scale, feetCenterOffset, feetHalf, halo, pajama,
           ))
         : null}
       <Animated.Image source={pose.source} resizeMode="stretch" fadeDuration={0} style={[{ position: "absolute", left: 0, top: 0, width: "100%", height: "100%" }, plainStyle]} />
+      {winter ? <Animated.Image source={FALL_POSES_KIS[k - 1]} resizeMode="stretch" fadeDuration={0} style={[{ position: "absolute", left: 0, top: FALL_KIS_TOP * scale, width: "100%", height: FALL_KIS_H * scale }, kisStyle]} /> : null}
       {rain ? <Animated.Image source={FALL_POSES_YAGMUR[k - 1]} resizeMode="stretch" fadeDuration={0} style={[{ position: "absolute", left: 0, top: 0, width: "100%", height: "100%" }, rainStyle]} /> : null}
     </Animated.View>
   );

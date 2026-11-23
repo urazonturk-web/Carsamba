@@ -32,3 +32,10 @@ Kullanıcı (18:44 videosu sonrası): yağmurda da çırpınsın → Kıvılcım
 - Katman: FallLayer içinde eşofmanlı kare opaklığı 1−yağmur, yağmurluklu kare opaklığı yağmur (kıyafet geçişiyle aynı oranda).
 - Kural: yağmur artık düşüşü engellemiyor; kış, pijama, şemsiye ve özel gün şapkası hâlâ engelliyor (şemsiye rüzgârsız yağmurda açılır).
 - Kanıt: simülatörde gerçek yağmurlu havada (rüzgârlı, şemsiyesiz) kasıtlı ıskalama → `sim-yagmurda-dusus.png`: yağmurluk ve kasketle iki çırpınma karesi. tsc temiz, worklet sıra testi ve düşüş simülasyonu PASS. Telefonda doğrulanmadı.
+
+## Ek — kışta düşüş (2026-11-23 akşam)
+Kıvılcım, kullanıcının sohbette verdiği "diğer hava durumları içinde gerekli düzenlemeler yapılsın" talimatıyla mevcut bere/atkı kaynaklarından 2 kare hazırladı (yeni görsel çağrısı yok); kullanıcı kabulü "Kabul, bağla".
+- Dosya: `amca-dusus-1-kis.png`, `amca-dusus-2-kis.png`, 1100×1203 (poz 100 px aşağıda, ponpon kesilmesin). Aynı kutuda üstten −100 px kaydırılarak çizilir (eşdeğer pivot 590, 1208). Hiza: 100 px kaydırılınca eşofmanlı karelerle silüet örtüşmesi %96,4.
+- Katman/öncelik: eşofman (1−yağmur)(1−kış), yağmurluk = yağmur, kış = kış·(1−yağmur) — oyundaki gibi yağmur kışın önüne geçer.
+- Kural: kış artık düşüşü engellemiyor; pijama, şemsiye ve özel gün şapkası hâlâ engelliyor.
+- Kanıt: simülatörde test havası "Karlı, Kış" ile kasıtlı ıskalama → `sim-kista-dusus.png` (bere + atkıyla iki çırpınma karesi). tsc temiz; worklet sıra testi ve düşüş simülasyonu PASS. Telefonda doğrulanmadı.

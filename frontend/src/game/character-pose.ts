@@ -108,8 +108,16 @@ export const FALL_POSES_YAGMUR = [
   require("@/assets/characters/beden/amca-dusus-1-yagmur.png"),
   require("@/assets/characters/beden/amca-dusus-2-yagmur.png"),
 ] as const;
+// Kış hâli (bere + atkı; kullanıcı kabulü "Kabul, bağla"): tuval 1100×1203, poz 100 px aşağıda (ponpon kesilmesin) →
+// aynı kutuda üstten -100 px kaydırılarak çizilir; eşdeğer pivot (590, 1208).
+export const FALL_POSES_KIS = [
+  require("@/assets/characters/beden/amca-dusus-1-kis.png"),
+  require("@/assets/characters/beden/amca-dusus-2-kis.png"),
+] as const;
+export const FALL_KIS_H = 1203;
+export const FALL_KIS_TOP = -100;
 export const DUSUS_KARE_MS = 110;
-// giysi = max(kış, pijama, şemsiye, özel şapka). Yağmur artık engellemez (yağmurluklu kareler var); kir ve kar da engellemez.
+// giysi = max(pijama, şemsiye, özel şapka). Yağmur ve kış artık engellemez (kendi kareleri var); kir ve kar da engellemez.
 export function fallVisible(d: number, giysi: number) {
   "worklet";
   return d > 0 && giysi <= 0.01;
