@@ -2042,3 +2042,5 @@ TESLIM_HAZIR: KARGA-DONGU-2026-11-23 — kargalarda periyotsuz bekleme (yem/bak�
 TESLIM_HAZIR: AMCA-DUSUS-2026-11-23 — düşüş kesinleşince iki karelik "eyvah" çırpınması; ai_review_evidence/AMCA-DUSUS-2026-11-23/RAPOR.md; telefonda kullanıcı videosu bekleniyor.
 
 TESLIM_HAZIR: VIDEO-2026-11-23e — oyun başında havada kalan osuruk dumanı giderildi (restart duman durumunu sıfırlıyor); ai_review_evidence/VIDEO-2026-11-23e/RAPOR.md.
+
+TESLIM_HAZIR: AMCA-DUSUS-YAGMUR-2026-11-23 — yağmurda da "eyvah" çırpınması (yağmurluklu 2 kare); ai_review_evidence/AMCA-DUSUS-2026-11-23/RAPOR.md; şemsiyeli/kış/pijama düşüşü hâlâ eski görünüm.

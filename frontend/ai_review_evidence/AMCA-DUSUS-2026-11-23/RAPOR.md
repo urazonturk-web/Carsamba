@@ -25,3 +25,10 @@
 
 ## Plan incelemesi
 Claudex Loop 3 tur (REVISE, REVISE, APPROVED) — PLAN-REVIEW-LOG.md.
+
+## Ek — yağmurluklu düşüş (2026-11-23 akşam)
+Kullanıcı (18:44 videosu sonrası): yağmurda da çırpınsın → Kıvılcım 2 görsel (amca-dusus-1/2-yagmur, kabul "Kabul, bağla").
+- Dosya: `assets/characters/beden/amca-dusus-1-yagmur.png`, `amca-dusus-2-yagmur.png`; aynı 1100×1103 tuval ve pivot (590, 1108); silüet örtüşmesi eşofmanlı karelerle %89–90 (fark kasket).
+- Katman: FallLayer içinde eşofmanlı kare opaklığı 1−yağmur, yağmurluklu kare opaklığı yağmur (kıyafet geçişiyle aynı oranda).
+- Kural: yağmur artık düşüşü engellemiyor; kış, pijama, şemsiye ve özel gün şapkası hâlâ engelliyor (şemsiye rüzgârsız yağmurda açılır).
+- Kanıt: simülatörde gerçek yağmurlu havada (rüzgârlı, şemsiyesiz) kasıtlı ıskalama → `sim-yagmurda-dusus.png`: yağmurluk ve kasketle iki çırpınma karesi. tsc temiz, worklet sıra testi ve düşüş simülasyonu PASS. Telefonda doğrulanmadı.
