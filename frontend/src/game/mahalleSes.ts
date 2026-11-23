@@ -3,7 +3,8 @@
 // Rastgelelik ayrı üreteçten (oyunun paylaşılan rastgele akışına dokunmaz).
 import { playSfx, type SfxName } from "./sfx";
 
-export const MAHALLE_SES_ON = true as boolean;
+// 2026-11-23 12:50 kullanıcı: "seslerin hiç biri olmamış, bazılarında timing hatası var, oyun takılıyormuş gibi" → kapalı.
+export const MAHALLE_SES_ON = false as boolean;
 
 export type MahalleOlay =
   | { tur: "inis"; perfect: number; ratio: number; towersCrossed: number }

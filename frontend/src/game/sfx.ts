@@ -6,6 +6,7 @@
 import { createAudioPlayer, setAudioModeAsync, setIsAudioActiveAsync, type AudioPlayer } from "expo-audio";
 
 export const SFX_ON = true as boolean;
+export const MAHALLE_SES_YUKLE = false as boolean; // mahalle seslerinin oynatıcıları (MAHALLE_SES_ON ile birlikte açılır)
 
 const SOURCES = {
   charge: require("@/assets/sounds/charge.wav"),
@@ -65,6 +66,8 @@ export function initSfx() {
     .catch(() => {});
   players = {};
   for (const k of Object.keys(SOURCES) as SfxName[]) {
+    // Mahalle sesleri kapalıyken oynatıcıları hiç oluşturulmaz (kullanıcı takılma hissetti; 14 ek oynatıcı yüklenmesin).
+    if (k.startsWith("m_") && !MAHALLE_SES_YUKLE) continue;
     const list: AudioPlayer[] = [];
     for (let i = 0; i < (k === "charge" ? 1 : POOL); i++) {
       try {

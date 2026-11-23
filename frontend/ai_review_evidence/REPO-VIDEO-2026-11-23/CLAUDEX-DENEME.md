@@ -42,4 +42,14 @@ Vazgeçme ölçütü: 3 özellikte tur sayısı azalmaz ya da süre/maliyet beli
 - Plan: 2 tur; 2 bulgu (aynı inişte iki ses; eşik sınırı) → APPROVED.
 - Son kontrol (temiz çalışma ağacı, fark yalnız bu iş): 1 gerçek bulgu (yarışta panjur çalmıyor) → düzeltildi.
 - Ölçülebilir: karar motoru birim testi PASS; ses düzeyleri ölçütte. Sınır: sesler dinlenemedi; doğallık kullanıcıda.
-- Kullanıcı videosu: bekleniyor.
+- Kullanıcı videosu 12:50: "seslerin hiç biri olmamış, bazılarında timing hatası var, oyun takılıyormuş gibi" → **reddedildi, 1 düzeltme turu** (sesler kapatıldı, oynatıcılar yüklenmiyor).
+- Ders: Claudex Loop planın ve kodun **mantığını** iyi denetliyor (doğru tetikleme, çakışma, kenar durumu), ama **duyusal kaliteyi** (ses kulağa nasıl geliyor, zamanlama hissi, akıcılık) denetleyemiyor; ben de sesleri dinleyemedim. Bu tür işlerde asıl kontrol kullanıcının kulağı/gözü.
+
+## Kesin sonuç (3 özellik)
+| Özellik | Kullanıcı düzeltme turu | Codex gerçek bulgu (plan + kod) |
+|---|---|---|
+| Oyun sonu kartı | 0 | 4 + 0 (1 kapsam dışı) |
+| Karga çeşitliliği | 0 | 6 + 3 |
+| Mahalle sesleri | 1 (tamamen reddedildi) | 2 + 1 |
+Taban (Claudex öncesi benzer işler): 2–4 tur.
+**Karar önerisi:** Claudex Loop kalsın — görsel/mantık ağırlıklı orta işlerde açıkça işe yaradı. Ama ses/his gibi duyusal işlerde önce küçük bir örneği kullanıcıya dinletmeden/göstermeden oyuna bağlanmasın (ölçüt: duyusal varlık → önce kullanıcı onayı). Her özellikten önce commit, son kontrolü temiz tutuyor.
