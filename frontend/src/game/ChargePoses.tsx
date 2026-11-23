@@ -9,7 +9,7 @@ import { View } from "react-native";
 const LIVE_RN_IMAGE = true as boolean;
 import Animated, { useAnimatedStyle, type SharedValue } from "react-native-reanimated";
 
-import { CHARGE_POSES, poseOpacity, REACTION_POSES, reactionVisible } from "./character-pose";
+import { CHARGE_POSES, poseOpacity, REACTION_POSES, reactionVisible, reactionPivotFix } from "./character-pose";
 import { HAT_BOX, HAT_SOURCE, SLIPPER_BOXES, SLIPPER_SOURCE } from "./pijama";
 import { RAIN_POSE_SOURCES, RAIN_CAP_SOURCE, RAIN_CAP_BOX } from "./yagmur";
 import { UMB_OPEN, UMB_CLOSED, UMB_FABRIC, UMB_FABRIC_LIGHT, UMB_LINE, UMB_WOOD } from "./semsiye";
@@ -63,6 +63,7 @@ type Props = {
   offsetY?: SharedValue<number>;
   // BEDEN DİLİ (2026-11-23): tepki 0 yok, 1 silkele, 2 denge, 3 oh be; phase = PHASE (0 yerde).
   tepki?: SharedValue<number>;
+  tepkiP?: SharedValue<number>; // yerleşme ilerlemesi 0→1 (180 ms)
   phase?: SharedValue<number>;
   onLoad?: () => void;
   onLoadStart?: () => void;
@@ -319,7 +320,7 @@ function SnowLump({ b, scale }: { b: SnowBlob; scale: number }) {
 
 // BEDEN DİLİ: tepki pozu katmanı (k = 1..3). PoseLayer ile aynı dönüşüm ve hale; kıyafet katmanı yok
 // (kıyafet görünürken reactionVisible false olur, tepki hiç çizilmez).
-function ReactionLayer({ k, px, py, poseCharge, scale, feetCenterOffset, feetHalf, landPulse, halo, dirty, pajama, winter, snow, rain, eventHat, umbrella, offsetX, offsetY, tepki, phase }: Props & { k: number }) {
+function ReactionLayer({ k, px, py, poseCharge, scale, feetCenterOffset, feetHalf, landPulse, halo, dirty, pajama, winter, snow, rain, eventHat, umbrella, offsetX, offsetY, tepki, tepkiP, phase }: Props & { k: number }) {
   const pose = REACTION_POSES[k - 1];
   const style = useAnimatedStyle(() => {
     const tk = tepki ? tepki.value : 0;
@@ -330,15 +331,18 @@ function ReactionLayer({ k, px, py, poseCharge, scale, feetCenterOffset, feetHal
     const pulse = landPulse ? landPulse.value : 0;
     const sq = 1 - pulse * 0.14;
     const bulge = 1 + pulse * 0.08;
-    const height = pose.h * scale;
-    const extraY = (height * (1 - sq)) / 2;
+    // Yerleşme (plan KARGA-DONGU C): ilk 180 ms sy 0,94→1, sx 1,04→1; ayak noktası tek formülle sabit.
+    const tp = tepkiP ? tepkiP.value : 1;
+    const SX = bulge * (1.04 - 0.04 * tp);
+    const SY = sq * (0.94 + 0.06 * tp);
+    const fix = reactionPivotFix(pose.pivotX, pose.pivotY, pose.w, pose.h, scale, SX, SY);
     return {
       opacity: on ? 1 : 0,
       transform: [
-        { translateX: px.value + feetCenterOffset - pose.pivotX * scale + (offsetX ? offsetX.value : 0) },
-        { translateY: py.value + feetHalf - pose.pivotY * scale + extraY + (offsetY ? offsetY.value : 0) },
-        { scaleY: sq },
-        { scaleX: bulge },
+        { translateX: px.value + feetCenterOffset - pose.pivotX * scale + fix.dx + (offsetX ? offsetX.value : 0) },
+        { translateY: py.value + feetHalf - pose.pivotY * scale + fix.dy + (offsetY ? offsetY.value : 0) },
+        { scaleY: SY },
+        { scaleX: SX },
       ],
     };
   });

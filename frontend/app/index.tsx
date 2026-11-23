@@ -55,7 +55,7 @@ const START_SKY = DURAK_SEFER ? skyStepForStops(stopsPassed(TEST_START_TOWER)) :
 import { SFX_ON, initSfx, playFart, playSfx, setSfxMuted, stopFart, stopSfx } from "../src/game/sfx";
 import { GAME_OVER_LINE, QUIP_ON, multiJumpShout, pickQuip, quipContext } from "../src/game/copy";
 import { mahalleSes } from "../src/game/mahalleSes";
-import { KARGA_ON, KARGA_TUNEMIS, KARGA_BAKIS, KARGA_YEM, KARGA_HAVALANMA, KARGA_FOOT_Y, KARGA_BOX_K, KARGA_MAX_Y, kargaSayisi, kargaTunek, kargaTunekAny, kargaDurus, kargaRngYap, kargaUcus, KARGA_TEST, KARGA_HAVUZ, KARGA_UCUS_MS } from "../src/game/karga";
+import { KARGA_ON, KARGA_TUNEMIS, KARGA_BAKIS, KARGA_YEM, KARGA_HAVALANMA, KARGA_FOOT_Y, KARGA_BOX_K, KARGA_MAX_Y, kargaSayisi, kargaTunek, kargaTunekAny, kargaBekle, kargaHedefTuru, kargaRngYap, kargaUcus, KARGA_TEST, KARGA_HAVUZ, KARGA_UCUS_MS } from "../src/game/karga";
 import { MAHALLE_ON, MAHALLE_SPEECH_ON, CUMBA_SOURCE, CUMBA_KEDI_SOURCE, CUMBA_ASPECT, CUMBA_TEYZE_SOURCE, CUMBA_TEYZE_BAKIS_SOURCE, CUMBA_TEYZE_ASPECT, cumbaBox, MAHALLE_BOX, TEYZE_ASPECT, KEDI_ASPECT, KEDI_UYUYAN_FOOT, KEDI_DIK_FOOT, AMCA_ASPECT, COCUK_ASPECT, KEDI_GERINEN_ASPECT, KEDI_GRI_ASPECT, TEYZE_SOURCE, KEDI_SOURCE, AMCA_SOURCE, COCUK_SOURCE, KEDI_GERINEN_SOURCE, KEDI_GRI_SOURCE, KEDI_ADLARI, sakin, teyzeBox, kediBox, kediAdi, kediGri, kediGriNo, pencereAspect, pencereLafi, kediLafi, KEDI_DEFTER_KEY } from "../src/game/mahalle";
 import { OZEL_GUN_ON, OZEL_GUN_TEST_TAP, OZEL_GUNLER, OZEL_GUN_TEST_ORDER, todaysEvent } from "../src/game/ozelGun";
 import { HANIM_ON, ICSES_ON, LAKAP_ON, newRunStats, noteLanding, icSesAfterLanding, icSesIdle, hanimMessage, lakap } from "../src/game/amcaSesi";
@@ -368,7 +368,7 @@ const AnimatedImage = Animated.createAnimatedComponent(Image);
 const BG_SCROLL_TEST = true as boolean;
 const BG_SCROLL_RATIO = 0.45;
 const BG_SCROLL_TILES = 4;
-const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "AMCA BEDEN DILI") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
+const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "KARGA DONGU + YERLESME") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
 const DIAG_MAX_EXAMPLES = 6;
 const HOUSE_AB_FROZEN = false as boolean;
 // REVIZYON-066 experiment (one variable): expo-linear-gradient's iOS layer
@@ -890,7 +890,7 @@ const OYUN_SONU_TEST = false as boolean; // GEÇİCİ: toast/çip konum denemesi
 const BEDEN_ON = true as boolean; // amcanın inişten sonraki beden dili pozları (2026-11-23)
 const BEDEN_TEST = false as boolean; // GEÇİCİ: her inişte sırayla 3 poz (simülatör denemesi); teslimde false
 const KARGA_POOL_IDX = Array.from({ length: KARGA_HAVUZ }, (_, i) => i);
-const KARGA_POOL_SRC = [KARGA_TUNEMIS, KARGA_BAKIS, KARGA_HAVALANMA];
+const KARGA_POOL_SRC = [KARGA_TUNEMIS, KARGA_BAKIS, KARGA_HAVALANMA, KARGA_YEM]; // poz: 0 tünemiş, 1 bakış, 2 uçuş, 3 yem
 
 export default function Game() {
   const insets = useSafeAreaInsets();
@@ -1046,6 +1046,7 @@ export default function Game() {
   const kP0 = useSharedValue(1), kP1 = useSharedValue(1), kP2 = useSharedValue(1), kP3 = useSharedValue(1), kP4 = useSharedValue(1), kP5 = useSharedValue(1), kP6 = useSharedValue(1), kP7 = useSharedValue(1);
   const kPs = [kP0, kP1, kP2, kP3, kP4, kP5, kP6, kP7];
   const kRng = useRef(kargaRngYap(Date.now())); // karga çeşitliliği için ayrı üreteç
+  const kSonGelen = useRef(0); // son yeni gelen karganın JS saati (KARGA-DONGU: en az 8 sn arayla)
   useEffect(() => {
     if (!KARGA_ON) return;
     const t0 = Date.now();
@@ -1077,7 +1078,7 @@ export default function Game() {
           if (!d) continue;
           const r = R();
           if (id !== landedId && r < 0.15) continue; // cesur: komşu kuleye inişte yerinde kalır
-          flights.push({ x0: d.wx, y0: d.wy, seed: d.seed, slot: -1, late: r >= 0.15 && r < 0.4, key });
+          flights.push({ x0: d.wx, y0: d.wy, seed: d.seed, slot: -1, late: r >= 0.15 && r < 0.4, key, kac: 0 });
         }
       }
       for (let i = 0; i < KARGA_HAVUZ; i++) {
@@ -1085,11 +1086,13 @@ export default function Game() {
         if (!e.on || e.id === -999 || now < (e.until ?? 0) || Math.abs(e.id - landedId) > 1) continue;
         const r = R();
         if (e.id !== landedId && r < 0.15) continue;
-        flights.push({ x0: e.x1, y0: e.y1, seed: e.seed, slot: i, late: r >= 0.15 && r < 0.4 });
+        flights.push({ x0: e.x1, y0: e.y1, seed: e.seed, slot: i, late: r >= 0.15 && r < 0.4, kac: e.kac ?? 1 });
       }
       // Yeni gelen: havuzda boş yer varsa ekran dışından bir karga.
-      if (lpk && R() < 0.15 && pool.some((e) => !e.on)) {
-        flights.push({ arrive: 1, x0: kAmcaX.value + 900 + R() * 400, y0: lpk.topY - 700 - R() * 300, seed: R(), slot: -1, late: false });
+      // KARGA-DONGU: %10 ve en az 8 sn arayla (aynı aralığa sürekli yeni karga konup kovalamaca döngüsü olmasın).
+      if (lpk && now - kSonGelen.current >= 8000 && R() < 0.1 && pool.some((e) => !e.on)) {
+        kSonGelen.current = now;
+        flights.push({ arrive: 1, kac: 0, x0: kAmcaX.value + 900 + R() * 400, y0: lpk.topY - 700 - R() * 300, seed: R(), slot: -1, late: false });
       }
       // Dolu tünekler: havuzda konmuş/konmakta olanlar (yeniden uçacaklar hariç).
       const reflying = flights.filter((f) => f.slot >= 0).map((f) => f.slot);
@@ -1131,15 +1134,17 @@ export default function Game() {
           }
         }
         if (s < 0) return;
-        // Hedef: %70 ileri (2–5), %20 geri (2–4), %10 gider. Seçilen aralıkta yer yoksa sırayla öbür yön ve daha
-        // uzak kuleler denenir; "gider"e yalnız %10'luk seçimle ya da listede hiç boş tünek kalmadıysa düşülür.
+        // Hedef (KARGA-DONGU): türü kargaHedefTuru(kac) seçer — ilk kaçış çoğunlukla ileri, yeniden kaçan karga
+        // gider / geri / uzak ileri (amca hemen yetişip yine kaçırmasın). Seçilen aralıkta yer yoksa sırayla öbür
+        // aralıklar denenir; "gider"e yalnız seçimle ya da listede hiç boş tünek kalmadıysa düşülür.
         let pick: any = null;
         let leave = false;
         if (f.arrive) pick = pickRange(3, 6) ?? pickRange(2, 8);
         else {
-          const rr = R();
-          if (rr < 0.7) pick = pickRange(2, 5) ?? pickRange(-4, -2) ?? pickRange(6, 8) ?? pickRange(-7, -5);
-          else if (rr < 0.9) pick = pickRange(-4, -2) ?? pickRange(2, 5) ?? pickRange(-7, -5) ?? pickRange(6, 8);
+          const tur = kargaHedefTuru(f.kac ?? 0, R());
+          if (tur === "ileri") pick = pickRange(2, 5) ?? pickRange(6, 9) ?? pickRange(-4, -2) ?? pickRange(-7, -5);
+          else if (tur === "uzak") pick = pickRange(6, 9) ?? pickRange(-4, -2) ?? pickRange(-7, -5) ?? pickRange(2, 5);
+          else if (tur === "geri") pick = pickRange(-4, -2) ?? pickRange(-7, -5) ?? pickRange(6, 9) ?? pickRange(2, 5);
           else leave = true;
         }
         if (f.arrive && !pick) return;
@@ -1149,7 +1154,7 @@ export default function Game() {
         if (f.key !== undefined) gone.push(f.key);
         const dur = 1100 + R() * 900;
         pool[s] = { on: 1, id: T, x0: f.x0, y0: f.y0, x1: dest.wx, y1: dest.wy, seed: dest.seed ?? f.seed,
-          arc: 0.6 + R() * 1.8, wob: R() * 0.25, wobN: 1 + Math.floor(R() * 2), dur, wait: f.late ? 1 : 0 };
+          arc: 0.6 + R() * 1.8, wob: R() * 0.25, wobN: 1 + Math.floor(R() * 2), dur, wait: f.late ? 1 : 0, kac: f.arrive ? 0 : (f.kac ?? 0) + 1 };
         const delay = f.late ? 300 + R() * 500 : R() * 200;
         pool[s].until = now + delay + dur + 50; // bu ana kadar slot "uçuşta" sayılır, yeniden kullanılmaz
         starts.push({ s, delay, dur, ease: R() < 0.5 ? 0 : 1 });
@@ -1170,7 +1175,7 @@ export default function Game() {
     const t = setTimeout(() => { h = setInterval(() => { kargaKacirRef.current(n, 0.5); n++; }, 3000); }, 12000);
     return () => { clearTimeout(t); if (h) clearInterval(h); };
   }, []);
-  // Uçan / yeni yerine konmuş kargalar: poz 0 tünemiş, 1 bakış, 2 uçuş. Dünya koordinatında (kule kırpması yok).
+  // Uçan / yeni yerine konmuş kargalar: poz 0 tünemiş, 1 bakış, 2 uçuş, 3 yem. Dünya koordinatında (kule kırpması yok).
   const kargaPoolStyle = (i: number, pose: number) => {
     const P = kPs[i];
     return useAnimatedStyle(() => {
@@ -1193,14 +1198,15 @@ export default function Game() {
         x = u.x; y = u.y; sy = u.sy;
         face = e.x1 >= e.x0 ? 1 : -1;
       } else {
-        want = kargaDurus(tick, e.seed);
+        const b = kargaBekle(tick, e.seed);
+        want = b === 2 ? 3 : b;
         face = ax < -1e8 ? 1 : ax < x ? -1 : 1; // bakışta da gövde aynı yönde (yalnız baş döner)
       }
       if (want !== pose) return KOFF;
       return { opacity: 1, transform: [{ translateX: x - MAHALLE_BOX / 2 }, { translateY: y - B * KARGA_FOOT_Y + B / 2 - MAHALLE_BOX / 2 }, { scaleX: (face * B) / MAHALLE_BOX }, { scaleY: (sy * B) / MAHALLE_BOX }] };
     });
   };
-  const kargaPoolStyles = KARGA_POOL_IDX.flatMap((i) => [0, 1, 2].map((pose) => kargaPoolStyle(i, pose)));
+  const kargaPoolStyles = KARGA_POOL_IDX.flatMap((i) => [0, 1, 2, 3].map((pose) => kargaPoolStyle(i, pose)));
   const [cats, setCats] = useState<string[]>([]);
   const [catBook, setCatBook] = useState(false);
   useEffect(() => {
@@ -1304,6 +1310,7 @@ export default function Game() {
   const vy = useSharedValue(0);
   const phase = useSharedValue<number>(PHASE.IDLE);
   const tepki = useSharedValue(0); // BEDEN DİLİ: 0 yok, 1 silkele, 2 denge, 3 oh be
+  const tepkiP = useSharedValue(1); // tepki pozunun yerleşme ilerlemesi (0→1, 180 ms)
   const bedenTest = useRef(0);
   const charge = useSharedValue(0);
   // __DEV__-only visual pose freeze (0/25/50/75/100 % screenshot QA), never
@@ -1923,6 +1930,9 @@ export default function Game() {
       if (k > 0) {
         cancelAnimation(tepki);
         tepki.value = k;
+        cancelAnimation(tepkiP);
+        tepkiP.value = 0;
+        tepkiP.value = withTiming(1, { duration: 180, easing: Easing.out(Easing.quad) });
         tepki.value = withDelay(k === 3 ? 1100 : 900, withTiming(0, { duration: 0 }));
       }
     }
@@ -2107,6 +2117,8 @@ export default function Game() {
     kGone.value = [];
     cancelAnimation(tepki);
     tepki.value = 0;
+    cancelAnimation(tepkiP);
+    tepkiP.value = 1;
     kPool.value = [];
     // Hanım bildirimi yeni koşuya geçerken de süresini doldurur (video: hızlı "Bir daha" onu hiç göstermiyordu).
     runNewCardsRef.current = [];
@@ -3648,7 +3660,7 @@ export default function Game() {
         ))}
         {KARGA_ON && kargaPoolStyles.map((st, j) => (
           <Animated.View key={`karga-ucan-${j}`} pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, width: MAHALLE_BOX, height: MAHALLE_BOX }, st]}>
-            <Image source={KARGA_POOL_SRC[j % 3]} style={{ width: "100%", height: "100%" }} resizeMode="stretch" fadeDuration={0} />
+            <Image source={KARGA_POOL_SRC[j % 4]} style={{ width: "100%", height: "100%" }} resizeMode="stretch" fadeDuration={0} />
           </Animated.View>
         ))}
 
@@ -3790,6 +3802,7 @@ export default function Game() {
           strain={OVERCHARGE ? overT : undefined}
           dirty={SPLAT_ON ? dirty : undefined}
           tepki={BEDEN_ON ? tepki : undefined}
+          tepkiP={BEDEN_ON ? tepkiP : undefined}
           phase={phase}
           onLoadStart={() => markArtStarted("character")}
           onLoad={() => { poseLoads.current += 1; if (poseLoads.current >= CHARGE_POSES.length) markArtLoaded("character"); }}
@@ -4784,13 +4797,13 @@ const PlatformHouseView = memo(function PlatformHouseView({ index, platforms, st
     if (!g) return OFF;
     const d = kargaYer(g, slot);
     if (!d || gone.includes(g.p.id * 4 + slot)) return OFF;
-    if (pose !== kargaDurus(tick, d.seed)) return OFF;
+    if (pose !== kargaBekle(tick, d.seed)) return OFF;
     const face = ax < -1e8 ? d.flip : ax < d.wx ? -1 : 1; // bakışta da gövde aynı yönde (yalnız baş döner)
     const B = FART_CHAR_H * KARGA_BOX_K;
     return { opacity: 1, transform: [{ translateX: d.x - MAHALLE_BOX / 2 }, { translateY: d.y - B * KARGA_FOOT_Y + B / 2 - MAHALLE_BOX / 2 }, { scaleX: (face * B) / MAHALLE_BOX }, { scaleY: B / MAHALLE_BOX }] };
   });
-  const k0a = kargaStyle(0, 0), k0b = kargaStyle(0, 1);
-  const k1a = kargaStyle(1, 0), k1b = kargaStyle(1, 1);
+  const k0a = kargaStyle(0, 0), k0b = kargaStyle(0, 1), k0c = kargaStyle(0, 2);
+  const k1a = kargaStyle(1, 0), k1b = kargaStyle(1, 1), k1c = kargaStyle(1, 2);
   const iciclesStyle = useAnimatedStyle(() => {
     const g = houseGeom.value;
     return g ? { top: g.rise + HOUSE_GUTTER_H - HOUSE_GUTTER_OVERLAP - 2, width: g.fw } : { width: 0 };
@@ -4896,7 +4909,7 @@ const PlatformHouseView = memo(function PlatformHouseView({ index, platforms, st
       )}
       {KARGA_ON && (
         <>
-          {[[k0a, KARGA_TUNEMIS], [k0b, KARGA_BAKIS], [k1a, KARGA_TUNEMIS], [k1b, KARGA_BAKIS]].map(([st, src]: any, i) => (
+          {[[k0a, KARGA_TUNEMIS], [k0b, KARGA_BAKIS], [k0c, KARGA_YEM], [k1a, KARGA_TUNEMIS], [k1b, KARGA_BAKIS], [k1c, KARGA_YEM]].map(([st, src]: any, i) => (
             <Animated.View key={`karga-${i}`} style={[{ position: "absolute", left: 0, top: 0, width: MAHALLE_BOX, height: MAHALLE_BOX }, st]}>
               <Image source={src} style={styles.houseFill} resizeMode="stretch" fadeDuration={0} />
             </Animated.View>

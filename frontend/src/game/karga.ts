@@ -146,6 +146,26 @@ export function kargaDurus(t: number, seed: number) {
   const dd = ph - ofs + 1;
   return dd - Math.floor(dd) < w ? 1 : 0;
 }
+// 2026-11-23 (video 13:56 "loopa düşüyor gibi", plan KARGA-DONGU): duran karga için periyotsuz bekleme.
+// Zaman 750 ms'lik dilimlere bölünür; her dilimin durumu (tohum, dilim) özetiyle BAĞIMSIZ seçilir:
+// %65 tünemiş (0), %20 bakış (1, yalnız baş döner), %15 yem (2, eğilip yoklar). Sabit dönem yok.
+export const KARGA_DILIM_MS = 750;
+export function kargaBekle(t: number, seed: number) {
+  "worklet";
+  const sl = Math.floor(t / KARGA_DILIM_MS + seed * 977);
+  let h = Math.imul(sl ^ 0x9e3779b9, 0x85ebca6b) ^ Math.imul(Math.floor(seed * 1e6) | 0, 0xc2b2ae35);
+  h = Math.imul(h ^ (h >>> 16), 0x7feb352d);
+  h = Math.imul(h ^ (h >>> 15), 0x846ca68b);
+  const r = ((h ^ (h >>> 16)) >>> 0) / 4294967296;
+  return r < 0.65 ? 0 : r < 0.85 ? 1 : 2;
+}
+// Kaçış hedefi türü (kac: bu karganın daha önce kaç kez kaçtığı; r: 0..1). Zinciri kırar: yeniden kaçan
+// karga amcanın hemen yetişeceği yere konmaz.
+export function kargaHedefTuru(kac: number, r: number): "ileri" | "uzak" | "geri" | "gider" {
+  if (kac <= 0) return r < 0.55 ? "ileri" : r < 0.75 ? "uzak" : r < 0.9 ? "geri" : "gider";
+  if (kac === 1) return r < 0.35 ? "gider" : r < 0.7 ? "geri" : "uzak";
+  return r < 0.7 ? "gider" : "geri";
+}
 // Ayrı karga üreteci (mulberry32): oyunun paylaşılan rastgele akışına dokunmaz.
 export function kargaRngYap(seed: number) {
   let a = seed >>> 0;

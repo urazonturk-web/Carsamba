@@ -91,6 +91,12 @@ export const REACTION_POSES = [
  *  İnişten sonraki çömelme toparlanmasını (poseCharge'ın sıfıra inişi) BEKLEMEZ: tepki iniş anında başlar,
  *  o sırada bütün şarj pozları gizlenir; yeni şarj (PHASE.CHARGING) ya da havalanma tepkiyi anında bitirir.
  *  (Son kontrol bulgusu: eskiden poseCharge ≤ 0,001 beklendiği için 900 ms'lik poz ~0,5 sn görünüyordu.) */
+// Tepki pozunun ayak noktası sabit kalsın diye ölçek telafisi (RN ölçeği görünüm merkezine göre uygular).
+// SX/SY birleşik ölçek (landPulse × yerleşme). sx=sy=1 iken dy eski extraY = h·scale·(1−sq)/2 ile aynı.
+export function reactionPivotFix(pivotX: number, pivotY: number, w: number, h: number, scale: number, SX: number, SY: number) {
+  "worklet";
+  return { dx: -(pivotX - w / 2) * scale * (SX - 1), dy: -(pivotY - h / 2) * scale * (SY - 1) };
+}
 export function reactionVisible(t: number, phase: number, outfit: number) {
   "worklet";
   return t > 0 && phase === 0 && outfit <= 0.01;

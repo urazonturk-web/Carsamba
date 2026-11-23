@@ -2036,3 +2036,5 @@ TESLIM_HAZIR: KARGA-CESITLILIK-KABUL — kullanıcı "Beğendim"; Claudex pilotu
 TESLIM_HAZIR: MAHALLE-SESLERI — kusursuz inişte ıslık/alkış, kıl payında "ıııh", büyük zıplamada "hööyt", düşüşte panjur, karga kalkışında gaklama; kodla sentez + yerel Chatterbox; plan/kayıt ai_review_evidence/MAHALLE-SES-2026-11-23/; telefonda kullanıcı dinleyecek.
 TESLIM_HAZIR: MAHALLE-SESLERI-KAPALI — kullanıcı sesleri reddetti ve takılma hissetti; sesler ve oynatıcıları kapatıldı; Claudex pilotu kesin sonuç ai_review_evidence/REPO-VIDEO-2026-11-23/CLAUDEX-DENEME.md.
 TESLIM_HAZIR: AMCA-BEDEN-DILI — inişten sonra silkele (kusursuz), denge (kıl payı), oh be (3+ kule) pozları; kıyafet açıkken çıkmaz; plan/kayıt ai_review_evidence/AMCA-BEDEN-2026-11-23/; oh be ve kıyafet durumu simülatörde doğrulanamadı, telefon videosu bekleniyor.
+
+TESLIM_HAZIR: KARGA-DONGU-2026-11-23 — kargalarda periyotsuz bekleme (yem/bakış), kaçış zinciri kırıldı, amca tepki pozuna yerleşme; ai_review_evidence/KARGA-DONGU-2026-11-23/RAPOR.md; telefonda kullanıcı videosu bekleniyor.
