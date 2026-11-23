@@ -2040,3 +2040,5 @@ TESLIM_HAZIR: AMCA-BEDEN-DILI — inişten sonra silkele (kusursuz), denge (kıl
 TESLIM_HAZIR: KARGA-DONGU-2026-11-23 — kargalarda periyotsuz bekleme (yem/bakış), kaçış zinciri kırıldı, amca tepki pozuna yerleşme; ai_review_evidence/KARGA-DONGU-2026-11-23/RAPOR.md; telefonda kullanıcı videosu bekleniyor.
 
 TESLIM_HAZIR: AMCA-DUSUS-2026-11-23 — düşüş kesinleşince iki karelik "eyvah" çırpınması; ai_review_evidence/AMCA-DUSUS-2026-11-23/RAPOR.md; telefonda kullanıcı videosu bekleniyor.
+
+TESLIM_HAZIR: VIDEO-2026-11-23e — oyun başında havada kalan osuruk dumanı giderildi (restart duman durumunu sıfırlıyor); ai_review_evidence/VIDEO-2026-11-23e/RAPOR.md.
