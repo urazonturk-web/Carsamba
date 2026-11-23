@@ -38,3 +38,15 @@ yarn-error.*
 *.tsbuildinfo
 
 app-example
+
+# Kanıt klasörlerinde ham kare/simülatör dizileri ve ses (büyük; rapor ve özet görseller commit edilir)
+ai_review_evidence/**/kare/
+ai_review_evidence/**/sim/
+ai_review_evidence/**/sim[0-9]*/
+ai_review_evidence/**/seq*/
+ai_review_evidence/**/*.wav
+# Üçüncü taraf (Instagram reel) içerik kareleri ve ses dökümü
+ai_review_evidence/REPO-VIDEO-2026-11-23/sh*.jpg
+ai_review_evidence/REPO-VIDEO-2026-11-23/ses.*
+ai_review_evidence/REPO-VIDEO-2026-11-23/brif-tam.md
+ai_review_evidence/VIDEO-2026-11-22/f16.png

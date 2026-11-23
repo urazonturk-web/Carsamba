@@ -18,7 +18,9 @@ export const SKULL_SCALE_MIN = 0.1; // etki oranı %10..%30 arası rastgele (bü
 export const SKULL_SCALE_MAX = 0.3;
 export const SKULL_JUMPS_MIN = 3; // etki 3..8 iniş arası rastgele
 export const SKULL_JUMPS_MAX = 8;
-export const SKULL_MIN_ID = 16; // ilk duraktan (15) sonra
+// 2026-11-22 kullanıcı: "12. kuleden sonra değil random olsun; bir kurukafanın süresi bitmeden diğeri çıkmasın"
+// -> 4. kuleden itibaren rastgele; etki sürerken yeni kurukafa gösterilmez (app/index.tsx, effectLeft kapısı).
+export const SKULL_MIN_ID = 4;
 export const SKULL_CHANCE = 0.2; // her boşlukta olasılık; ardışık engeli ile ~12-13 kulede bir
 export const SKULL_MIN_GAP = 4; // kullanıcı: "peş peşe de çıkmasın" -> iki kurukafa arası en az 4 kule
 export const SKULL_LIFT_MIN = 180; // doğal yay tepesinin üstünde rastgele yükseklik: alçak = kolay,

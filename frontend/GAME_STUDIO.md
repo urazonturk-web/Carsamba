@@ -1993,3 +1993,43 @@ TESLIM_HAZIR: YAGMUR-KIYAFET-DUZELTME — telefona kuruldu; kullanıcının tele
 Kullanıcı: "Dikeye kilitle". iPad yalnız dikey + tam ekran (app.json ios.requireFullScreen ve infoPlist; ios/frontend/Info.plist). iPad mini simülatöründe döndürerek doğrulandı. Telefon davranışı değişmez.
 
 TESLIM_HAZIR: IPAD-DIKEY-KILIT — app.json + Info.plist; iPad simülatöründe doğrulandı, commit bekleniyor.
+
+## AMCA-SESI-LAKAP + OZEL-GUN-ORNEK (2026-11-20)
+Kullanıcı: "Evet, 1 ve 2den başla, görselleri de iste". Hanım arıyor bildirimi, iç ses balonu, lakap damgası (src/game/amcaSesi.ts, app/index.tsx, src/game/ShareCard.tsx); telefona "HANIM + IC SES + LAKAP" kuruldu. Kıvılcım 4 örnek görsel (yılbaşı/cadı şapkası, halı silkeleyen teyze, uyuyan kedi): ai_review_evidence/OZEL-GUN-2026-11-20/. Metinler TASLAK.
+
+TESLIM_HAZIR: AMCA-SESI-LAKAP — ai_review_evidence/OZEL-GUN-2026-11-20/RAPOR.md; kullanıcının metinleri telefonda onayı ve 4 örnek görselin kabulü bekleniyor.
+
+## OZEL-GUN + MAHALLE (2026-11-20)
+Kullanıcı: "Kabul, devam et". Özel gün takvimi + yılbaşı/cadı şapkası, kulelerde teyze ve kedi (iniş tepkileri, kedi defteri sayacı); telefona "OZEL GUN + TEYZE + KEDI". Kıvılcım tur 2: 8 görsel geldi, kabul bekliyor. Kural eklendi: Arapça/dinî ünlem yok.
+
+TESLIM_HAZIR: OZEL-GUN-MAHALLE — ai_review_evidence/OZEL-GUN-2026-11-20/RAPOR.md; kullanıcının telefonda görmesi ve tur 2 görsellerinin kabulü bekleniyor.
+
+TESLIM_HAZIR: OZEL-GUN-TUR2 — 8 görsel bağlandı (başlıklar, komşu amca/çocuk, gerinen/gri kedi, kedi defteri); telefona "OZEL GUN v2 + KOMSULAR + KEDILER"; kullanıcının telefonda görmesi bekleniyor.
+
+TESLIM_HAZIR: VIDEO-2026-11-20 — ai_review_evidence/VIDEO-2026-11-20/RAPOR.md; Hanım/balon/kedi düzeltmeleri telefona kuruldu, kullanıcının denemesi bekleniyor.
+
+## DIYALOG-v2 (2026-11-20)
+Kullanıcı: "diyaloglar güzel olmamış… diğer editörlere de videoyu göstererek değerlendirmelerini iste". Codex + Claude editörü videoyu ve diyalogları değerlendirdi; yeni set (iç ses, Hanım, teyze/komşu amca/çocuk, kedi, özel günler, lakap) koda yazıldı; balon kenar kırpması ve öğretici yazı (ilk 3 koşu) düzeltildi. Rapor: ai_review_evidence/VIDEO-2026-11-20/DIYALOG-v2.md.
+
+TESLIM_HAZIR: DIYALOG-v2 — ai_review_evidence/VIDEO-2026-11-20/DIYALOG-v2.md; telefona "DIYALOG v2" kuruldu, kullanıcının metinleri telefonda görmesi bekleniyor.
+
+TESLIM_HAZIR: YARATICI-SES-2026-11-21 — ai_review_evidence/YARATICI-SES-2026-11-21/RAPOR.md; kullanıcının hangi fikirle başlanacağı ve balon/komşuların kapatılması kararı bekleniyor.
+
+TESLIM_HAZIR: ORAN-2026-11-21 — ai_review_evidence/ORAN-2026-11-21/RAPOR.md; kullanıcının cumba planına ve 3 görsellik Kıvılcım isteğine onayı bekleniyor.
+
+TESLIM_HAZIR: CUMBA-TEYZE — ai_review_evidence/ORAN-2026-11-21/cumba/ (3 görsel + oran karşılaştırması); kullanıcının kabulü ve ölçek seçimi (1,0 / 1,4) bekleniyor.
+
+TESLIM_HAZIR: CUMBA-TEYZE-BAGLANDI — telefona "CUMBALI TEYZE (YAZISIZ)"; yazılı diyaloglar kapalı; kullanıcının telefonda görmesi bekleniyor.
+
+TESLIM_HAZIR: TEYZE-KEDI-SABIT-BOY — ai_review_evidence/VIDEO-2026-11-21/RAPOR.md; telefona kuruldu, kullanıcının denemesi bekleniyor.
+TESLIM_HAZIR: SIRALAMA-KILIT-DUZELTME — Sıralama (Game Center) açılınca oyun sonu kartının kitlenmesi: iOS 26 için GKAccessPoint; rapor ai_review_evidence/VIDEO-2026-11-21b/RAPOR.md; telefonda Sıralama → Bir daha denemesi kullanıcıda.
+TESLIM_HAZIR: KEDI-CUMBA + PENCERE-x1.4 — kedi cumbanın pervazında, cephe pencereleri 1,4 kat; rapor ai_review_evidence/VIDEO-2026-11-22/RAPOR.md; kullanıcı telefonda görsel kabul verecek.
+TESLIM_HAZIR: KEDI-PERVAZ + KARGA-GORSEL — kedi gövdesi cumba pervazına oturtuldu (ai_review_evidence/VIDEO-2026-11-22b/kedi-pervaz-onizleme.jpg); Kıvılcım 4 karga pozu teslim etti (ai_review_evidence/KARGA-2026-11-22/), kullanıcı kabulü bekleniyor, oyuna bağlanmadı.
+TESLIM_HAZIR: KARGALAR — korkuluk/ip/pervazda kargalar, amca inince havalanır; rapor ai_review_evidence/KARGA-2026-11-22/RAPOR.md; telefonda havalanma ve performans videosu kullanıcıda.
+TESLIM_HAZIR: KARGA-ERKEN + KURUKAFA-RASTGELE — kargalar 1. kuleden, kurukafa 4. kuleden rastgele ve etki sürerken yenisi yok; rapor ai_review_evidence/KARGA-2026-11-22/RAPOR.md; telefonda video kullanıcıda.
+TESLIM_HAZIR: KARGA-UST-KAT — kargalar yalnız üst katlarda (KARGA_MAX_Y 450); rapor ai_review_evidence/KARGA-2026-11-22/RAPOR.md; havalanma için telefonda video kullanıcıda.
+TESLIM_HAZIR: KARGA-KONUP-KALKMA — kargalar tünekte kalıcı, amca yakına inince havalanıp başka kuleye konuyor, uzaktakiler amcaya dönük; rapor ai_review_evidence/KARGA-2026-11-22/RAPOR.md; telefonda video kullanıcıda.
+TESLIM_HAZIR: REPO-VIDEO-RAPOR + CLAUDEX-KURULUM — dürüst repo raporu ai_review_evidence/REPO-VIDEO-2026-11-23/RAPOR.md; Claudex Loop projeye kuruldu, ölçüm planı CLAUDEX-DENEME.md; ilk deneme özelliği kullanıcıdan bekleniyor.
+TESLIM_HAZIR: OYUN-SONU-KUCUK-KART — Claudex Loop pilotu 1. özellik: kart %52,6→%38,4, toast çakışmaları giderildi; plan/kayıt ai_review_evidence/OYUN-SONU-2026-11-23/ (PLAN.md, PLAN-REVIEW-LOG.md, delta.patch); telefonda kullanıcı videosu bekleniyor.
+TESLIM_HAZIR: KARGA-CESITLILIK — kargalarda kişilik (hemen/geç/cesur), değişken uçuş (süre, yay, dalgalanma, kanat çırpma, konuş sıçraması), ileri/geri/gider hedefleri, yeni gelenler, zamanlaması farklı baş dönüşleri; plan/kayıt ai_review_evidence/KARGA-VARYASYON-2026-11-23/; telefonda kullanıcı videosu bekleniyor.
+TESLIM_HAZIR: KARGA-CESITLILIK-KABUL — kullanıcı "Beğendim"; Claudex pilotu ara sonucu 2/3 özellik 0 düzeltme turu (ai_review_evidence/REPO-VIDEO-2026-11-23/CLAUDEX-DENEME.md).

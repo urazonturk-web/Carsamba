@@ -22,15 +22,17 @@ export type ShareCardProps = {
   sticker: any; // amcanın ifadeli pozu
   stamp: string; // "18 Kasım, Yağmurlu, 12°"
   time: string; // "21:40"
+  lakap?: string | null; // "Üsküdar'da aceleci" (amcaSesi.ts lakap) — damga olarak fotoğrafın köşesinde
   onClose: () => void;
 };
 
-export function shareMessage(score: number, place: string | null) {
+export function shareMessage(score: number, place: string | null, lakap?: string | null) {
   const where = place ? `, ${place}` : "";
-  return `Byzantion'da amcayla İstanbul çatılarında ${score} puan yaptım${where}! Sen de dene: ${SHARE_LINK}`;
+  const nick = lakap ? ` Lakabım: ${lakap}.` : "";
+  return `Byzantion'da amcayla İstanbul çatılarında ${score} puan yaptım${where}!${nick} Sen de dene: ${SHARE_LINK}`;
 }
 
-export function ShareSheet({ score, newRecord, place, photo, sticker, stamp, time, onClose }: ShareCardProps) {
+export function ShareSheet({ score, newRecord, place, photo, sticker, stamp, time, lakap, onClose }: ShareCardProps) {
   const cardRef = useRef<any>(null);
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<string | null>(null);
@@ -40,7 +42,7 @@ export function ShareSheet({ score, newRecord, place, photo, sticker, stamp, tim
     setBusy(true);
     setNote(null);
     cardRef.current.measureInWindow(async (x: number, y: number, w: number, h: number) => {
-      const r = await GameCenter.shareSnapshot(x, y, w, h, shareMessage(score, place));
+      const r = await GameCenter.shareSnapshot(x, y, w, h, shareMessage(score, place, lakap));
       setBusy(false);
       if (r === "shared") onClose();
       else if (r === "error" || r === "unavailable") setNote("Paylaşım açılamadı, tekrar dene.");
@@ -59,6 +61,12 @@ export function ShareSheet({ score, newRecord, place, photo, sticker, stamp, tim
             <CachedImage source={sticker} contentFit="fill" style={{ position: "absolute", width: 92, height: (92 * 1103) / 516, left: -8, top: -6 }} transition={0} />
           </View>
           {newRecord && <View style={s.recBadge}><Text style={s.recText}>YENİ REKOR</Text></View>}
+          {lakap ? (
+            <View style={s.lakapStamp} testID="share-lakap">
+              <Text style={s.lakapSmall}>LAKAP</Text>
+              <Text style={s.lakapText} numberOfLines={1} adjustsFontSizeToFit>{lakap}</Text>
+            </View>
+          ) : null}
         </View>
         <Text style={s.greeting} numberOfLines={1} adjustsFontSizeToFit>İstanbul'dan selamlar</Text>
         <View style={s.scoreRow}>
@@ -99,6 +107,9 @@ const s = StyleSheet.create({
   photo: { width: "100%", height: "100%" },
   sticker: { position: "absolute", left: -8, bottom: -22, width: 76, height: 76, borderRadius: 38, overflow: "hidden", borderWidth: 3, borderColor: "#fff", backgroundColor: "#f3d9b0", transform: [{ rotate: "-8deg" }] },
   recBadge: { position: "absolute", right: 8, top: 8, backgroundColor: "#c0472b", paddingHorizontal: 8, paddingVertical: 3, borderRadius: 4, transform: [{ rotate: "4deg" }] },
+  lakapStamp: { position: "absolute", right: 6, bottom: 8, maxWidth: 190, paddingHorizontal: 9, paddingVertical: 3, borderWidth: 2.5, borderColor: "rgba(168,40,30,0.88)", borderRadius: 6, backgroundColor: "rgba(255,248,236,0.82)", alignItems: "center", transform: [{ rotate: "-7deg" }] },
+  lakapSmall: { color: "rgba(168,40,30,0.88)", fontWeight: "900", fontSize: 9, letterSpacing: 2 },
+  lakapText: { fontFamily: HAND, color: "rgba(150,32,24,0.95)", fontSize: 18 },
   recText: { color: "#fff", fontWeight: "900", fontSize: 12, letterSpacing: 1 },
   greeting: { fontFamily: SCRIPT, fontSize: 24, color: "#1f4e79", marginTop: 22, marginLeft: 80, marginRight: 16 },
   scoreRow: { flexDirection: "row", alignItems: "baseline", justifyContent: "center", marginTop: 2 },

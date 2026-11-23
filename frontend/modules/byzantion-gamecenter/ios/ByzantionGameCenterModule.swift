@@ -427,6 +427,15 @@ public class ByzantionGameCenterModule: Module {
     }.runOnQueue(.main)
 
     AsyncFunction("showLeaderboard") { (leaderboardId: String, promise: Promise) in
+      // KİTLENME DÜZELTMESİ (2026-11-21): iOS 26'da GKGameCenterViewController kaldırıldı; sunulunca
+      // Apple'ın yeni katmanı açılıyor, boş sunulan pencere ekranda kalıp tüm dokunuşları yutuyordu
+      // (video: "Liderlik Tabloları" bildirimi + oyun sonu kartı tepkisiz). iOS 18+ Apple'ın önerdiği
+      // GKAccessPoint ile açılır; hiçbir pencere sunulmaz, oyun kendi ekranında kalır.
+      if #available(iOS 18.0, *) {
+        GKAccessPoint.shared.trigger(leaderboardID: leaderboardId, playerScope: .friendsOnly, timeScope: .allTime) {}
+        promise.resolve(true)
+        return
+      }
       guard let presenter = self.appContext?.utilities?.currentViewController() else {
         promise.resolve(false)
         return

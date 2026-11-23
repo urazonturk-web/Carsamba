@@ -54,6 +54,10 @@ import { DURAK_SEFER, nextStopLine, reachedLine, stopName, stopTowerId, stopsPas
 const START_SKY = DURAK_SEFER ? skyStepForStops(stopsPassed(TEST_START_TOWER)) : 0;
 import { SFX_ON, initSfx, playFart, playSfx, setSfxMuted, stopFart, stopSfx } from "../src/game/sfx";
 import { GAME_OVER_LINE, QUIP_ON, multiJumpShout, pickQuip, quipContext } from "../src/game/copy";
+import { KARGA_ON, KARGA_TUNEMIS, KARGA_BAKIS, KARGA_YEM, KARGA_HAVALANMA, KARGA_FOOT_Y, KARGA_BOX_K, KARGA_MAX_Y, kargaSayisi, kargaTunek, kargaTunekAny, kargaDurus, kargaRngYap, kargaUcus, KARGA_TEST, KARGA_HAVUZ, KARGA_UCUS_MS } from "../src/game/karga";
+import { MAHALLE_ON, MAHALLE_SPEECH_ON, CUMBA_SOURCE, CUMBA_KEDI_SOURCE, CUMBA_ASPECT, CUMBA_TEYZE_SOURCE, CUMBA_TEYZE_BAKIS_SOURCE, CUMBA_TEYZE_ASPECT, cumbaBox, MAHALLE_BOX, TEYZE_ASPECT, KEDI_ASPECT, KEDI_UYUYAN_FOOT, KEDI_DIK_FOOT, AMCA_ASPECT, COCUK_ASPECT, KEDI_GERINEN_ASPECT, KEDI_GRI_ASPECT, TEYZE_SOURCE, KEDI_SOURCE, AMCA_SOURCE, COCUK_SOURCE, KEDI_GERINEN_SOURCE, KEDI_GRI_SOURCE, KEDI_ADLARI, sakin, teyzeBox, kediBox, kediAdi, kediGri, kediGriNo, pencereAspect, pencereLafi, kediLafi, KEDI_DEFTER_KEY } from "../src/game/mahalle";
+import { OZEL_GUN_ON, OZEL_GUN_TEST_TAP, OZEL_GUNLER, OZEL_GUN_TEST_ORDER, todaysEvent } from "../src/game/ozelGun";
+import { HANIM_ON, ICSES_ON, LAKAP_ON, newRunStats, noteLanding, icSesAfterLanding, icSesIdle, hanimMessage, lakap } from "../src/game/amcaSesi";
 import { jumpVelocity, advanceFlight } from "../src/game/jump";
 import { findFootLanding } from "../src/game/landing";
 import { MEYDAN_ON, makeCode, parseCode, shareText, type Challenge } from "../src/game/meydan";
@@ -232,7 +236,10 @@ const HOUSE_CLIP_S = 1200; // clip box side (covers any roof face)
 const HOUSE_GUTTER_W = 584 * HOUSE_K;
 const HOUSE_GUTTER_H = 16 * HOUSE_K;
 const HOUSE_GUTTER_OVERLAP = 6;
-const HOUSE_COL_W = 140 * HOUSE_K;
+// PENCERE BOYU (2026-11-22, kullanıcı: "diğer pencereler teyzenin cumbasıyla aynı ya da biraz küçük olsun"):
+// yalnız görsel; cephe atlası bu katsayıyla büyütülür (kule, çatı, iniş çizgisi değişmez).
+const PENCERE_BUYUK = 1.4 as number;
+const HOUSE_COL_W = 140 * HOUSE_K * PENCERE_BUYUK;
 const HOUSE_PERIOD = GORSEL018_TRIAL ? (HOUSE_COL_W * 1340) / 350 : 560 * HOUSE_K;
 // Facade phase always starts at a floor boundary of the column asset.
 const FACADE_PERIODS = FACADE_PERIOD_PX.map((v) => (v * HOUSE_COL_W) / 350);
@@ -360,7 +367,7 @@ const AnimatedImage = Animated.createAnimatedComponent(Image);
 const BG_SCROLL_TEST = true as boolean;
 const BG_SCROLL_RATIO = 0.45;
 const BG_SCROLL_TILES = 4;
-const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "IPAD DIKEY KILIT") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
+const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "KARGA CESITLILIK") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
 const DIAG_MAX_EXAMPLES = 6;
 const HOUSE_AB_FROZEN = false as boolean;
 // REVIZYON-066 experiment (one variable): expo-linear-gradient's iOS layer
@@ -600,6 +607,65 @@ const SHED_FLAKES = Array.from({ length: 8 }, (_, i) => {
   const H = CHARGE_POSES[0].h * SPRITE_SCALE * GLOBAL_VISUAL_SCALE * CHAR_SIZE_TRIAL;
   return { ox: (h(1) - 0.5) * H * 0.3, vx: (h(2) - 0.65) * H * 0.9, vy: -(0.15 + h(3) * 0.45) * H, d: H * (0.022 + h(4) * 0.02) };
 });
+// İÇ SES (2026-11-20): amcanın başının üstünde düşünce balonu; ekran uzayında (yazı kamera yakınlaştırmasıyla küçülmesin).
+const THINK_HEAD_H = CHARGE_POSES[0].h * SPRITE_SCALE * GLOBAL_VISUAL_SCALE * CHAR_SIZE_TRIAL;
+function ThoughtBubble({ text, px, py, camX, camY }: { text: string; px: SharedValue<number>; py: SharedValue<number>; camX: SharedValue<number>; camY: SharedValue<number> }) {
+  const st = useAnimatedStyle(() => {
+    const s = CONFIG.cameraZoom;
+    const x = (px.value + SOLE_CENTER_OFFSET - camX.value) * s;
+    const y = (py.value + PH / 2 - THINK_HEAD_H * 0.98 - camY.value) * s;
+    return { transform: [{ translateX: x - 24 }, { translateY: y - 70 }] };
+  });
+  return (
+    <Animated.View pointerEvents="none" entering={FadeIn.duration(180)} exiting={FadeOut.duration(250)} style={[{ position: "absolute", left: 0, top: 0, zIndex: 30 }, st]}>
+      <View style={{ maxWidth: 210, backgroundColor: "rgba(255,252,244,0.97)", borderRadius: 18, borderWidth: 2, borderColor: "#5b3a24", paddingHorizontal: 12, paddingVertical: 7 }}>
+        <Text style={{ color: "#3b2516", fontSize: 15, fontWeight: "700", fontStyle: "italic" }}>{text}</Text>
+      </View>
+      <View style={{ position: "absolute", left: 18, bottom: -12, width: 10, height: 10, borderRadius: 5, backgroundColor: "rgba(255,252,244,0.97)", borderWidth: 2, borderColor: "#5b3a24" }} />
+      <View style={{ position: "absolute", left: 10, bottom: -22, width: 6, height: 6, borderRadius: 3, backgroundColor: "rgba(255,252,244,0.97)", borderWidth: 1.5, borderColor: "#5b3a24" }} />
+    </Animated.View>
+  );
+}
+
+// MAHALLE (2026-11-20): teyzenin/kedinin konuşma balonu; dünya noktası (wx, wy) ekrana çevrilir.
+function SpeechBubble({ text, wx, wy, camX, camY, screenW }: { text: string; wx: number; wy: number; camX: SharedValue<number>; camY: SharedValue<number>; screenW: number }) {
+  // Balon ekranın içinde kalır (video: kamera kayınca "…a geldi!" gibi yarım görünüyordu).
+  const maxX = Math.max(8, screenW - 8 - Math.min(200, 24 + text.length * 8.6));
+  const st = useAnimatedStyle(() => {
+    const s = CONFIG.cameraZoom;
+    const x = Math.min(maxX, Math.max(8, (wx - camX.value) * s - 20));
+    return { transform: [{ translateX: x }, { translateY: (wy - camY.value) * s - 50 }] };
+  });
+  return (
+    <Animated.View pointerEvents="none" entering={FadeIn.duration(160)} exiting={FadeOut.duration(250)} style={[{ position: "absolute", left: 0, top: 0, zIndex: 31 }, st]}>
+      <View style={{ maxWidth: 200, backgroundColor: "#fffdf6", borderRadius: 14, borderWidth: 2, borderColor: "#7a3b1f", paddingHorizontal: 10, paddingVertical: 5 }}>
+        <Text style={{ color: "#5a2a14", fontSize: 15, fontWeight: "900" }}>{text}</Text>
+      </View>
+      <View style={{ position: "absolute", left: 14, bottom: -7, width: 0, height: 0, borderLeftWidth: 7, borderRightWidth: 7, borderTopWidth: 9, borderLeftColor: "transparent", borderRightColor: "transparent", borderTopColor: "#7a3b1f" }} />
+    </Animated.View>
+  );
+}
+
+// HANIM ARIYOR (2026-11-20): oyun sonunda üstten kayan telefon bildirimi.
+function HanimBanner({ text, top, onClose }: { text: string; top: number; onClose: () => void }) {
+  return (
+    <Animated.View entering={FadeInDown.duration(380)} exiting={FadeOut.duration(260)} style={{ position: "absolute", left: 10, right: 10, top, zIndex: 120, alignItems: "center" }}>
+      <Pressable onPress={onClose} testID="hanim-banner" style={{ width: "100%", maxWidth: 420, backgroundColor: "rgba(246,244,240,0.97)", borderRadius: 22, paddingHorizontal: 14, paddingVertical: 11, flexDirection: "row", alignItems: "center", shadowColor: "#000", shadowOpacity: 0.22, shadowRadius: 10, shadowOffset: { width: 0, height: 4 } }}>
+        <View style={{ width: 40, height: 40, borderRadius: 10, backgroundColor: "#34c759", alignItems: "center", justifyContent: "center", marginRight: 11 }}>
+          <Text style={{ fontSize: 22 }}>📞</Text>
+        </View>
+        <View style={{ flex: 1 }}>
+          <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+            <Text style={{ fontSize: 15, fontWeight: "700", color: "#111" }}>Hanım ❤️</Text>
+            <Text style={{ fontSize: 13, color: "#8a8a8e" }}>şimdi</Text>
+          </View>
+          <Text style={{ fontSize: 15, color: "#1c1c1e", marginTop: 1 }}>{text}</Text>
+        </View>
+      </Pressable>
+    </Animated.View>
+  );
+}
+
 function ShedFlake({ f, shed, shedX, shedY, shedAmt }: { f: (typeof SHED_FLAKES)[number]; shed: SharedValue<number>; shedX: SharedValue<number>; shedY: SharedValue<number>; shedAmt: SharedValue<number> }) {
   const H = CHARGE_POSES[0].h * SPRITE_SCALE * GLOBAL_VISUAL_SCALE * CHAR_SIZE_TRIAL;
   const st = useAnimatedStyle(() => {
@@ -793,6 +859,36 @@ function absoluteFill() {
   return { position: "absolute" as const, top: 0, left: 0, right: 0, bottom: 0 };
 }
 
+// KARGA (2026-11-23): kulenin kendi koordinatında tünek; house view ile aynı hesap. slot>=0 kulenin kendi
+// kargası, slot<0 herhangi bir tünek (tuz = -slot; uçup gelen karga için). wx/wy dünya koordinatı.
+function kargaYer(g: any, slot: number) {
+  "worklet";
+  if (!KARGA_ON || !g || (MAHALLE_ON && sakin(g.p.id) !== 0)) return null;
+  const id = g.p.id;
+  const q = Math.floor(houseHash(id, 1) * 4) % 4;
+  let v = Math.floor(houseHash(id, 4) * FACADE_CELLS) % FACADE_CELLS;
+  if (v === Math.floor(houseHash(id - 1, 4) * FACADE_CELLS) % FACADE_CELLS) v = (v + 1 + Math.floor(houseHash(id, 5) * (FACADE_CELLS - 1))) % FACADE_CELLS;
+  const d = slot >= 0
+    ? kargaTunek(id, slot, v, FACADE_PERIOD_PX[v], FACADE_STARTS_PX[v][q], 30, KARGA_MAX_Y)
+    : kargaTunekAny(id, -slot, v, FACADE_PERIOD_PX[v], FACADE_STARTS_PX[v][q], 30, KARGA_MAX_Y);
+  if (!d) return null;
+  const s = HOUSE_COL_W / 350;
+  const B = FART_CHAR_H * KARGA_BOX_K;
+  const x = (g.fw - HOUSE_COL_W) / 2 + d.x * s;
+  const y = g.rise + HOUSE_GUTTER_H - HOUSE_GUTTER_OVERLAP + d.y * s;
+  if (x - B * 0.27 < 0 || x + B * 0.27 > g.fw) return null; // dar kulede kenardan taşmasın
+  return { x, y, wx: g.p.x - g.r + x, wy: g.p.topY + y, flip: d.flip, seed: d.seed };
+}
+function kargaGeom(list: any[], id: number) {
+  const p = platformById(list, id);
+  if (!p) return null;
+  const r = houseRun(p, platformById(list, id - 1), platformById(list, id + 1));
+  return { p, r, rise: r * HOUSE_HIP_SLOPE, fw: p.width + 2 * r };
+}
+const OYUN_SONU_TEST = false as boolean; // GEÇİCİ: toast/çip konum denemesi (teslimde false)
+const KARGA_POOL_IDX = Array.from({ length: KARGA_HAVUZ }, (_, i) => i);
+const KARGA_POOL_SRC = [KARGA_TUNEMIS, KARGA_BAKIS, KARGA_HAVALANMA];
+
 export default function Game() {
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
@@ -919,6 +1015,205 @@ export default function Game() {
   const [landingSub, setLandingSub] = useState("");
   const [quip, setQuip] = useState(GAME_OVER_LINE);
   const [goInfo, setGoInfo] = useState({ prevBest: 0, newRecord: false });
+  // AMCANIN SESİ + LAKAP (2026-11-20)
+  const runStatsRef = useRef(newRunStats());
+  const [thought, setThought] = useState<{ k: number; text: string } | null>(null);
+  const thoughtTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const showThought = useCallback((text: string) => {
+    setThought({ k: Date.now(), text });
+    if (thoughtTimer.current) clearTimeout(thoughtTimer.current);
+    thoughtTimer.current = setTimeout(() => setThought(null), 2400);
+  }, []);
+  const [speech, setSpeech] = useState<{ k: number; text: string; wx: number; wy: number } | null>(null);
+  const speechTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const showSpeech = useCallback((text: string, wx: number, wy: number) => {
+    setSpeech({ k: Date.now(), text, wx, wy });
+    if (speechTimer.current) clearTimeout(speechTimer.current);
+    speechTimer.current = setTimeout(() => setSpeech(null), 2200);
+  }, []);
+  const catsRef = useRef<string[]>([]);
+  const catWoken = useSharedValue(-1); // amcanın indiği kedili kule: turuncu kedi gerinir
+  const neighborLook = useSharedValue(-1); // amcanın indiği cumbalı kule: teyze başını kaldırıp bakar
+  // KARGALAR: kaba saat (250 ms; her karede değil, 14 kule × 8 katman eşleyici her karede koşmasın),
+  // kaçan kuleler ve son kaçışın ilerlemesi.
+  const kTick = useSharedValue(0);
+  const kGone = useSharedValue<number[]>([]); // havalanmış kule kargaları: id*4+slot
+  const kAmcaX = useSharedValue(-1e9); // amcanın son indiği yer (kafa çevirme yönü)
+  const kPool = useSharedValue<any[]>([]); // uçan / yeni yerine konmuş kargalar (dünya koordinatı)
+  const kP0 = useSharedValue(1), kP1 = useSharedValue(1), kP2 = useSharedValue(1), kP3 = useSharedValue(1), kP4 = useSharedValue(1), kP5 = useSharedValue(1), kP6 = useSharedValue(1), kP7 = useSharedValue(1);
+  const kPs = [kP0, kP1, kP2, kP3, kP4, kP5, kP6, kP7];
+  const kRng = useRef(kargaRngYap(Date.now())); // karga çeşitliliği için ayrı üreteç
+  useEffect(() => {
+    if (!KARGA_ON) return;
+    const t0 = Date.now();
+    const h = setInterval(() => { kTick.value = Date.now() - t0; }, 250);
+    return () => clearInterval(h);
+  }, []);
+  // KARGALAR: amca landedId kulesine inince (ratio = kule içindeki yer) yakın kargalar havalanır.
+  const kargaKacirRef = useRef<(landedId: number, ratio: number) => void>(() => {});
+  kargaKacirRef.current = (landedId: number, ratio: number) => {
+      // KARGALAR (2026-11-23 çeşitlilik, Claudex planı KARGA-VARYASYON): amca bir kuleye inince o kulenin ve iki
+      // yanındaki kulelerin kargaları kişiliklerine göre tepki verir: çoğu hemen kalkar, bazıları önce bakıp geç kalkar,
+      // cesurlar (komşu kuledeyse) kalmaz-kalkmaz. Uçuş süresi/yay/dalgalanma/hedef (ileri, geri, gider) her seferinde farklı;
+      // arada ekran dışından yeni kargalar gelir. Rastgelelik yalnız kRng'den (oyunun paylaşılan akışına dokunmaz).
+      const R = kRng.current;
+      const now = Date.now(); // uçuş bitişleri JS saatinde tutulur (UI'deki animasyon değerini JS'ten okumaya güvenilmez)
+      const list = platforms.value;
+      const lpk = platformById(list, landedId);
+      if (lpk) kAmcaX.value = lpk.x + ratio * lpk.width;
+      const gone = kGone.value.slice();
+      const pool: any[] = KARGA_POOL_IDX.map((i) => kPool.value[i] ?? { on: 0, id: -999 });
+      const flights: any[] = [];
+      for (let id = landedId - 1; id <= landedId + 1; id++) {
+        const g = kargaGeom(list, id);
+        if (!g) continue;
+        for (let slot = 0; slot < 2; slot++) {
+          const key = id * 4 + slot;
+          if (gone.includes(key)) continue;
+          const d = kargaYer(g, slot);
+          if (!d) continue;
+          const r = R();
+          if (id !== landedId && r < 0.15) continue; // cesur: komşu kuleye inişte yerinde kalır
+          flights.push({ x0: d.wx, y0: d.wy, seed: d.seed, slot: -1, late: r >= 0.15 && r < 0.4, key });
+        }
+      }
+      for (let i = 0; i < KARGA_HAVUZ; i++) {
+        const e = pool[i];
+        if (!e.on || e.id === -999 || now < (e.until ?? 0) || Math.abs(e.id - landedId) > 1) continue;
+        const r = R();
+        if (e.id !== landedId && r < 0.15) continue;
+        flights.push({ x0: e.x1, y0: e.y1, seed: e.seed, slot: i, late: r >= 0.15 && r < 0.4 });
+      }
+      // Yeni gelen: havuzda boş yer varsa ekran dışından bir karga.
+      if (lpk && R() < 0.15 && pool.some((e) => !e.on)) {
+        flights.push({ arrive: 1, x0: kAmcaX.value + 900 + R() * 400, y0: lpk.topY - 700 - R() * 300, seed: R(), slot: -1, late: false });
+      }
+      // Dolu tünekler: havuzda konmuş/konmakta olanlar (yeniden uçacaklar hariç).
+      const reflying = flights.filter((f) => f.slot >= 0).map((f) => f.slot);
+      const occupied: number[][] = [];
+      pool.forEach((e, i) => { if (e.on && e.id !== -999 && !reflying.includes(i)) occupied.push([e.x1, e.y1]); });
+      const isFree = (x: number, y: number) => occupied.every((o) => Math.abs(o[0] - x) >= 12 || Math.abs(o[1] - y) >= 12);
+      const tryTower = (id: number) => {
+        const g = kargaGeom(list, id);
+        if (!g) return null;
+        for (let slot = 0; slot < 2; slot++) { // hedef kulenin yerinde duran kendi kargaları
+          const d0 = kargaYer(g, slot);
+          if (d0 && !gone.includes(id * 4 + slot)) occupied.push([d0.wx, d0.wy]);
+        }
+        for (let salt = 1; salt <= 8; salt++) {
+          const d = kargaYer(g, -salt);
+          if (d && isFree(d.wx, d.wy)) return d;
+        }
+        return null;
+      };
+      const pickRange = (lo: number, hi: number) => {
+        const ids = list.map((q: any) => q.id).filter((id: number) => id - landedId >= lo && id - landedId <= hi);
+        for (let k = ids.length - 1; k > 0; k--) { const m = Math.floor(R() * (k + 1)); const t = ids[k]; ids[k] = ids[m]; ids[m] = t; }
+        for (const id of ids) { const d = tryTower(id); if (d) return { d, T: id }; }
+        return null;
+      };
+      const starts: { s: number; delay: number; dur: number; ease: number }[] = [];
+      flights.forEach((f) => {
+        // Slot: önce boş, sonra işi bitmiş (gitmiş) ya da en geride konmuş olan; UÇMAKTA olan slot asla kullanılmaz.
+        // Slot yoksa karga yerinde kalır (kule kargası kGone'a eklenmez → kaybolmaz).
+        let s = f.slot;
+        if (s < 0) {
+          const freeOf = (i: number) => !starts.some((q) => q.s === i) && !reflying.includes(i);
+          s = pool.findIndex((e, i) => !e.on && freeOf(i));
+          if (s < 0) s = pool.findIndex((e, i) => e.on && e.id === -999 && now >= (e.until ?? 0) && freeOf(i));
+          if (s < 0) {
+            let best = -1;
+            for (let i = 0; i < KARGA_HAVUZ; i++) if (freeOf(i) && pool[i].on && now >= (pool[i].until ?? 0) && (best < 0 || pool[i].id < pool[best].id)) best = i;
+            s = best;
+          }
+        }
+        if (s < 0) return;
+        // Hedef: %70 ileri (2–5), %20 geri (2–4), %10 gider. Seçilen aralıkta yer yoksa sırayla öbür yön ve daha
+        // uzak kuleler denenir; "gider"e yalnız %10'luk seçimle ya da listede hiç boş tünek kalmadıysa düşülür.
+        let pick: any = null;
+        let leave = false;
+        if (f.arrive) pick = pickRange(3, 6) ?? pickRange(2, 8);
+        else {
+          const rr = R();
+          if (rr < 0.7) pick = pickRange(2, 5) ?? pickRange(-4, -2) ?? pickRange(6, 8) ?? pickRange(-7, -5);
+          else if (rr < 0.9) pick = pickRange(-4, -2) ?? pickRange(2, 5) ?? pickRange(-7, -5) ?? pickRange(6, 8);
+          else leave = true;
+        }
+        if (f.arrive && !pick) return;
+        let dest: any, T: number;
+        if (pick && !leave) { dest = pick.d; T = pick.T; occupied.push([dest.wx, dest.wy]); }
+        else { dest = { wx: f.x0 + (R() < 0.5 ? -1 : 1) * (1200 + R() * 400), wy: f.y0 - 900 - R() * 300, seed: f.seed }; T = -999; } // gider
+        if (f.key !== undefined) gone.push(f.key);
+        const dur = 1100 + R() * 900;
+        pool[s] = { on: 1, id: T, x0: f.x0, y0: f.y0, x1: dest.wx, y1: dest.wy, seed: dest.seed ?? f.seed,
+          arc: 0.6 + R() * 1.8, wob: R() * 0.25, wobN: 1 + Math.floor(R() * 2), dur, wait: f.late ? 1 : 0 };
+        const delay = f.late ? 300 + R() * 500 : R() * 200;
+        pool[s].until = now + delay + dur + 50; // bu ana kadar slot "uçuşta" sayılır, yeniden kullanılmaz
+        starts.push({ s, delay, dur, ease: R() < 0.5 ? 0 : 1 });
+      });
+      kGone.value = gone.slice(-60);
+      kPool.value = pool;
+      starts.forEach(({ s, delay, dur, ease }) => {
+        kPs[s].value = 0;
+        kPs[s].value = withDelay(delay, withTiming(1, { duration: dur, easing: ease ? Easing.out(Easing.cubic) : Easing.inOut(Easing.quad) }));
+      });
+  };
+  useEffect(() => {
+    if (!KARGA_ON || !KARGA_TEST) return;
+    // GEÇİCİ simülatör denemesi: 12 sn sonra her 3 sn sırayla ilerleyen kuleye inilmiş gibi kargaları kaçırır.
+    let n = 1;
+    let h: any = null;
+    const t = setTimeout(() => { h = setInterval(() => { kargaKacirRef.current(n, 0.5); n++; }, 3000); }, 12000);
+    return () => { clearTimeout(t); if (h) clearInterval(h); };
+  }, []);
+  // Uçan / yeni yerine konmuş kargalar: poz 0 tünemiş, 1 bakış, 2 uçuş. Dünya koordinatında (kule kırpması yok).
+  const kargaPoolStyle = (i: number, pose: number) => {
+    const P = kPs[i];
+    return useAnimatedStyle(() => {
+      const pool = kPool.value;
+      const p = P.value;
+      const tick = kTick.value;
+      const ax = kAmcaX.value;
+      const e = pool[i];
+      const KOFF = { opacity: 0, transform: [{ translateX: -99999 }, { translateY: 0 }, { scaleX: 1 }, { scaleY: 1 }] };
+      if (!KARGA_ON || !e || !e.on || (e.id === -999 && p >= 1)) return KOFF;
+      const B = FART_CHAR_H * KARGA_BOX_K;
+      let x = e.x1, y = e.y1, face = 1, want = 2, sy = 1;
+      if (p <= 0) {
+        // Kalkış beklerken tünekte: geç kaçan bakış pozunda, gövde amcaya dönük (aynalanmaz).
+        x = e.x0; y = e.y0;
+        want = e.wait ? 1 : 0;
+        face = ax < -1e8 ? 1 : ax < x ? -1 : 1;
+      } else if (p < 1) {
+        const u = kargaUcus(e, p, B);
+        x = u.x; y = u.y; sy = u.sy;
+        face = e.x1 >= e.x0 ? 1 : -1;
+      } else {
+        want = kargaDurus(tick, e.seed);
+        face = ax < -1e8 ? 1 : ax < x ? -1 : 1; // bakışta da gövde aynı yönde (yalnız baş döner)
+      }
+      if (want !== pose) return KOFF;
+      return { opacity: 1, transform: [{ translateX: x - MAHALLE_BOX / 2 }, { translateY: y - B * KARGA_FOOT_Y + B / 2 - MAHALLE_BOX / 2 }, { scaleX: (face * B) / MAHALLE_BOX }, { scaleY: (sy * B) / MAHALLE_BOX }] };
+    });
+  };
+  const kargaPoolStyles = KARGA_POOL_IDX.flatMap((i) => [0, 1, 2].map((pose) => kargaPoolStyle(i, pose)));
+  const [cats, setCats] = useState<string[]>([]);
+  const [catBook, setCatBook] = useState(false);
+  useEffect(() => {
+    if (!MAHALLE_ON) return;
+    storage.getItem<string>(KEDI_DEFTER_KEY, "").then((raw) => { catsRef.current = raw ? raw.split(",").filter(Boolean) : []; setCats(catsRef.current); });
+  }, []);
+  const [hanim, setHanim] = useState<string | null>(null);
+  const hanimTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [lakapText, setLakapText] = useState<string | null>(null);
+  const [runsDone, setRunsDone] = useState(0); // öğretici yazı ilk 3 koşudan sonra gizlenir (editörler, video 2026-11-20)
+  // ÖZEL GÜN (2026-11-20): gerçek tarih ya da (test) menü başlığına dokunarak önizleme
+  const [eventTest, setEventTest] = useState(-1);
+  const [eventDay, setEventDay] = useState(() => todaysEvent());
+  const curEvent = !OZEL_GUN_ON ? null : eventTest >= 0 ? OZEL_GUNLER[OZEL_GUN_TEST_ORDER[eventTest]] : eventDay;
+  useEffect(() => { if (menuOpen) setEventDay(todaysEvent()); }, [menuOpen]);
+  const eventRef = useRef(curEvent);
+  eventRef.current = curEvent;
   const [shareOpen, setShareOpen] = useState(false); // PAYLAŞIM KARTPOSTALI (2026-11-18)
   const [debug, setDebug] = useState({
     charge: 0, vx: 0, vy: 0, dist: 0, width: 0, offset: 0, fps: 0, p50: 0, p95: 0, dropped: 0,
@@ -942,6 +1237,9 @@ export default function Game() {
   const [incoming, setIncoming] = useState<GameCenter.FriendChallenge[]>([]);
   const [friendResults, setFriendResults] = useState<GameCenter.FriendChallenge[]>([]);
   const [toast, setToast] = useState<string | null>(null);
+  // OYUN SONU (2026-11-23, Claudex planı): toast konumu için ölçülen HUD ve oyun sonu kartı alt kenarları.
+  const [hudBottom, setHudBottom] = useState<number | null>(null);
+  const [goCardBottom, setGoCardBottom] = useState<number | null>(null);
   const [friendSheet, setFriendSheet] = useState(false);
   const [friends, setFriends] = useState<GameCenter.GameCenterFriend[]>([]);
   const [friendsMsg, setFriendsMsg] = useState<string | null>(null);
@@ -960,6 +1258,11 @@ export default function Game() {
     if (toastTimer.current) clearTimeout(toastTimer.current);
     toastTimer.current = setTimeout(() => setToast(null), 2600);
   }, []);
+  useEffect(() => {
+    if (!OYUN_SONU_TEST) return;
+    if (gameOver) { const t = setTimeout(() => showToast("⚔️ Uzun deneme bildirimi: Arkadaşın Mehmet Ali Kadıköylüoğlu senin 48 puanını oynadı ve 52 yaptı, seni geçti! Bu metin bilerek çok uzun yazıldı; iki satırdan sonrası üç nokta ile kısalmalı ve kart ile çakışmamalı."), 900); return () => clearTimeout(t); }
+    if (!menuOpen) { const t = setTimeout(() => showToast("🐈 Tekir ile tanıştın! Kedi defteri: 3"), 700); return () => clearTimeout(t); }
+  }, [gameOver, menuOpen, showToast]);
   const copiedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [arrivalCard, setArrivalCard] = useState<number | null>(null); // varışta kayan küçük kart
   const arrivalTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -1170,6 +1473,8 @@ export default function Game() {
   const shownWeather: IstWeather | null = weatherTest >= 0
     ? { ...WEATHER_TEST_CYCLE[weatherTest], temp: istWeather?.temp ?? 14, at: Date.now(), test: true }
     : istWeather;
+  const weatherRef = useRef(shownWeather);
+  weatherRef.current = shownWeather;
   const moon = useMemo(() => {
     const m = moonInfo();
     return sceneTest === 1 ? { ...m, illum: 1, full: true, waxing: true, name: "Dolunay" } : m;
@@ -1242,6 +1547,16 @@ export default function Game() {
     if (scoreRef.current === 0) rainWear.value = rainingNow ? 1 : 0;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rainingNow]);
+  // İÇ SES: oyun başında 9 sn hiç zıplanmazsa amca söylenir (koşu başına bir kez).
+  useEffect(() => {
+    if (!ICSES_ON || menuOpen || gameOver || score !== 0 || raceOn) return;
+    const t = setTimeout(() => {
+      if (scoreRef.current !== 0) return;
+      const line = icSesIdle();
+      if (line) showThought(line);
+    }, 9000);
+    return () => clearTimeout(t);
+  }, [menuOpen, gameOver, score, raceOn, showThought]);
   const doorLock = useSharedValue(0); // 1 = kapı anı sürüyor, dokunma yok sayılır
   const doorOp = useSharedValue(0);
   const doorOpen = useSharedValue(0);
@@ -1437,6 +1752,7 @@ export default function Game() {
       landPulse.value = 0;
       if (SEMSIYE_ON) { cancelAnimation(umbOpen); cancelAnimation(umbFlip); umbOpen.value = 0; umbFlip.value = 0; umbArmed.value = 0; }
       baseY.value = first.topY;
+      kAmcaX.value = first.x + first.width * 0.55; // kargalar baştan amcaya dönük
       phase.value = PHASE.IDLE;
 
       if (USE_FIXED_PANEL_COURSE) {
@@ -1552,6 +1868,46 @@ export default function Game() {
       (perfect ? CONFIG.scorePerfectBonus : 0);
     scoreRef.current += gained;
     setScore(scoreRef.current);
+    if (ICSES_ON || LAKAP_ON) {
+      const rs = runStatsRef.current;
+      noteLanding(rs, ratio, towersCrossed, perfect > 0);
+      // Komşu ya da kedi konuşacaksa iç ses susar (video: iki balon üst üste biniyordu).
+      if (ICSES_ON && !raceRef.current && !(MAHALLE_ON && sakin(landedId) !== 0)) {
+        const line = icSesAfterLanding(rs, ratio, towersCrossed, scoreRef.current, bestRef.current);
+        if (line) setTimeout(() => showThought(line), 350);
+      }
+    }
+    if (KARGA_ON) kargaKacirRef.current(landedId, ratio);
+    if (MAHALLE_ON && !raceRef.current) {
+      const kind = sakin(landedId);
+      const list = platforms.value;
+      const lp = kind ? platformById(list, landedId) : null;
+      if (lp) {
+        const r = houseRun(lp, platformById(list, landedId - 1), platformById(list, landedId + 1));
+        const g = { p: lp, r, rise: r * HOUSE_HIP_SLOPE, fw: lp.width + 2 * r };
+        if (kind === 1) {
+          // CUMBA (2026-11-21): yazı yok; teyze başını kaldırıp amcaya bakar ("vay sen misin" pozu).
+          if (cumbaBox(g, HOUSE_GUTTER_H, FART_CHAR_H).w > 0) neighborLook.value = landedId;
+        } else if (kind !== 2) {
+          const b = teyzeBox(g, HOUSE_GUTTER_H, pencereAspect(kind));
+          if (MAHALLE_SPEECH_ON) setTimeout(() => showSpeech(pencereLafi(kind, ratio), lp.x - r + b.left + b.w * 0.62, lp.topY + b.top + b.h * 0.3), 250);
+        } else {
+          const b = kediBox(g, kediGri(landedId) ? KEDI_GRI_ASPECT : KEDI_ASPECT, FART_CHAR_H, HOUSE_GUTTER_H);
+          if (b.w > 0) {
+            if (!kediGri(landedId)) catWoken.value = landedId;
+            // Balon oluğun altında, cephenin üstünde: amcanın ayaklarını ve kediyi örtmesin (video 63. sn).
+            if (MAHALLE_SPEECH_ON) setTimeout(() => showSpeech(kediLafi(), lp.x - r + b.left + b.w * 0.2, lp.topY + g.rise + HOUSE_GUTTER_H + 150), 250);
+            const name = kediAdi(landedId);
+            if (!catsRef.current.includes(name)) {
+              catsRef.current = [...catsRef.current, name];
+              storage.setItem(KEDI_DEFTER_KEY, catsRef.current.join(","));
+              setCats(catsRef.current);
+              setTimeout(() => showToast(`🐈 ${name} ile tanıştın! Kedi defteri: ${catsRef.current.length}`), 900);
+            }
+          }
+        }
+      }
+    }
     if (SFX_ON && towersCrossed > 1) playSfx("multi");
     if (perfect && Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
@@ -1574,6 +1930,7 @@ export default function Game() {
       setLandingSub(`+${OVER_BONUS} 👌`);
       if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy).catch(() => {});
     } else {
+      runStatsRef.current.exploded = true;
       setLandingLabel(SPLAT_ON ? "PATLADI!" : "Dayanamadı!");
       setLandingSub(SPLAT_ON ? "💩" : "💨");
       if (Platform.OS !== "web") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => {});
@@ -1664,6 +2021,25 @@ export default function Game() {
       const sc = scoreRef.current;
       setGoInfo({ prevBest, newRecord: sc > prevBest && sc > 0 });
       setQuip((prev) => pickQuip(quipContext(sc, prevBest), prev));
+      const rec = sc > prevBest && sc > 0;
+      const stopsNow = DURAK_SEFER ? stopsPassed(lastTowerRef.current) : 0;
+      setLakapText(LAKAP_ON ? lakap(runStatsRef.current, sc, stopsNow, rec) : null);
+      setRunsDone((n) => n + 1);
+      setThought(null);
+      if (HANIM_ON && !raceRef.current && !challengeRef.current) {
+        const tr = new Date(Date.now() + 3 * 3600 * 1000);
+        const w = weatherRef.current;
+        const msg = hanimMessage({ score: sc, newRecord: rec, stops: stopsNow, hour: tr.getUTCHours(), minute: tr.getUTCMinutes(),
+          weather: w ? w.kind : null, wind: w ? w.wind : null, exploded: runStatsRef.current.exploded, eventLines: eventRef.current?.hanim });
+        if (hanimTimer.current) clearTimeout(hanimTimer.current);
+        if (msg) {
+          hanimTimer.current = setTimeout(() => {
+            setHanim(msg);
+            if (Platform.OS !== "web") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+            hanimTimer.current = setTimeout(() => setHanim(null), 4200);
+          }, 600);
+        }
+      }
     }
     setGameOver(true);
     // Free-mode runs only: the daily map is a different course every day.
@@ -1704,6 +2080,14 @@ export default function Game() {
       splat.value = 1;
     }
     lastTowerRef.current = TEST_START_TOWER;
+    runStatsRef.current = newRunStats();
+    setThought(null);
+    setSpeech(null);
+    catWoken.value = -1;
+    neighborLook.value = -1;
+    kGone.value = [];
+    kPool.value = [];
+    // Hanım bildirimi yeni koşuya geçerken de süresini doldurur (video: hızlı "Bir daha" onu hiç göstermiyordu).
     runNewCardsRef.current = [];
     setRunNewCards([]);
     setAlbumOpen(false);
@@ -2290,7 +2674,8 @@ export default function Game() {
     // KURUKAFA: ileride alınmamış ilk kurukafayı göster.
     if (KURUKAFA_ON) {
       let found = 0;
-      for (let i = 0; i < list.length; i++) {
+      // Kullanıcı 2026-11-22: bir kurukafanın etkisi bitmeden yenisi görünmesin (alınamaz da).
+      if (effectLeft.value <= 0) for (let i = 0; i < list.length; i++) {
         const q = list[i];
         if (q.skull && q.id > lastLandedId.value && q.id !== skullTaken.value) {
           skullX.value = q.skull.x;
@@ -3238,7 +3623,12 @@ export default function Game() {
         )}
         {!USE_FIXED_PANEL_COURSE && POOL_IDX.map((i) => (POPUP
           ? <PopupHouseView key={`pu-house-${i}`} index={i} platforms={platforms} styles={styles} />
-          : <PlatformHouseView key={`house-${i}`} index={i} platforms={HOUSE_AB_FROZEN ? housePlatformsFrozen : platforms} styles={styles} probe={houseProbe} roofWx={roofWx} />
+          : <PlatformHouseView key={`house-${i}`} index={i} platforms={HOUSE_AB_FROZEN ? housePlatformsFrozen : platforms} styles={styles} probe={houseProbe} roofWx={roofWx} woken={MAHALLE_ON ? catWoken : undefined} look={MAHALLE_ON ? neighborLook : undefined} kTick={kTick} kGone={kGone} kAmcaX={kAmcaX} />
+        ))}
+        {KARGA_ON && kargaPoolStyles.map((st, j) => (
+          <Animated.View key={`karga-ucan-${j}`} pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, width: MAHALLE_BOX, height: MAHALLE_BOX }, st]}>
+            <Image source={KARGA_POOL_SRC[j % 3]} style={{ width: "100%", height: "100%" }} resizeMode="stretch" fadeDuration={0} />
+          </Animated.View>
         ))}
 
         {/* Platforms (fixed pool, positioned by the worklet) */}
@@ -3356,6 +3746,7 @@ export default function Game() {
           winter={KIS_ON ? winterWear : undefined}
           rain={YAGMUR_ON ? rainWear : undefined}
           rainLayers={YAGMUR_ON && rainMounted}
+          eventHat={curEvent?.hat ?? null}
           umbrella={SEMSIYE_ON ? umbVis : undefined}
           umbOpen={SEMSIYE_ON ? umbOpen : undefined}
           umbFlip={SEMSIYE_ON ? umbFlip : undefined}
@@ -3384,6 +3775,13 @@ export default function Game() {
         </Animated.View>
 
       </Animated.View>
+
+      {ICSES_ON && thought && !gameOver && !menuOpen && (
+        <ThoughtBubble key={thought.k} text={thought.text} px={px} py={py} camX={camXR} camY={camYR} />
+      )}
+      {MAHALLE_ON && speech && !gameOver && !menuOpen && (
+        <SpeechBubble key={speech.k} text={speech.text} wx={speech.wx} wy={speech.wy} camX={camXR} camY={camYR} screenW={W} />
+      )}
 
       {/* REVIZYON-022: opaque asset-ready cover; blocks the first frame (and
           input, see charge-surface) until background/district/character loaded. */}
@@ -3440,14 +3838,16 @@ export default function Game() {
         </Pressable>
       )}
       {/* Score HUD */}
-      {!gameOver && assetsReady && !menuOpen && !raceResult && <View style={[styles.hud, { top: insets.top + 24 }]}>
+      {!gameOver && assetsReady && !menuOpen && !raceResult && <View style={[styles.hud, { top: insets.top + 24 }]} onLayout={(e) => { const l = e.nativeEvent.layout; setHudBottom(l.y + l.height); }}>
         <Text style={[styles.scoreText, (POPUP || nightHud) && styles.puScoreText]} testID="score-value">
           {score}
         </Text>
         <Text style={[styles.bestText, (POPUP || nightHud) && styles.puBestText]} testID="best-value">
           {FAZ1_UI ? (mode === "daily" ? "GÜNÜN REKORU" : "REKOR") : "BEST"} {best}
         </Text>
-        {MEYDAN_ON && challenge && <Text style={styles.challengeChip}>⚔️ Hedef {challenge.target}</Text>}
+        {MEYDAN_ON && (challenge || OYUN_SONU_TEST) && <Text style={styles.challengeChip}>⚔️ Hedef {challenge?.target ?? 99}</Text>}
+        {OYUN_SONU_TEST && <Text style={[styles.skullChip, styles.skullChipUp]}>💀 GENİŞ kuleler %20 · 5 zıplama</Text>}
+        {OYUN_SONU_TEST && <Text style={styles.dailyChip}>📅 Günün haritası · 23 Kasım</Text>}
         {KURUKAFA_ON && skullHud && (
           <Text style={[styles.skullChip, skullHud.k > 1 ? styles.skullChipUp : styles.skullChipDown]} testID="skull-hud">
             💀 {skullHud.k > 1 ? "GENİŞ kuleler" : "DAR kuleler"} %{Math.round(Math.abs(skullHud.k - 1) * 100)} · {skullHud.left} zıplama
@@ -3489,7 +3889,7 @@ export default function Game() {
         </View>
       )}
       {/* Hint (only before first jump) */}
-      {score === 0 && !gameOver && assetsReady && !raceOn && !menuOpen && !raceResult && (
+      {score === 0 && !gameOver && assetsReady && !raceOn && !menuOpen && !raceResult && runsDone < 3 && (
         <View style={styles.hint}>
           {FAZ1_UI ? (
             <View style={styles.hintPill}>
@@ -3511,8 +3911,12 @@ export default function Game() {
         </Animated.View>
       )}
       {toast && (
-        <Animated.View entering={FadeIn.duration(200)} exiting={FadeOut.duration(300)} pointerEvents="none" style={[styles.toastWrap, { top: insets.top + 64 }]}>
-          <Text style={styles.toastText}>{toast}</Text>
+        <Animated.View entering={FadeIn.duration(200)} exiting={FadeOut.duration(300)} pointerEvents="none"
+          style={[styles.toastWrap,
+            gameOver ? (goCardBottom != null ? { top: goCardBottom + (goInfo.newRecord ? 22 : 8) } : { bottom: insets.bottom + 24 })
+              : menuOpen ? { bottom: insets.bottom + 24 }
+              : { top: hudBottom != null ? Math.max(insets.top + 64, hudBottom + 8) : insets.top + 150 }]}>
+          <Text style={styles.toastText} numberOfLines={gameOver ? 2 : 3} ellipsizeMode="tail">{toast}</Text>
         </Animated.View>
       )}
       {POSTCARDS_ON && arrivalCard !== null && POSTCARDS[arrivalCard - 1] && !gameOver && (
@@ -3567,18 +3971,20 @@ export default function Game() {
 
       {/* Game Over — KARTPOSTAL (2026-11-16) */}
       {gameOver && FAZ1_UI && (
-        <View style={styles.overlay} testID="game-over-overlay">
-          <Animated.View entering={FadeInDown.duration(380)} style={styles.pcWrap}>
-            <View style={styles.pcTilt}>
-            <View style={styles.pcCard}>
+        <View style={[styles.overlay, styles.goOverlay, { paddingTop: insets.top + 70 }]} testID="game-over-overlay">
+          <Animated.View entering={FadeInDown.duration(380)} style={[styles.pcWrap, styles.goWrap, { maxHeight: Math.min(H - (insets.top + 70) - insets.bottom - 86, 0.6 * H) }]}
+            onLayout={(e) => { const l = e.nativeEvent.layout; setGoCardBottom(l.y + l.height); }}>
+            <View style={[styles.pcTilt, styles.goShrink]}>
+            <View style={[styles.pcCard, styles.goShrink]}>
               <View style={styles.pcAirmail}>
                 {Array.from({ length: 18 }).map((_, k) => <View key={k} style={[styles.pcStripe, { backgroundColor: k % 2 ? "#1f4e79" : "#c0472b" }]} />)}
               </View>
-              <View style={styles.pcInner}>
-                <Text style={styles.pcGreeting} numberOfLines={1} adjustsFontSizeToFit>İstanbul'dan selamlar</Text>
-                <Text style={styles.pcLabel}>{DAILY_MAP && mode === "daily" ? `GÜNÜN HARİTASI · ${todayLabel()}` : "SKOR"}</Text>
-                <CountUp to={score} style={styles.pcScore} />
-                <Text style={styles.pcBest} testID="final-best">
+              <ScrollView style={styles.goScroll} bounces={false} showsVerticalScrollIndicator={false}>
+              <View style={[styles.pcInner, styles.goInner]}>
+                <Text style={[styles.pcGreeting, styles.goGreeting]} numberOfLines={1} adjustsFontSizeToFit>İstanbul'dan selamlar</Text>
+                <Text style={[styles.pcLabel, styles.goSmLabel]}>{DAILY_MAP && mode === "daily" ? `GÜNÜN HARİTASI · ${todayLabel()}` : "SKOR"}</Text>
+                <CountUp to={score} style={[styles.pcScore, styles.goScore]} />
+                <Text style={[styles.pcBest, styles.goSmBest]} testID="final-best">
                   {goInfo.newRecord
                     ? `Önceki rekor ${goInfo.prevBest}`
                     : `Rekor ${best}${best - score > 0 ? ` · ${best - score} puan kaldı` : best === score && score > 0 ? " · rekora eşitledin" : ""}`}
@@ -3590,10 +3996,13 @@ export default function Game() {
                 </Text>
               </View>
             ) : DURAK_SEFER ? (
-              <View style={styles.pcLine} testID="stop-summary">
-                <Text style={styles.pcHand} numberOfLines={1} adjustsFontSizeToFit>
+              <View style={[styles.pcLine, styles.goSmLine]} testID="stop-summary">
+                <Text style={[styles.pcHand, styles.goSmHand]} numberOfLines={1} adjustsFontSizeToFit>
                   📍 {runEnd.stops > 0 ? `${stopName(runEnd.stops)} · ` : ""}{nextStopLine(runEnd.lastTower)}
                 </Text>
+                {LAKAP_ON && lakapText && (
+                  <Text style={[styles.lakapLine, styles.goSmLakap]} numberOfLines={1} adjustsFontSizeToFit testID="lakap-line">🏷️ Lakabın: {lakapText}</Text>
+                )}
                 {POSTCARDS_ON && runNewCards.length > 0 && (
                   <Text style={styles.goInfoNew}>📮 Yeni kartpostal: {runNewCards.map((k) => POSTCARDS[k - 1]?.name).join(", ")}</Text>
                 )}
@@ -3625,7 +4034,7 @@ export default function Game() {
             </View>}
                 <Pressable
                   testID="play-again-button"
-                  style={({ pressed }) => [styles.trPlayBtn, styles.pcTicket, { marginTop: 12 }, pressed && styles.playBtnPressed]}
+                  style={({ pressed }) => [styles.trPlayBtn, styles.pcTicket, styles.goPlayBtn, pressed && styles.playBtnPressed]}
                   onPress={restart}
                 >
                   <View pointerEvents="none" style={[styles.pcNotch, { left: -9 }]} /><View pointerEvents="none" style={[styles.pcNotch, { right: -9 }]} />
@@ -3636,47 +4045,48 @@ export default function Game() {
                     <Text style={styles.goLink}>Serbest oyuna dön</Text>
                   </Pressable>
                 )}
-                <View style={styles.pcIconRow}>
+                <View style={[styles.pcIconRow, styles.goSmIconRow]}>
                   {SHARE_CARD_ON && Platform.OS === "ios" && (
                     <Pressable testID="share-card" style={({ pressed }) => [styles.pcIconBtn, pressed && styles.playBtnPressed]} onPress={() => setShareOpen(true)}>
-                      <View style={styles.pcIconCircle}><Ico name="square.and.arrow.up" size={22} color="#2f7d4f" /></View>
+                      <View style={[styles.pcIconCircle, styles.goSmIcon]}><Ico name="square.and.arrow.up" size={22} color="#2f7d4f" /></View>
                       <Text style={styles.pcIconLabel}>Paylaş</Text>
                     </Pressable>
                   )}
                   {MEYDAN_ON && (
                     <Pressable testID="challenge-share" style={({ pressed }) => [styles.pcIconBtn, pressed && styles.playBtnPressed]} onPress={YARIS_ON ? startMeydan : () => { setSheetMode("score"); askChallenge(); }}>
-                      <View style={styles.pcIconCircle}><Ico name="flag.2.crossed.fill" size={22} color="#c0472b" /></View>
+                      <View style={[styles.pcIconCircle, styles.goSmIcon]}><Ico name="flag.2.crossed.fill" size={22} color="#c0472b" /></View>
                       <Text style={styles.pcIconLabel}>Meydan oku</Text>
                     </Pressable>
                   )}
                   {GAME_CENTER_ON && GameCenter.gameCenterAvailable && (
                     <Pressable testID="leaderboard-button" style={({ pressed }) => [styles.pcIconBtn, pressed && styles.playBtnPressed]} onPress={openLeaderboard}>
-                      <View style={styles.pcIconCircle}><Ico name="trophy.fill" size={22} color="#b8862b" /></View>
+                      <View style={[styles.pcIconCircle, styles.goSmIcon]}><Ico name="trophy.fill" size={22} color="#b8862b" /></View>
                       <Text style={styles.pcIconLabel}>Sıralama</Text>
                     </Pressable>
                   )}
                 </View>
                 {MENU_ON && (
-                  <Pressable onPress={() => { restart(); setMenuOpen(true); }} hitSlop={8} testID="go-menu" style={styles.linkRow}>
+                  <Pressable onPress={() => { restart(); setMenuOpen(true); }} hitSlop={8} testID="go-menu" style={[styles.linkRow, styles.goSmLink]}>
                     <Ico name="house.fill" size={14} color="#c0472b" />
                     <Text style={[styles.goLink, { marginTop: 0 }]}>Ana menü</Text>
                   </Pressable>
                 )}
               </View>
+              </ScrollView>
             </View>
             {/* Pul: mevcut Galata kartpostalı */}
-            <View pointerEvents="none" style={styles.pcStamp}>
+            <View pointerEvents="none" style={[styles.pcStamp, styles.goStamp]}>
               <CachedImage source={PC_STAMP} contentFit="cover" style={{ width: "100%", height: "100%" }} />
             </View>
             {/* Amcanın ifadeli kafası, çıkartma */}
-            <View pointerEvents="none" style={styles.pcSticker}>
+            <View pointerEvents="none" style={[styles.pcSticker, styles.goSticker]}>
               <CachedImage
                 source={goInfo.newRecord ? PC_STICKER.rec : score === 0 || score < best * 0.3 ? PC_STICKER.low : PC_STICKER.mid}
                 contentFit="fill"
-                style={{ position: "absolute", width: 100, height: 100 * 1103 / 516, left: -8, top: -6 }}
+                style={{ position: "absolute", width: 84, height: 84 * 1103 / 516, left: -7, top: -5 }}
               />
             </View>
-            {goInfo.newRecord && <Postmark delay={countUpMs(score)} styles={styles} />}
+            {goInfo.newRecord && <Postmark delay={countUpMs(score)} styles={styles} small />}
             </View>
           </Animated.View>
         </View>
@@ -3697,16 +4107,25 @@ export default function Game() {
             sticker={goInfo.newRecord ? PC_STICKER.rec : score === 0 || score < best * 0.3 ? PC_STICKER.low : PC_STICKER.mid}
             stamp={shownWeather && !shownWeather.test ? weatherStamp(shownWeather, TR_MONTHS_TITLE) : `${trNow.getUTCDate()} ${TR_MONTHS_TITLE[trNow.getUTCMonth()]}, İstanbul`}
             time={`${hh}:${mm}`}
+            lakap={LAKAP_ON ? lakapText : null}
             onClose={() => setShareOpen(false)}
           />
         );
       })()}
+      {HANIM_ON && hanim && !shareOpen && !menuOpen && (
+        <HanimBanner text={hanim} top={insets.top + 6} onClose={() => { if (hanimTimer.current) clearTimeout(hanimTimer.current); setHanim(null); }} />
+      )}
       {MENU_ON && menuOpen && assetsReady && !gameOver && (
         <View style={[styles.menuOverlay, { paddingTop: insets.top + 46 }]} testID="start-menu">
           {/* TASARIM 2026-11-16: başlık gökyüzünde, kart küçük; amca ve kuleler aşağıda görünür kalır. */}
-          <Text style={styles.menuTitle}>BYZANTION</Text>
-          <Text style={styles.menuSub}>Amcayla İstanbul çatılarında</Text>
+          <Text style={styles.menuTitle} onPress={OZEL_GUN_TEST_TAP ? () => { setEventTest((v) => (v + 1 >= OZEL_GUN_TEST_ORDER.length ? -1 : v + 1)); setEventDay(todaysEvent()); } : undefined} suppressHighlighting>BYZANTION</Text>
+          {curEvent ? null : <Text style={styles.menuSub}>Amcayla İstanbul çatılarında</Text>}
           {BUILD_TAG !== "" && <Text style={styles.menuTag}>{BUILD_TAG}</Text>}
+          {curEvent && (
+            <Animated.View key={curEvent.id} entering={FadeIn.duration(320)} style={styles.eventPill} testID="event-pill">
+              <Text style={styles.eventPillText} numberOfLines={1} adjustsFontSizeToFit>{curEvent.title}{eventTest >= 0 ? " (önizleme)" : ""}</Text>
+            </Animated.View>
+          )}
           {/* KARTPOSTAL MENÜ (2026-11-16): oyun sonuyla aynı dil — hava postası şeridi, pul, bilet "Oyna". */}
           <Animated.View style={styles.pcWrap}>
             <View style={styles.pcTiltR}>
@@ -3774,6 +4193,12 @@ export default function Game() {
                       <Pressable testID="menu-album" style={({ pressed }) => [styles.pcIconBtn, pressed && styles.playBtnPressed]} onPress={() => setAlbumOpen(true)}>
                         <View style={[styles.pcIconCircle, styles.pcIconCircleSm]}><Ico name="envelope.fill" size={22} color="#c0472b" /></View>
                         <Text style={styles.pcIconLabel}>Kartpostal {unlocked.length}/{POSTCARDS.length}</Text>
+                      </Pressable>
+                    )}
+                    {MAHALLE_ON && (
+                      <Pressable testID="menu-cats" style={({ pressed }) => [styles.pcIconBtn, pressed && styles.playBtnPressed]} onPress={() => setCatBook(true)}>
+                        <View style={[styles.pcIconCircle, styles.pcIconCircleSm]}><Ico name="pawprint.fill" size={22} color="#c77a2c" /></View>
+                        <Text style={styles.pcIconLabel}>Kediler {cats.length}/{KEDI_ADLARI.length}</Text>
                       </Pressable>
                     )}
                   </View>
@@ -3926,6 +4351,35 @@ export default function Game() {
             </Pressable>
             <Pressable style={({ pressed }) => [styles.modeBtn, pressed && styles.playBtnPressed]} onPress={() => setCodeOpen(false)}>
               <Text style={styles.modeBtnText}>Vazgeç</Text>
+            </Pressable>
+          </View>
+        </View>
+      )}
+      {MAHALLE_ON && catBook && (
+        <View style={styles.albumOverlay} testID="cat-book">
+          <View style={styles.albumCard}>
+            <Text style={styles.albumTitle}>🐈 Kedi defteri</Text>
+            <Text style={styles.albumSub}>{cats.length}/{KEDI_ADLARI.length} · çatılardaki kedilerin yanına in, tanış</Text>
+            <ScrollView contentContainerStyle={styles.albumGrid}>
+              {KEDI_ADLARI.map((name, n) => {
+                const met = cats.includes(name);
+                const gri = kediGriNo(n);
+                return (
+                  <View key={name} style={styles.albumItem}>
+                    {met ? (
+                      <View style={[styles.albumImg, { backgroundColor: "#f6ead2", alignItems: "center", justifyContent: "center" }]}>
+                        <Image source={gri ? KEDI_GRI_SOURCE : KEDI_SOURCE} style={{ width: "86%", height: "70%" }} resizeMode="contain" fadeDuration={0} />
+                      </View>
+                    ) : (
+                      <View style={[styles.albumImg, styles.albumLocked]}><Text style={styles.albumLockedText}>?</Text></View>
+                    )}
+                    <Text style={styles.albumName}>{met ? name : "???"}</Text>
+                  </View>
+                );
+              })}
+            </ScrollView>
+            <Pressable style={({ pressed }) => [styles.trPlayBtn, pressed && styles.playBtnPressed]} onPress={() => setCatBook(false)}>
+              <Text style={styles.playBtnText}>Kapat</Text>
             </Pressable>
           </View>
         </View>
@@ -4129,7 +4583,7 @@ function PierConfetti({ W, H, onDone }: { W: number; H: number; onDone: () => vo
   );
 }
 
-const PlatformHouseView = memo(function PlatformHouseView({ index, platforms, styles, probe, roofWx }: any) {
+const PlatformHouseView = memo(function PlatformHouseView({ index, platforms, styles, probe, roofWx, woken, look, kTick, kGone, kAmcaX }: any) {
   // REVIZYON-062: every updater passes its SharedValue's .value itself. Reanimated
   // only subscribes a mapper to SharedValues found directly in the updater's
   // closure (extractInputs does not look inside nested worklet functions), so
@@ -4253,6 +4707,67 @@ const PlatformHouseView = memo(function PlatformHouseView({ index, platforms, st
     const g = houseGeom.value;
     return { transform: [{ scaleX: g ? g.fw / HOUSE_GRAD_W : 1 }] };
   });
+  // MAHALLE (2026-11-20): teyze cephede, kedi saçak köşesinde; yalnız seçilen kulelerde görünür.
+  // Sabit kutu (MAHALLE_BOX) + transform: düzen (layout) özelliği değişmez (R066 kuralı gibi).
+  // Pencereler (1 teyze, 3 komşu amca, 4 çocuk) ve kediler (turuncu uyuyan / gerinen, gri uyuyan).
+  const OFF = { opacity: 0, transform: [{ translateX: -99999 }, { translateY: 0 }, { scale: 1 }] };
+  const winStyle = (kind: number, aspect: number) => useAnimatedStyle(() => {
+    const g = houseGeom.value;
+    if (!g || sakin(g.p.id) !== kind) return OFF;
+    const b = teyzeBox(g, HOUSE_GUTTER_H, aspect);
+    return { opacity: 1, transform: [{ translateX: b.left + b.w / 2 - MAHALLE_BOX / 2 }, { translateY: b.top + b.h / 2 - (MAHALLE_BOX * aspect) / 2 }, { scale: b.w / MAHALLE_BOX }] };
+  });
+  // mode 0 = turuncu uyuyan, 1 = turuncu gerinen (amca bu kuleye indiyse), 2 = gri uyuyan
+  const catStyle = (mode: number, aspect: number) => useAnimatedStyle(() => {
+    const g = houseGeom.value;
+    if (!g || sakin(g.p.id) !== 2) return OFF;
+    const gri = kediGri(g.p.id);
+    const awake = woken ? woken.value === g.p.id : false;
+    const want = gri ? 2 : awake ? 1 : 0;
+    if (want !== mode) return OFF;
+    const b = kediBox(g, aspect, FART_CHAR_H, HOUSE_GUTTER_H, mode === 0 ? KEDI_UYUYAN_FOOT : KEDI_DIK_FOOT);
+    if (b.w <= 0) return OFF;
+    return { opacity: 1, transform: [{ translateX: b.left + b.w / 2 - MAHALLE_BOX / 2 }, { translateY: b.top + b.h / 2 - (MAHALLE_BOX * aspect) / 2 }, { scale: b.w / MAHALLE_BOX }] };
+  });
+  // CUMBA: cumba + teyze (normalde halı silker; amca bu kuleye inince bakar). Aynı kutu, teyze tuvali daha uzun.
+  const cumbaLayer = (mode: number, aspect: number) => useAnimatedStyle(() => {
+    const g = houseGeom.value;
+    if (!g || sakin(g.p.id) !== (mode === 3 ? 2 : 1)) return OFF;
+    if (mode === 1 || mode === 2) {
+      const looking = look ? look.value === g.p.id : false;
+      if ((mode === 2) !== looking) return OFF;
+    }
+    const b = cumbaBox(g, HOUSE_GUTTER_H, FART_CHAR_H);
+    if (b.w <= 0) return OFF; // kuleye sığmıyor: bu kulede teyze yok (ölçek her yerde aynı kalsın)
+    const h = b.w * aspect;
+    return { opacity: 1, transform: [{ translateX: b.left + b.w / 2 - MAHALLE_BOX / 2 }, { translateY: b.top + h / 2 - (MAHALLE_BOX * aspect) / 2 }, { scale: b.w / MAHALLE_BOX }] };
+  });
+  const cumbaStyle = cumbaLayer(0, CUMBA_ASPECT);
+  const teyzeStyle = cumbaLayer(1, CUMBA_TEYZE_ASPECT);
+  const teyzeBakisStyle = cumbaLayer(2, CUMBA_TEYZE_ASPECT);
+  const kediCumbaStyle = cumbaLayer(3, CUMBA_ASPECT); // kedili kulede aynı cumba (kedi pervazında)
+  const amcaStyle = winStyle(3, AMCA_ASPECT);
+  const cocukStyle = winStyle(4, COCUK_ASPECT);
+  const kediStyle = catStyle(0, KEDI_ASPECT);
+  const kediGerStyle = catStyle(1, KEDI_GERINEN_ASPECT);
+  const kediGriStyle = catStyle(2, KEDI_GRI_ASPECT);
+  // KARGALAR: kulenin kendi kargaları (slot 0/1); poz 0 tünemiş (amcaya dönük), 1 bakış (omzunun üstünden amcaya).
+  // Havalanınca bu kuleden silinir; uçuş ve yeni yer Game içindeki dünya katmanında (kule kırpmasına takılmaz).
+  const kargaStyle = (slot: number, pose: number) => useAnimatedStyle(() => {
+    const g = houseGeom.value;
+    const tick = kTick ? kTick.value : 0;
+    const gone = kGone ? kGone.value : [];
+    const ax = kAmcaX ? kAmcaX.value : -1e9;
+    if (!g) return OFF;
+    const d = kargaYer(g, slot);
+    if (!d || gone.includes(g.p.id * 4 + slot)) return OFF;
+    if (pose !== kargaDurus(tick, d.seed)) return OFF;
+    const face = ax < -1e8 ? d.flip : ax < d.wx ? -1 : 1; // bakışta da gövde aynı yönde (yalnız baş döner)
+    const B = FART_CHAR_H * KARGA_BOX_K;
+    return { opacity: 1, transform: [{ translateX: d.x - MAHALLE_BOX / 2 }, { translateY: d.y - B * KARGA_FOOT_Y + B / 2 - MAHALLE_BOX / 2 }, { scaleX: (face * B) / MAHALLE_BOX }, { scaleY: B / MAHALLE_BOX }] };
+  });
+  const k0a = kargaStyle(0, 0), k0b = kargaStyle(0, 1);
+  const k1a = kargaStyle(1, 0), k1b = kargaStyle(1, 1);
   const iciclesStyle = useAnimatedStyle(() => {
     const g = houseGeom.value;
     return g ? { top: g.rise + HOUSE_GUTTER_H - HOUSE_GUTTER_OVERLAP - 2, width: g.fw } : { width: 0 };
@@ -4288,6 +4803,28 @@ const PlatformHouseView = memo(function PlatformHouseView({ index, platforms, st
         <View style={styles.houseEdgeL} />
         <View style={styles.houseEdgeR} />
       </Animated.View>
+      {MAHALLE_ON && (
+        <>
+          <Animated.View style={[{ position: "absolute", left: 0, top: 0, width: MAHALLE_BOX, height: MAHALLE_BOX * CUMBA_ASPECT }, cumbaStyle]}>
+            <Image source={CUMBA_SOURCE} style={styles.houseFill} resizeMode="stretch" fadeDuration={0} />
+          </Animated.View>
+          <Animated.View style={[{ position: "absolute", left: 0, top: 0, width: MAHALLE_BOX, height: MAHALLE_BOX * CUMBA_ASPECT }, kediCumbaStyle]}>
+            <Image source={CUMBA_KEDI_SOURCE} style={styles.houseFill} resizeMode="stretch" fadeDuration={0} />
+          </Animated.View>
+          <Animated.View style={[{ position: "absolute", left: 0, top: 0, width: MAHALLE_BOX, height: MAHALLE_BOX * CUMBA_TEYZE_ASPECT }, teyzeStyle]}>
+            <Image source={CUMBA_TEYZE_SOURCE} style={styles.houseFill} resizeMode="stretch" fadeDuration={0} />
+          </Animated.View>
+          <Animated.View style={[{ position: "absolute", left: 0, top: 0, width: MAHALLE_BOX, height: MAHALLE_BOX * CUMBA_TEYZE_ASPECT }, teyzeBakisStyle]}>
+            <Image source={CUMBA_TEYZE_BAKIS_SOURCE} style={styles.houseFill} resizeMode="stretch" fadeDuration={0} />
+          </Animated.View>
+          <Animated.View style={[{ position: "absolute", left: 0, top: 0, width: MAHALLE_BOX, height: MAHALLE_BOX * AMCA_ASPECT }, amcaStyle]}>
+            <Image source={AMCA_SOURCE} style={styles.houseFill} resizeMode="stretch" fadeDuration={0} />
+          </Animated.View>
+          <Animated.View style={[{ position: "absolute", left: 0, top: 0, width: MAHALLE_BOX, height: MAHALLE_BOX * COCUK_ASPECT }, cocukStyle]}>
+            <Image source={COCUK_SOURCE} style={styles.houseFill} resizeMode="stretch" fadeDuration={0} />
+          </Animated.View>
+        </>
+      )}
       <Animated.View style={[styles.houseClip, { left: 0 }, roofBandStyle]}>
         <Animated.View style={[styles.houseRoofClipL, ROOF_MASK_OFF, clipLStyle]}>
           <View style={styles.houseRoofUnL}>
@@ -4320,6 +4857,28 @@ const PlatformHouseView = memo(function PlatformHouseView({ index, platforms, st
         <Animated.View style={[styles.houseIcicles, iciclesStyle]}>
           {ICICLES.map((c, i) => <View key={i} style={[styles.houseIcicle, { left: `${c.x}%`, borderTopWidth: c.h, borderLeftWidth: c.w, borderRightWidth: c.w }]} />)}
         </Animated.View>
+      )}
+      {MAHALLE_ON && (
+        <>
+          <Animated.View style={[{ position: "absolute", left: 0, top: 0, width: MAHALLE_BOX, height: MAHALLE_BOX * KEDI_ASPECT }, kediStyle]}>
+            <Image source={KEDI_SOURCE} style={styles.houseFill} resizeMode="stretch" fadeDuration={0} />
+          </Animated.View>
+          <Animated.View style={[{ position: "absolute", left: 0, top: 0, width: MAHALLE_BOX, height: MAHALLE_BOX * KEDI_GERINEN_ASPECT }, kediGerStyle]}>
+            <Image source={KEDI_GERINEN_SOURCE} style={styles.houseFill} resizeMode="stretch" fadeDuration={0} />
+          </Animated.View>
+          <Animated.View style={[{ position: "absolute", left: 0, top: 0, width: MAHALLE_BOX, height: MAHALLE_BOX * KEDI_GRI_ASPECT }, kediGriStyle]}>
+            <Image source={KEDI_GRI_SOURCE} style={styles.houseFill} resizeMode="stretch" fadeDuration={0} />
+          </Animated.View>
+        </>
+      )}
+      {KARGA_ON && (
+        <>
+          {[[k0a, KARGA_TUNEMIS], [k0b, KARGA_BAKIS], [k1a, KARGA_TUNEMIS], [k1b, KARGA_BAKIS]].map(([st, src]: any, i) => (
+            <Animated.View key={`karga-${i}`} style={[{ position: "absolute", left: 0, top: 0, width: MAHALLE_BOX, height: MAHALLE_BOX }, st]}>
+              <Image source={src} style={styles.houseFill} resizeMode="stretch" fadeDuration={0} />
+            </Animated.View>
+          ))}
+        </>
       )}
     </Animated.View>
   );
@@ -4891,6 +5450,25 @@ const useStyles = makeStyles((colors) => ({
   friendAvatarText: { color: "#fff", fontWeight: "900", fontSize: 16 },
   friendName: { flex: 1, fontSize: 16, fontWeight: "800", color: "#2a1b12" },
   pcWrap: { width: "86%", maxWidth: 370 },
+  // OYUN SONU küçük kart (2026-11-23, Claudex planı; menü kartı pc* stillerini aynen kullanır)
+  goOverlay: { justifyContent: "flex-start", backgroundColor: "rgba(20,48,58,0.22)" },
+  goWrap: { width: "76%", maxWidth: 330 },
+  goShrink: { flexShrink: 1 },
+  goScroll: { flexGrow: 0 },
+  goInner: { margin: 8, marginTop: 6, paddingTop: 6, paddingBottom: 4, paddingHorizontal: 12 },
+  goGreeting: { fontSize: 16, marginLeft: 40, marginRight: 46, marginBottom: 0 },
+  goScore: { fontSize: 48, lineHeight: 54 },
+  goPlayBtn: { marginTop: 6, paddingVertical: 9 },
+  goSmIconRow: { marginTop: 6 },
+  goSmLabel: { marginTop: 0 },
+  goSmBest: { marginBottom: 2 },
+  goSmLine: { paddingVertical: 2, marginTop: 2 },
+  goSmHand: { fontSize: 17 },
+  goSmLakap: { fontSize: 16, marginTop: 0 },
+  goSmLink: { marginTop: 4 },
+  goSmIcon: { width: 44, height: 44, borderRadius: 22 },
+  goStamp: { right: 14, top: 18, width: 46, height: 54 },
+  goSticker: { left: -14, top: -20, width: 70, height: 70, borderRadius: 35 },
   pcTilt: { transform: [{ rotate: "-2deg" }] },
   pcTiltR: { transform: [{ rotate: "1.5deg" }] },
   pcTicket: { overflow: "visible" },
@@ -4921,11 +5499,11 @@ const useStyles = makeStyles((colors) => ({
   pcBest: { fontFamily: PC_TYPE, fontSize: 14, color: "#7a5a44", marginBottom: 6 },
   pcLine: { alignSelf: "stretch", borderBottomWidth: 1.5, borderBottomColor: "#d9c3a3", borderStyle: "dotted", paddingVertical: 4, marginTop: 4 },
   pcHand: { fontFamily: PC_HAND, fontSize: 19, color: "#1f4e79", textAlign: "center" },
-  pcIconRow: { flexDirection: "row", justifyContent: "center", gap: 18, marginTop: 14 },
+  pcIconRow: { flexDirection: "row", justifyContent: "center", gap: 10, marginTop: 14 },
   pcIconBtn: { alignItems: "center" },
   pcIconCircle: { width: 54, height: 54, borderRadius: 27, backgroundColor: "#fff", borderWidth: 2, borderColor: "#e6cdb0", alignItems: "center", justifyContent: "center" },
   pcIconCircleSm: { width: 46, height: 46, borderRadius: 23 },
-  pcIconLabel: { marginTop: 4, fontSize: 12, fontWeight: "800", color: "#6e4632" },
+  pcIconLabel: { marginTop: 4, fontSize: 11.5, fontWeight: "800", color: "#6e4632" },
   pcStamp: { position: "absolute", right: 18, top: 22, width: 54, height: 64, borderWidth: 4, borderColor: "#fff", borderRadius: 2, transform: [{ rotate: "6deg" }], shadowColor: "#000", shadowOpacity: 0.25, shadowRadius: 3, shadowOffset: { width: 0, height: 2 }, backgroundColor: "#fff" },
   pcSticker: { position: "absolute", left: -18, top: -26, width: 84, height: 84, borderRadius: 42, overflow: "hidden", borderWidth: 3, borderColor: "#fff", backgroundColor: "#f3d9b0", transform: [{ rotate: "-8deg" }] },
   pcPostmark: { position: "absolute", right: 2, top: 96, width: 106, height: 106, borderRadius: 53, borderWidth: 3, borderColor: "rgba(140,30,70,0.9)", alignItems: "center", justifyContent: "center" },
@@ -4934,6 +5512,8 @@ const useStyles = makeStyles((colors) => ({
   pcPostmarkSmall: { fontFamily: PC_TYPE, fontSize: 8, color: "rgba(140,30,70,0.95)", letterSpacing: 1 },
   menuOverlay: { ...absoluteFill(), alignItems: "center", backgroundColor: "rgba(20,48,58,0.12)" },
   menuTitle: { fontSize: 42, fontWeight: "900", color: "#fff8ec", letterSpacing: 3, textShadowColor: "rgba(42,27,18,0.65)", textShadowOffset: { width: 0, height: 3 }, textShadowRadius: 8 },
+  eventPill: { backgroundColor: "rgba(192,71,43,0.92)", paddingHorizontal: 14, paddingVertical: 4, borderRadius: 14, marginTop: 0, marginBottom: 6, maxWidth: "92%", transform: [{ rotate: "-2deg" }] },
+  eventPillText: { color: "#fff8ec", fontWeight: "900", fontSize: 15 },
   menuTag: { fontSize: 9, color: "rgba(255,248,236,0.7)", marginTop: -8, marginBottom: 6 },
   menuSub: { fontSize: 16, fontWeight: "800", color: "#fff8ec", marginTop: 2, marginBottom: 10, textShadowColor: "rgba(42,27,18,0.6)", textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 4 },
   menuCard: { paddingTop: 14, paddingBottom: 10 },
@@ -4955,6 +5535,7 @@ const useStyles = makeStyles((colors) => ({
   friendPill: { width: "100%", marginTop: 10, borderRadius: 12, paddingVertical: 8, paddingHorizontal: 10, flexDirection: "row", alignItems: "center", justifyContent: "space-between", backgroundColor: "#3c2878" },
   friendPillText: { flex: 1, fontSize: 14, fontWeight: "800", color: "#fff" },
   friendPillGo: { marginLeft: 8, fontSize: 15, fontWeight: "900", color: "#ffd66b" },
+  lakapLine: { marginTop: 2, fontFamily: PC_HAND, fontSize: 18, color: "#a8432a", textAlign: "center" },
   toastWrap: { position: "absolute", left: 16, right: 16, alignItems: "center", zIndex: 95 },
   toastText: { backgroundColor: "rgba(30,20,60,0.92)", color: "#fff", fontSize: 15, fontWeight: "800", paddingHorizontal: 14, paddingVertical: 8, borderRadius: 14, overflow: "hidden", textAlign: "center" },
   goInfoPill: { width: "100%", marginTop: 10, borderRadius: 12, paddingVertical: 7, paddingHorizontal: 10, alignItems: "center", backgroundColor: "rgba(192,71,43,0.08)" },

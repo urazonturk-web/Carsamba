@@ -1,0 +1,2 @@
+Tur 2 kararı:
+- KARGA-03 (medium, kabul — kapsamı daraltarak): "Öbür yana bakma" (tüm sprite aynalama) durumu plandan çıkarıldı. Uzak karga çeşitliliği yalnız mevcut baş dönüşü görseli (bakış) ile, zamanlama çeşitliliğiyle sağlanır. Yeni görsel üretilmez. Gövde yönünün amcanın inişinde amcaya dönmesi önceki, kullanıcının gördüğü ve itiraz etmediği davranış olarak aynen kalır (bu turda değişmiyor). Kabul ölçütü 4 buna göre yazıldı.

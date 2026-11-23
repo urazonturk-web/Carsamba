@@ -52,6 +52,8 @@ type Props = {
   // 2026-11-20 düzeltme: rain her zaman verilir (stil ilk çizimden itibaren aynı değeri izlesin);
   // görseller yalnız rainLayers true olunca bağlanır. Önce rain sonradan verilince kıyafet hiç görünmüyordu.
   rainLayers?: boolean;
+  // ÖZEL GÜN (2026-11-20): o güne özel başlık (yılbaşı/cadı şapkası); varsa bere ve yağmur kasketi gizlenir.
+  eventHat?: { source: any; box: { x: number; y: number; w: number; h: number }; keepCaps?: boolean } | null;
   // ŞEMSİYE (2026-11-17): umbrella 1 = yağmurda şemsiye var; umbOpen 0..1 açılma; umbFlip 0..1 kumaşın ters dönmesi.
   umbrella?: SharedValue<number>;
   umbOpen?: SharedValue<number>;
@@ -74,7 +76,7 @@ const DIRT_SPOTS = [
 ];
 const DIRT_COLORS = ["rgba(150,104,48,0.92)", "rgba(126,86,40,0.92)", "rgba(171,124,62,0.9)"];
 
-function PoseLayer({ i, px, py, poseCharge, scale, feetCenterOffset, feetHalf, landPulse, halo, strain, dirty, pajama, winter, snow, nose, breath, rain, rainLayers, umbrella, umbOpen, umbFlip, offsetX, offsetY, ...cb }: Props & { i: number }) {
+function PoseLayer({ i, px, py, poseCharge, scale, feetCenterOffset, feetHalf, landPulse, halo, strain, dirty, pajama, winter, snow, nose, breath, rain, rainLayers, eventHat, umbrella, umbOpen, umbFlip, offsetX, offsetY, ...cb }: Props & { i: number }) {
   const pose = CHARGE_POSES[i];
   const style = useAnimatedStyle(() => {
     // Squash toward the FOOT line (feetHalf), not the sprite's own center,
@@ -103,6 +105,7 @@ function PoseLayer({ i, px, py, poseCharge, scale, feetCenterOffset, feetHalf, l
   const dirtStyle = useAnimatedStyle(() => ({ opacity: dirty ? dirty.value : 0 }));
   const pajamaStyle = useAnimatedStyle(() => ({ opacity: pajama ? pajama.value : 0 }));
   const scarfStyle = useAnimatedStyle(() => ({ opacity: winter ? winter.value : 0 }));
+  const eventHatStyle = useAnimatedStyle(() => ({ opacity: 1 - (pajama ? pajama.value : 0) }));
   const winterHatStyle = useAnimatedStyle(() => ({ opacity: winter ? winter.value * (1 - (pajama ? pajama.value : 0)) * (1 - (rain ? rain.value : 0)) : 0 }));
   const rainBodyStyle = useAnimatedStyle(() => ({ opacity: rain ? rain.value : 0 }));
   const rainCapStyle = useAnimatedStyle(() => ({ opacity: rain ? rain.value * (1 - (pajama ? pajama.value : 0)) : 0 }));
@@ -195,16 +198,22 @@ function PoseLayer({ i, px, py, poseCharge, scale, feetCenterOffset, feetHalf, l
             <Image source={WINTER_SCARF_SOURCE} resizeMode="stretch" fadeDuration={0}
               style={{ position: "absolute", left: WINTER_SCARF_BOX.x * scale, top: WINTER_SCARF_BOX.y * scale, width: WINTER_SCARF_BOX.w * scale, height: WINTER_SCARF_BOX.h * scale }} />
           </Animated.View>
-          <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, right: 0, bottom: 0 }, winterHatStyle]}>
+          {!(eventHat && !eventHat.keepCaps) && <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, right: 0, bottom: 0 }, winterHatStyle]}>
             <Image source={WINTER_HAT_SOURCE} resizeMode="stretch" fadeDuration={0}
               style={{ position: "absolute", left: WINTER_HAT_BOX.x * scale, top: WINTER_HAT_BOX.y * scale, width: WINTER_HAT_BOX.w * scale, height: WINTER_HAT_BOX.h * scale }} />
-          </Animated.View>
+          </Animated.View>}
         </>
       ) : null}
-      {rain && rainLayers ? (
+      {rain && rainLayers && !(eventHat && !eventHat.keepCaps) ? (
         <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, right: 0, bottom: 0 }, rainCapStyle]}>
           <Image source={RAIN_CAP_SOURCE} resizeMode="stretch" fadeDuration={0}
             style={{ position: "absolute", left: RAIN_CAP_BOX.x * scale, top: RAIN_CAP_BOX.y * scale, width: RAIN_CAP_BOX.w * scale, height: RAIN_CAP_BOX.h * scale }} />
+        </Animated.View>
+      ) : null}
+      {eventHat ? (
+        <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, right: 0, bottom: 0 }, eventHatStyle]}>
+          <Image source={eventHat.source} resizeMode="stretch" fadeDuration={0}
+            style={{ position: "absolute", left: eventHat.box.x * scale, top: eventHat.box.y * scale, width: eventHat.box.w * scale, height: eventHat.box.h * scale }} />
         </Animated.View>
       ) : null}
       {nose && i < 4 ? (

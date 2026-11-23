@@ -1,0 +1,214 @@
+--- a/frontend/b/frontend/app/index.tsx (oyun sonu işi öncesi)	2026-11-23 11:06:38
++++ b/frontend/app/index.tsx	2026-11-23 11:16:13
+@@ -367,7 +367,7 @@
+ const BG_SCROLL_TEST = true as boolean;
+ const BG_SCROLL_RATIO = 0.45;
+ const BG_SCROLL_TILES = 4;
+-const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "KARGALAR KONUP KALKIYOR") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
++const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "OYUN SONU KUCUK KART") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
+ const DIAG_MAX_EXAMPLES = 6;
+ const HOUSE_AB_FROZEN = false as boolean;
+ // REVIZYON-066 experiment (one variable): expo-linear-gradient's iOS layer
+@@ -885,6 +885,7 @@
+   const r = houseRun(p, platformById(list, id - 1), platformById(list, id + 1));
+   return { p, r, rise: r * HOUSE_HIP_SLOPE, fw: p.width + 2 * r };
+ }
++const OYUN_SONU_TEST = false as boolean; // GEÇİCİ: toast/çip konum denemesi (teslimde false)
+ const KARGA_POOL_IDX = Array.from({ length: KARGA_HAVUZ }, (_, i) => i);
+ const KARGA_POOL_SRC = [KARGA_TUNEMIS, KARGA_BAKIS, KARGA_HAVALANMA];
+ 
+@@ -1180,6 +1181,9 @@
+   const [incoming, setIncoming] = useState<GameCenter.FriendChallenge[]>([]);
+   const [friendResults, setFriendResults] = useState<GameCenter.FriendChallenge[]>([]);
+   const [toast, setToast] = useState<string | null>(null);
++  // OYUN SONU (2026-11-23, Claudex planı): toast konumu için ölçülen HUD ve oyun sonu kartı alt kenarları.
++  const [hudBottom, setHudBottom] = useState<number | null>(null);
++  const [goCardBottom, setGoCardBottom] = useState<number | null>(null);
+   const [friendSheet, setFriendSheet] = useState(false);
+   const [friends, setFriends] = useState<GameCenter.GameCenterFriend[]>([]);
+   const [friendsMsg, setFriendsMsg] = useState<string | null>(null);
+@@ -1198,6 +1202,11 @@
+     if (toastTimer.current) clearTimeout(toastTimer.current);
+     toastTimer.current = setTimeout(() => setToast(null), 2600);
+   }, []);
++  useEffect(() => {
++    if (!OYUN_SONU_TEST) return;
++    if (gameOver) { const t = setTimeout(() => showToast("⚔️ Uzun deneme bildirimi: Arkadaşın Mehmet Ali Kadıköylüoğlu senin 48 puanını oynadı ve 52 yaptı, seni geçti! Bu metin bilerek çok uzun yazıldı; iki satırdan sonrası üç nokta ile kısalmalı ve kart ile çakışmamalı."), 900); return () => clearTimeout(t); }
++    if (!menuOpen) { const t = setTimeout(() => showToast("🐈 Tekir ile tanıştın! Kedi defteri: 3"), 700); return () => clearTimeout(t); }
++  }, [gameOver, menuOpen, showToast]);
+   const copiedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+   const [arrivalCard, setArrivalCard] = useState<number | null>(null); // varışta kayan küçük kart
+   const arrivalTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+@@ -3773,14 +3782,16 @@
+         </Pressable>
+       )}
+       {/* Score HUD */}
+-      {!gameOver && assetsReady && !menuOpen && !raceResult && <View style={[styles.hud, { top: insets.top + 24 }]}>
++      {!gameOver && assetsReady && !menuOpen && !raceResult && <View style={[styles.hud, { top: insets.top + 24 }]} onLayout={(e) => { const l = e.nativeEvent.layout; setHudBottom(l.y + l.height); }}>
+         <Text style={[styles.scoreText, (POPUP || nightHud) && styles.puScoreText]} testID="score-value">
+           {score}
+         </Text>
+         <Text style={[styles.bestText, (POPUP || nightHud) && styles.puBestText]} testID="best-value">
+           {FAZ1_UI ? (mode === "daily" ? "GÜNÜN REKORU" : "REKOR") : "BEST"} {best}
+         </Text>
+-        {MEYDAN_ON && challenge && <Text style={styles.challengeChip}>⚔️ Hedef {challenge.target}</Text>}
++        {MEYDAN_ON && (challenge || OYUN_SONU_TEST) && <Text style={styles.challengeChip}>⚔️ Hedef {challenge?.target ?? 99}</Text>}
++        {OYUN_SONU_TEST && <Text style={[styles.skullChip, styles.skullChipUp]}>💀 GENİŞ kuleler %20 · 5 zıplama</Text>}
++        {OYUN_SONU_TEST && <Text style={styles.dailyChip}>📅 Günün haritası · 23 Kasım</Text>}
+         {KURUKAFA_ON && skullHud && (
+           <Text style={[styles.skullChip, skullHud.k > 1 ? styles.skullChipUp : styles.skullChipDown]} testID="skull-hud">
+             💀 {skullHud.k > 1 ? "GENİŞ kuleler" : "DAR kuleler"} %{Math.round(Math.abs(skullHud.k - 1) * 100)} · {skullHud.left} zıplama
+@@ -3844,8 +3855,12 @@
+         </Animated.View>
+       )}
+       {toast && (
+-        <Animated.View entering={FadeIn.duration(200)} exiting={FadeOut.duration(300)} pointerEvents="none" style={[styles.toastWrap, { top: insets.top + 64 }]}>
+-          <Text style={styles.toastText}>{toast}</Text>
++        <Animated.View entering={FadeIn.duration(200)} exiting={FadeOut.duration(300)} pointerEvents="none"
++          style={[styles.toastWrap,
++            gameOver ? (goCardBottom != null ? { top: goCardBottom + (goInfo.newRecord ? 22 : 8) } : { bottom: insets.bottom + 24 })
++              : menuOpen ? { bottom: insets.bottom + 24 }
++              : { top: hudBottom != null ? Math.max(insets.top + 64, hudBottom + 8) : insets.top + 150 }]}>
++          <Text style={styles.toastText} numberOfLines={gameOver ? 2 : 3} ellipsizeMode="tail">{toast}</Text>
+         </Animated.View>
+       )}
+       {POSTCARDS_ON && arrivalCard !== null && POSTCARDS[arrivalCard - 1] && !gameOver && (
+@@ -3900,18 +3915,20 @@
+ 
+       {/* Game Over — KARTPOSTAL (2026-11-16) */}
+       {gameOver && FAZ1_UI && (
+-        <View style={styles.overlay} testID="game-over-overlay">
+-          <Animated.View entering={FadeInDown.duration(380)} style={styles.pcWrap}>
+-            <View style={styles.pcTilt}>
+-            <View style={styles.pcCard}>
++        <View style={[styles.overlay, styles.goOverlay, { paddingTop: insets.top + 70 }]} testID="game-over-overlay">
++          <Animated.View entering={FadeInDown.duration(380)} style={[styles.pcWrap, styles.goWrap, { maxHeight: Math.min(H - (insets.top + 70) - insets.bottom - 86, 0.6 * H) }]}
++            onLayout={(e) => { const l = e.nativeEvent.layout; setGoCardBottom(l.y + l.height); }}>
++            <View style={[styles.pcTilt, styles.goShrink]}>
++            <View style={[styles.pcCard, styles.goShrink]}>
+               <View style={styles.pcAirmail}>
+                 {Array.from({ length: 18 }).map((_, k) => <View key={k} style={[styles.pcStripe, { backgroundColor: k % 2 ? "#1f4e79" : "#c0472b" }]} />)}
+               </View>
+-              <View style={styles.pcInner}>
+-                <Text style={styles.pcGreeting} numberOfLines={1} adjustsFontSizeToFit>İstanbul'dan selamlar</Text>
+-                <Text style={styles.pcLabel}>{DAILY_MAP && mode === "daily" ? `GÜNÜN HARİTASI · ${todayLabel()}` : "SKOR"}</Text>
+-                <CountUp to={score} style={styles.pcScore} />
+-                <Text style={styles.pcBest} testID="final-best">
++              <ScrollView style={styles.goScroll} bounces={false} showsVerticalScrollIndicator={false}>
++              <View style={[styles.pcInner, styles.goInner]}>
++                <Text style={[styles.pcGreeting, styles.goGreeting]} numberOfLines={1} adjustsFontSizeToFit>İstanbul'dan selamlar</Text>
++                <Text style={[styles.pcLabel, styles.goSmLabel]}>{DAILY_MAP && mode === "daily" ? `GÜNÜN HARİTASI · ${todayLabel()}` : "SKOR"}</Text>
++                <CountUp to={score} style={[styles.pcScore, styles.goScore]} />
++                <Text style={[styles.pcBest, styles.goSmBest]} testID="final-best">
+                   {goInfo.newRecord
+                     ? `Önceki rekor ${goInfo.prevBest}`
+                     : `Rekor ${best}${best - score > 0 ? ` · ${best - score} puan kaldı` : best === score && score > 0 ? " · rekora eşitledin" : ""}`}
+@@ -3923,12 +3940,12 @@
+                 </Text>
+               </View>
+             ) : DURAK_SEFER ? (
+-              <View style={styles.pcLine} testID="stop-summary">
+-                <Text style={styles.pcHand} numberOfLines={1} adjustsFontSizeToFit>
++              <View style={[styles.pcLine, styles.goSmLine]} testID="stop-summary">
++                <Text style={[styles.pcHand, styles.goSmHand]} numberOfLines={1} adjustsFontSizeToFit>
+                   📍 {runEnd.stops > 0 ? `${stopName(runEnd.stops)} · ` : ""}{nextStopLine(runEnd.lastTower)}
+                 </Text>
+                 {LAKAP_ON && lakapText && (
+-                  <Text style={styles.lakapLine} numberOfLines={1} adjustsFontSizeToFit testID="lakap-line">🏷️ Lakabın: {lakapText}</Text>
++                  <Text style={[styles.lakapLine, styles.goSmLakap]} numberOfLines={1} adjustsFontSizeToFit testID="lakap-line">🏷️ Lakabın: {lakapText}</Text>
+                 )}
+                 {POSTCARDS_ON && runNewCards.length > 0 && (
+                   <Text style={styles.goInfoNew}>📮 Yeni kartpostal: {runNewCards.map((k) => POSTCARDS[k - 1]?.name).join(", ")}</Text>
+@@ -3961,7 +3978,7 @@
+             </View>}
+                 <Pressable
+                   testID="play-again-button"
+-                  style={({ pressed }) => [styles.trPlayBtn, styles.pcTicket, { marginTop: 12 }, pressed && styles.playBtnPressed]}
++                  style={({ pressed }) => [styles.trPlayBtn, styles.pcTicket, styles.goPlayBtn, pressed && styles.playBtnPressed]}
+                   onPress={restart}
+                 >
+                   <View pointerEvents="none" style={[styles.pcNotch, { left: -9 }]} /><View pointerEvents="none" style={[styles.pcNotch, { right: -9 }]} />
+@@ -3972,47 +3989,48 @@
+                     <Text style={styles.goLink}>Serbest oyuna dön</Text>
+                   </Pressable>
+                 )}
+-                <View style={styles.pcIconRow}>
++                <View style={[styles.pcIconRow, styles.goSmIconRow]}>
+                   {SHARE_CARD_ON && Platform.OS === "ios" && (
+                     <Pressable testID="share-card" style={({ pressed }) => [styles.pcIconBtn, pressed && styles.playBtnPressed]} onPress={() => setShareOpen(true)}>
+-                      <View style={styles.pcIconCircle}><Ico name="square.and.arrow.up" size={22} color="#2f7d4f" /></View>
++                      <View style={[styles.pcIconCircle, styles.goSmIcon]}><Ico name="square.and.arrow.up" size={22} color="#2f7d4f" /></View>
+                       <Text style={styles.pcIconLabel}>Paylaş</Text>
+                     </Pressable>
+                   )}
+                   {MEYDAN_ON && (
+                     <Pressable testID="challenge-share" style={({ pressed }) => [styles.pcIconBtn, pressed && styles.playBtnPressed]} onPress={YARIS_ON ? startMeydan : () => { setSheetMode("score"); askChallenge(); }}>
+-                      <View style={styles.pcIconCircle}><Ico name="flag.2.crossed.fill" size={22} color="#c0472b" /></View>
++                      <View style={[styles.pcIconCircle, styles.goSmIcon]}><Ico name="flag.2.crossed.fill" size={22} color="#c0472b" /></View>
+                       <Text style={styles.pcIconLabel}>Meydan oku</Text>
+                     </Pressable>
+                   )}
+                   {GAME_CENTER_ON && GameCenter.gameCenterAvailable && (
+                     <Pressable testID="leaderboard-button" style={({ pressed }) => [styles.pcIconBtn, pressed && styles.playBtnPressed]} onPress={openLeaderboard}>
+-                      <View style={styles.pcIconCircle}><Ico name="trophy.fill" size={22} color="#b8862b" /></View>
++                      <View style={[styles.pcIconCircle, styles.goSmIcon]}><Ico name="trophy.fill" size={22} color="#b8862b" /></View>
+                       <Text style={styles.pcIconLabel}>Sıralama</Text>
+                     </Pressable>
+                   )}
+                 </View>
+                 {MENU_ON && (
+-                  <Pressable onPress={() => { restart(); setMenuOpen(true); }} hitSlop={8} testID="go-menu" style={styles.linkRow}>
++                  <Pressable onPress={() => { restart(); setMenuOpen(true); }} hitSlop={8} testID="go-menu" style={[styles.linkRow, styles.goSmLink]}>
+                     <Ico name="house.fill" size={14} color="#c0472b" />
+                     <Text style={[styles.goLink, { marginTop: 0 }]}>Ana menü</Text>
+                   </Pressable>
+                 )}
+               </View>
++              </ScrollView>
+             </View>
+             {/* Pul: mevcut Galata kartpostalı */}
+-            <View pointerEvents="none" style={styles.pcStamp}>
++            <View pointerEvents="none" style={[styles.pcStamp, styles.goStamp]}>
+               <CachedImage source={PC_STAMP} contentFit="cover" style={{ width: "100%", height: "100%" }} />
+             </View>
+             {/* Amcanın ifadeli kafası, çıkartma */}
+-            <View pointerEvents="none" style={styles.pcSticker}>
++            <View pointerEvents="none" style={[styles.pcSticker, styles.goSticker]}>
+               <CachedImage
+                 source={goInfo.newRecord ? PC_STICKER.rec : score === 0 || score < best * 0.3 ? PC_STICKER.low : PC_STICKER.mid}
+                 contentFit="fill"
+-                style={{ position: "absolute", width: 100, height: 100 * 1103 / 516, left: -8, top: -6 }}
++                style={{ position: "absolute", width: 84, height: 84 * 1103 / 516, left: -7, top: -5 }}
+               />
+             </View>
+-            {goInfo.newRecord && <Postmark delay={countUpMs(score)} styles={styles} />}
++            {goInfo.newRecord && <Postmark delay={countUpMs(score)} styles={styles} small />}
+             </View>
+           </Animated.View>
+         </View>
+@@ -5377,6 +5395,25 @@
+   friendAvatarText: { color: "#fff", fontWeight: "900", fontSize: 16 },
+   friendName: { flex: 1, fontSize: 16, fontWeight: "800", color: "#2a1b12" },
+   pcWrap: { width: "86%", maxWidth: 370 },
++  // OYUN SONU küçük kart (2026-11-23, Claudex planı; menü kartı pc* stillerini aynen kullanır)
++  goOverlay: { justifyContent: "flex-start", backgroundColor: "rgba(20,48,58,0.22)" },
++  goWrap: { width: "76%", maxWidth: 330 },
++  goShrink: { flexShrink: 1 },
++  goScroll: { flexGrow: 0 },
++  goInner: { margin: 8, marginTop: 6, paddingTop: 6, paddingBottom: 4, paddingHorizontal: 12 },
++  goGreeting: { fontSize: 16, marginLeft: 40, marginRight: 46, marginBottom: 0 },
++  goScore: { fontSize: 48, lineHeight: 54 },
++  goPlayBtn: { marginTop: 6, paddingVertical: 9 },
++  goSmIconRow: { marginTop: 6 },
++  goSmLabel: { marginTop: 0 },
++  goSmBest: { marginBottom: 2 },
++  goSmLine: { paddingVertical: 2, marginTop: 2 },
++  goSmHand: { fontSize: 17 },
++  goSmLakap: { fontSize: 16, marginTop: 0 },
++  goSmLink: { marginTop: 4 },
++  goSmIcon: { width: 44, height: 44, borderRadius: 22 },
++  goStamp: { right: 14, top: 18, width: 46, height: 54 },
++  goSticker: { left: -14, top: -20, width: 70, height: 70, borderRadius: 35 },
+   pcTilt: { transform: [{ rotate: "-2deg" }] },
+   pcTiltR: { transform: [{ rotate: "1.5deg" }] },
+   pcTicket: { overflow: "visible" },

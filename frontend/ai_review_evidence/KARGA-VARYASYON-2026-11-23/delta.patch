@@ -1,0 +1,272 @@
+--- a/frontend/app/index.tsx	2026-11-23 11:47:43
++++ b/frontend/app/index.tsx	2026-11-23 11:59:11
+@@ -54,7 +54,7 @@
+ const START_SKY = DURAK_SEFER ? skyStepForStops(stopsPassed(TEST_START_TOWER)) : 0;
+ import { SFX_ON, initSfx, playFart, playSfx, setSfxMuted, stopFart, stopSfx } from "../src/game/sfx";
+ import { GAME_OVER_LINE, QUIP_ON, multiJumpShout, pickQuip, quipContext } from "../src/game/copy";
+-import { KARGA_ON, KARGA_TUNEMIS, KARGA_BAKIS, KARGA_YEM, KARGA_HAVALANMA, KARGA_FOOT_Y, KARGA_BOX_K, KARGA_MAX_Y, kargaSayisi, kargaTunek, kargaTunekAny, kargaDurus, KARGA_HAVUZ, KARGA_UCUS_MS } from "../src/game/karga";
++import { KARGA_ON, KARGA_TUNEMIS, KARGA_BAKIS, KARGA_YEM, KARGA_HAVALANMA, KARGA_FOOT_Y, KARGA_BOX_K, KARGA_MAX_Y, kargaSayisi, kargaTunek, kargaTunekAny, kargaDurus, kargaRngYap, kargaUcus, KARGA_TEST, KARGA_HAVUZ, KARGA_UCUS_MS } from "../src/game/karga";
+ import { MAHALLE_ON, MAHALLE_SPEECH_ON, CUMBA_SOURCE, CUMBA_KEDI_SOURCE, CUMBA_ASPECT, CUMBA_TEYZE_SOURCE, CUMBA_TEYZE_BAKIS_SOURCE, CUMBA_TEYZE_ASPECT, cumbaBox, MAHALLE_BOX, TEYZE_ASPECT, KEDI_ASPECT, KEDI_UYUYAN_FOOT, KEDI_DIK_FOOT, AMCA_ASPECT, COCUK_ASPECT, KEDI_GERINEN_ASPECT, KEDI_GRI_ASPECT, TEYZE_SOURCE, KEDI_SOURCE, AMCA_SOURCE, COCUK_SOURCE, KEDI_GERINEN_SOURCE, KEDI_GRI_SOURCE, KEDI_ADLARI, sakin, teyzeBox, kediBox, kediAdi, kediGri, kediGriNo, pencereAspect, pencereLafi, kediLafi, KEDI_DEFTER_KEY } from "../src/game/mahalle";
+ import { OZEL_GUN_ON, OZEL_GUN_TEST_TAP, OZEL_GUNLER, OZEL_GUN_TEST_ORDER, todaysEvent } from "../src/game/ozelGun";
+ import { HANIM_ON, ICSES_ON, LAKAP_ON, newRunStats, noteLanding, icSesAfterLanding, icSesIdle, hanimMessage, lakap } from "../src/game/amcaSesi";
+@@ -367,7 +367,7 @@
+ const BG_SCROLL_TEST = true as boolean;
+ const BG_SCROLL_RATIO = 0.45;
+ const BG_SCROLL_TILES = 4;
+-const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "OYUN SONU KUCUK KART") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
++const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "KARGA CESITLILIK") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
+ const DIAG_MAX_EXAMPLES = 6;
+ const HOUSE_AB_FROZEN = false as boolean;
+ // REVIZYON-066 experiment (one variable): expo-linear-gradient's iOS layer
+@@ -1040,8 +1040,9 @@
+   const kGone = useSharedValue<number[]>([]); // havalanmış kule kargaları: id*4+slot
+   const kAmcaX = useSharedValue(-1e9); // amcanın son indiği yer (kafa çevirme yönü)
+   const kPool = useSharedValue<any[]>([]); // uçan / yeni yerine konmuş kargalar (dünya koordinatı)
+-  const kP0 = useSharedValue(1), kP1 = useSharedValue(1), kP2 = useSharedValue(1), kP3 = useSharedValue(1), kP4 = useSharedValue(1), kP5 = useSharedValue(1);
+-  const kPs = [kP0, kP1, kP2, kP3, kP4, kP5];
++  const kP0 = useSharedValue(1), kP1 = useSharedValue(1), kP2 = useSharedValue(1), kP3 = useSharedValue(1), kP4 = useSharedValue(1), kP5 = useSharedValue(1), kP6 = useSharedValue(1), kP7 = useSharedValue(1);
++  const kPs = [kP0, kP1, kP2, kP3, kP4, kP5, kP6, kP7];
++  const kRng = useRef(kargaRngYap(Date.now())); // karga çeşitliliği için ayrı üreteç
+   useEffect(() => {
+     if (!KARGA_ON) return;
+     const t0 = Date.now();
+@@ -1051,8 +1052,12 @@
+   // KARGALAR: amca landedId kulesine inince (ratio = kule içindeki yer) yakın kargalar havalanır.
+   const kargaKacirRef = useRef<(landedId: number, ratio: number) => void>(() => {});
+   kargaKacirRef.current = (landedId: number, ratio: number) => {
+-      // KARGALAR: amca bir kuleye inince o kulenin ve iki yanındaki kulelerin kargaları havalanır,
+-      // ileride komşusuz bir kulenin tüneğine uçup konar (orada da amca yaklaşınca yine kalkar).
++      // KARGALAR (2026-11-23 çeşitlilik, Claudex planı KARGA-VARYASYON): amca bir kuleye inince o kulenin ve iki
++      // yanındaki kulelerin kargaları kişiliklerine göre tepki verir: çoğu hemen kalkar, bazıları önce bakıp geç kalkar,
++      // cesurlar (komşu kuledeyse) kalmaz-kalkmaz. Uçuş süresi/yay/dalgalanma/hedef (ileri, geri, gider) her seferinde farklı;
++      // arada ekran dışından yeni kargalar gelir. Rastgelelik yalnız kRng'den (oyunun paylaşılan akışına dokunmaz).
++      const R = kRng.current;
++      const now = Date.now(); // uçuş bitişleri JS saatinde tutulur (UI'deki animasyon değerini JS'ten okumaya güvenilmez)
+       const list = platforms.value;
+       const lpk = platformById(list, landedId);
+       if (lpk) kAmcaX.value = lpk.x + ratio * lpk.width;
+@@ -1067,53 +1072,100 @@
+           if (gone.includes(key)) continue;
+           const d = kargaYer(g, slot);
+           if (!d) continue;
+-          gone.push(key);
+-          flights.push({ x0: d.wx, y0: d.wy, seed: d.seed, slot: -1 });
++          const r = R();
++          if (id !== landedId && r < 0.15) continue; // cesur: komşu kuleye inişte yerinde kalır
++          flights.push({ x0: d.wx, y0: d.wy, seed: d.seed, slot: -1, late: r >= 0.15 && r < 0.4, key });
+         }
+       }
+       for (let i = 0; i < KARGA_HAVUZ; i++) {
+         const e = pool[i];
+-        if (e.on && kPs[i].value >= 1 && Math.abs(e.id - landedId) <= 1) flights.push({ x0: e.x1, y0: e.y1, seed: e.seed, slot: i });
++        if (!e.on || e.id === -999 || now < (e.until ?? 0) || Math.abs(e.id - landedId) > 1) continue;
++        const r = R();
++        if (e.id !== landedId && r < 0.15) continue;
++        flights.push({ x0: e.x1, y0: e.y1, seed: e.seed, slot: i, late: r >= 0.15 && r < 0.4 });
+       }
+-      const starts: number[] = [];
+-      const usedT: number[] = [];
+-      flights.forEach((f, n) => {
+-        // Konacak yer: listede GERÇEKTEN olan, amcadan en az 2 kule ötedeki komşusuz bir kule; önce ileridekiler,
+-        // önce kendi kargası olmayan ve bu turda seçilmemiş olanlar. Hiç yoksa ekran dışına uçar ve kapanır.
+-        let dest: any = null;
+-        let T = -999;
+-        let bestScore = 1e9;
+-        for (let k = 0; k < list.length; k++) {
+-          const id = list[k].id;
+-          const dist = id - landedId;
+-          if (Math.abs(dist) < 2) continue;
+-          const g = kargaGeom(list, id);
+-          if (!g) continue;
+-          const d = kargaYer(g, -(1 + n + Math.floor(f.seed * 5)));
+-          if (!d) continue;
+-          const score = (dist > 0 ? dist : 50 - dist) + (kargaSayisi(id) > 0 ? 20 : 0) + (usedT.includes(id) ? 40 : 0);
+-          if (score < bestScore) { bestScore = score; dest = d; T = id; }
++      // Yeni gelen: havuzda boş yer varsa ekran dışından bir karga.
++      if (lpk && R() < 0.15 && pool.some((e) => !e.on)) {
++        flights.push({ arrive: 1, x0: kAmcaX.value + 900 + R() * 400, y0: lpk.topY - 700 - R() * 300, seed: R(), slot: -1, late: false });
++      }
++      // Dolu tünekler: havuzda konmuş/konmakta olanlar (yeniden uçacaklar hariç).
++      const reflying = flights.filter((f) => f.slot >= 0).map((f) => f.slot);
++      const occupied: number[][] = [];
++      pool.forEach((e, i) => { if (e.on && e.id !== -999 && !reflying.includes(i)) occupied.push([e.x1, e.y1]); });
++      const isFree = (x: number, y: number) => occupied.every((o) => Math.abs(o[0] - x) >= 12 || Math.abs(o[1] - y) >= 12);
++      const tryTower = (id: number) => {
++        const g = kargaGeom(list, id);
++        if (!g) return null;
++        for (let slot = 0; slot < 2; slot++) { // hedef kulenin yerinde duran kendi kargaları
++          const d0 = kargaYer(g, slot);
++          if (d0 && !gone.includes(id * 4 + slot)) occupied.push([d0.wx, d0.wy]);
+         }
+-        if (!dest) dest = { wx: f.x0 + 1400, wy: f.y0 - 900, seed: f.seed }; // yer yoksa uzaklara uçar (sonra kapanır)
+-        else usedT.push(T);
+-        let s = f.slot;
+-        if (s < 0) s = pool.findIndex((e, i) => !e.on && !starts.includes(i));
+-        if (s < 0) {
+-          let best = -1;
+-          for (let i = 0; i < KARGA_HAVUZ; i++) if (!starts.includes(i) && (best < 0 || pool[i].id < pool[best].id)) best = i;
+-          s = best;
++        for (let salt = 1; salt <= 8; salt++) {
++          const d = kargaYer(g, -salt);
++          if (d && isFree(d.wx, d.wy)) return d;
+         }
++        return null;
++      };
++      const pickRange = (lo: number, hi: number) => {
++        const ids = list.map((q: any) => q.id).filter((id: number) => id - landedId >= lo && id - landedId <= hi);
++        for (let k = ids.length - 1; k > 0; k--) { const m = Math.floor(R() * (k + 1)); const t = ids[k]; ids[k] = ids[m]; ids[m] = t; }
++        for (const id of ids) { const d = tryTower(id); if (d) return { d, T: id }; }
++        return null;
++      };
++      const starts: { s: number; delay: number; dur: number; ease: number }[] = [];
++      flights.forEach((f) => {
++        // Slot: önce boş, sonra işi bitmiş (gitmiş) ya da en geride konmuş olan; UÇMAKTA olan slot asla kullanılmaz.
++        // Slot yoksa karga yerinde kalır (kule kargası kGone'a eklenmez → kaybolmaz).
++        let s = f.slot;
++        if (s < 0) {
++          const freeOf = (i: number) => !starts.some((q) => q.s === i) && !reflying.includes(i);
++          s = pool.findIndex((e, i) => !e.on && freeOf(i));
++          if (s < 0) s = pool.findIndex((e, i) => e.on && e.id === -999 && now >= (e.until ?? 0) && freeOf(i));
++          if (s < 0) {
++            let best = -1;
++            for (let i = 0; i < KARGA_HAVUZ; i++) if (freeOf(i) && pool[i].on && now >= (pool[i].until ?? 0) && (best < 0 || pool[i].id < pool[best].id)) best = i;
++            s = best;
++          }
++        }
+         if (s < 0) return;
+-        pool[s] = { on: 1, id: T, x0: f.x0, y0: f.y0, x1: dest.wx, y1: dest.wy, seed: dest.seed };
+-        starts.push(s);
++        // Hedef: %70 ileri (2–5), %20 geri (2–4), %10 gider. Seçilen aralıkta yer yoksa sırayla öbür yön ve daha
++        // uzak kuleler denenir; "gider"e yalnız %10'luk seçimle ya da listede hiç boş tünek kalmadıysa düşülür.
++        let pick: any = null;
++        let leave = false;
++        if (f.arrive) pick = pickRange(3, 6) ?? pickRange(2, 8);
++        else {
++          const rr = R();
++          if (rr < 0.7) pick = pickRange(2, 5) ?? pickRange(-4, -2) ?? pickRange(6, 8) ?? pickRange(-7, -5);
++          else if (rr < 0.9) pick = pickRange(-4, -2) ?? pickRange(2, 5) ?? pickRange(-7, -5) ?? pickRange(6, 8);
++          else leave = true;
++        }
++        if (f.arrive && !pick) return;
++        let dest: any, T: number;
++        if (pick && !leave) { dest = pick.d; T = pick.T; occupied.push([dest.wx, dest.wy]); }
++        else { dest = { wx: f.x0 + (R() < 0.5 ? -1 : 1) * (1200 + R() * 400), wy: f.y0 - 900 - R() * 300, seed: f.seed }; T = -999; } // gider
++        if (f.key !== undefined) gone.push(f.key);
++        const dur = 1100 + R() * 900;
++        pool[s] = { on: 1, id: T, x0: f.x0, y0: f.y0, x1: dest.wx, y1: dest.wy, seed: dest.seed ?? f.seed,
++          arc: 0.6 + R() * 1.8, wob: R() * 0.25, wobN: 1 + Math.floor(R() * 2), dur, wait: f.late ? 1 : 0 };
++        const delay = f.late ? 300 + R() * 500 : R() * 200;
++        pool[s].until = now + delay + dur + 50; // bu ana kadar slot "uçuşta" sayılır, yeniden kullanılmaz
++        starts.push({ s, delay, dur, ease: R() < 0.5 ? 0 : 1 });
+       });
+       kGone.value = gone.slice(-60);
+       kPool.value = pool;
+-      starts.forEach((s, n) => {
++      starts.forEach(({ s, delay, dur, ease }) => {
+         kPs[s].value = 0;
+-        kPs[s].value = withTiming(1, { duration: KARGA_UCUS_MS + n * 150, easing: Easing.inOut(Easing.quad) });
++        kPs[s].value = withDelay(delay, withTiming(1, { duration: dur, easing: ease ? Easing.out(Easing.cubic) : Easing.inOut(Easing.quad) }));
+       });
+-      };
++  };
++  useEffect(() => {
++    if (!KARGA_ON || !KARGA_TEST) return;
++    // GEÇİCİ simülatör denemesi: 12 sn sonra her 3 sn sırayla ilerleyen kuleye inilmiş gibi kargaları kaçırır.
++    let n = 1;
++    let h: any = null;
++    const t = setTimeout(() => { h = setInterval(() => { kargaKacirRef.current(n, 0.5); n++; }, 3000); }, 12000);
++    return () => { clearTimeout(t); if (h) clearInterval(h); };
++  }, []);
+   // Uçan / yeni yerine konmuş kargalar: poz 0 tünemiş, 1 bakış, 2 uçuş. Dünya koordinatında (kule kırpması yok).
+   const kargaPoolStyle = (i: number, pose: number) => {
+     const P = kPs[i];
+@@ -1126,18 +1178,22 @@
+       const KOFF = { opacity: 0, transform: [{ translateX: -99999 }, { translateY: 0 }, { scaleX: 1 }, { scaleY: 1 }] };
+       if (!KARGA_ON || !e || !e.on || (e.id === -999 && p >= 1)) return KOFF;
+       const B = FART_CHAR_H * KARGA_BOX_K;
+-      let x = e.x1, y = e.y1, face = 1, want = 2;
+-      if (p < 1) {
+-        x = e.x0 + (e.x1 - e.x0) * p;
+-        y = e.y0 + (e.y1 - e.y0) * p - Math.sin(Math.PI * p) * B * 1.4;
++      let x = e.x1, y = e.y1, face = 1, want = 2, sy = 1;
++      if (p <= 0) {
++        // Kalkış beklerken tünekte: geç kaçan bakış pozunda, gövde amcaya dönük (aynalanmaz).
++        x = e.x0; y = e.y0;
++        want = e.wait ? 1 : 0;
++        face = ax < -1e8 ? 1 : ax < x ? -1 : 1;
++      } else if (p < 1) {
++        const u = kargaUcus(e, p, B);
++        x = u.x; y = u.y; sy = u.sy;
+         face = e.x1 >= e.x0 ? 1 : -1;
+       } else {
+         want = kargaDurus(tick, e.seed);
+-        const f = ax < -1e8 ? 1 : ax < x ? -1 : 1;
+-        face = want === 1 ? -f : f;
++        face = ax < -1e8 ? 1 : ax < x ? -1 : 1; // bakışta da gövde aynı yönde (yalnız baş döner)
+       }
+       if (want !== pose) return KOFF;
+-      return { opacity: 1, transform: [{ translateX: x - MAHALLE_BOX / 2 }, { translateY: y - B * KARGA_FOOT_Y + B / 2 - MAHALLE_BOX / 2 }, { scaleX: (face * B) / MAHALLE_BOX }, { scaleY: B / MAHALLE_BOX }] };
++      return { opacity: 1, transform: [{ translateX: x - MAHALLE_BOX / 2 }, { translateY: y - B * KARGA_FOOT_Y + B / 2 - MAHALLE_BOX / 2 }, { scaleX: (face * B) / MAHALLE_BOX }, { scaleY: (sy * B) / MAHALLE_BOX }] };
+     });
+   };
+   const kargaPoolStyles = KARGA_POOL_IDX.flatMap((i) => [0, 1, 2].map((pose) => kargaPoolStyle(i, pose)));
+@@ -4706,8 +4762,7 @@
+     const d = kargaYer(g, slot);
+     if (!d || gone.includes(g.p.id * 4 + slot)) return OFF;
+     if (pose !== kargaDurus(tick, d.seed)) return OFF;
+-    const f = ax < -1e8 ? d.flip : ax < d.wx ? -1 : 1;
+-    const face = pose === 1 ? -f : f;
++    const face = ax < -1e8 ? d.flip : ax < d.wx ? -1 : 1; // bakışta da gövde aynı yönde (yalnız baş döner)
+     const B = FART_CHAR_H * KARGA_BOX_K;
+     return { opacity: 1, transform: [{ translateX: d.x - MAHALLE_BOX / 2 }, { translateY: d.y - B * KARGA_FOOT_Y + B / 2 - MAHALLE_BOX / 2 }, { scaleX: (face * B) / MAHALLE_BOX }, { scaleY: B / MAHALLE_BOX }] };
+   });
+--- a/frontend/src/game/karga.ts	2026-11-23 11:47:43
++++ b/frontend/src/game/karga.ts	2026-11-23 11:56:02
+@@ -132,12 +132,42 @@
+   }
+   return null;
+ }
+-// Duran karga: çoğunlukla tünemiş, arada kısa bir "bakış" (başını çevirir). 0 tünemiş, 1 bakış.
++// Duran karga: çoğunlukla tünemiş, arada "bakış" (yalnız baş döner; gövde aynalanmaz). 0 tünemiş, 1 bakış.
++// 2026-11-23 çeşitlilik: her karganın tohumundan dönem 3–9 sn, bakış penceresi %10–30, döngüdeki yeri farklı;
++// kargaların dörtte biri seyrek bakar (%10).
+ export function kargaDurus(t: number, seed: number) {
+   "worklet";
+-  const period = 5000 + seed * 4000;
+-  const ph = ((t + seed * 7000) % period) / period;
+-  return ph > 0.72 && ph < 0.9 ? 1 : 0;
++  const period = 3000 + seed * 6000;
++  const s3 = seed * 3.1, s7 = seed * 7.3, s13 = seed * 13.7;
++  const w = s3 - Math.floor(s3) < 0.25 ? 0.1 : 0.1 + (s7 - Math.floor(s7)) * 0.2;
++  const ofs = s13 - Math.floor(s13);
++  const q = (t + seed * 7000) / period;
++  const ph = q - Math.floor(q);
++  const dd = ph - ofs + 1;
++  return dd - Math.floor(dd) < w ? 1 : 0;
+ }
+-export const KARGA_HAVUZ = 6; // aynı anda uçan / yeni yerine konmuş karga sayısı
++// Ayrı karga üreteci (mulberry32): oyunun paylaşılan rastgele akışına dokunmaz.
++export function kargaRngYap(seed: number) {
++  let a = seed >>> 0;
++  return () => {
++    a = (a + 0x6d2b79f5) >>> 0;
++    let t = a;
++    t = Math.imul(t ^ (t >>> 15), t | 1);
++    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
++    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
++  };
++}
++// Uçuş konumu ve kanat çırpma (p: 0..1). e: havuz girdisi (x0,y0,x1,y1,arc,wob,wobN,dur). B: tuval boyu.
++export function kargaUcus(e: any, p: number, B: number) {
++  "worklet";
++  const sp = Math.sin(Math.PI * p);
++  const wob = Math.sin(2 * Math.PI * e.wobN * p) * e.wob * B * sp;
++  let x = e.x0 + (e.x1 - e.x0) * p + wob * 0.6;
++  let y = e.y0 + (e.y1 - e.y0) * p - sp * e.arc * B + wob * 0.4;
++  if (p > 0.9) y -= Math.sin(((p - 0.9) / 0.1) * Math.PI) * 0.08 * B; // konarken küçük oturma sıçraması
++  const flaps = (e.dur / 1000) * 7;
++  const sy = 1 - 0.14 * (0.5 + 0.5 * Math.sin(2 * Math.PI * flaps * p));
++  return { x, y, sy };
++}
++export const KARGA_HAVUZ = 8; // aynı anda uçan / yeni yerine konmuş karga sayısı
+ export const KARGA_UCUS_MS = 1500;

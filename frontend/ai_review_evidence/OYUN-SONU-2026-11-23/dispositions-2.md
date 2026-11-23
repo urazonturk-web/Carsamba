@@ -1,0 +1,2 @@
+Tur 2 bulguları ve kararlar:
+- OYUN-SONU-02 (medium, kabul): Kart sarmalayıcısına maxHeight = H − cardTop − insets.bottom − 64 eklendi; kart gövdesi ScrollView'e alındı (taşmada kaydırılabilir, düğmeler erişilebilir). Oyun sonunda toast, kartın onLayout ile ölçülen alt kenarının 8 pt altına konuyor; maxHeight toast için 64 pt bırakıyor. Menü için ayrı kural ve doğrulama eklendi. Kabul ölçütü 4 en kötü durumu ve SE boyutunu kapsayacak şekilde güncellendi.
