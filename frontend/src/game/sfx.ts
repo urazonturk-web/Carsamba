@@ -25,6 +25,15 @@ const SOURCES = {
   fart_m2: require("@/assets/sounds/fart-m2.wav"),
   fart_l1: require("@/assets/sounds/fart-l1.wav"),
   fart_l2: require("@/assets/sounds/fart-l2.wav"),
+  // MAHALLE SESLE KONUŞUR (2026-11-23): kodla sentez (ıslık, alkış, panjur, karga) ve yerel Chatterbox TTS
+  // (ıııh, hööyt); indirme yok, lisans yok. Uzaktan gelir gibi süzgeç + yankı; düzeyler kısık.
+  m_islik: require("@/assets/sounds/mahalle/islik.wav"),
+  m_alkis: require("@/assets/sounds/mahalle/alkis.wav"),
+  m_panjur: require("@/assets/sounds/mahalle/panjur.wav"),
+  m_karga1: require("@/assets/sounds/mahalle/karga1.wav"),
+  m_karga2: require("@/assets/sounds/mahalle/karga2.wav"),
+  m_iiih: require("@/assets/sounds/mahalle/iiih.wav"),
+  m_hooyt: require("@/assets/sounds/mahalle/hooyt.wav"),
 } as const;
 
 export type SfxName = keyof typeof SOURCES;
@@ -32,6 +41,7 @@ export type SfxName = keyof typeof SOURCES;
 const VOLUME: Record<SfxName, number> = {
   charge: 0.35, land: 0.7, multi: 0.6, record: 0.55, fall: 0.45, horn_far: 0.14,
   fart_s1: 0.55, fart_s2: 0.55, fart_m1: 0.55, fart_m2: 0.55, fart_l1: 0.6, fart_l2: 0.6,
+  m_islik: 0.35, m_alkis: 0.35, m_panjur: 0.4, m_karga1: 0.3, m_karga2: 0.3, m_iiih: 0.35, m_hooyt: 0.3,
 };
 const FARTS: SfxName[] = ["fart_s1", "fart_s2", "fart_m1", "fart_m2", "fart_l1", "fart_l2"];
 

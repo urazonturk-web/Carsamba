@@ -69,4 +69,6 @@ GORSEL-009 (veya onu genişleten bir görev) kapsamında:
 
 ## Commit/push/deploy
 
-Yalnızca kullanıcının o an açıkça istediği durumda yapılır. Bir önceki onay bir sonraki değişiklik için geçerli sayılmaz.
+**Commit ve push (GitHub):** kullanıcı talimatı (2026-11-23): "githubda bunun gibi işlemleri yapmak için benden onay bekleme". Doğrulanmış bir iş bitince onay beklemeden commit + push yapılır (push: GitHub Desktop; `git ls-remote origin main` ile doğrula) ve sonuç bildirilir. Yine de önce sorulur: force-push, push edilmiş geçmişi yeniden yazma, dal/etiket silme, gizli bilgi içeren dosyalar, büyük ham/üçüncü taraf içerik.
+
+**Deploy (TestFlight/App Store), para ve hesap işlemleri:** yalnızca kullanıcının o an açıkça istediği durumda; bir önceki onay sonrakine geçmez.

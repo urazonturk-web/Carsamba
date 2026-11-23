@@ -37,3 +37,9 @@ Vazgeçme ölçütü: 3 özellikte tur sayısı azalmaz ya da süre/maliyet beli
 - Maliyet: özellik başına ~5 plan turu (~40 sn/tur) + 1–2 son kontrol (~1–3 dk). Toplam ek bekleme ~6–10 dk/özellik.
 - Codex gerçek bulgu: özellik 1'de 4 (plan), özellik 2'de 6 (plan) + 3 (kod). Kapsam dışı/hatalı bulgu: 1 (kirli çalışma ağacı).
 - Öneri: 3. özellikten önce bekleyen işleri commit'lemek (kullanıcı onayıyla) son kontrolü temizler.
+
+## Özellik 3 — Mahalle sesleri (2026-11-23)
+- Plan: 2 tur; 2 bulgu (aynı inişte iki ses; eşik sınırı) → APPROVED.
+- Son kontrol (temiz çalışma ağacı, fark yalnız bu iş): 1 gerçek bulgu (yarışta panjur çalmıyor) → düzeltildi.
+- Ölçülebilir: karar motoru birim testi PASS; ses düzeyleri ölçütte. Sınır: sesler dinlenemedi; doğallık kullanıcıda.
+- Kullanıcı videosu: bekleniyor.
