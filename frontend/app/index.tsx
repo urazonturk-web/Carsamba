@@ -383,7 +383,7 @@ const AnimatedImage = Animated.createAnimatedComponent(Image);
 const BG_SCROLL_TEST = true as boolean;
 const BG_SCROLL_RATIO = 0.45;
 const BG_SCROLL_TILES = 4;
-const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "CEPHE CESIDI") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
+const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "TUTARLILIK") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
 const DIAG_MAX_EXAMPLES = 6;
 const HOUSE_AB_FROZEN = false as boolean;
 // REVIZYON-066 experiment (one variable): expo-linear-gradient's iOS layer
@@ -463,6 +463,8 @@ const BG_VARIANTS = {
   kar: { m: require("@/assets/environment/mevsim/master-kar.jpg"), a: require("@/assets/environment/mevsim/alt-kar.jpg") },
   sonbahar: { m: require("@/assets/environment/mevsim/master-sonbahar.jpg"), a: require("@/assets/environment/mevsim/alt-sonbahar.jpg") },
   kis: { m: require("@/assets/environment/mevsim/master-kis.jpg"), a: require("@/assets/environment/mevsim/alt-kis.jpg") },
+  // TUTARLILIK (2026-11-24): yağmurda çatıdaki kilim, üstündeki kedi ve çamaşırlar yok (Kıvılcım temiz arka plan).
+  yagmur: { m: require("@/assets/environment/mevsim/master-temiz.jpg"), a: require("@/assets/environment/mevsim/alt-temiz.jpg") },
 } as const;
 const BG_LOW_SIL_H = 748;
 // REVIZYON-023: start decoding every first-scene bitmap at module load (before
@@ -1521,7 +1523,7 @@ export default function Game() {
   const roofWx: "kar" | "yagmur" | null = !ISTANBUL_ON ? null : shownWeather?.kind === "kar" ? "kar" : shownWeather?.kind === "yagmur" ? "yagmur" : null;
   // Kış yağmurunda yaz bitkisi olmasın: yağmur + kış -> kış cephesi (zaten çamaşırsız).
   const cepheHal: CepheHal = !ISTANBUL_ON ? null : roofWx === "kar" ? "kar" : roofWx === "yagmur" ? (season === "kis" ? "kis" : "yagmur") : season === "kis" ? "kis" : season === "sonbahar" ? "sonbahar" : null;
-  const bgVariant: keyof typeof BG_VARIANTS | null = !ISTANBUL_ON ? null : roofWx === "kar" ? "kar" : season === "sonbahar" ? "sonbahar" : season === "kis" ? "kis" : null;
+  const bgVariant: keyof typeof BG_VARIANTS | null = !ISTANBUL_ON ? null : roofWx === "kar" ? "kar" : season === "kis" ? "kis" : roofWx === "yagmur" ? "yagmur" : season === "sonbahar" ? "sonbahar" : null;
   // Gece (gerçek saat ya da gece durakları): skor koyu gökte okunsun diye açık renk.
   const nightHud = ISTANBUL_ON && (isNightNow || (DURAK_SEFER && stopsPassed(lastTowerRef.current) >= NIGHT_STOP));
   // Günün ilk koşusunda bir satır İstanbul havası; pil azsa (oturumda bir kez) amcanın şarj şakası öncelikli.
@@ -2514,6 +2516,19 @@ export default function Game() {
   }, []);
   const snowingNow = KIS_ON && ISTANBUL_ON && shownWeather?.kind === "kar";
   const coldNow = KIS_ON && (season === "kis" || snowingNow);
+  // KEDİ ÜŞÜYOR (2026-11-24, kullanıcı: "kediler ile ilgili işler yapılmamış ... tutarsızlıklar olmasın"): kış
+  // görselinde fark az kaldı -> kar/karsız kışta kısa titreme nöbetleri ve burnundan nefes buharı (yalnız görsel).
+  const kediUsur = MAHALLE_ON && (roofWx === "kar" || (roofWx !== "yagmur" && cepheHal === "kis"));
+  const kediTitre = useSharedValue(0);
+  const kediNefes = useSharedValue(0);
+  useEffect(() => {
+    cancelAnimation(kediTitre); cancelAnimation(kediNefes);
+    kediTitre.value = 0; kediNefes.value = 0;
+    if (!kediUsur) return;
+    const t = (v: number) => withTiming(v, { duration: 60 });
+    kediTitre.value = withRepeat(withSequence(t(1), t(-1), t(1), t(-1), t(1), t(-1), t(0), withTiming(0, { duration: 1700 })), -1, false);
+    kediNefes.value = withRepeat(withSequence(withTiming(1, { duration: 1100, easing: Easing.out(Easing.quad) }), withTiming(0, { duration: 0 }), withTiming(0, { duration: 1500 })), -1, false);
+  }, [kediUsur]);
   useEffect(() => {
     if (!KIS_ON) return;
     snowingSV.value = snowingNow ? 1 : 0;
@@ -3701,7 +3716,7 @@ export default function Game() {
         )}
         {!USE_FIXED_PANEL_COURSE && POOL_IDX.map((i) => (POPUP
           ? <PopupHouseView key={`pu-house-${i}`} index={i} platforms={platforms} styles={styles} />
-          : <PlatformHouseView key={`house-${i}`} index={i} platforms={HOUSE_AB_FROZEN ? housePlatformsFrozen : platforms} styles={styles} probe={houseProbe} roofWx={roofWx} cepheHal={cepheHal} woken={MAHALLE_ON ? catWoken : undefined} look={MAHALLE_ON ? neighborLook : undefined} kTick={kTick} kGone={kGone} kAmcaX={kAmcaX} />
+          : <PlatformHouseView key={`house-${i}`} index={i} platforms={HOUSE_AB_FROZEN ? housePlatformsFrozen : platforms} styles={styles} probe={houseProbe} roofWx={roofWx} cepheHal={cepheHal} kediTitre={kediUsur ? kediTitre : undefined} kediNefes={kediUsur ? kediNefes : undefined} woken={MAHALLE_ON ? catWoken : undefined} look={MAHALLE_ON ? neighborLook : undefined} kTick={kTick} kGone={kGone} kAmcaX={kAmcaX} />
         ))}
         {KARGA_ON && kargaPoolStyles.map((st, j) => (
           <Animated.View key={`karga-ucan-${j}`} pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, width: MAHALLE_BOX, height: MAHALLE_BOX }, st]}>
@@ -4665,7 +4680,7 @@ function PierConfetti({ W, H, onDone }: { W: number; H: number; onDone: () => vo
   );
 }
 
-const PlatformHouseView = memo(function PlatformHouseView({ index, platforms, styles, probe, roofWx, cepheHal, woken, look, kTick, kGone, kAmcaX }: any) {
+const PlatformHouseView = memo(function PlatformHouseView({ index, platforms, styles, probe, roofWx, cepheHal, kediTitre, kediNefes, woken, look, kTick, kGone, kAmcaX }: any) {
   // REVIZYON-062: every updater passes its SharedValue's .value itself. Reanimated
   // only subscribes a mapper to SharedValues found directly in the updater's
   // closure (extractInputs does not look inside nested worklet functions), so
@@ -4811,7 +4826,8 @@ const PlatformHouseView = memo(function PlatformHouseView({ index, platforms, st
     if (want !== mode) return OFF;
     const b = kediBox(g, aspect, FART_CHAR_H, HOUSE_GUTTER_H, mode === 0 ? uyuyanFoot : KEDI_DIK_FOOT);
     if (b.w <= 0) return OFF;
-    return { opacity: 1, transform: [{ translateX: b.left + b.w / 2 - MAHALLE_BOX / 2 }, { translateY: b.top + b.h / 2 - (MAHALLE_BOX * aspect) / 2 }, { scale: b.w / MAHALLE_BOX }] };
+    const titre = kediTitre ? kediTitre.value * 0.9 : 0;
+    return { opacity: 1, transform: [{ translateX: b.left + b.w / 2 - MAHALLE_BOX / 2 + titre }, { translateY: b.top + b.h / 2 - (MAHALLE_BOX * aspect) / 2 }, { scale: b.w / MAHALLE_BOX }] };
   });
   // CUMBA: cumba + teyze (normalde halı silker; amca bu kuleye inince bakar). Aynı kutu, teyze tuvali daha uzun.
   const cumbaLayer = (mode: number, aspect: number) => useAnimatedStyle(() => {
@@ -4832,6 +4848,10 @@ const PlatformHouseView = memo(function PlatformHouseView({ index, platforms, st
   const kediCumbaStyle = cumbaLayer(3, CUMBA_ASPECT); // kedili kulede aynı cumba (kedi pervazında)
   const amcaStyle = winStyle(3, AMCA_ASPECT);
   const cocukStyle = winStyle(4, COCUK_ASPECT);
+  const nefesStyle = useAnimatedStyle(() => {
+    const n = kediNefes ? kediNefes.value : 0;
+    return { opacity: n > 0.02 ? (1 - n) * 0.75 : 0, transform: [{ translateX: -9 * n }, { translateY: -5 * n }, { scale: 0.5 + 0.9 * n }] };
+  });
   const kediStyle = catStyle(0, KEDI_ASPECT);
   const kediGerStyle = catStyle(1, KEDI_GERINEN_ASPECT);
   const kediGriStyle = catStyle(2, KEDI_GRI_ASPECT);
@@ -4949,12 +4969,15 @@ const PlatformHouseView = memo(function PlatformHouseView({ index, platforms, st
         <>
           <Animated.View style={[{ position: "absolute", left: 0, top: 0, width: MAHALLE_BOX, height: MAHALLE_BOX * KEDI_ASPECT }, kediStyle]}>
             <Image source={mk.kedi} style={styles.houseFill} resizeMode="stretch" fadeDuration={0} />
+            {kediNefes ? <Animated.View pointerEvents="none" style={[{ position: "absolute", left: MAHALLE_BOX * 0.39 - 7, top: MAHALLE_BOX * KEDI_ASPECT * 0.74 - 4, width: 9, height: 6, borderRadius: 4, backgroundColor: "rgba(255,255,255,0.95)" }, nefesStyle]} /> : null}
           </Animated.View>
           <Animated.View style={[{ position: "absolute", left: 0, top: 0, width: MAHALLE_BOX, height: MAHALLE_BOX * KEDI_GERINEN_ASPECT }, kediGerStyle]}>
             <Image source={mk.kediGerinen} style={styles.houseFill} resizeMode="stretch" fadeDuration={0} />
+            {kediNefes ? <Animated.View pointerEvents="none" style={[{ position: "absolute", left: MAHALLE_BOX * 0.26 - 7, top: MAHALLE_BOX * KEDI_GERINEN_ASPECT * 0.7 - 4, width: 9, height: 6, borderRadius: 4, backgroundColor: "rgba(255,255,255,0.95)" }, nefesStyle]} /> : null}
           </Animated.View>
           <Animated.View style={[{ position: "absolute", left: 0, top: 0, width: MAHALLE_BOX, height: MAHALLE_BOX * KEDI_GRI_ASPECT }, kediGriStyle]}>
             <Image source={mk.kediGri} style={styles.houseFill} resizeMode="stretch" fadeDuration={0} />
+            {kediNefes ? <Animated.View pointerEvents="none" style={[{ position: "absolute", left: MAHALLE_BOX * 0.44 - 7, top: MAHALLE_BOX * KEDI_GRI_ASPECT * 0.7 - 4, width: 9, height: 6, borderRadius: 4, backgroundColor: "rgba(255,255,255,0.95)" }, nefesStyle]} /> : null}
           </Animated.View>
         </>
       )}

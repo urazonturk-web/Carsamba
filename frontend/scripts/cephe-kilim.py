@@ -14,7 +14,8 @@ from PIL import Image
 from scipy import ndimage as nd
 
 G = "assets/environment/district/house/g018/"
-HALLER = ["", "-kar", "-yagmur", "-kis", "-sonbahar"]
+# Kilim yalnız yaz ve sonbaharda asılı (TUTARLILIK 2026-11-24: kar/yağmur/kışta kilimsiz hücreler kullanılır).
+HALLER = ["", "-sonbahar"]
 CELL = 350
 # (desen no 1..6 ya da 0 = özgün kilim kalsın, zemin tonu derece ya da None = kırmızı kalsın, doygunluk çarpanı)
 PALET = [(0, None, 1.0), (1, 222, 0.9), (2, 42, 1.0), (3, 165, 0.85), (4, 30, 0.35), (5, 345, 1.0), (6, None, 1.0)]

@@ -4,7 +4,11 @@
 # sarı-turuncu), kış (yeşiller solgun, genel soğuk/soluk). Kullanım: python3 scripts/mevsim-arkaplan.py
 import numpy as np
 from PIL import Image, ImageFilter
-SRC = ["assets/environment/bosphorus-rooftop-day-master-v1.png", "assets/environment/bosphorus-low-silhouette.jpg"]
+import sys
+# TUTARLILIK (2026-11-24): kar/kış/yağmur, kedi-kilim-çamaşırı kaldırılmış "temiz" kaynaktan türetilir
+# (Kıvılcım master-temiz + alt-temiz). Sonbahar özgün kaynaktan. Kullanım: önce düz, sonra --temiz ile çalıştır.
+TEMIZ = "--temiz" in sys.argv
+SRC = ["assets/environment/mevsim/master-temiz.jpg", "assets/environment/mevsim/alt-temiz.jpg"] if TEMIZ else ["assets/environment/bosphorus-rooftop-day-master-v1.png", "assets/environment/bosphorus-low-silhouette.jpg"]
 NAMES = ["master", "alt"]
 
 def hsv(a):
@@ -41,7 +45,8 @@ for src, name in zip(SRC, NAMES):
     gray = k.mean(-1, keepdims=True)
     k = k * 0.78 + gray * 0.22                                          # genel soğuk/gri hava
     k = lerp(k, np.broadcast_to(np.array([0.72, 0.78, 0.86], np.float32), k.shape), (blue * 0.25).astype(np.float32))
-    Image.fromarray((np.clip(k, 0, 1) * 255).astype(np.uint8)).save(f"assets/environment/mevsim/{name}-kar.jpg", quality=88)
+    if TEMIZ:
+        Image.fromarray((np.clip(k, 0, 1) * 255).astype(np.uint8)).save(f"assets/environment/mevsim/{name}-kar.jpg", quality=88)
 
     # SONBAHAR: yeşiller sarı-turuncu-kızıl karışımına
     f = a.copy()
@@ -49,7 +54,8 @@ for src, name in zip(SRC, NAMES):
     autumn = np.stack([0.80 + 0.15 * rnd, 0.42 + 0.25 * rnd, 0.12 + 0.05 * rnd], -1).astype(np.float32)
     shade = (v / 0.75).clip(0.35, 1.15)[..., None]
     f = lerp(f, np.clip(autumn * shade, 0, 1), (green * 0.85).astype(np.float32))
-    Image.fromarray((np.clip(f, 0, 1) * 255).astype(np.uint8)).save(f"assets/environment/mevsim/{name}-sonbahar.jpg", quality=88)
+    if not TEMIZ:
+        Image.fromarray((np.clip(f, 0, 1) * 255).astype(np.uint8)).save(f"assets/environment/mevsim/{name}-sonbahar.jpg", quality=88)
 
     # KIŞ (karsız): yeşiller solgun kahve-gri, genel soğuk ve soluk
     w = a.copy()
@@ -58,5 +64,6 @@ for src, name in zip(SRC, NAMES):
     g2 = w.mean(-1, keepdims=True)
     w = w * 0.8 + g2 * 0.2
     w = lerp(w, np.broadcast_to(np.array([0.78, 0.84, 0.92], np.float32), w.shape), np.full(a.shape[:2], 0.08, np.float32))
-    Image.fromarray((np.clip(w, 0, 1) * 255).astype(np.uint8)).save(f"assets/environment/mevsim/{name}-kis.jpg", quality=88)
+    if TEMIZ:
+        Image.fromarray((np.clip(w, 0, 1) * 255).astype(np.uint8)).save(f"assets/environment/mevsim/{name}-kis.jpg", quality=88)
 print("ok")

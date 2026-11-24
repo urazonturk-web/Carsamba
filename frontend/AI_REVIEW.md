@@ -3134,3 +3134,13 @@ CHANGED:
 EVIDENCE (ai_review_evidence/MEVSIM-CEPHE-2026-11-24/): cephe-*-simdiki-kis-sonbahar.png, birlestirme-raporu.txt, sim-sonbahar-yagmur-kar.png (aynı yeni hücre üç havada).
 Testler: worklet sıra testi PASS, karga döngü testi PASS, tsc oyun kodunda hata yok.
 OPEN_ISSUES: Atlas 4200→8400 px: hava başına çözülmüş doku ~45 MB (önce ~22 MB); takılma için telefonda ölçülmedi. Uygulama boyutu +~25 MB (5 atlas). Sonbahar yağmurunda yaz bitkili yağmur atlası kullanılıyor. Kilimler yağmur/karda hâlâ asılı (kaldırmak ~10 çizim). Özgün 12 hücrenin FACADE_STARTS değerleri pencere ortasından geçiyor (oluk o satırdan başlıyor) — ayrı düzeltme. Android doğrulanmadı.
+
+## TUTARLILIK — karda/yağmurda kilim, arka plan kedisi, üşüyen kedi — 2026-11-24
+TASK: Kullanıcı videosu (14:38, kar): "kediler ile ilgili işler yapılmamış. hala kar yağarken dışarıda halı asılmış bunun gibi tutarsızlıklar olmasın" -> "Evet, 16 çizim" -> "Telefona kur ve gönder".
+CHANGED:
+- Cephe: kar/yağmur/kış 12'lik atlaslarında kilimli 5 hücre kilimsiz (Kıvılcım 15 çizim; 02/05/08'de sırık da kalkmış, duvar temiz). Kış hücre 11 çizilmedi (17. çağrı olurdu): kilim bölgesi aynı geometrideki kilimsiz yağmur hücresinden aktarıldı. 24'lük atlaslar cephe-cesit.py ile yeniden kuruldu (tablolar değişmedi); cephe-kilim.py artık yalnız yaz ve sonbahara desen uygular.
+- Arka plan: master-temiz.jpg (Kıvılcım) ve alt-temiz.jpg (Kıvılcım çıktısından yalnız kedi/kilim/çamaşır bölgeleri, σ=1.3 bulanıklıkla aktarıldı; aynalı kompozisyon korundu). mevsim-arkaplan.py --temiz ile kar/kış bunlardan türetildi; yeni BG_VARIANTS.yagmur = temiz. bgVariant: kar > kış > yağmur > sonbahar.
+- Kediler: karda ve karsız kışta kısa titreme nöbetleri (±0.9 px, 6×60 ms, 1.7 s ara) ve burundan nefes buharı (1.1 s); burun konumları sprite üzerinde ölçüldü.
+- Denetim listesi: ai_review_evidence/TUTARLILIK-2026-11-24/DENETIM-LISTESI.md.
+EVIDENCE: worklet sıra testi PASS, karga döngü testi PASS, tsc oyun kodunda hata yok. Simülatörde görülmedi (kullanıcı doğrudan telefona kurulum istedi).
+OPEN_ISSUES: Sonbahar yağmurunda cephe bitkileri yaz hâli. Titreme/nefes cihazda görülmedi. Android doğrulanmadı.
