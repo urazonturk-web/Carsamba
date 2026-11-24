@@ -3093,3 +3093,18 @@ REVIZYON-069 — cihaz sonucu bekleniyor; commit/push/deploy yok.
   - **Katman:** değişmedi (cephe kolonları, çatı kırpmaları, oluk aynı sırada).
   - **Risk:** üslup kabulü var, nihai kabul yok; cephe geçiş bölgesinde (balkon altı → panjur) hafif yarı saydamlık; tek renk/tek modül olduğu için tekrar hissi sürüyor; kontur/gölge (şartname 5) henüz yok. Kiremit ekranda ~%4 dikey esniyor (1170/118 ≈ 9,9 vs 486/47 ≈ 10,3).
 - Kod: `app/index.tsx` bayrak `GORSEL018_TRIAL = true` (false = eski görseller), etiket `G018 DENEME + R077`. tsc(app) 0, Release derleme + telefona kurulum OK. Yedek `backups/r070b-2026-11-10/index.tsx.pre-G018`. Commit yok.
+
+## KAR-CEPHE — kar yağan günde kış cephesi — 2026-11-24
+TASK: Kullanıcı videosu (11:14): karlı bölümde arka plan ve çatılar karlı, kule cepheleri yaz hâlinde. Kullanıcı: "balkonlardaki çiçekler vb şeylerde karlı olsun", "kışın çiçekler açmaz solar yaprak döker".
+CHANGED:
+- assets/environment/district/house/g018/facade-atlas-g018-kar.jpg (yeni, 4200×1340, 12 hücre).
+- app/index.tsx: KAR_CEPHE_ON, HOUSE_FACADE_KAR_SOURCE; PlatformHouseView'da roofWx === "kar" iken cephe kaynağı kış atlası. BUILD_TAG "KARLI CEPHE".
+- scripts/kar-cephe-birlestir.py (hizalama + aktarma), scripts/kivilcim-bekle.py (Kıvılcım bitişini Codex kaydından izler).
+EVIDENCE (ai_review_evidence/KAR-CEPHE-2026-11-24/):
+1. Dosya: Kıvılcım'ın hücre başına 12 kış çizimi (shared/KAR-CEPHE-preview/hucre-XX-kis.png); beyaz kenar payı kırpıldı, hücre tekrar boyuna (350×1035; hücre 0: 350×1340) küçültüldü.
+2. Ölçü/hizalama: kenar haritası eşleşmesiyle kayma 11 hücrede (0,0), hücre 0'da (0,0), hücre 3'te (0,1). Yalnız orijinalden belirgin farklı bölgeler (bitki, kar; hücre başına %13–40) yumuşak maskeyle aktarıldı; pencere/panjur/kilim/cumba orijinal piksel. 1035 tekrarı kopyayla birebir; hücre 0 üst/alt dikişi 30 px şeritte orijinale döner (dikiş farkı 8,8 = orijinal 8,8). Rapor: birlestirme-raporu.txt.
+   Bitki sayımı (yeşil yaprak pikseli, hücre başına): orijinal 2451–9483 → kış 0–1729; kalan renkli bölgeler gözle kontrol edildi: cumba süsü, çamaşır, kilim, pembe sıva (bitki değil).
+3. Katman: yalnız cephe Image kaynağı değişir; z-sırası, ölçüler, FACADE_STARTS/kargalar aynı. Atlas önden yüklenmez (yalnız karlı günde çözülür).
+4. Simülatör (iPhone 17, kar testi): sim-karli-cephe.png — menü ve oyun içinde kış cephesi, kargalar pervazda doğru.
+OPEN_ISSUES: Hücre 0 en alt balkonunda dikiş şeridinde (30 px) eski saksı yeşilinden kırıntı kalabilir. Telefonda gerçek kar günüyle görülmedi. Karlı atlas çözülünce bellek ~22 MB artar (yalnız kar günü). Android doğrulanmadı.
+NEXT: Kullanıcı telefon videosu.

@@ -1,0 +1,12 @@
+hucre 00: cizim 569x2171, kayma dy,dx=(0, 0), aktarilan alan %28, dikis farki 8.8
+hucre 01: cizim 729x2156, kayma dy,dx=(0, 0), aktarilan alan %40, dikis farki 10.6
+hucre 02: cizim 729x2156, kayma dy,dx=(0, 0), aktarilan alan %13, dikis farki 1.4
+hucre 03: cizim 729x2156, kayma dy,dx=(0, 1), aktarilan alan %15, dikis farki 3.0
+hucre 04: cizim 729x2156, kayma dy,dx=(0, 0), aktarilan alan %35, dikis farki 15.0
+hucre 05: cizim 729x2156, kayma dy,dx=(0, 0), aktarilan alan %15, dikis farki 2.0
+hucre 06: cizim 729x2156, kayma dy,dx=(0, 0), aktarilan alan %20, dikis farki 2.6
+hucre 07: cizim 729x2156, kayma dy,dx=(0, 0), aktarilan alan %29, dikis farki 9.3
+hucre 08: cizim 729x2156, kayma dy,dx=(0, 0), aktarilan alan %15, dikis farki 2.2
+hucre 09: cizim 729x2156, kayma dy,dx=(0, 0), aktarilan alan %17, dikis farki 2.8
+hucre 10: cizim 729x2156, kayma dy,dx=(0, 0), aktarilan alan %25, dikis farki 4.9
+hucre 11: cizim 729x2156, kayma dy,dx=(0, 0), aktarilan alan %19, dikis farki 3.0

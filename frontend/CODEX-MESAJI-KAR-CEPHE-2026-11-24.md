@@ -28,3 +28,24 @@ Not: Claude kodla bir deneme yaptı (ai_review_evidence/KAR-CEPHE-2026-11-24/oni
 - hizalama.txt: her hücre için orijinal ile karlı arasında kenar haritası kayması (px) ve 1035 tekrar farkı ölçümü
 
 Kurallar: yeni görsel yalnız bu atlas; fazlası gerekirse önce sor. Oyuna bağlama Claude Code'da; kullanıcı kabul etmeden oyuna girmez. Oyun kodunu değiştirme.
+
+## Revizyon 1 (Claude inceledi, 2026-11-24 11:40) — RET
+Teslim edilen aday, Claude'un kodla denemesiyle aynı yöntem: açmış kırmızı/pembe sardunyalar ve yapraklı sarmaşıklar duruyor. Kullanıcı tam olarak bunu reddetmişti ("kışın çiçekler açmaz solar yaprak döker bu şekilde canlı olmaz"). Onaylı iş ÇİZİM; görsel üretim çağrısı kullan.
+Önerilen yol (geometri korunur):
+1. Her hücre için bitki maskesi çıkar (saksı kutuları, sarmaşıklar, balkon çiçekleri; birkaç px genişlet). Pencere, panjur, kilim, cumba gövdesi maskenin DIŞINDA kalır.
+2. Görsel modeliyle yalnız maskeli bölgeyi yeniden çiz (inpainting / düzenleme): yapraksız kahverengi çıplak sarmaşık dalları; saksılarda kurumuş, kahverengi saplar; üstlerinde kar. Canlı yeşil yaprak ve açmış çiçek SIFIR.
+3. Maske dışını orijinal pikselden geri yapıştır (hizalama birebir kalır), sonra mevcut kar çıkıntılarını koru.
+4. 1035 tekrarını yeniden kur (0–305 bandını 1035–1340'a kopyala); hücre 0'da dikişi kontrol et.
+5. QA: her hücrede açmış çiçek ve yeşil yaprak kalmadığını yakın görüntüyle doğrula; kalırsa teslim etme, düzelt.
+Aynı çıktı adları; önceki aday dosyalarının üzerine yaz.
+
+## Revizyon 2 (2026-11-24) — 11 hücre çizimi, kullanıcı onaylı ("Evet, 11 çizim")
+Claude, senin tek hücre çizimini (generated_images/.../exec-236cf0b1-...png, hücre 1) 350×1035'e küçültünce pencere sıralarının orijinalle KAYMASIZ örtüştüğünü ölçtü (kayma 0,0). Bitki/kar bölgelerini kendisi aktardı; sonuç kabul edildi (ai_review_evidence/KAR-CEPHE-2026-11-24/hucre1-once-sonra.jpg). Yani yöntem çalışıyor; yerleştirmeyi Claude yapacak.
+Senden istenen: kalan 11 hücre için AYNI yöntem ve aynı istemle birer görsel düzenleme çağrısı (toplam 11, fazlası için sor):
+- Hücre 2–11: atlasın x = c×350 … c×350+350, y = 0 … 1035 bandı.
+- Hücre 0: y = 0 … 1340 (bu hücrenin tekrar boyu 1340).
+- İstem hücre 1'dekiyle aynı: kış, yapraksız çıplak dallar, saksılarda kuru saplar, karlı; mimari, pencere, panjur, kilim, cumba, çamaşır aynı yerde.
+- Bitki yoksa bile kilim/cumba/lamba üstlerine kar ekle.
+- Kırpma, hizalama, birleştirme YAPMA. Ham çıktıyı kaydet:
+  shared/KAR-CEPHE-preview/hucre-00-kis.png, hucre-02-kis.png … hucre-11-kis.png (hücre 1 için de mevcut çizimi hucre-01-kis.png olarak kopyala).
+- Bitince tek satır: hangi hücreler hazır, hangisinde açmış çiçek ya da yeşil yaprak kaldı.

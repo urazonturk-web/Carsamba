@@ -197,6 +197,11 @@ const HOUSE_FACADE_SOURCE = FACADE_ATLAS
   : GORSEL018_TRIAL
     ? require("@/assets/environment/district/house/g018/facade-g018-cream.png")
     : require("@/assets/environment/district/house/house-facade-column.png");
+// KAR CEPHE (2026-11-24, kullanıcı: "karlı bölümde kolonlarımız üzerinde hiç kar yok ... balkonlardaki çiçekler
+// vb şeylerde karlı olsun", "kışın çiçekler açmaz solar yaprak döker"): kar yağan günde aynı atlasın kış hâli
+// (yapraksız dallar, kuru saplar, kar). Pencere/panjur/kilim pikselleri ve 1035 tekrarı birebir aynı; ölçüler değişmez.
+const KAR_CEPHE_ON = FACADE_ATLAS && (true as boolean);
+const HOUSE_FACADE_KAR_SOURCE = require("@/assets/environment/district/house/g018/facade-atlas-g018-kar.jpg");
 const FACADE_CELLS = FACADE_ATLAS ? 12 : 1;
 // GORSEL-018 sartname 5: darker 3-unit outline + right-face shadow strip on the
 // playable towers, and a warm glow on the target tower's cap while charging.
@@ -368,7 +373,7 @@ const AnimatedImage = Animated.createAnimatedComponent(Image);
 const BG_SCROLL_TEST = true as boolean;
 const BG_SCROLL_RATIO = 0.45;
 const BG_SCROLL_TILES = 4;
-const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "TUM DUSUSLER") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
+const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "KARLI CEPHE") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
 const DIAG_MAX_EXAMPLES = 6;
 const HOUSE_AB_FROZEN = false as boolean;
 // REVIZYON-066 experiment (one variable): expo-linear-gradient's iOS layer
@@ -4837,13 +4842,14 @@ const PlatformHouseView = memo(function PlatformHouseView({ index, platforms, st
     const g = houseGeom.value;
     return g ? { top: g.rise + HOUSE_GUTTER_H - HOUSE_GUTTER_OVERLAP - 2, width: g.fw } : { width: 0 };
   });
+  const facadeSrc = KAR_CEPHE_ON && roofWx === "kar" ? HOUSE_FACADE_KAR_SOURCE : HOUSE_FACADE_SOURCE;
   return (
     <Animated.View pointerEvents="none" style={[styles.house, houseStyle]}>
       <Animated.View style={[styles.houseFacade, facadeStyle]}>
-        <Animated.View style={[styles.houseCol, col0]}><Image source={HOUSE_FACADE_SOURCE} style={styles.houseFill} resizeMode="stretch" fadeDuration={0} /></Animated.View>
-        <Animated.View style={[styles.houseCol, col1]}><Image source={HOUSE_FACADE_SOURCE} style={styles.houseFill} resizeMode="stretch" fadeDuration={0} /></Animated.View>
-        <Animated.View style={[styles.houseCol, col2]}><Image source={HOUSE_FACADE_SOURCE} style={styles.houseFill} resizeMode="stretch" fadeDuration={0} /></Animated.View>
-        {FACADE_ATLAS ? <Animated.View style={[styles.houseCol, col3]}><Image source={HOUSE_FACADE_SOURCE} style={styles.houseFill} resizeMode="stretch" fadeDuration={0} /></Animated.View> : null}
+        <Animated.View style={[styles.houseCol, col0]}><Image source={facadeSrc} style={styles.houseFill} resizeMode="stretch" fadeDuration={0} /></Animated.View>
+        <Animated.View style={[styles.houseCol, col1]}><Image source={facadeSrc} style={styles.houseFill} resizeMode="stretch" fadeDuration={0} /></Animated.View>
+        <Animated.View style={[styles.houseCol, col2]}><Image source={facadeSrc} style={styles.houseFill} resizeMode="stretch" fadeDuration={0} /></Animated.View>
+        {FACADE_ATLAS ? <Animated.View style={[styles.houseCol, col3]}><Image source={facadeSrc} style={styles.houseFill} resizeMode="stretch" fadeDuration={0} /></Animated.View> : null}
         {HOUSE_GRAD_FIXED ? (
           <>
             <Animated.View pointerEvents="none" style={[styles.houseLightFixed, lightStyle]}>

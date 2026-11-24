@@ -2048,3 +2048,4 @@ TESLIM_HAZIR: AMCA-DUSUS-YAGMUR-2026-11-23 — yağmurda da "eyvah" çırpınmas
 TESLIM_HAZIR: AMCA-DUSUS-KIS-2026-11-23 — kışta da "eyvah" çırpınması (bere + atkılı 2 kare); ai_review_evidence/AMCA-DUSUS-2026-11-23/RAPOR.md; pijama/şemsiye/özel şapka düşüşü hâlâ eski görünüm.
 
 TESLIM_HAZIR: AMCA-DUSUS-DIGER-2026-11-23 — pijama ve özel gün aksesuarlarıyla düşüş, şemsiyeli kareler (şemsiye kapalı olduğundan pasif); ai_review_evidence/AMCA-DUSUS-2026-11-23/RAPOR.md.
+TESLIM_HAZIR: KAR-CEPHE-2026-11-24 — kar yağan günde kış cephesi (yapraksız dallar, kuru saplar, kar), assets/.../facade-atlas-g018-kar.jpg, kanıt ai_review_evidence/KAR-CEPHE-2026-11-24/; kullanıcı atlası kabul etti, telefon videosu bekleniyor.
