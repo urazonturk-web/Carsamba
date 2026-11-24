@@ -48,15 +48,21 @@ def hizala_ve_aktar(o, g, dikis_koru=0):
 
 
 def main():
-    klasor, cikti = sys.argv[1], sys.argv[2]
-    src = np.asarray(Image.open(KAYNAK).convert("RGB")).astype(float) / 255
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("klasor"); ap.add_argument("cikti"); ap.add_argument("rapor", nargs="?")
+    ap.add_argument("--kaynak", default=KAYNAK, help="üzerine oturtulacak atlas")
+    ap.add_argument("--desen", default="hucre-{c:02d}-kis.png", help="hücre dosya adı deseni")
+    a = ap.parse_args()
+    klasor, cikti = a.klasor, a.cikti
+    src = np.asarray(Image.open(a.kaynak).convert("RGB")).astype(float) / 255
     out = src.copy()
     rapor = []
     for c in range(12):
         x0 = c * CELL
         per = PERIOD[c]
         try:
-            gi = Image.open(f"{klasor}/hucre-{c:02d}-kis.png").convert("RGB")
+            gi = Image.open(f"{klasor}/" + a.desen.format(c=c)).convert("RGB")
         except FileNotFoundError:
             rapor.append(f"hucre {c:02d}: CIZIM YOK, orijinal kaldi")
             continue
@@ -77,8 +83,8 @@ def main():
     Image.fromarray((np.clip(out, 0, 1) * 255).astype(np.uint8)).save(cikti, quality=92, subsampling=0)
     txt = "\n".join(rapor)
     print(txt)
-    if len(sys.argv) > 3:
-        open(sys.argv[3], "w").write(txt + "\n")
+    if a.rapor:
+        open(a.rapor, "w").write(txt + "\n")
 
 
 if __name__ == "__main__":

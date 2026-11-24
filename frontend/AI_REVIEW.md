@@ -3108,3 +3108,18 @@ EVIDENCE (ai_review_evidence/KAR-CEPHE-2026-11-24/):
 4. Simülatör (iPhone 17, kar testi): sim-karli-cephe.png — menü ve oyun içinde kış cephesi, kargalar pervazda doğru.
 OPEN_ISSUES: Hücre 0 en alt balkonunda dikiş şeridinde (30 px) eski saksı yeşilinden kırıntı kalabilir. Telefonda gerçek kar günüyle görülmedi. Karlı atlas çözülünce bellek ~22 MB artar (yalnız kar günü). Android doğrulanmadı.
 NEXT: Kullanıcı telefon videosu.
+
+## MEVSIM-MAHALLE — yağmur ve kar/kışta mahalle — 2026-11-24
+TASK: Kullanıcı videosu (12:11): "kışın ve yağmurlu havalarda çamaşır asılması saçma ... teyzede yaz modunda ... kışın kedi üşür halde gözüksün". 19 çizim onayı → "Kabul, bağla".
+CHANGED:
+- Yeni görseller (assets/environment/mahalle/): cumba-teyze-serin(-bakis).png (cumba pervazı y=414'te yumuşak kırpıldı), komsu-amca-serin, komsu-cocuk-serin, kedi-{uyuyan,gri-uyuyan,gerinen}-{kis,yagmur}.png. komsu-teyze-serin oyunda kullanılmadığı için eklenmedi.
+- Atlas: facade-atlas-g018-yagmur.jpg (yeni; 2/5/8/11 hücrelerinde çamaşır alındı), facade-atlas-g018-kar.jpg (aynı hücrelerde çamaşırsız sürümle güncellendi).
+- src/game/mahalle.ts: mahalleKaynak(hava) — kar/yağmurda serin teyze/komşu, kışta üşüyen, yağmurda ıslak kedi.
+- app/index.tsx: cephe kaynağı yağmurda yağmur atlası; mahalle görselleri mahalleKaynak(roofWx); turuncu uyuyan kedi kış/yağmurda ayak çizgisi KEDI_DIK_FOOT (görselde kuyruk sarkmıyor: gövde altı %99, orijinal %75). BUILD_TAG "MEVSIM MAHALLE".
+- scripts/kar-cephe-birlestir.py (--kaynak, --desen), scripts/yagmur-camasir-birlestir.py.
+EVIDENCE (ai_review_evidence/MEVSIM-MAHALLE-2026-11-24/):
+1. Dosya: Kıvılcım 19 çizim (shared/MEVSIM-MAHALLE-preview/). Tuval ölçüleri orijinalle aynı (ölçüldü).
+2. Ölçü/pivot: kedilerin son satırı orijinalle aynı; gövde alt çizgisi alfa taramasıyla ölçüldü (turuncu uyuyan: 191/255 → 254/255). Çamaşır hücreleri: kayma (0,0); kar atlasında aktarılan alan %4–6; yağmurda çizim duvara ıslaklık eklediği için yalnız çamaşır bölgesi (kar farkının en büyük bileşeni ±25 px) aktarıldı, alan %5–9.
+3. Katman: kaynak değişimi yalnız; kutular, z-sırası, yerleşim aynı.
+4. Simülatör (MAHALLE_TEST geçici açık, sonra kapatıldı): sim-yagmur-kar-teyze-kedi.png, sim-kedi-yagmur-kar.png.
+OPEN_ISSUES: Turuncu uyuyan kedinin yeni ayak çizgisi simülatörde görülmedi (yalnız ölçümle). Eski pencere komşuları (amca, çocuk) ESKI_KOMSULAR_ON=false nedeniyle oyunda zaten kapalı; görselleri hazır. Kar yağmayan kış ve sonbahar ikinci aşama. Android doğrulanmadı.

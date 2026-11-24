@@ -32,6 +32,33 @@ export const CUMBA_KEDI_SOURCE = require("@/assets/environment/mahalle/cumba-ked
 export const CUMBA_TEYZE_SOURCE = require("@/assets/environment/mahalle/cumba-teyze-hali.png");
 export const CUMBA_TEYZE_BAKIS_SOURCE = require("@/assets/environment/mahalle/cumba-teyze-bakis.png");
 export const CUMBA_TEYZE_ASPECT = 1300 / 1000;
+// MEVSIM-MAHALLE (2026-11-24, kullanıcı: "kışın ve yağmurlu havalarda çamaşır asılması saçma olmuş ... teyzede yaz
+// modunda ... kışın kedi üşür halde gözüksün" -> "Kabul, bağla"). Yağmur/kar hâlleri; tuval ölçüleri orijinalle aynı.
+// Teyze ve komşular "serin" hâli (hırka/kazak/bere) iki havada ortak; kediler kışın üşüyen, yağmurda ıslak.
+export type MahalleHava = "kar" | "yagmur" | null;
+const CUMBA_TEYZE_SERIN = require("@/assets/environment/mahalle/cumba-teyze-serin.png");
+const CUMBA_TEYZE_SERIN_BAKIS = require("@/assets/environment/mahalle/cumba-teyze-serin-bakis.png");
+const AMCA_SERIN = require("@/assets/environment/mahalle/komsu-amca-serin.png");
+const COCUK_SERIN = require("@/assets/environment/mahalle/komsu-cocuk-serin.png");
+const KEDI_KIS = require("@/assets/environment/mahalle/kedi-uyuyan-kis.png");
+const KEDI_YAGMUR = require("@/assets/environment/mahalle/kedi-uyuyan-yagmur.png");
+const KEDI_GRI_KIS = require("@/assets/environment/mahalle/kedi-gri-uyuyan-kis.png");
+const KEDI_GRI_YAGMUR = require("@/assets/environment/mahalle/kedi-gri-uyuyan-yagmur.png");
+const KEDI_GERINEN_KIS = require("@/assets/environment/mahalle/kedi-gerinen-kis.png");
+const KEDI_GERINEN_YAGMUR = require("@/assets/environment/mahalle/kedi-gerinen-yagmur.png");
+export function mahalleKaynak(hava: MahalleHava) {
+  const serin = hava === "kar" || hava === "yagmur";
+  const kis = hava === "kar", yag = hava === "yagmur";
+  return {
+    teyze: serin ? CUMBA_TEYZE_SERIN : CUMBA_TEYZE_SOURCE,
+    teyzeBakis: serin ? CUMBA_TEYZE_SERIN_BAKIS : CUMBA_TEYZE_BAKIS_SOURCE,
+    amca: serin ? AMCA_SERIN : AMCA_SOURCE,
+    cocuk: serin ? COCUK_SERIN : COCUK_SOURCE,
+    kedi: kis ? KEDI_KIS : yag ? KEDI_YAGMUR : KEDI_SOURCE,
+    kediGri: kis ? KEDI_GRI_KIS : yag ? KEDI_GRI_YAGMUR : KEDI_GRI_SOURCE,
+    kediGerinen: kis ? KEDI_GERINEN_KIS : yag ? KEDI_GERINEN_YAGMUR : KEDI_GERINEN_SOURCE,
+  };
+}
 // Eski küçük pencere komşuları (komşu amca, çocuk) oran sorunu yüzünden kapalı; cumbalı sürümleri çizilince açılır.
 export const ESKI_KOMSULAR_ON = false as boolean;
 /** Görsellerin sabit kutu genişliği (dünya birimi); gerçek boyut transform scale ile verilir. */
