@@ -3123,3 +3123,14 @@ EVIDENCE (ai_review_evidence/MEVSIM-MAHALLE-2026-11-24/):
 3. Katman: kaynak değişimi yalnız; kutular, z-sırası, yerleşim aynı.
 4. Simülatör (MAHALLE_TEST geçici açık, sonra kapatıldı): sim-yagmur-kar-teyze-kedi.png, sim-kedi-yagmur-kar.png.
 OPEN_ISSUES: Turuncu uyuyan kedinin yeni ayak çizgisi simülatörde görülmedi (yalnız ölçümle). Eski pencere komşuları (amca, çocuk) ESKI_KOMSULAR_ON=false nedeniyle oyunda zaten kapalı; görselleri hazır. Kar yağmayan kış ve sonbahar ikinci aşama. Android doğrulanmadı.
+
+## MEVSIM-CEPHE + CEPHE-CESIDI — kış/sonbahar cepheleri ve 24 hücre — 2026-11-24
+TASK: Kullanıcı: "Kabul" (kış/sonbahar) -> "12 cepheye biraz daha varyasyon ... halı desenini değiştirelim yerlerini değiştirelim" -> "1+2+3, önce mevsimi bağla".
+CHANGED:
+- Mevsim: kış (karsız; yapraksız, kuru sap, çamaşırsız) ve sonbahar (sarı-turuncu yaprak, solgun çiçek/krizantem) atlasları; Kıvılcım 24 hücre çizimi, scripts/kar-cephe-birlestir.py ile hizalandı (kayma 0, dikiş orijinal düzeyinde).
+- app/index.tsx: cepheHal = kar | yagmur (kışta yağmur -> kış) | kis | sonbahar | null; cepheKaynak(). Karsız kışta teyze/kediler kış hâli. Cat ayak çizgisi kışta da KEDI_DIK_FOOT.
+- Çeşit: scripts/cephe-cesit.py — gerçek boş sıva bantlarından (FACADE_STARTS bu atlasta pencere ortasından geçiyor, kullanılmadı) kat kesip aynı sıva rengindeki 3 hücrenin katlarını karıştırarak 12 yeni hücre; yeni hücrelerde yeşil boya (panjur/cumba) mavi/ceviz/bordo. 5 atlasa aynı işlem -> facade-atlas-g018{,-kar,-yagmur,-kis,-sonbahar}-24.jpg (8400×1340). src/game/cepheCesit.ts: dönem, başlangıç (yeni hücrelerde gerçek kat sınırları), karga tünekleri (katlarla taşındı); karga.ts KARGA_TUNEK = CEPHE_TUNEK.
+- Kilim: scripts/cephe-kilim.py — Kıvılcım 6 düz motif (hepsi kırmızı geldi); renk kodla (lacivert, hardal, turkuaz, krem, bordo); kilimin kıvrım ışığı (σ=7 bulanık parlaklık) ile çarpılıp yerine kondu.
+EVIDENCE (ai_review_evidence/MEVSIM-CEPHE-2026-11-24/): cephe-*-simdiki-kis-sonbahar.png, birlestirme-raporu.txt, sim-sonbahar-yagmur-kar.png (aynı yeni hücre üç havada).
+Testler: worklet sıra testi PASS, karga döngü testi PASS, tsc oyun kodunda hata yok.
+OPEN_ISSUES: Atlas 4200→8400 px: hava başına çözülmüş doku ~45 MB (önce ~22 MB); takılma için telefonda ölçülmedi. Uygulama boyutu +~25 MB (5 atlas). Sonbahar yağmurunda yaz bitkili yağmur atlası kullanılıyor. Kilimler yağmur/karda hâlâ asılı (kaldırmak ~10 çizim). Özgün 12 hücrenin FACADE_STARTS değerleri pencere ortasından geçiyor (oluk o satırdan başlıyor) — ayrı düzeltme. Android doğrulanmadı.

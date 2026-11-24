@@ -1,3 +1,4 @@
+import { CEPHE_TUNEK } from "./cepheCesit";
 // KARGALAR (2026-11-22, kullanıcı: "balkonların korkuluklarında, çamaşır iplerinde, çiçeklerin yanlarında
 // hareket eden kargalar"). Görseller Kıvılcım KARGA-preview, kullanıcı kabulü "Kabul, bağla".
 // Yalnız görsel: cephenin üstünde durur, çatıya / iniş yüzeyine / fiziğe dokunmaz.
@@ -20,20 +21,8 @@ export const KARGA_MAX_Y = 450;
 // Tünek noktaları: cephe atlası hücre pikseli (hücre 350 px genişlik, x = hücre içi, y = tünek çizgisi),
 // facade-atlas-g018.jpg üzerinde ızgarayla elle ölçüldü. Korkuluk üstü, halı sırığı, çamaşır ipi ucu,
 // pencere pervazı (çiçeklerin yanı), cumba çatısı.
-export const KARGA_TUNEK: number[][][] = [
-  [[90, 188], [175, 700], [175, 960], [100, 1252]],
-  [[175, 155], [175, 378], [175, 585], [175, 770], [175, 963], [175, 1190]],
-  [[90, 198], [175, 340], [95, 688], [90, 1235]],
-  [[175, 212], [175, 498], [175, 710], [175, 1250]],
-  [[175, 147], [175, 362], [175, 570], [175, 780], [175, 972], [175, 1180]],
-  [[150, 200], [175, 325], [175, 728], [262, 905]],
-  [[100, 210], [175, 487], [175, 700], [100, 1250]],
-  [[175, 168], [175, 447], [175, 695], [175, 950], [175, 1200]],
-  [[85, 190], [175, 518], [175, 965], [85, 1218]],
-  [[110, 215], [175, 488], [175, 710], [245, 985], [110, 1245]],
-  [[170, 172], [170, 447], [170, 690], [170, 940], [170, 1205]],
-  [[75, 155], [175, 310], [175, 748], [175, 998], [75, 1188]],
-];
+// 24 hücrelik cephe atlası: tünekler kat karışımıyla birlikte taşındı (scripts/cephe-cesit.py).
+export const KARGA_TUNEK: number[][][] = CEPHE_TUNEK;
 
 function kHash(id: number, salt: number) {
   "worklet";

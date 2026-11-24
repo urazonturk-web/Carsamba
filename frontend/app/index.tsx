@@ -56,6 +56,7 @@ import { SFX_ON, initSfx, playFart, playSfx, setSfxMuted, stopFart, stopSfx } fr
 import { GAME_OVER_LINE, QUIP_ON, multiJumpShout, pickQuip, quipContext } from "../src/game/copy";
 import { mahalleSes } from "../src/game/mahalleSes";
 import { KARGA_ON, KARGA_TUNEMIS, KARGA_BAKIS, KARGA_YEM, KARGA_HAVALANMA, KARGA_FOOT_Y, KARGA_BOX_K, KARGA_MAX_Y, kargaSayisi, kargaTunek, kargaTunekAny, kargaBekle, kargaHedefTuru, kargaRngYap, kargaUcus, KARGA_TEST, KARGA_HAVUZ, KARGA_UCUS_MS } from "../src/game/karga";
+import { CEPHE_HUCRE, CEPHE_DONEM_PX, CEPHE_BASLANGIC_PX } from "../src/game/cepheCesit";
 import { MAHALLE_ON, MAHALLE_SPEECH_ON, CUMBA_SOURCE, CUMBA_KEDI_SOURCE, CUMBA_ASPECT, CUMBA_TEYZE_SOURCE, CUMBA_TEYZE_BAKIS_SOURCE, CUMBA_TEYZE_ASPECT, cumbaBox, MAHALLE_BOX, TEYZE_ASPECT, KEDI_ASPECT, KEDI_UYUYAN_FOOT, KEDI_DIK_FOOT, AMCA_ASPECT, COCUK_ASPECT, KEDI_GERINEN_ASPECT, KEDI_GRI_ASPECT, TEYZE_SOURCE, KEDI_SOURCE, AMCA_SOURCE, COCUK_SOURCE, KEDI_GERINEN_SOURCE, KEDI_GRI_SOURCE, KEDI_ADLARI, sakin, teyzeBox, kediBox, kediAdi, kediGri, kediGriNo, pencereAspect, pencereLafi, kediLafi, KEDI_DEFTER_KEY, mahalleKaynak } from "../src/game/mahalle";
 import { OZEL_GUN_ON, OZEL_GUN_TEST_TAP, OZEL_GUNLER, OZEL_GUN_TEST_ORDER, todaysEvent } from "../src/game/ozelGun";
 import { HANIM_ON, ICSES_ON, LAKAP_ON, newRunStats, noteLanding, icSesAfterLanding, icSesIdle, hanimMessage, lakap } from "../src/game/amcaSesi";
@@ -193,7 +194,7 @@ const HOUSE_GUTTER_SOURCE = require("@/assets/environment/district/house/house-g
 // switches variant with a layout offset only -- no React re-render, no new decode.
 const FACADE_ATLAS = GORSEL018_TRIAL;
 const HOUSE_FACADE_SOURCE = FACADE_ATLAS
-  ? require("@/assets/environment/district/house/g018/facade-atlas-g018.jpg")
+  ? require("@/assets/environment/district/house/g018/facade-atlas-g018-24.jpg")
   : GORSEL018_TRIAL
     ? require("@/assets/environment/district/house/g018/facade-g018-cream.png")
     : require("@/assets/environment/district/house/house-facade-column.png");
@@ -201,11 +202,22 @@ const HOUSE_FACADE_SOURCE = FACADE_ATLAS
 // vb şeylerde karlı olsun", "kışın çiçekler açmaz solar yaprak döker"): kar yağan günde aynı atlasın kış hâli
 // (yapraksız dallar, kuru saplar, kar). Pencere/panjur/kilim pikselleri ve 1035 tekrarı birebir aynı; ölçüler değişmez.
 const KAR_CEPHE_ON = FACADE_ATLAS && (true as boolean);
-const HOUSE_FACADE_KAR_SOURCE = require("@/assets/environment/district/house/g018/facade-atlas-g018-kar.jpg");
+const HOUSE_FACADE_KAR_SOURCE = require("@/assets/environment/district/house/g018/facade-atlas-g018-kar-24.jpg");
 // MEVSIM-MAHALLE (2026-11-24): yağmurda çamaşır içeride (4 çamaşırlı hücrede ip boş; geri kalan piksel orijinal).
 // Kar atlası da çamaşırsız sürümle güncellendi.
-const HOUSE_FACADE_YAGMUR_SOURCE = require("@/assets/environment/district/house/g018/facade-atlas-g018-yagmur.jpg");
-const FACADE_CELLS = FACADE_ATLAS ? 12 : 1;
+const HOUSE_FACADE_YAGMUR_SOURCE = require("@/assets/environment/district/house/g018/facade-atlas-g018-yagmur-24.jpg");
+// MEVSIM-CEPHE (2026-11-24, kullanıcı: "Kabul" -> "1+2+3, önce mevsimi bağla"): kar yağmayan kış (yapraksız, kuru
+// saplar, çamaşır yok) ve sonbahar (sarı-turuncu yaprak, solgun çiçek). Geometri birebir aynı.
+const HOUSE_FACADE_KIS_SOURCE = require("@/assets/environment/district/house/g018/facade-atlas-g018-kis-24.jpg");
+const HOUSE_FACADE_SONBAHAR_SOURCE = require("@/assets/environment/district/house/g018/facade-atlas-g018-sonbahar-24.jpg");
+type CepheHal = "kar" | "yagmur" | "kis" | "sonbahar" | null;
+function cepheKaynak(h: CepheHal) {
+  if (!KAR_CEPHE_ON) return HOUSE_FACADE_SOURCE;
+  return h === "kar" ? HOUSE_FACADE_KAR_SOURCE : h === "yagmur" ? HOUSE_FACADE_YAGMUR_SOURCE : h === "kis" ? HOUSE_FACADE_KIS_SOURCE : h === "sonbahar" ? HOUSE_FACADE_SONBAHAR_SOURCE : HOUSE_FACADE_SOURCE;
+}
+// CEPHE ÇEŞİDİ (2026-11-24, kullanıcı: "12 cepheye biraz daha varyasyon ekleyelim" -> "1+2+3"): 24 hücre;
+// 12-23 kat karışımı + panjur rengi + kilim deseni (scripts/cephe-cesit.py, cephe-kilim.py). Tablolar cepheCesit.ts'de.
+const FACADE_CELLS = FACADE_ATLAS ? CEPHE_HUCRE : 1;
 // GORSEL-018 sartname 5: darker 3-unit outline + right-face shadow strip on the
 // playable towers, and a warm glow on the target tower's cap while charging.
 const KONTUR_PARILTI = true as boolean;
@@ -218,14 +230,9 @@ const HOUSE_SHADE_A = KONTUR_PARILTI ? 0.4 : 0.3;
 const GLOW_W = 200;
 const GLOW_H = 38;
 // order: cream, light-pink, ochre, gray-blue x (window, balcony, kilim/laundry/cumba)
-const FACADE_PERIOD_PX = [1340, 1035, 1035, 1035, 1035, 1035, 1035, 1035, 1035, 1035, 1035, 1035];
+const FACADE_PERIOD_PX = CEPHE_DONEM_PX;
 // calm wall rows per variant (cell px) -- the gutter never cuts through a window
-const FACADE_STARTS_PX = [
-  [0, 393, 725, 1018], [3, 284, 692, 1029], [0, 437, 658, 1031],
-  [0, 379, 745, 1021], [228, 515, 649, 890], [0, 384, 769, 1021],
-  [0, 377, 730, 1031], [10, 371, 543, 876], [8, 293, 605, 1028],
-  [242, 426, 742, 1029], [0, 367, 525, 1029], [0, 392, 659, 1026],
-];
+const FACADE_STARTS_PX = CEPHE_BASLANGIC_PX;
 const HOUSE_K = DISTRICT_SCALE;
 const HOUSE_ROOF_W = 486 * HOUSE_K;
 const HOUSE_ROOF_H = 47 * HOUSE_K;
@@ -376,7 +383,7 @@ const AnimatedImage = Animated.createAnimatedComponent(Image);
 const BG_SCROLL_TEST = true as boolean;
 const BG_SCROLL_RATIO = 0.45;
 const BG_SCROLL_TILES = 4;
-const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "MEVSIM MAHALLE") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
+const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "CEPHE CESIDI") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
 const DIAG_MAX_EXAMPLES = 6;
 const HOUSE_AB_FROZEN = false as boolean;
 // REVIZYON-066 experiment (one variable): expo-linear-gradient's iOS layer
@@ -1512,6 +1519,8 @@ export default function Game() {
   const testEntry = weatherTest >= 0 ? WEATHER_TEST_CYCLE[weatherTest] : null;
   const season: Season = testEntry?.season ?? seasonFor(Date.now(), istWeather ? istWeather.temp : null);
   const roofWx: "kar" | "yagmur" | null = !ISTANBUL_ON ? null : shownWeather?.kind === "kar" ? "kar" : shownWeather?.kind === "yagmur" ? "yagmur" : null;
+  // Kış yağmurunda yaz bitkisi olmasın: yağmur + kış -> kış cephesi (zaten çamaşırsız).
+  const cepheHal: CepheHal = !ISTANBUL_ON ? null : roofWx === "kar" ? "kar" : roofWx === "yagmur" ? (season === "kis" ? "kis" : "yagmur") : season === "kis" ? "kis" : season === "sonbahar" ? "sonbahar" : null;
   const bgVariant: keyof typeof BG_VARIANTS | null = !ISTANBUL_ON ? null : roofWx === "kar" ? "kar" : season === "sonbahar" ? "sonbahar" : season === "kis" ? "kis" : null;
   // Gece (gerçek saat ya da gece durakları): skor koyu gökte okunsun diye açık renk.
   const nightHud = ISTANBUL_ON && (isNightNow || (DURAK_SEFER && stopsPassed(lastTowerRef.current) >= NIGHT_STOP));
@@ -3692,7 +3701,7 @@ export default function Game() {
         )}
         {!USE_FIXED_PANEL_COURSE && POOL_IDX.map((i) => (POPUP
           ? <PopupHouseView key={`pu-house-${i}`} index={i} platforms={platforms} styles={styles} />
-          : <PlatformHouseView key={`house-${i}`} index={i} platforms={HOUSE_AB_FROZEN ? housePlatformsFrozen : platforms} styles={styles} probe={houseProbe} roofWx={roofWx} woken={MAHALLE_ON ? catWoken : undefined} look={MAHALLE_ON ? neighborLook : undefined} kTick={kTick} kGone={kGone} kAmcaX={kAmcaX} />
+          : <PlatformHouseView key={`house-${i}`} index={i} platforms={HOUSE_AB_FROZEN ? housePlatformsFrozen : platforms} styles={styles} probe={houseProbe} roofWx={roofWx} cepheHal={cepheHal} woken={MAHALLE_ON ? catWoken : undefined} look={MAHALLE_ON ? neighborLook : undefined} kTick={kTick} kGone={kGone} kAmcaX={kAmcaX} />
         ))}
         {KARGA_ON && kargaPoolStyles.map((st, j) => (
           <Animated.View key={`karga-ucan-${j}`} pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, width: MAHALLE_BOX, height: MAHALLE_BOX }, st]}>
@@ -4656,7 +4665,7 @@ function PierConfetti({ W, H, onDone }: { W: number; H: number; onDone: () => vo
   );
 }
 
-const PlatformHouseView = memo(function PlatformHouseView({ index, platforms, styles, probe, roofWx, woken, look, kTick, kGone, kAmcaX }: any) {
+const PlatformHouseView = memo(function PlatformHouseView({ index, platforms, styles, probe, roofWx, cepheHal, woken, look, kTick, kGone, kAmcaX }: any) {
   // REVIZYON-062: every updater passes its SharedValue's .value itself. Reanimated
   // only subscribes a mapper to SharedValues found directly in the updater's
   // closure (extractInputs does not look inside nested worklet functions), so
@@ -4792,7 +4801,7 @@ const PlatformHouseView = memo(function PlatformHouseView({ index, platforms, st
   });
   // mode 0 = turuncu uyuyan, 1 = turuncu gerinen (amca bu kuleye indiyse), 2 = gri uyuyan
   // MEVSIM-MAHALLE: kış/yağmur turuncu kedisinde kuyruk sarkmıyor -> gövde alt çizgisi tuvalin altında (%99).
-  const uyuyanFoot = roofWx === "kar" || roofWx === "yagmur" ? KEDI_DIK_FOOT : KEDI_UYUYAN_FOOT;
+  const uyuyanFoot = roofWx === "kar" || roofWx === "yagmur" || cepheHal === "kis" ? KEDI_DIK_FOOT : KEDI_UYUYAN_FOOT;
   const catStyle = (mode: number, aspect: number) => useAnimatedStyle(() => {
     const g = houseGeom.value;
     if (!g || sakin(g.p.id) !== 2) return OFF;
@@ -4847,8 +4856,9 @@ const PlatformHouseView = memo(function PlatformHouseView({ index, platforms, st
     const g = houseGeom.value;
     return g ? { top: g.rise + HOUSE_GUTTER_H - HOUSE_GUTTER_OVERLAP - 2, width: g.fw } : { width: 0 };
   });
-  const facadeSrc = KAR_CEPHE_ON && roofWx === "kar" ? HOUSE_FACADE_KAR_SOURCE : KAR_CEPHE_ON && roofWx === "yagmur" ? HOUSE_FACADE_YAGMUR_SOURCE : HOUSE_FACADE_SOURCE;
-  const mk = mahalleKaynak(roofWx);
+  const facadeSrc = cepheKaynak(cepheHal);
+  // Mahalle: kar/yağmur kendi hâlleri; kar yağmayan kışta da üşüyen kediler ve şallı teyze (kış hâli).
+  const mk = mahalleKaynak(roofWx === "kar" || roofWx === "yagmur" ? roofWx : cepheHal === "kis" ? "kar" : null);
   return (
     <Animated.View pointerEvents="none" style={[styles.house, houseStyle]}>
       <Animated.View style={[styles.houseFacade, facadeStyle]}>
