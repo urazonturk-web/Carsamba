@@ -3172,3 +3172,12 @@ TASK: Video 14:03 (yağmur + kar denemesi): cumbalarda hep şallı teyze. Gözle
 CHANGED: Neden (ölçüm, Python ile aynı formül): eski mhash neredeyse doğrusal; kule 3–80 arası kadın kulelerinin 5/7'si teyze (K0), ilk 20 kulede yalnız kule 3 ve 15 kadın, ikisi de teyze. Günün haritası her oyunda aynı kimliklerle geldiği için oyuncu hep aynı sakinleri görüyordu. mhash -> murmur3 sonlandırıcı + SAKIN_TOHUM (makeMutable; restart'ta Math.random). Yalnız sakin yeri/kadın/kedi adı-görünümü; kule üretimi, fizik, kamera, iniş dokunulmadı. BUILD_TAG "CESIT SAKIN 3".
 EVIDENCE: Python benzetimi (4 tohum, kule 3–59): her tohumda 3–4 farklı kadın, 4–6 farklı kedi. tsc hata yok. Simülatör: oyun açıldı, sakinler yeni yerlerde, çökme yok — ai_review_evidence/CESIT-SAKIN-3-simulator.png.
 OPEN_ISSUES: Kedi adları artık oyuna göre değişir (defter birikimi sürer). Cihazda görülmedi. Android doğrulanmadı.
+
+## MEVSIM-SILUET — arka plan İstanbul silueti mevsime göre (çizim) — 2026-11-25
+TASK: Kullanıcı: "karda arkadaki istanbul siluetini de karlı yapalım. mevsimlere göre arkadaki istanbul silueti de mevsime göre değişsin" -> "Evet, 4 çizim" -> "Kabul, bağla".
+CHANGED:
+- Dosya: Kıvılcım shared/MEVSIM-SILUET-preview/master-{kar,kis,sonbahar,yagmur}.png -> assets/environment/mevsim/master-{kar,kis,sonbahar,yagmur}.jpg (q90, 4:4:4). Eski kar/kış/sonbahar master'ları (kodla renk kaydırma) üzerine yazıldı; yağmur yeni (eskiden master-temiz). Brif: CODEX-MESAJI-MEVSIM-SILUET-2026-11-25.md.
+- Ölçü/pivot: 941×1672, kaynakla (kar/kış/yağmur: master-temiz; sonbahar: bosphorus-rooftop-day-master-v1) siluet bandı y 380–960 kenar haritası faz korelasyonu: kar dy=+1, yağmur dy=−1 -> np.roll ile düzeltildi, sonra hepsi (0,0).
+- Katman: BG_VARIANTS değişmedi (yalnız yagmur.m -> master-yagmur.jpg); alt-* (alçak çatı katmanı) kodla renkli olarak kaldı. BUILD_TAG "MEVSIM SILUET".
+EVIDENCE: Simülatör: menüde sonbahar/yağmur/kar (ai_review_evidence/MEVSIM-SILUET-simulator-menu.jpg), oyunda kar: karlı kubbe ve çatılar (MEVSIM-SILUET-simulator-kar.png). Önizleme ai_review_evidence/MEVSIM-SILUET-onizleme.jpg.
+OPEN_ISSUES (Risk): Karsız kış oyunda görülmedi (bugün sonbahar). Hava filtresiyle birlikte karda ton biraz sıcak/sepya. Önündeki alçak çatı katmanı (alt-*) hâlâ kodla renkli. Cihazda görülmedi; Android doğrulanmadı.

@@ -15,6 +15,7 @@ Hâller: YAZ (ilkbahar/yaz, kuru) · SONBAHAR (kuru) · KIŞ (kar yok) · YAĞMU
 | Cumba kadını (4 kişi, 2026-11-25) | halı/çiçek/örgü/sofra bezi | halı/çiçek/örgü/sofra bezi | 4 kadın, kalın giysi + çay/fincan | aynı | aynı | aynı |
 | Kediler (kule; 6 görünüm, her birinin kış/yağmur hâli var) | uyuyan/gerinen + smokin/beyaz/üç renk/oturan tekir | uyuyan/gerinen | üşüyen + titreme + nefes buharı | ıslak | ıslak | üşüyen + titreme + nefes |
 | Arka plan çatısındaki kedi/kilim/çamaşır | var | var | yok | yok | yok | yok |
+| Arka plan İstanbul silueti (çizim, 2026-11-25) | yaz | sarı-turuncu ağaç | kapalı gök, çıplak ağaç | koyu bulut, ıslak çatı | kapalı gök, çıplak ağaç | karlı kubbe/çatı, kar yağışı |
 | Arka plan bitkileri | yeşil | sarı-turuncu | solgun | yeşil (temiz) | solgun | karlı |
 | Amca kıyafeti | eşofman | eşofman | bere + atkı | yağmurluk + kasket | yağmurluk + kasket | bere + atkı |
 | Düşüş pozu | normal | normal | kış | yağmur | yağmur | kış |
