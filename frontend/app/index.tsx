@@ -383,7 +383,7 @@ const AnimatedImage = Animated.createAnimatedComponent(Image);
 const BG_SCROLL_TEST = true as boolean;
 const BG_SCROLL_RATIO = 0.45;
 const BG_SCROLL_TILES = 4;
-const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "MEVSIM SILUET") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
+const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "KAR FILTRE") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
 const DIAG_MAX_EXAMPLES = 6;
 const HOUSE_AB_FROZEN = false as boolean;
 // REVIZYON-066 experiment (one variable): expo-linear-gradient's iOS layer
@@ -571,6 +571,8 @@ const CONFETTI = Array.from({ length: 22 }, (_, i) => {
 });
 // 2026-11-12 video 13-15-13: ilk tonlar telefonda neredeyse fark edilmedi (gök mavisi ~%5 ısındı) -> güçlendirildi.
 const SKY_TINTS = ["rgba(255,205,130,0)", "rgba(255,206,120,0.20)", "rgba(255,150,70,0.30)", "rgba(240,90,70,0.36)", "rgba(16,26,74,0.50)"];
+// KAR-FILTRE (2026-11-25): kapalı karlı havada güneşin turuncu ikindi/gün batımı ışığı yok -> aynı kararma, soğuk gri ton.
+const SKY_TINTS_KAR = ["rgba(200,210,225,0)", "rgba(196,206,222,0.08)", "rgba(150,160,184,0.16)", "rgba(110,112,148,0.26)", "rgba(16,26,74,0.50)"];
 const BEST_SCORE_KEY = REFERENCE_TRIAL ? "jumpcharge.bestScore.reference.v1" : "jumpcharge.bestScore";
 // EXPERIMENTAL_COURSE (see src/game/config.ts) swaps the fixed, measured
 // REFERENCE_COURSE for the procedural generator below, independent of
@@ -3208,8 +3210,9 @@ export default function Game() {
   const fly0 = useAnimatedStyle(() => { const a = flyT.value * Math.PI * 2; return { transform: [{ translateX: Math.cos(a) * 30 }, { translateY: Math.sin(a * 2) * 9 }] }; });
   const fly1 = useAnimatedStyle(() => { const a = flyT.value * Math.PI * 2 + 2.1; return { transform: [{ translateX: Math.cos(-a) * 24 }, { translateY: Math.sin(a * 3) * 11 - 6 }] }; });
   const fly2 = useAnimatedStyle(() => { const a = flyT.value * Math.PI * 4 + 4.2; return { transform: [{ translateX: Math.cos(a) * 18 }, { translateY: Math.sin(a) * 7 - 14 }] }; });
+  const skyTintKar = roofWx === "kar";
   const skyTintStyle = useAnimatedStyle(() => ({
-    backgroundColor: interpolateColor(skyStep.value, SKY_STEPS, SKY_TINTS),
+    backgroundColor: interpolateColor(skyStep.value, SKY_STEPS, skyTintKar ? SKY_TINTS_KAR : SKY_TINTS),
   }));
   // Rekor bayrağı: şimdiye kadar varılan en uzak kulenin çatısında.
   const recordFlagStyle = useAnimatedStyle(() => {
@@ -3430,10 +3433,12 @@ export default function Game() {
           )}
         </Animated.View>
       )}
-      {!POPUP && <View style={[styles.backgroundWash, GORUNUM_REV && { opacity: 0.26 }]} pointerEvents="none" />}
+      {/* KAR-FILTRE (2026-11-25, "kar filtresini biraz hafiflet"): karda beyaz örtü 0.26 -> 0.12 ve ufuktaki sıcak
+          (turuncu) ton kapalı; karlı master zaten kapalı-gri çizim, üst üste binince sahne soluk-sarımsı oluyordu. */}
+      {!POPUP && <View style={[styles.backgroundWash, GORUNUM_REV && { opacity: roofWx === "kar" ? 0.12 : 0.26 }]} pointerEvents="none" />}
       {/* REVIZYON-034: very light depth/colour: warm glow toward the horizon,
           deeper blue at the top. Screen-space, under the world + HUD. */}
-      {!POPUP && <LinearGradient pointerEvents="none" colors={["rgba(30,120,230,0.10)", "rgba(255,190,120,0)", "rgba(255,170,100,0.10)"]}
+      {!POPUP && <LinearGradient pointerEvents="none" colors={roofWx === "kar" ? ["rgba(60,110,190,0.08)", "rgba(255,190,120,0)", "rgba(255,170,100,0)"] : ["rgba(30,120,230,0.10)", "rgba(255,190,120,0)", "rgba(255,170,100,0.10)"]}
         locations={[0, 0.5, 1]} style={styles.fill} />}
       {DURAK_SEFER && !POPUP && <Animated.View pointerEvents="none" style={[styles.fill, skyTintStyle]} />}
       {DURAK_SEFER && !POPUP && (

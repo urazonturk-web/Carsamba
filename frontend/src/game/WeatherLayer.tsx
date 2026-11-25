@@ -52,8 +52,10 @@ const FOG_WASH_AT = [0, 0.16, 0.27, 0.38, 0.55, 0.7, 1] as const;
 // Sis bandı: üst üste binen yumuşak elipsler (bulanıklık yok; düşük opaklıklı katmanlar yumuşak kenar verir).
 const FOG_PUFF = Array.from({ length: 9 }, (_, i) => ({ x: i / 9 + (hash(i, 31) - 0.5) * 0.06, w: 0.32 + hash(i, 32) * 0.22, h: 0.55 + hash(i, 33) * 0.45, dy: (hash(i, 34) - 0.5) * 0.4 }));
 
+// KAR-FILTRE (2026-11-25, kullanıcı: "kar filtresini biraz hafiflet"): karlı master artık kendisi kapalı-gri çizim
+// (MEVSIM-SILUET); 0.20 beyaz örtü üstüne binince siluet denizle karışıyordu -> 0.07.
 const TINT: Record<string, string> = {
-  bulutlu: "rgba(105,116,132,0.24)", yagmur: "rgba(55,66,90,0.34)", kar: "rgba(200,214,232,0.20)", sis: "rgba(0,0,0,0)",
+  bulutlu: "rgba(105,116,132,0.24)", yagmur: "rgba(55,66,90,0.34)", kar: "rgba(200,214,232,0.07)", sis: "rgba(0,0,0,0)",
   lodos: "rgba(255,140,50,0.24)", poyraz: "rgba(80,132,222,0.24)",
 };
 

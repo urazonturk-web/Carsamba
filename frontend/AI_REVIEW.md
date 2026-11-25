@@ -3181,3 +3181,13 @@ CHANGED:
 - Katman: BG_VARIANTS değişmedi (yalnız yagmur.m -> master-yagmur.jpg); alt-* (alçak çatı katmanı) kodla renkli olarak kaldı. BUILD_TAG "MEVSIM SILUET".
 EVIDENCE: Simülatör: menüde sonbahar/yağmur/kar (ai_review_evidence/MEVSIM-SILUET-simulator-menu.jpg), oyunda kar: karlı kubbe ve çatılar (MEVSIM-SILUET-simulator-kar.png). Önizleme ai_review_evidence/MEVSIM-SILUET-onizleme.jpg.
 OPEN_ISSUES (Risk): Karsız kış oyunda görülmedi (bugün sonbahar). Hava filtresiyle birlikte karda ton biraz sıcak/sepya. Önündeki alçak çatı katmanı (alt-*) hâlâ kodla renkli. Cihazda görülmedi; Android doğrulanmadı.
+
+## KAR-FILTRE — karda sahne daha az soluk — 2026-11-25
+TASK: Video 15:13 incelemesinde "karda ekran soluk-gri, siluet denizle karışıyor" gözlemi; kullanıcı: "kar filtresini biraz hafiflet".
+CHANGED (yalnız roofWx === "kar"):
+- WeatherLayer TINT.kar 0.20 -> 0.07 (dünyanın arkasında beyaz-mavi örtü).
+- backgroundWash (gameSky beyaz) 0.26 -> 0.12; ufuk sıcak gradyanı (rgba 255,170,100 0.10) kapalı, üstte hafif soğuk mavi.
+- Gerçek saate bağlı gök tonu (SKY_TINTS, ikindi = turuncu 0.30) karda SKY_TINTS_KAR (aynı kararma, soğuk gri); gece aynı.
+- Fizik/kamera/kule dokunulmadı. BUILD_TAG "KAR FILTRE".
+EVIDENCE: Ölçüm (simülatör, aynı kare yeri): deniz pikseli önce (186,174,167) sıcak bej -> sonra (142,162,181) soğuk mavi-gri; master-kar kaynağı (114,140,163). Önce/sonra: ai_review_evidence/KAR-FILTRE-once-sonra.jpg.
+OPEN_ISSUES: Gece/sabah saatlerinde karda görülmedi. Cihazda görülmedi; Android doğrulanmadı.

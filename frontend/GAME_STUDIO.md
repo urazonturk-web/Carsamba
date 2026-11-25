@@ -2057,3 +2057,4 @@ TESLIM_HAZIR: CESIT-SAKIN-2026-11-25 — cumbada 3 yeni kadın (çiçek sulayan,
 TESLIM_HAZIR: CESIT-SAKIN-2-2026-11-25 — 3 yeni kadının kalın giyimli çaylı hâli ve 4 yeni kedinin üşüyen/ıslak hâli oyuna bağlandı (soğukta da 4 kadın, 6 kedi); kanıt ai_review_evidence/CESIT-SAKIN-2-onizleme.jpg, CESIT-SAKIN-2-simulator-kar.png.
 TESLIM_HAZIR: CESIT-SAKIN-3-2026-11-25 — cumba sakinleri her oyunda yeniden karışıyor (eski formül hep halı silken teyzeyi seçiyordu); kanıt AI_REVIEW.md CESIT-SAKIN-3.
 TESLIM_HAZIR: MEVSIM-SILUET-2026-11-25 — arka plandaki İstanbul silueti kar/karsız kış/sonbahar/yağmur için çizildi ve bağlandı; kanıt ai_review_evidence/MEVSIM-SILUET-onizleme.jpg, MEVSIM-SILUET-simulator-kar.png.
+TESLIM_HAZIR: KAR-FILTRE-2026-11-25 — karda beyaz örtü ve öğleden sonra turuncu gök tonu hafifletildi, sahne soğuk ve net; kanıt ai_review_evidence/KAR-FILTRE-once-sonra.jpg.
