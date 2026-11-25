@@ -5,11 +5,11 @@
 
 export const CAY_ON = true as boolean;
 
-export type CayUrun = { id: string; ad: string; aciklama: string; ikon: string; kademe: 1 | 2 | 3 };
+export type CayUrun = { id: string; ad: string; aciklama: string; ikon: string; gorsel: number; kademe: 1 | 2 | 3 };
 export const CAY_URUNLER: readonly CayUrun[] = [
-  { id: "com.urazonturk.carsamba.cay", ad: "Bir çay", aciklama: "İnce belli bardakta tavşan kanı", ikon: "cup.and.saucer.fill", kademe: 1 },
-  { id: "com.urazonturk.carsamba.demlik", ad: "Bir demlik", aciklama: "Bütün mahalleye yeter", ikon: "mug.fill", kademe: 2 },
-  { id: "com.urazonturk.carsamba.semaver", ad: "Semaver", aciklama: "Amca bütün gün keyifli", ikon: "flame.fill", kademe: 3 },
+  { id: "com.urazonturk.carsamba.cay", ad: "Bir çay", aciklama: "İnce belli bardakta tavşan kanı", ikon: "cup.and.saucer.fill", gorsel: require("@/assets/cay/rozet-cay.png"), kademe: 1 },
+  { id: "com.urazonturk.carsamba.demlik", ad: "Bir demlik", aciklama: "Bütün mahalleye yeter", ikon: "mug.fill", gorsel: require("@/assets/cay/rozet-demlik.png"), kademe: 2 },
+  { id: "com.urazonturk.carsamba.semaver", ad: "Semaver", aciklama: "Amca bütün gün keyifli", ikon: "flame.fill", gorsel: require("@/assets/cay/rozet-semaver.png"), kademe: 3 },
 ];
 export const CAY_IDLER = CAY_URUNLER.map((u) => u.id);
 
@@ -24,3 +24,8 @@ export function cayKademe(owned: readonly string[]): 0 | 1 | 2 | 3 {
   for (const u of CAY_URUNLER) if (owned.includes(u.id) && u.kademe > k) k = u.kademe;
   return k;
 }
+
+// Kıvılcım çizimleri (CAY-2026-11-25, kullanıcı: "Kabul, bağla"): rozetler 192 px kare, çaylı amca 419×600.
+export const CAY_TESEKKUR = require("@/assets/cay/cay-tesekkur.png");
+export const CAY_TESEKKUR_ASPECT = 600 / 419;
+export const CAY_ROZET_MENU = require("@/assets/cay/rozet-cay.png");

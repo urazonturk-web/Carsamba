@@ -1,10 +1,10 @@
 // AMCAYA ÇAY ISMARLA kartı (2026-11-25). Menüden ya da oyun sonu satırından açılır; kendiliğinden açılmaz.
 // Görseller (rozet sayfası, çaylı amca) kullanıcı kabulüne kadar bağlanmaz: şimdilik iOS simgeleri.
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Pressable, Text, View } from "react-native";
+import { ActivityIndicator, Image, Pressable, Text, View } from "react-native";
 import { SymbolView } from "expo-symbols";
 import * as GameCenter from "../../modules/byzantion-gamecenter/src";
-import { CAY_IDLER, CAY_URUNLER, cayKademe } from "./cay";
+import { CAY_IDLER, CAY_TESEKKUR, CAY_TESEKKUR_ASPECT, CAY_URUNLER, cayKademe } from "./cay";
 
 function Ico({ name, size = 22, color = "#6e4632" }: { name: string; size?: number; color?: string }) {
   return <SymbolView name={name as any} size={size} tintColor={color} type="monochrome" style={{ width: size, height: size }} />;
@@ -58,8 +58,8 @@ export function CayKart({ styles, owned, onOwned, onClose }: {
       <View style={styles.albumCard}>
         {tesekkur ? (
           <View style={{ alignItems: "center", paddingVertical: 18 }}>
-            <Ico name="cup.and.saucer.fill" size={64} color="#b5482c" />
-            <Text style={[styles.albumTitle, { marginTop: 12 }]}>Eline sağlık!</Text>
+            <Image source={CAY_TESEKKUR} style={{ width: 170, height: 170 * CAY_TESEKKUR_ASPECT }} resizeMode="contain" fadeDuration={0} />
+            <Text style={[styles.albumTitle, { marginTop: 8 }]}>Eline sağlık!</Text>
             <Text style={[styles.albumSub, { textAlign: "center" }]}>Amca çayını yudumluyor, keyfi yerinde.{"\n"}Rozetin menüde.</Text>
             <Pressable style={({ pressed }) => [styles.trPlayBtn, { marginTop: 16 }, pressed && styles.playBtnPressed]} onPress={onClose}>
               <Text style={styles.playBtnText}>Afiyet olsun</Text>
@@ -75,7 +75,7 @@ export function CayKart({ styles, owned, onOwned, onClose }: {
               const var_ = owned.includes(u.id);
               return (
                 <View key={u.id} style={{ flexDirection: "row", alignItems: "center", paddingVertical: 8, gap: 10 }}>
-                  <View style={[styles.pcIconCircle, styles.pcIconCircleSm]}><Ico name={u.ikon} size={22} color="#b5482c" /></View>
+                  <Image source={u.gorsel} style={{ width: 52, height: 52 }} resizeMode="contain" fadeDuration={0} />
                   <View style={{ flex: 1, minWidth: 0 }}>
                     <Text style={[styles.albumName, { textAlign: "left", fontSize: 16, marginTop: 0 }]}>{u.ad}</Text>
                     <Text style={[styles.albumSub, { textAlign: "left", marginBottom: 0 }]}>{u.aciklama}</Text>

@@ -3204,3 +3204,9 @@ CHANGED:
 - Fizik/kamera/kule dokunulmadı.
 EVIDENCE: tsc hata yok; simülatör Release derlemesi başarılı; kart açılıyor, düzen doğru (ai_review_evidence/CAY-2026-11-25/cay-kart-simulator.png). Ürünler App Store Connect'te olmadığı için fiyat "…" ve "Mağaza şu an açılamadı" (beklenen).
 OPEN_ISSUES: Gerçek satın alma/geri yükleme TEST EDİLMEDİ (Xcode deneme mağazası: Xcode açılışta sistem bileşeni kurulumu istedi, kurulmadı; sandbox için ürünlerin App Store Connect'te oluşturulması gerek). Kullanıcı adımları: ai_review_evidence/CAY-2026-11-25/APP-STORE-CONNECT.md. Paylaşım kartında rozet henüz yok. Android doğrulanmadı.
+
+## CAY-GORSEL — çay rozetleri ve çaylı amca bağlandı — 2026-11-25
+TASK: Kullanıcı: "Kabul, bağla" (Kıvılcım CAY-preview çizimleri).
+CHANGED: assets/cay/rozet-{cay,demlik,semaver}.png (cay-rozetler.png 512'lik hücrelerden alfa sınırına kırpıldı, 16 px pay, 192×192), assets/cay/cay-tesekkur.png (alfa sınırı, 419×600). cay.ts gorsel alanı + CAY_TESEKKUR; CayKart ürün satırında 52 px rozet, teşekkürde 170 px genişlik amca; menü ve oyun sonu satırında 22–24 px rozet. BUILD_TAG "CAY GORSEL".
+EVIDENCE: Simülatör: menü satırı ve kart (ai_review_evidence/CAY-2026-11-25/cay-gorsel-simulator.jpg). Teşekkür ekranı satın alma olmadan açılamadığından görülmedi.
+OPEN_ISSUES: Gerçek satın alma/teşekkür ekranı test edilmedi (App Store Connect ürünleri bekleniyor). Cihazda görülmedi.
