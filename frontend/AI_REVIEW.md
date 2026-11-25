@@ -3166,3 +3166,9 @@ CHANGED:
 - BUILD_TAG "CESIT SAKIN 2". Fizik/kamera/çatı/çarpışma değişmedi.
 EVIDENCE: tsc index.tsx/mahalle.ts hata yok. Simülatör, kar (MAHALLE_TEST geçici açık, kapatıldı): şallı teyze, şallı nine (çaylı), üşüyen beyaz ve smokin kedi cumbada — ai_review_evidence/CESIT-SAKIN-2-simulator-kar.png; önizleme ai_review_evidence/CESIT-SAKIN-2-onizleme.jpg.
 OPEN_ISSUES (Risk): Yağmur hâli simülatörde görülmedi (yalnız önizleme). Nefes buharı burun konumu göz ölçümü. Cihazda görülmedi. Android doğrulanmadı.
+
+## CESIT-SAKIN-3 — sakin seçimi her oyunda karışır — 2026-11-25
+TASK: Video 14:03 (yağmur + kar denemesi): cumbalarda hep şallı teyze. Gözlem: telefonda BUILD_TAG "CESIT SAKIN 2" (sürüm doğru).
+CHANGED: Neden (ölçüm, Python ile aynı formül): eski mhash neredeyse doğrusal; kule 3–80 arası kadın kulelerinin 5/7'si teyze (K0), ilk 20 kulede yalnız kule 3 ve 15 kadın, ikisi de teyze. Günün haritası her oyunda aynı kimliklerle geldiği için oyuncu hep aynı sakinleri görüyordu. mhash -> murmur3 sonlandırıcı + SAKIN_TOHUM (makeMutable; restart'ta Math.random). Yalnız sakin yeri/kadın/kedi adı-görünümü; kule üretimi, fizik, kamera, iniş dokunulmadı. BUILD_TAG "CESIT SAKIN 3".
+EVIDENCE: Python benzetimi (4 tohum, kule 3–59): her tohumda 3–4 farklı kadın, 4–6 farklı kedi. tsc hata yok. Simülatör: oyun açıldı, sakinler yeni yerlerde, çökme yok — ai_review_evidence/CESIT-SAKIN-3-simulator.png.
+OPEN_ISSUES: Kedi adları artık oyuna göre değişir (defter birikimi sürer). Cihazda görülmedi. Android doğrulanmadı.

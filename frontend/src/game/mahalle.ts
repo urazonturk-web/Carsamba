@@ -1,3 +1,4 @@
+import { makeMutable } from "react-native-reanimated";
 // MAHALLE SAKİNLERİ (2026-11-20, kullanıcı: "Kabul, devam et"): kulelerde pencereden halı silkeleyen teyze
 // ve çatı saçağında uyuyan kedi. Yalnız görüntü: iniş yüzeyine (kule üst çizgisi) girmez; teyze cephede,
 // kedi saçak köşesinde (p.x'in solunda). Fizik/kamera/çarpışma değişmez.
@@ -96,10 +97,20 @@ export const ESKI_KOMSULAR_ON = false as boolean;
 export const MAHALLE_BOX = 100;
 
 // Kule kimliğinden sabit 0..1 (houseHash ile aynı karıştırma, ayrı tuz).
+// CESIT-SAKIN video 14:03 (2026-11-25): eski karıştırma neredeyse doğrusaldı (kadın seçiminde ilk 60 kulede hep
+// halı silken teyze) ve günün haritası her oyunda aynı kule kimlikleriyle geldiği için ilk kulelerde hep aynı sakinler
+// çıkıyordu. Artık murmur3 sonlandırıcı + her oyunda değişen tohum (restart'ta SAKIN_TOHUM). Yalnız görüntü/sakin
+// seçimi; kule üretimi, fizik ve iniş bu tohumu kullanmaz.
+export const SAKIN_TOHUM = makeMutable(0);
 function mhash(id: number, salt: number) {
   "worklet";
-  const h = Math.imul((id * 31 + salt) ^ 0x27d4eb2d, 0x165667b1) >>> 0;
-  return h / 4294967296;
+  let h = Math.imul(id, 0x9e3779b1) ^ Math.imul(salt + 0x7f4a7c15, 0x85ebca6b) ^ Math.imul(SAKIN_TOHUM.value, 0xc2b2ae35);
+  h ^= h >>> 16;
+  h = Math.imul(h, 0x85ebca6b);
+  h ^= h >>> 13;
+  h = Math.imul(h, 0xc2b2ae35);
+  h ^= h >>> 16;
+  return (h >>> 0) / 4294967296;
 }
 
 /** 0 = boş, 1 = teyze, 2 = kedi, 3 = komşu amca, 4 = çocuk. İlk 3 kule boş; komşu kulelerde aynı tür
