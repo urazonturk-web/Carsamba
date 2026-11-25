@@ -7,9 +7,9 @@ export const CAY_ON = true as boolean;
 
 export type CayUrun = { id: string; ad: string; aciklama: string; ikon: string; gorsel: number; kademe: 1 | 2 | 3 };
 export const CAY_URUNLER: readonly CayUrun[] = [
-  { id: "com.urazonturk.carsamba.cay", ad: "Bir çay", aciklama: "İnce belli bardakta tavşan kanı", ikon: "cup.and.saucer.fill", gorsel: require("@/assets/cay/rozet-cay.png"), kademe: 1 },
-  { id: "com.urazonturk.carsamba.demlik", ad: "Bir demlik", aciklama: "Bütün mahalleye yeter", ikon: "mug.fill", gorsel: require("@/assets/cay/rozet-demlik.png"), kademe: 2 },
-  { id: "com.urazonturk.carsamba.semaver", ad: "Semaver", aciklama: "Amca bütün gün keyifli", ikon: "flame.fill", gorsel: require("@/assets/cay/rozet-semaver.png"), kademe: 3 },
+  { id: "byzantion.cay", ad: "Bir çay", aciklama: "İnce belli bardakta tavşan kanı", ikon: "cup.and.saucer.fill", gorsel: require("@/assets/cay/rozet-cay.png"), kademe: 1 },
+  { id: "byzantion.demlik", ad: "Bir demlik", aciklama: "Bütün mahalleye yeter", ikon: "mug.fill", gorsel: require("@/assets/cay/rozet-demlik.png"), kademe: 2 },
+  { id: "byzantion.semaver", ad: "Semaver", aciklama: "Amca bütün gün keyifli", ikon: "flame.fill", gorsel: require("@/assets/cay/rozet-semaver.png"), kademe: 3 },
 ];
 export const CAY_IDLER = CAY_URUNLER.map((u) => u.id);
 

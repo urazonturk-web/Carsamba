@@ -3210,3 +3210,9 @@ TASK: Kullanıcı: "Kabul, bağla" (Kıvılcım CAY-preview çizimleri).
 CHANGED: assets/cay/rozet-{cay,demlik,semaver}.png (cay-rozetler.png 512'lik hücrelerden alfa sınırına kırpıldı, 16 px pay, 192×192), assets/cay/cay-tesekkur.png (alfa sınırı, 419×600). cay.ts gorsel alanı + CAY_TESEKKUR; CayKart ürün satırında 52 px rozet, teşekkürde 170 px genişlik amca; menü ve oyun sonu satırında 22–24 px rozet. BUILD_TAG "CAY GORSEL".
 EVIDENCE: Simülatör: menü satırı ve kart (ai_review_evidence/CAY-2026-11-25/cay-gorsel-simulator.jpg). Teşekkür ekranı satın alma olmadan açılamadığından görülmedi.
 OPEN_ISSUES: Gerçek satın alma/teşekkür ekranı test edilmedi (App Store Connect ürünleri bekleniyor). Cihazda görülmedi.
+
+## CAY-URUN — App Store Connect ürünleri oluşturuldu — 2026-11-25
+TASK: Kullanıcı: "computer use ile sen yap" + "carsamba geçmesin adında".
+CHANGED: App Store Connect (yerleşik tarayıcı, kullanıcı kendi oturumunu açtı): tüketilmeyen üç ürün byzantion.cay (29,99 TL), byzantion.demlik (79,99 TL), byzantion.semaver (199,99 TL); temel ülke Türkiye, 175 ülke, Türkçe ad/açıklama. İlk açılan com.urazonturk.carsamba.cay silindi. Kod: cay.ts kimlikleri byzantion.*; ios/Byzantion-Cay.storekit aynı. BUILD_TAG "CAY URUN".
+EVIDENCE: App Store Connect In-App Purchases listesi: 3 taslak, "Prepare for Submission".
+OPEN_ISSUES: Sandbox satın alma için Ücretli Uygulamalar sözleşmesi etkin olmalı — durum "New"; önce tüzel/kişi bilgisi güncellemesi ve AB DSA tacir beyanı isteniyor, sonra banka+vergi. Bunlar kullanıcının (sözleşme kabulü, kişisel/finansal veri). İngilizce yerelleştirme ve inceleme ekran görüntüleri eksik.
