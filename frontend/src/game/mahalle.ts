@@ -51,6 +51,9 @@ export function mahalleKaynak(hava: MahalleHava) {
   const kis = hava === "kar", yag = hava === "yagmur";
   return {
     serin,
+    // CESIT-SAKIN-2: yeni kadınların serin hâli, yeni kedilerin kış/yağmur hâli
+    kadin: KADIN_KAYNAK.map((k, i) => (serin && i > 0 ? KADIN_SERIN[i - 1] : k)),
+    kediYeni: KEDI_YENI.map((k) => (kis ? k.kis : yag ? k.yagmur : k.src)),
     teyze: serin ? CUMBA_TEYZE_SERIN : CUMBA_TEYZE_SOURCE,
     teyzeBakis: serin ? CUMBA_TEYZE_SERIN_BAKIS : CUMBA_TEYZE_BAKIS_SOURCE,
     amca: serin ? AMCA_SERIN : AMCA_SOURCE,
@@ -71,14 +74,20 @@ export const KADIN_KAYNAK = [
   [require("@/assets/environment/mahalle/cumba-orgu.png"), require("@/assets/environment/mahalle/cumba-orgu-bakis.png")],
   [require("@/assets/environment/mahalle/cumba-sofra.png"), require("@/assets/environment/mahalle/cumba-sofra-bakis.png")],
 ] as const;
+// CESIT-SAKIN-2 (2026-11-25, "ikinci turu başlat" -> "Kabul, bağla"): serin havada kalın giyimli, elinde çay/fincan.
+const KADIN_SERIN = [
+  [require("@/assets/environment/mahalle/cumba-sulayan-serin.png"), require("@/assets/environment/mahalle/cumba-sulayan-serin-bakis.png")],
+  [require("@/assets/environment/mahalle/cumba-orgu-serin.png"), require("@/assets/environment/mahalle/cumba-orgu-serin-bakis.png")],
+  [require("@/assets/environment/mahalle/cumba-sofra-serin.png"), require("@/assets/environment/mahalle/cumba-sofra-serin-bakis.png")],
+] as const;
 // Kediler: görünüm = ad sırası % 6 -> 0 turuncu tekir, 1 gri tekir (eski tek/çift kuralı bu ikisinde korunur),
-// 2 smokin, 3 beyaz, 4 üç renk, 5 oturan tekir. Yeni dördünün kış/yağmur hâli yok: soğukta 2,4 -> turuncu, 3,5 -> gri.
+// 2 smokin, 3 beyaz, 4 üç renk, 5 oturan tekir. Kış/yağmur hâlleri CESIT-SAKIN-2 ile geldi (burun = nefes buharı yeri, oran).
 // foot = gövde alt çizgisinin tuval yüksekliğine oranı (alfa taraması, 2026-11-25); 360×255 tuval.
 export const KEDI_YENI = [
-  { src: require("@/assets/environment/mahalle/kedi-smokin.png"), foot: 190 / 255 },
-  { src: require("@/assets/environment/mahalle/kedi-beyaz.png"), foot: 225 / 255 },
-  { src: require("@/assets/environment/mahalle/kedi-uc-renk.png"), foot: 193 / 255 },
-  { src: require("@/assets/environment/mahalle/kedi-tekir-oturan.png"), foot: 247 / 255 },
+  { src: require("@/assets/environment/mahalle/kedi-smokin.png"), kis: require("@/assets/environment/mahalle/kedi-smokin-kis.png"), yagmur: require("@/assets/environment/mahalle/kedi-smokin-yagmur.png"), burun: [.26, .65], foot: 190 / 255 },
+  { src: require("@/assets/environment/mahalle/kedi-beyaz.png"), kis: require("@/assets/environment/mahalle/kedi-beyaz-kis.png"), yagmur: require("@/assets/environment/mahalle/kedi-beyaz-yagmur.png"), burun: [.375, .63], foot: 225 / 255 },
+  { src: require("@/assets/environment/mahalle/kedi-uc-renk.png"), kis: require("@/assets/environment/mahalle/kedi-uc-renk-kis.png"), yagmur: require("@/assets/environment/mahalle/kedi-uc-renk-yagmur.png"), burun: [.40, .67], foot: 193 / 255 },
+  { src: require("@/assets/environment/mahalle/kedi-tekir-oturan.png"), kis: require("@/assets/environment/mahalle/kedi-tekir-oturan-kis.png"), yagmur: require("@/assets/environment/mahalle/kedi-tekir-oturan-yagmur.png"), burun: [.53, .47], foot: 247 / 255 },
 ] as const;
 export const KEDI_YENI_ASPECT = 255 / 360;
 // Eski küçük pencere komşuları (komşu amca, çocuk) oran sorunu yüzünden kapalı; cumbalı sürümleri çizilince açılır.
@@ -124,9 +133,7 @@ export function kediAdi(id: number) {
 /** Kedinin görünümü (0..5, bkz. KEDI_YENI); soguk = kış/yağmur hâli (yeni görünümler turuncu/gri olur). */
 export function kediGorunumNo(n: number, soguk = false) {
   "worklet";
-  const v = n % 6;
-  if (!soguk || v < 2) return v;
-  return v % 2 === 0 ? 0 : 1;
+  return n % 6; // soguk: CESIT-SAKIN-2'den beri her görünümün soğuk hâli var
 }
 export function kediGorunum(id: number, soguk = false) {
   "worklet";
@@ -137,10 +144,9 @@ export function kediGri(id: number, soguk = false) {
   return kediGorunum(id, soguk) === 1;
 }
 export const kediGriNo = (n: number) => kediGorunumNo(n) === 1;
-/** Cumbadaki kadın (0..3); serin havada hep 0 (şallı teyze). */
+/** Cumbadaki kadın (0..3); serin havada kendi kalın giyimli hâliyle (mahalleKaynak.kadin). */
 export function kadinNo(id: number, serin = false) {
   "worklet";
-  if (serin) return 0;
   return Math.floor(mhash(id, 74) * KADIN_SAYI) % KADIN_SAYI;
 }
 export const KEDI_DEFTER_KEY = "carsamba.kediler.v1";

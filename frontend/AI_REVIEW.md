@@ -3155,3 +3155,14 @@ CHANGED:
 - Fizik, kamera, çatı, çarpışma, iniş yüzeyi değişmedi. BUILD_TAG "CESIT SAKIN".
 EVIDENCE: tsc index.tsx/mahalle.ts hata yok. Simülatör (Release, MAHALLE_TEST geçici açık, sonra kapatıldı): örgü ören nine, halı silken teyze ve üç renkli kedi cumbada doğru oturuyor — ai_review_evidence/CESIT-SAKIN-simulator.png; önizleme ai_review_evidence/CESIT-SAKIN-onizleme.jpg.
 OPEN_ISSUES (Risk): Yeni kadın ve kedilerin kış/yağmur hâli yok (ikinci tur, 14 çizim). Kar/yağmurda düşüş simülatörde görülmedi. Cihazda görülmedi. Android doğrulanmadı.
+
+## CESIT-SAKIN-2 — yeni kadın ve kedilerin kış/yağmur hâlleri — 2026-11-25
+TASK: Kullanıcı: "ikinci turu başlat" (14 çizim) -> "Kabul, bağla".
+CHANGED:
+- Dosya: Kıvılcım çıktısı shared/CESIT-SAKIN-2-preview/ -> assets/environment/mahalle/: cumba-{sulayan,orgu,sofra}-serin(-bakis).png (600×780), kedi-{smokin,beyaz,uc-renk,tekir-oturan}-{kis,yagmur}.png (360×255). Brif: CODEX-MESAJI-CESIT-SAKIN-2-2026-11-25.md.
+- Ölçü/pivot: alfa taraması — kadınların alt sınırı y 414 (pervaz, aşağı sarkma yok); kedi gövde alt satırları kaynakla ±3 px (smokin 187–188, beyaz 222–223, üç renk 191, tekir 245); foot değerleri değişmedi.
+- Seçim: mahalleKaynak artık kadin[] (serin havada yeni kadınların serin hâli) ve kediYeni[] (kar/karsız kış -> kis, yağmur -> yagmur) döndürür. kadinNo serin havada 0'a zorlanmaz; kediGorunumNo soğukta turuncu/gri'ye düşmez.
+- Katman: değişmedi. Karda/karsız kışta yeni kedilere de nefes buharı (burun oranları göz ölçümü: smokin .26/.65, beyaz .375/.63, üç renk .40/.67, tekir .53/.47); titreme mevcut catStyle'dan.
+- BUILD_TAG "CESIT SAKIN 2". Fizik/kamera/çatı/çarpışma değişmedi.
+EVIDENCE: tsc index.tsx/mahalle.ts hata yok. Simülatör, kar (MAHALLE_TEST geçici açık, kapatıldı): şallı teyze, şallı nine (çaylı), üşüyen beyaz ve smokin kedi cumbada — ai_review_evidence/CESIT-SAKIN-2-simulator-kar.png; önizleme ai_review_evidence/CESIT-SAKIN-2-onizleme.jpg.
+OPEN_ISSUES (Risk): Yağmur hâli simülatörde görülmedi (yalnız önizleme). Nefes buharı burun konumu göz ölçümü. Cihazda görülmedi. Android doğrulanmadı.

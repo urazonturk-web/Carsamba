@@ -12,8 +12,8 @@ Hâller: YAZ (ilkbahar/yaz, kuru) · SONBAHAR (kuru) · KIŞ (kar yok) · YAĞMU
 | Cephe kilimi | asılı (6 desen) | asılı (6 desen) | yok (sırık) | yok | yok | yok |
 | Panjur rengi | yeşil/mavi/ceviz/bordo | aynı | aynı | aynı | aynı | aynı |
 | Çatı | kiremit | kiremit | kiremit | ıslak kiremit | ıslak kiremit | kar örtüsü + saçak buzu |
-| Cumba kadını (4 kişi, 2026-11-25) | halı/çiçek/örgü/sofra bezi | halı/çiçek/örgü/sofra bezi | yalnız şallı teyze | yalnız şallı teyze | yalnız şallı teyze | yalnız şallı teyze |
-| Kediler (kule; 6 görünüm, soğukta turuncu/gri) | uyuyan/gerinen + smokin/beyaz/üç renk/oturan tekir | uyuyan/gerinen | üşüyen + titreme + nefes buharı | ıslak | ıslak | üşüyen + titreme + nefes |
+| Cumba kadını (4 kişi, 2026-11-25) | halı/çiçek/örgü/sofra bezi | halı/çiçek/örgü/sofra bezi | 4 kadın, kalın giysi + çay/fincan | aynı | aynı | aynı |
+| Kediler (kule; 6 görünüm, her birinin kış/yağmur hâli var) | uyuyan/gerinen + smokin/beyaz/üç renk/oturan tekir | uyuyan/gerinen | üşüyen + titreme + nefes buharı | ıslak | ıslak | üşüyen + titreme + nefes |
 | Arka plan çatısındaki kedi/kilim/çamaşır | var | var | yok | yok | yok | yok |
 | Arka plan bitkileri | yeşil | sarı-turuncu | solgun | yeşil (temiz) | solgun | karlı |
 | Amca kıyafeti | eşofman | eşofman | bere + atkı | yağmurluk + kasket | yağmurluk + kasket | bere + atkı |
