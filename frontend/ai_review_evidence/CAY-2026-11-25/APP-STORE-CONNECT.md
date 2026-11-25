@@ -3,7 +3,7 @@
 Bunlar hesap işlemleri; Claude Code yapmaz (sözleşme, banka, vergi, fiyat onayı). Sırayla:
 
 ## 1. Sözleşme, banka, vergi (bir kez) — 2026-11-25 durum
-Tüzel kişi adresi Apple biçimiyle onaylandı (Kurupelit; site adı eklenemedi). Ücretli Uygulamalar Sözleşmesi kabul edildi → "Processing". Banka: Garanti BBVA Samsun OSB (0062 01163 055), TL, "Processing" (≤24 saat). Vergi: ABD anketi (mukim değil, ABD faaliyeti yok), W-8BEN (9. satır Türkiye, 10. satır boş) ve yabancı statü beyanı "Active". AB DSA tacir beyanı YAPILMADI (AB yayını öncesi gerekli). Küçük İşletme Programı başvurusu YAPILMADI.
+Tüzel kişi adresi Apple biçimiyle onaylandı (Kurupelit; site adı eklenemedi). Ücretli Uygulamalar Sözleşmesi kabul edildi → "Processing". Banka: Garanti BBVA Samsun OSB (0062 01163 055), TL, "Processing" (≤24 saat). Vergi: ABD anketi (mukim değil, ABD faaliyeti yok), W-8BEN (9. satır Türkiye, 10. satır boş) ve yabancı statü beyanı "Active". AB DSA tacir beyanı YAPILMADI (AB yayını öncesi gerekli). Küçük İşletme Programı başvurusu 2026-11-25 gönderildi (bağlı hesap yok; Apple e-postayla dönecek).
 
 1. App Store Connect → **İş (Business)** → **Ücretli Uygulamalar (Paid Apps)** sözleşmesini kabul et.
 2. Aynı sayfada **banka hesabı** ve **vergi formlarını** doldur (Türkiye'den bireysel geliştirici: W-8BEN formu çıkar). Durum "Etkin" olana kadar ürünler satışa çıkmaz; onay birkaç gün sürebilir.
