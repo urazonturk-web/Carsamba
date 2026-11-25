@@ -2058,3 +2058,4 @@ TESLIM_HAZIR: CESIT-SAKIN-2-2026-11-25 — 3 yeni kadının kalın giyimli çayl
 TESLIM_HAZIR: CESIT-SAKIN-3-2026-11-25 — cumba sakinleri her oyunda yeniden karışıyor (eski formül hep halı silken teyzeyi seçiyordu); kanıt AI_REVIEW.md CESIT-SAKIN-3.
 TESLIM_HAZIR: MEVSIM-SILUET-2026-11-25 — arka plandaki İstanbul silueti kar/karsız kış/sonbahar/yağmur için çizildi ve bağlandı; kanıt ai_review_evidence/MEVSIM-SILUET-onizleme.jpg, MEVSIM-SILUET-simulator-kar.png.
 TESLIM_HAZIR: KAR-FILTRE-2026-11-25 — karda beyaz örtü ve öğleden sonra turuncu gök tonu hafifletildi, sahne soğuk ve net; kanıt ai_review_evidence/KAR-FILTRE-once-sonra.jpg.
+TESLIM_HAZIR: SATIS-2026-11-25 — oyun içi satış değerlendirmesi (Kıvılcım + ekonomi + oyuncu editörü): ilk ürünler çay ısmarla, gaz paketi, simitçi kıyafeti; rapor ai_review_evidence/SATIS-2026-11-25/RAPOR.md; uygulama kararı kullanıcıda.
