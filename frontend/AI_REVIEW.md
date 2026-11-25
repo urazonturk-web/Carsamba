@@ -3144,3 +3144,14 @@ CHANGED:
 - Denetim listesi: ai_review_evidence/TUTARLILIK-2026-11-24/DENETIM-LISTESI.md.
 EVIDENCE: worklet sıra testi PASS, karga döngü testi PASS, tsc oyun kodunda hata yok. Simülatörde görülmedi (kullanıcı doğrudan telefona kurulum istedi).
 OPEN_ISSUES: Sonbahar yağmurunda cephe bitkileri yaz hâli. Titreme/nefes cihazda görülmedi. Android doğrulanmadı.
+
+## CESIT-SAKIN — cumbada 4 kadın, 6 kedi görünümü — 2026-11-25
+TASK: Kullanıcı (video 12:50): "hep aynı kadın ve hep aynı kedi görseli olması çeşitlilik olsun. boyut daha iyi" -> "Evet, 10 çizim" -> "Kabul, bağla".
+CHANGED:
+- Dosya: Kıvılcım çıktısı shared/CESIT-SAKIN-preview/ -> assets/environment/mahalle/: cumba-sulayan(-bakis), cumba-orgu(-bakis), cumba-sofra(-bakis) (600×780), kedi-smokin, kedi-beyaz, kedi-uc-renk, kedi-tekir-oturan (360×255). Brif: CODEX-MESAJI-CESIT-SAKIN-2026-11-25.md.
+- Ölçü/pivot: kadınlar cumba-teyze ile aynı tuval ve kutu (CUMBA_TEYZE_ASPECT), pervaz y 414. Kedilerde foot = gövde alt satırı / 255 (alfa taraması, satır genişliği > bbox'ın %30'u): smokin 190, beyaz 225, üç renk 193, oturan tekir 247.
+- Seçim: kadinNo(id) = mhash(id,74)·4 (0 halı silken teyze, 1 sulayan, 2 örgü, 3 sofra). Kedi görünümü = ad sırası % 6 (0 turuncu, 1 gri, 2–5 yeni); defter de aynı görünümü gösterir. Kış/yağmur/karsız kışta kadın hep şallı teyze, yeni kediler turuncu/gri soğuk hâline düşer (yeni hâlleri yok).
+- Katman: yeni kadınlar teyze katmanlarıyla aynı yerde (cumba üstü, çatı bandının altında); yeni kediler gri kedi katmanından hemen sonra. Yalnız turuncu kedi uyanıp gerinir.
+- Fizik, kamera, çatı, çarpışma, iniş yüzeyi değişmedi. BUILD_TAG "CESIT SAKIN".
+EVIDENCE: tsc index.tsx/mahalle.ts hata yok. Simülatör (Release, MAHALLE_TEST geçici açık, sonra kapatıldı): örgü ören nine, halı silken teyze ve üç renkli kedi cumbada doğru oturuyor — ai_review_evidence/CESIT-SAKIN-simulator.png; önizleme ai_review_evidence/CESIT-SAKIN-onizleme.jpg.
+OPEN_ISSUES (Risk): Yeni kadın ve kedilerin kış/yağmur hâli yok (ikinci tur, 14 çizim). Kar/yağmurda düşüş simülatörde görülmedi. Cihazda görülmedi. Android doğrulanmadı.

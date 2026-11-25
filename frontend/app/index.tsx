@@ -57,7 +57,7 @@ import { GAME_OVER_LINE, QUIP_ON, multiJumpShout, pickQuip, quipContext } from "
 import { mahalleSes } from "../src/game/mahalleSes";
 import { KARGA_ON, KARGA_TUNEMIS, KARGA_BAKIS, KARGA_YEM, KARGA_HAVALANMA, KARGA_FOOT_Y, KARGA_BOX_K, KARGA_MAX_Y, kargaSayisi, kargaTunek, kargaTunekAny, kargaBekle, kargaHedefTuru, kargaRngYap, kargaUcus, KARGA_TEST, KARGA_HAVUZ, KARGA_UCUS_MS } from "../src/game/karga";
 import { CEPHE_HUCRE, CEPHE_DONEM_PX, CEPHE_BASLANGIC_PX } from "../src/game/cepheCesit";
-import { MAHALLE_ON, MAHALLE_SPEECH_ON, CUMBA_SOURCE, CUMBA_KEDI_SOURCE, CUMBA_ASPECT, CUMBA_TEYZE_SOURCE, CUMBA_TEYZE_BAKIS_SOURCE, CUMBA_TEYZE_ASPECT, cumbaBox, MAHALLE_BOX, TEYZE_ASPECT, KEDI_ASPECT, KEDI_UYUYAN_FOOT, KEDI_DIK_FOOT, AMCA_ASPECT, COCUK_ASPECT, KEDI_GERINEN_ASPECT, KEDI_GRI_ASPECT, TEYZE_SOURCE, KEDI_SOURCE, AMCA_SOURCE, COCUK_SOURCE, KEDI_GERINEN_SOURCE, KEDI_GRI_SOURCE, KEDI_ADLARI, sakin, teyzeBox, kediBox, kediAdi, kediGri, kediGriNo, pencereAspect, pencereLafi, kediLafi, KEDI_DEFTER_KEY, mahalleKaynak } from "../src/game/mahalle";
+import { MAHALLE_ON, MAHALLE_SPEECH_ON, CUMBA_SOURCE, CUMBA_KEDI_SOURCE, CUMBA_ASPECT, CUMBA_TEYZE_SOURCE, CUMBA_TEYZE_BAKIS_SOURCE, CUMBA_TEYZE_ASPECT, cumbaBox, MAHALLE_BOX, TEYZE_ASPECT, KEDI_ASPECT, KEDI_UYUYAN_FOOT, KEDI_DIK_FOOT, AMCA_ASPECT, COCUK_ASPECT, KEDI_GERINEN_ASPECT, KEDI_GRI_ASPECT, TEYZE_SOURCE, KEDI_SOURCE, AMCA_SOURCE, COCUK_SOURCE, KEDI_GERINEN_SOURCE, KEDI_GRI_SOURCE, KEDI_ADLARI, sakin, teyzeBox, kediBox, kediAdi, kediGri, kediGriNo, pencereAspect, pencereLafi, kediLafi, KEDI_DEFTER_KEY, mahalleKaynak, kediGorunum, kediGorunumNo, kadinNo, KADIN_KAYNAK, KEDI_YENI, KEDI_YENI_ASPECT } from "../src/game/mahalle";
 import { OZEL_GUN_ON, OZEL_GUN_TEST_TAP, OZEL_GUNLER, OZEL_GUN_TEST_ORDER, todaysEvent } from "../src/game/ozelGun";
 import { HANIM_ON, ICSES_ON, LAKAP_ON, newRunStats, noteLanding, icSesAfterLanding, icSesIdle, hanimMessage, lakap } from "../src/game/amcaSesi";
 import { jumpVelocity, advanceFlight } from "../src/game/jump";
@@ -383,7 +383,7 @@ const AnimatedImage = Animated.createAnimatedComponent(Image);
 const BG_SCROLL_TEST = true as boolean;
 const BG_SCROLL_RATIO = 0.45;
 const BG_SCROLL_TILES = 4;
-const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "TEYZE BOYU") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
+const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "CESIT SAKIN") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
 const DIAG_MAX_EXAMPLES = 6;
 const HOUSE_AB_FROZEN = false as boolean;
 // REVIZYON-066 experiment (one variable): expo-linear-gradient's iOS layer
@@ -4460,12 +4460,12 @@ export default function Game() {
             <ScrollView contentContainerStyle={styles.albumGrid}>
               {KEDI_ADLARI.map((name, n) => {
                 const met = cats.includes(name);
-                const gri = kediGriNo(n);
+                const gor = kediGorunumNo(n);
                 return (
                   <View key={name} style={styles.albumItem}>
                     {met ? (
                       <View style={[styles.albumImg, { backgroundColor: "#f6ead2", alignItems: "center", justifyContent: "center" }]}>
-                        <Image source={gri ? KEDI_GRI_SOURCE : KEDI_SOURCE} style={{ width: "86%", height: "70%" }} resizeMode="contain" fadeDuration={0} />
+                        <Image source={gor === 0 ? KEDI_SOURCE : gor === 1 ? KEDI_GRI_SOURCE : KEDI_YENI[gor - 2].src} style={{ width: "86%", height: "70%" }} resizeMode="contain" fadeDuration={0} />
                       </View>
                     ) : (
                       <View style={[styles.albumImg, styles.albumLocked]}><Text style={styles.albumLockedText}>?</Text></View>
@@ -4816,24 +4816,27 @@ const PlatformHouseView = memo(function PlatformHouseView({ index, platforms, st
   });
   // mode 0 = turuncu uyuyan, 1 = turuncu gerinen (amca bu kuleye indiyse), 2 = gri uyuyan
   // MEVSIM-MAHALLE: kış/yağmur turuncu kedisinde kuyruk sarkmıyor -> gövde alt çizgisi tuvalin altında (%99).
-  const uyuyanFoot = roofWx === "kar" || roofWx === "yagmur" || cepheHal === "kis" ? KEDI_DIK_FOOT : KEDI_UYUYAN_FOOT;
-  const catStyle = (mode: number, aspect: number) => useAnimatedStyle(() => {
+  const soguk = roofWx === "kar" || roofWx === "yagmur" || cepheHal === "kis";
+  const uyuyanFoot = soguk ? KEDI_DIK_FOOT : KEDI_UYUYAN_FOOT;
+  // CESIT-SAKIN: mode 12..15 = yeni görünümler (smokin, beyaz, üç renk, oturan tekir); yalnız turuncu (0) uyanıp gerinir.
+  const catStyle = (mode: number, aspect: number, footK = KEDI_DIK_FOOT) => useAnimatedStyle(() => {
     const g = houseGeom.value;
     if (!g || sakin(g.p.id) !== 2) return OFF;
-    const gri = kediGri(g.p.id);
+    const gor = kediGorunum(g.p.id, soguk);
     const awake = woken ? woken.value === g.p.id : false;
-    const want = gri ? 2 : awake ? 1 : 0;
+    const want = gor === 1 ? 2 : gor >= 2 ? 10 + gor : awake ? 1 : 0;
     if (want !== mode) return OFF;
-    const b = kediBox(g, aspect, FART_CHAR_H, HOUSE_GUTTER_H, mode === 0 ? uyuyanFoot : KEDI_DIK_FOOT);
+    const b = kediBox(g, aspect, FART_CHAR_H, HOUSE_GUTTER_H, mode === 0 ? uyuyanFoot : footK);
     if (b.w <= 0) return OFF;
     const titre = kediTitre ? kediTitre.value * 0.9 : 0;
     return { opacity: 1, transform: [{ translateX: b.left + b.w / 2 - MAHALLE_BOX / 2 + titre }, { translateY: b.top + b.h / 2 - (MAHALLE_BOX * aspect) / 2 }, { scale: b.w / MAHALLE_BOX }] };
   });
   // CUMBA: cumba + teyze (normalde halı silker; amca bu kuleye inince bakar). Aynı kutu, teyze tuvali daha uzun.
-  const cumbaLayer = (mode: number, aspect: number) => useAnimatedStyle(() => {
+  const cumbaLayer = (mode: number, aspect: number, kadin = 0) => useAnimatedStyle(() => {
     const g = houseGeom.value;
     if (!g || sakin(g.p.id) !== (mode === 3 ? 2 : 1)) return OFF;
     if (mode === 1 || mode === 2) {
+      if (kadinNo(g.p.id, soguk) !== kadin) return OFF; // CESIT-SAKIN: bu kulenin kadını
       const looking = look ? look.value === g.p.id : false;
       if ((mode === 2) !== looking) return OFF;
     }
@@ -4845,6 +4848,10 @@ const PlatformHouseView = memo(function PlatformHouseView({ index, platforms, st
   const cumbaStyle = cumbaLayer(0, CUMBA_ASPECT);
   const teyzeStyle = cumbaLayer(1, CUMBA_TEYZE_ASPECT);
   const teyzeBakisStyle = cumbaLayer(2, CUMBA_TEYZE_ASPECT);
+  const kadin1 = cumbaLayer(1, CUMBA_TEYZE_ASPECT, 1), kadin1b = cumbaLayer(2, CUMBA_TEYZE_ASPECT, 1);
+  const kadin2 = cumbaLayer(1, CUMBA_TEYZE_ASPECT, 2), kadin2b = cumbaLayer(2, CUMBA_TEYZE_ASPECT, 2);
+  const kadin3 = cumbaLayer(1, CUMBA_TEYZE_ASPECT, 3), kadin3b = cumbaLayer(2, CUMBA_TEYZE_ASPECT, 3);
+  const kadinStyles = [[kadin1, kadin1b], [kadin2, kadin2b], [kadin3, kadin3b]];
   const kediCumbaStyle = cumbaLayer(3, CUMBA_ASPECT); // kedili kulede aynı cumba (kedi pervazında)
   const amcaStyle = winStyle(3, AMCA_ASPECT);
   const cocukStyle = winStyle(4, COCUK_ASPECT);
@@ -4855,6 +4862,9 @@ const PlatformHouseView = memo(function PlatformHouseView({ index, platforms, st
   const kediStyle = catStyle(0, KEDI_ASPECT);
   const kediGerStyle = catStyle(1, KEDI_GERINEN_ASPECT);
   const kediGriStyle = catStyle(2, KEDI_GRI_ASPECT);
+  const kediY0 = catStyle(12, KEDI_YENI_ASPECT, KEDI_YENI[0].foot), kediY1 = catStyle(13, KEDI_YENI_ASPECT, KEDI_YENI[1].foot);
+  const kediY2 = catStyle(14, KEDI_YENI_ASPECT, KEDI_YENI[2].foot), kediY3 = catStyle(15, KEDI_YENI_ASPECT, KEDI_YENI[3].foot);
+  const kediYeniStyles = [kediY0, kediY1, kediY2, kediY3];
   // KARGALAR: kulenin kendi kargaları (slot 0/1); poz 0 tünemiş (amcaya dönük), 1 bakış (omzunun üstünden amcaya).
   // Havalanınca bu kuleden silinir; uçuş ve yeni yer Game içindeki dünya katmanında (kule kırpmasına takılmaz).
   const kargaStyle = (slot: number, pose: number) => useAnimatedStyle(() => {
@@ -4924,6 +4934,11 @@ const PlatformHouseView = memo(function PlatformHouseView({ index, platforms, st
           <Animated.View style={[{ position: "absolute", left: 0, top: 0, width: MAHALLE_BOX, height: MAHALLE_BOX * CUMBA_TEYZE_ASPECT }, teyzeBakisStyle]}>
             <Image source={mk.teyzeBakis} style={styles.houseFill} resizeMode="stretch" fadeDuration={0} />
           </Animated.View>
+          {kadinStyles.map((st, i) => st.map((sty, poz) => (
+            <Animated.View key={`kadin-${i}-${poz}`} style={[{ position: "absolute", left: 0, top: 0, width: MAHALLE_BOX, height: MAHALLE_BOX * CUMBA_TEYZE_ASPECT }, sty]}>
+              <Image source={KADIN_KAYNAK[i + 1][poz]} style={styles.houseFill} resizeMode="stretch" fadeDuration={0} />
+            </Animated.View>
+          )))}
           <Animated.View style={[{ position: "absolute", left: 0, top: 0, width: MAHALLE_BOX, height: MAHALLE_BOX * AMCA_ASPECT }, amcaStyle]}>
             <Image source={mk.amca} style={styles.houseFill} resizeMode="stretch" fadeDuration={0} />
           </Animated.View>
@@ -4979,6 +4994,11 @@ const PlatformHouseView = memo(function PlatformHouseView({ index, platforms, st
             <Image source={mk.kediGri} style={styles.houseFill} resizeMode="stretch" fadeDuration={0} />
             {kediNefes ? <Animated.View pointerEvents="none" style={[{ position: "absolute", left: MAHALLE_BOX * 0.44 - 7, top: MAHALLE_BOX * KEDI_GRI_ASPECT * 0.7 - 4, width: 9, height: 6, borderRadius: 4, backgroundColor: "rgba(255,255,255,0.95)" }, nefesStyle]} /> : null}
           </Animated.View>
+          {kediYeniStyles.map((sty, i) => (
+            <Animated.View key={`kedi-yeni-${i}`} style={[{ position: "absolute", left: 0, top: 0, width: MAHALLE_BOX, height: MAHALLE_BOX * KEDI_YENI_ASPECT }, sty]}>
+              <Image source={KEDI_YENI[i].src} style={styles.houseFill} resizeMode="stretch" fadeDuration={0} />
+            </Animated.View>
+          ))}
         </>
       )}
       {KARGA_ON && (
