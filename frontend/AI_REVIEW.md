@@ -3216,3 +3216,9 @@ TASK: Kullanıcı: "computer use ile sen yap" + "carsamba geçmesin adında".
 CHANGED: App Store Connect (yerleşik tarayıcı, kullanıcı kendi oturumunu açtı): tüketilmeyen üç ürün byzantion.cay (29,99 TL), byzantion.demlik (79,99 TL), byzantion.semaver (199,99 TL); temel ülke Türkiye, 175 ülke, Türkçe ad/açıklama. İlk açılan com.urazonturk.carsamba.cay silindi. Kod: cay.ts kimlikleri byzantion.*; ios/Byzantion-Cay.storekit aynı. BUILD_TAG "CAY URUN".
 EVIDENCE: App Store Connect In-App Purchases listesi: 3 taslak, "Prepare for Submission".
 OPEN_ISSUES: Sandbox satın alma için Ücretli Uygulamalar sözleşmesi etkin olmalı — durum "New"; önce tüzel/kişi bilgisi güncellemesi ve AB DSA tacir beyanı isteniyor, sonra banka+vergi. Bunlar kullanıcının (sözleşme kabulü, kişisel/finansal veri). İngilizce yerelleştirme ve inceleme ekran görüntüleri eksik.
+
+## CAY-SOZLESME — App Store Connect iş adımları — 2026-11-25
+TASK: Kullanıcı: "computer use ile sen yap" (sözleşme/banka/vergi).
+CHANGED (yerleşik tarayıcı; kullanıcı oturumu): tüzel kişi adresi Apple standardıyla onaylandı (kullanıcı onayı); Ücretli Uygulamalar Sözleşmesi özetlendi ve kullanıcının "Evet, kabul et" onayıyla kabul edildi; banka formunda hesap sahibi bilgileri ve şube kodu (0062 01163 055) Claude, IBAN/hesap no/onay/2FA kullanıcı; ABD vergi anketi Claude ("hayır/hayır"); W-8BEN'de 9. satır Claude, TC/doğum tarihi/imza kullanıcı; yabancı statü beyanında unvan Claude, onay/gönder kullanıcı.
+EVIDENCE: Business sayfası: Paid Apps "Processing", banka "Processing", W-8BEN ve yabancı statü "Active".
+OPEN_ISSUES: Sözleşme Active olunca sandbox test hesabı (yeni e-posta gerekir; hesap açma kullanıcı onayı ister) ile telefonda satın alma/teşekkür/geri yükleme denenecek. DSA tacir beyanı ve Küçük İşletme Programı başvurusu bekliyor. Site adı adrese eklenemedi.

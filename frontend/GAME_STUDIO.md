@@ -2063,3 +2063,4 @@ TESLIM_HAZIR: SATIS-ZAMAN-2026-11-25 — satış ilk sürümde mi sonra mı (Kı
 TESLIM_HAZIR: CAY-2026-11-25 — Amcaya çay ısmarla (StoreKit 2, 3 kalıcı ürün, menü satırı, oyun sonu önerisi, geri yükleme); Kıvılcım'ın 2 çizimi kabul bekliyor; App Store Connect adımları kullanıcıda: ai_review_evidence/CAY-2026-11-25/APP-STORE-CONNECT.md.
 TESLIM_HAZIR: CAY-GORSEL-2026-11-25 — çay/demlik/semaver rozetleri ve çaylı amca teşekkür görseli bağlandı; kanıt ai_review_evidence/CAY-2026-11-25/cay-gorsel-simulator.jpg.
 TESLIM_HAZIR: CAY-URUN-2026-11-25 — App Store Connect'te byzantion.cay/demlik/semaver (29,99/79,99/199,99 TL) oluşturuldu, kod kimlikleri güncellendi; satın alma denemesi Ücretli Uygulamalar sözleşmesi + banka/vergi (kullanıcı) bekliyor.
+TESLIM_HAZIR: CAY-SOZLESME-2026-11-25 — Ücretli Uygulamalar Sözleşmesi kabul edildi, banka ve vergi formları gönderildi (sözleşme Processing); sandbox denemesi sözleşme Active olunca.
