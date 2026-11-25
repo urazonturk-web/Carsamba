@@ -19,7 +19,11 @@ type Native = {
   battery?(): Promise<{ level: number; state: number }>;
   istanbulWeather?(): Promise<AppleWeather>;
   shareSnapshot?(x: number, y: number, w: number, h: number, message: string): Promise<string>;
-  addListener?(event: string, cb: (e: FriendChallenge) => void): { remove(): void };
+  storeProducts?(ids: string[]): Promise<StoreProduct[]>;
+  storePurchase?(id: string): Promise<StorePurchaseResult>;
+  storeOwned?(): Promise<string[]>;
+  storeRestore?(): Promise<string[]>;
+  addListener?(event: string, cb: (e: any) => void): { remove(): void };
 };
 
 export type GameCenterFriend = { id: string; name: string; alias: string; score?: number };
@@ -136,4 +140,29 @@ export async function istanbulWeather(): Promise<AppleWeather | null> {
 export async function shareSnapshot(x: number, y: number, w: number, h: number, message: string): Promise<"shared" | "cancelled" | "error" | "unavailable"> {
   if (!native?.shareSnapshot) return "unavailable";
   try { return (await native.shareSnapshot(x, y, w, h, message)) as any; } catch { return "error"; }
+}
+
+// ÇAY (2026-11-25): "Amcaya çay ısmarla" — StoreKit 2 (Apple'ın ödeme sayfası). Modül yoksa sessizce boş döner.
+export type StoreProduct = { id: string; price: string; name: string };
+export type StorePurchaseResult = { status: "purchased" | "cancelled" | "pending" | "error"; id?: string; message?: string };
+
+export async function storeProducts(ids: string[]): Promise<StoreProduct[]> {
+  if (!native?.storeProducts) return [];
+  try { return await native.storeProducts(ids); } catch { return []; }
+}
+export async function storePurchase(id: string): Promise<StorePurchaseResult> {
+  if (!native?.storePurchase) return { status: "error", message: "unavailable" };
+  try { return await native.storePurchase(id); } catch (e: any) { return { status: "error", message: String(e?.message ?? e) }; }
+}
+export async function storeOwned(): Promise<string[]> {
+  if (!native?.storeOwned) return [];
+  try { return await native.storeOwned(); } catch { return []; }
+}
+export async function storeRestore(): Promise<string[]> {
+  if (!native?.storeRestore) return [];
+  try { return await native.storeRestore(); } catch { return []; }
+}
+export function onStoreUpdate(cb: (e: { id: string; revoked: boolean }) => void): { remove(): void } | null {
+  if (!native?.addListener) return null;
+  return native.addListener("onStoreUpdate", cb);
 }

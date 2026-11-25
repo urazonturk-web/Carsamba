@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   s.static_framework = true
 
   s.dependency 'ExpoModulesCore'
-  s.frameworks = 'GameKit'
+  s.frameworks = 'GameKit', 'StoreKit'
 
   s.source_files = "**/*.{h,m,swift}"
   s.pod_target_xcconfig = {

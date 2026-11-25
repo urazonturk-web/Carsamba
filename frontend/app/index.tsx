@@ -101,6 +101,8 @@ import { CONFIG, DEBUG_MODE, EXPERIMENTAL_COURSE, PHASE, REFERENCE_TRIAL } from 
 import { makeStyles, useTheme } from "@/src/theme";
 import { storage } from "@/src/utils/storage";
 import * as GameCenter from "../modules/byzantion-gamecenter/src";
+import { CAY_ON, CAY_IDLER, CAY_KEY, CAY_ONERI_MIN_OYUN, CAY_URUNLER, cayKademe } from "../src/game/cay";
+import { CayKart } from "../src/game/CayKart";
 
 // Game Center: Apple hesabıyla otomatik giriş + serbest oyun rekoru için
 // arkadaş sıralaması. Kimlik App Store Connect'teki skor tablosuyla aynı olmalı.
@@ -383,7 +385,7 @@ const AnimatedImage = Animated.createAnimatedComponent(Image);
 const BG_SCROLL_TEST = true as boolean;
 const BG_SCROLL_RATIO = 0.45;
 const BG_SCROLL_TILES = 4;
-const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "KAR FILTRE") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
+const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "CAY ISMARLA") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
 const DIAG_MAX_EXAMPLES = 6;
 const HOUSE_AB_FROZEN = false as boolean;
 // REVIZYON-066 experiment (one variable): expo-linear-gradient's iOS layer
@@ -1235,6 +1237,26 @@ export default function Game() {
     if (!MAHALLE_ON) return;
     storage.getItem<string>(KEDI_DEFTER_KEY, "").then((raw) => { catsRef.current = raw ? raw.split(",").filter(Boolean) : []; setCats(catsRef.current); });
   }, []);
+  // AMCAYA ÇAY ISMARLA (2026-11-25): sahip olunan çaylar (önce yerel önbellek, sonra Apple'ın kayıtları).
+  const [cayOwned, setCayOwnedState] = useState<string[]>([]);
+  const cayOwnedRef = useRef<string[]>([]);
+  const [cayOpen, setCayOpen] = useState(false);
+  const cayOyunRef = useRef(0); // bu oturumda biten oyun sayısı
+  const cayOneriRef = useRef(false); // oturumda en fazla bir öneri
+  const [cayOneri, setCayOneri] = useState(false);
+  const setCayOwned = useCallback((ids: string[]) => {
+    const benim = ids.filter((i) => CAY_IDLER.includes(i));
+    cayOwnedRef.current = benim;
+    setCayOwnedState(benim);
+    storage.setItem(CAY_KEY, benim.join(","));
+  }, []);
+  useEffect(() => {
+    if (!CAY_ON) return;
+    storage.getItem<string>(CAY_KEY, "").then((raw) => { if (raw) { cayOwnedRef.current = raw.split(",").filter(Boolean); setCayOwnedState(cayOwnedRef.current); } });
+    GameCenter.storeOwned().then((ids) => { if (GameCenter.gameCenterAvailable) setCayOwned(ids); });
+    const sub = GameCenter.onStoreUpdate(() => { GameCenter.storeOwned().then(setCayOwned); });
+    return () => sub?.remove();
+  }, [setCayOwned]);
   const [hanim, setHanim] = useState<string | null>(null);
   const hanimTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [lakapText, setLakapText] = useState<string | null>(null);
@@ -2075,6 +2097,14 @@ export default function Game() {
       const prevBest = bestRef.current;
       const sc = scoreRef.current;
       setGoInfo({ prevBest, newRecord: sc > prevBest && sc > 0 });
+      if (CAY_ON) {
+        // Öneri yalnız iyi bir anda: rekor ya da yeni durak; ilk 3 oyunda ve çay ısmarlamışsa hiç; oturumda bir kez.
+        cayOyunRef.current += 1;
+        const iyiAn = sc > prevBest && sc > 0 || (DURAK_SEFER && stopsPassed(lastTowerRef.current) > 0 && sc >= prevBest * 0.8);
+        const goster = iyiAn && cayOyunRef.current > CAY_ONERI_MIN_OYUN && !cayOneriRef.current && cayKademe(cayOwnedRef.current) === 0;
+        if (goster) cayOneriRef.current = true;
+        setCayOneri(goster);
+      }
       setQuip((prev) => pickQuip(quipContext(sc, prevBest), prev));
       const rec = sc > prevBest && sc > 0;
       const stopsNow = DURAK_SEFER ? stopsPassed(lastTowerRef.current) : 0;
@@ -4137,6 +4167,14 @@ export default function Game() {
               <Text style={styles.bubbleText} testID="game-over-line">{quip}</Text>
               <View style={styles.bubbleTail} />
             </View>}
+                {CAY_ON && cayOneri && (
+                  <Pressable testID="cay-oneri" onPress={() => { setCayOneri(false); setCayOpen(true); }} hitSlop={6}
+                    style={({ pressed }) => [styles.linkRow, { alignSelf: "center", marginTop: 6 }, pressed && styles.playBtnPressed]}>
+                    <Ico name="cup.and.saucer.fill" size={15} color="#b5482c" />
+                    <Text style={[styles.goLink, { marginTop: 0, color: "#b5482c" }]}>Keyfin yerinde mi? Amcaya bir çay ısmarla</Text>
+                    <Pressable onPress={() => setCayOneri(false)} hitSlop={10} testID="cay-oneri-kapat"><Ico name="xmark" size={12} color="#9a7a66" /></Pressable>
+                  </Pressable>
+                )}
                 <Pressable
                   testID="play-again-button"
                   style={({ pressed }) => [styles.trPlayBtn, styles.pcTicket, styles.goPlayBtn, pressed && styles.playBtnPressed]}
@@ -4307,6 +4345,15 @@ export default function Game() {
                       </Pressable>
                     )}
                   </View>
+                  {CAY_ON && GameCenter.gameCenterAvailable && (
+                    <Pressable testID="menu-cay" onPress={() => setCayOpen(true)} hitSlop={6}
+                      style={({ pressed }) => [styles.linkRow, { alignSelf: "center", marginTop: 8 }, pressed && styles.playBtnPressed]}>
+                      {cayKademe(cayOwned) > 0
+                        ? CAY_URUNLER.filter((u) => cayOwned.includes(u.id)).map((u) => <Ico key={u.id} name={u.ikon} size={15} color="#b5482c" />)
+                        : <Ico name="cup.and.saucer.fill" size={15} color="#b5482c" />}
+                      <Text style={[styles.goLink, { marginTop: 0, color: "#b5482c" }]}>{cayKademe(cayOwned) > 0 ? "Çayın için sağ ol" : "Amcaya çay ısmarla"}</Text>
+                    </Pressable>
+                  )}
                 </View>
               </View>
               <View pointerEvents="none" style={styles.pcStamp}>
@@ -4460,6 +4507,7 @@ export default function Game() {
           </View>
         </View>
       )}
+      {CAY_ON && cayOpen && <CayKart styles={styles} owned={cayOwned} onOwned={setCayOwned} onClose={() => setCayOpen(false)} />}
       {MAHALLE_ON && catBook && (
         <View style={styles.albumOverlay} testID="cat-book">
           <View style={styles.albumCard}>

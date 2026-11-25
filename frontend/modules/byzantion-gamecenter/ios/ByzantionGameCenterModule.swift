@@ -3,6 +3,7 @@ import GameKit
 import UIKit
 import WeatherKit
 import CoreLocation
+import StoreKit
 
 // Dismisses the Game Center sheet when the player taps Done.
 final class GameCenterDismisser: NSObject, GKGameCenterControllerDelegate {
@@ -128,10 +129,90 @@ public class ByzantionGameCenterModule: Module {
     waiting.forEach { $0.resolve(info) }
   }
 
+  private var storeListener: Task<Void, Never>?
+
+  func ownedProductIDs() async -> [String] {
+    var ids: [String] = []
+    for await r in Transaction.currentEntitlements {
+      if case .verified(let tx) = r, tx.revocationDate == nil { ids.append(tx.productID) }
+    }
+    return ids
+  }
+
+  func startStoreListener() {
+    if storeListener != nil { return }
+    storeListener = Task.detached { [weak self] in
+      for await r in Transaction.updates {
+        if case .verified(let tx) = r {
+          await tx.finish()
+          self?.sendEvent("onStoreUpdate", ["id": tx.productID, "revoked": tx.revocationDate != nil])
+        }
+      }
+    }
+  }
+
   public func definition() -> ModuleDefinition {
     Name("ByzantionGameCenter")
 
-    Events("onChallenge", "onChallengeResult")
+    Events("onChallenge", "onChallengeResult", "onStoreUpdate")
+
+    // CAY (2026-11-25, kullanıcı: "Ara yol (çayla çık)" -> "Evet, 2 çizimle"): "Amcaya çay ısmarla",
+    // StoreKit 2, kalıcı (tüketilmeyen) üç ürün. Apple'ın kendi ödeme sayfası; biz kart/para görmeyiz.
+    OnCreate {
+      self.startStoreListener()
+    }
+
+    AsyncFunction("storeProducts") { (ids: [String], promise: Promise) in
+      Task {
+        do {
+          let products = try await Product.products(for: ids)
+          promise.resolve(products.map { ["id": $0.id, "price": $0.displayPrice, "name": $0.displayName] })
+        } catch {
+          promise.resolve([[String: Any]]())
+        }
+      }
+    }
+
+    AsyncFunction("storePurchase") { (id: String, promise: Promise) in
+      Task {
+        do {
+          guard let product = try await Product.products(for: [id]).first else {
+            promise.resolve(["status": "error", "message": "no_product"]); return
+          }
+          let result = try await product.purchase()
+          switch result {
+          case .success(let verification):
+            if case .verified(let tx) = verification {
+              await tx.finish()
+              promise.resolve(["status": "purchased", "id": tx.productID])
+            } else {
+              promise.resolve(["status": "error", "message": "unverified"])
+            }
+          case .userCancelled:
+            promise.resolve(["status": "cancelled"])
+          case .pending:
+            promise.resolve(["status": "pending"])
+          @unknown default:
+            promise.resolve(["status": "error", "message": "unknown"])
+          }
+        } catch {
+          promise.resolve(["status": "error", "message": error.localizedDescription])
+        }
+      }
+    }
+
+    AsyncFunction("storeOwned") { (promise: Promise) in
+      Task {
+        promise.resolve(await self.ownedProductIDs())
+      }
+    }
+
+    AsyncFunction("storeRestore") { (promise: Promise) in
+      Task {
+        do { try await AppStore.sync() } catch {}
+        promise.resolve(await self.ownedProductIDs())
+      }
+    }
 
     // Arkadaş seçme ekranını açar; seçilince maça {seed, score, from} yazılır ve sıra arkadaşa geçer.
     AsyncFunction("challengeFriend") { (seed: Double, score: Int, from: String, promise: Promise) in

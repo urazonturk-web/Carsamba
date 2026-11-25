@@ -3191,3 +3191,16 @@ CHANGED (yalnız roofWx === "kar"):
 - Fizik/kamera/kule dokunulmadı. BUILD_TAG "KAR FILTRE".
 EVIDENCE: Ölçüm (simülatör, aynı kare yeri): deniz pikseli önce (186,174,167) sıcak bej -> sonra (142,162,181) soğuk mavi-gri; master-kar kaynağı (114,140,163). Önce/sonra: ai_review_evidence/KAR-FILTRE-once-sonra.jpg.
 OPEN_ISSUES: Gece/sabah saatlerinde karda görülmedi. Cihazda görülmedi; Android doğrulanmadı.
+
+## CAY — "Amcaya çay ısmarla" (StoreKit 2) — 2026-11-25
+TASK: SATIS-ZAMAN raporu, kullanıcı: "Ara yol (çayla çık)" -> "Evet, 2 çizimle".
+CHANGED:
+- modules/byzantion-gamecenter (yerel modül; yeni paket yok): `import StoreKit`; storeProducts / storePurchase / storeOwned / storeRestore (AppStore.sync) + Transaction.updates dinleyici (onStoreUpdate). Podspec frameworks + StoreKit.
+- src/game/cay.ts: üç tüketilmeyen ürün com.urazonturk.carsamba.{cay,demlik,semaver}; cayKademe; CAY_KEY önbellek; öneri eşiği 3 oyun.
+- src/game/CayKart.tsx: kart (üç kademe, Apple'dan gelen fiyat, geri yükle, teşekkür). Şimdilik iOS simgeleri.
+- app/index.tsx: menüde "Amcaya çay ısmarla" satırı (sahipse rozet simgeleri + "Çayın için sağ ol"); oyun sonunda yalnız rekor/iyi durak anında, 3 oyundan sonra, oturumda bir kez, çay sahibi değilse kapatılabilir satır. BUILD_TAG "CAY ISMARLA".
+- Deneme: ios/Byzantion-Cay.storekit + frontend-cay-deneme şeması (ios/ .git/info/exclude'da, depoya girmez).
+- Görseller: Kıvılcım shared/CAY-preview/cay-rozetler.png (1536×512), cay-tesekkur.png (1024×1024) — kullanıcı kabulü bekliyor, BAĞLANMADI.
+- Fizik/kamera/kule dokunulmadı.
+EVIDENCE: tsc hata yok; simülatör Release derlemesi başarılı; kart açılıyor, düzen doğru (ai_review_evidence/CAY-2026-11-25/cay-kart-simulator.png). Ürünler App Store Connect'te olmadığı için fiyat "…" ve "Mağaza şu an açılamadı" (beklenen).
+OPEN_ISSUES: Gerçek satın alma/geri yükleme TEST EDİLMEDİ (Xcode deneme mağazası: Xcode açılışta sistem bileşeni kurulumu istedi, kurulmadı; sandbox için ürünlerin App Store Connect'te oluşturulması gerek). Kullanıcı adımları: ai_review_evidence/CAY-2026-11-25/APP-STORE-CONNECT.md. Paylaşım kartında rozet henüz yok. Android doğrulanmadı.
