@@ -3246,3 +3246,18 @@ Kullanıcı: "İlk paketi yap" (OYNANIS-2026-11-26/RAPOR.md §6.1). Fizik, kamer
 - Kullanıcı ilk metinleri beğenmedi ("bunları beğenmedim"), editörlere danışıldı (`ai_review_evidence/IPUCU-METIN-2026-11-26/`: Kıvılcım iç ses, diyalog editörü "evlat" seti), kullanıcı: "\"Evlat\" seti".
 - `src/game/ipucu.ts`: her duruma 2 satır (sırayla, ilk satır favori; kısa satırdaki "uçayım" Claude Code önerisiyle çıkarıldı). Sayaç anahtarı v1 → v2 (eski 5 hak sıfırlandı).
 - Telefon: Release, etiket "OYNANIS PAKET 1 EVLAT" (`strings` = 1); Türkçe harfli metinler pakette UTF-16 tutulduğu için `strings` görmüyor, Python ile UTF-16 aramasında "Fren de var evlat, biraz erken bırak." ve "Az bastın evlat! Biraz daha tut." bulundu. devicectl "App installed".
+
+## OYNANIS-PAKET-1 video denetimi + ipucu düzeltmesi — 2026-11-26
+### TASK
+Kullanıcı videosu (11:51, 124 sn) denetimi: evlat ipuçları, hızlı yeniden başlama, sonraki durak çubuğu, çay satın alma/geri yükleme.
+### EVIDENCE
+- Gözlem: 5 oyun sonu kartı. Skor 6 kartında "Fren de var evlat, biraz erken bırak.", skor 0 kartında "Fazla bastın, kuleyi aştım. Biraz erken bırak." (2 satıra kırılıyor, kart taşmıyor). Skor 10, 36, 29 kartlarında ipucu YOK.
+- Gözlem: sonraki durak çubuğu ve kartpostal tüm kartlarda görünüyor ("Harem'e 10/12/15 kule kaldı").
+- Neden (kod okuması, cihazda ölçülmedi): ipucu sonraki kuleyi `platforms.value` içinde `lastTower+1` kimliğiyle arıyor. Uzun atışta kamera ilerleyip o kuleyi `removeBehind` ile listeden siliyor → kule bulunamıyor → ipucu null. İpucu sayaçları (0/1 veya 2/3 dizini) ilk üç kartta sayacın artmadığıyla tutarlı.
+### CHANGED
+- app/index.tsx: sonraki kule listede yoksa ama daha ilerideki kuleler varsa tür "uzun" sayılıyor.
+- src/game/ipucu.ts: sayaç anahtarı v3 (kullanıcı 5 ipucunu yeniden görsün).
+- BUILD_TAG "OYNANIS PAKET 1 IPUCU2".
+### OPEN_ISSUES
+- Kurukafa alt yazısı ("Kuleler %27 küçüldü · 4 zıplama") `bigPopSub` stilinde renksiz, 40 pt siyah sistem yazısı olarak çıkıyor; stil 7309bd5'ten beri emoji için tanımlı. Bu değişiklikle ilgisi yok, kullanıcı kararı bekliyor.
+- Düzeltme cihazda henüz görülmedi.

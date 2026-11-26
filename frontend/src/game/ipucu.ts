@@ -2,7 +2,7 @@
 // Yalnız ilk IPUCU_MAX oyun sonunda (cihazda sayılır); fizik/çarpışma okunur, değiştirilmez.
 export const IPUCU_ON = true as boolean;
 export const IPUCU_MAX = 5;
-export const IPUCU_KEY = "carsamba.ipucu.v2";
+export const IPUCU_KEY = "carsamba.ipucu.v3";
 export type IpucuTur = "kisa" | "uzun" | "patladi";
 // Metin: "evlat" seti (IPUCU-METIN-2026-11-26; diyalog editörü favorisi, kullanıcı: "\"Evlat\" seti").
 // Her durumda iki satır sırayla çıkar; ilk satır favori.
