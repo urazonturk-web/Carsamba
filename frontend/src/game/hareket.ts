@@ -45,7 +45,8 @@ export function ucusPoz(vy: number, vy0: number) {
 
 /**
  * Uçuş/kenar kol durumu: 0 normal poz, 1 kollar açık denge, 2 süzülme (uzun atışın tepesi),
- * 3 fırlama (uzun atışın kalkışı), 4 dalış (uzun atışın inişi). UCUS-ARA-KARE (2026-11-26, "Yes, add both").
+ * 3 fırlama (uzun atışın kalkışı), 4 dalış (uzun atışın inişi), 5 itiş, 6 açılma, 7 toplanma, 8 uzanma,
+ * 9 iniş çökmesi (yalnız yerde, kare döngüsü verir). UCUS-ARA-KARE (2026-11-26, "Yes, add both").
  * Hem çizim (ucusKol) hem geçiş yumuşatması aynı kuralı kullanır.
  */
 export function kolDurumu(airborne: boolean, idle: boolean, dususVar: boolean, vy: number, vy0: number, birakilan: number, kenar: number) {
@@ -53,9 +54,21 @@ export function kolDurumu(airborne: boolean, idle: boolean, dususVar: boolean, v
   if (dususVar) return 0;
   if (airborne) {
     const r = vy / Math.max(1, vy0);
-    // GECIS (19:57 videosu): dalış r 0,3'te başlar (daha okunur); kalkış yüksekliğinin çok altına
-    // inince (r ≥ 1,3: büyük olasılıkla düşüş) top hâli yerine kollar açık "eyvah".
-    if (birakilan >= 0.4) return r <= -0.55 ? 3 : r < 0.3 ? 2 : r < 1.3 ? 4 : 1;
+    // GECIS-ARA (20:48 videosu, "daha fazla kare çizilmesi lazım"; kullanıcı "Yes, add all 5"):
+    // uzun atış 7 kare: itiş → fırlama → açılma → süzülme → toplanma → dalış → uzanma.
+    // Kalkış yüksekliğinin çok altına inince (r ≥ 1,3: büyük olasılıkla düşüş) kollar açık "eyvah".
+    if (r >= 1.3) return 1;
+    if (birakilan >= 0.4) {
+      if (r <= -0.85) return 5;
+      if (r <= -0.55) return 3;
+      if (r <= -0.3) return 6;
+      if (r < 0.15) return 2;
+      if (r < 0.35) return 7;
+      if (r < 0.75) return 4;
+      return 8;
+    }
+    // Orta atış: itiş → kollar açık → uzanma.
+    if (birakilan >= 0.2) return r <= -0.8 ? 5 : r >= 0.7 ? 8 : 1;
     return r > -0.6 ? 1 : 0;
   }
   return idle && kenar !== 0 ? 1 : 0;
@@ -67,7 +80,9 @@ export const GECIS_ESNE = 0.04;
 /** GECIS (19:57 videosu, "geçişler sert"; rapor ai_review_evidence/GECIS-VIDEO-2026-11-26/RAPOR.md, Paket 1).
  *  Çizimlerdeki gövde ekseni (derece, öne +): 0 şarj/duruş, 1 denge, 2 süzülme, 3 fırlama, 4 dalış.
  *  Poz değişiminde yeni çizim eski gövde açısıyla başlar, YÜZ noktası etrafında kendi açısına döner. */
-export const GOVDE_ACI = [3, 3, 25, 41, 20];
+export const GOVDE_ACI = [3, 3, 25, 41, 20, 20, 30, 25, 8, 15];
+/** Durum → REACTION_POSES k (1 tabanlı). */
+export const KOL_K = [0, 2, 4, 5, 6, 7, 8, 9, 10, 11];
 export const TELAFI_MAX = 25;
 export const TELAFI_SONUM = 12; // 1/sn (~85 ms zaman sabiti)
 /** Uçuş pozlarında yüz noktası, pozun ayak/pivot noktasına göre (sprite px; süzülmede ölçüldü). */
@@ -78,8 +93,8 @@ export const POZ_EN_AZ = 0.11;
 /** İniş çömelmesi: mevcut şarj kareleriyle (037→025→012→000) doğrulma; tutma ve sönüm süresi (ms). */
 export const INIS_TUT = 35;
 export const INIS_SURE = 170;
-/** Dalışta çizimi inişe doğru aşağı kaydırma (sprite px, r 0,3→1 arasında 0→170). */
-export const DALIS_KAY = 170;
+/** Dalışta çizimi uzanma karesinin baş yüksekliğine doğru kaydırma (sprite px, r 0,35→0,75 arasında 0→63). */
+export const DALIS_KAY = 63;
 /** Süzülürken canlılık: hafif dalgalanma (derece) ve nefes (ölçek), frekans Hz. */
 export const SUZUL_DALGA = 3.5;
 export const SUZUL_NEFES = 0.03;

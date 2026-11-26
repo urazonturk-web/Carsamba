@@ -3411,3 +3411,12 @@ CHANGED (yalnız çizim; fizik/kamera/çarpışma/puan aynı):
 - Tek kaynak: ucusKol artık kare döngüsünün tuttuğu `kolOnceki`; uçuşta her poz en az 110 ms. Dalış eşiği r 0,4→0,3; r ≥ 1,3 → kollar açık (düşüş).
 - BUILD_TAG "YUMUSAK GECIS".
 EVIDENCE: simülatör kaydı (sim-paket1-inis.jpg, 30 kare/sn): dalış çatı hizasına iniyor, temas sonrası 3 çömelme karesi ardından duruş. tsc yeni hata yok. Telefona kuruldu; kullanıcı videosuyla doğrulanmadı. GOVDE_ACI süzülme/dalış değerleri göz kararı (25/20).
+
+## GECIS-ARA — 5 ara kare oyuna bağlandı — 2026-11-26
+TASK: 20:48 videosu "geçişler hâlâ sert, daha fazla kare çizilmesi lazım" → "All 5 frames" (Kıvılcım 5 çağrı, 1'er görsel) → "Yes, add all 5".
+CHANGED: kolDurumu uzun atış (bırakılan ≥ 0,4): r ≤ −0,85 itiş(5), ≤ −0,55 fırlama(3), ≤ −0,3 açılma(6), < 0,15 süzülme(2), < 0,35 toplanma(7), < 0,75 dalış(4), sonra uzanma(8); r ≥ 1,3 kollar açık. Orta atış (0,2–0,4): itiş → denge → uzanma. İnişte orta/uzun atıştan sonra inisCok > 0,12 iken çökme(9), ardından şarj kareleriyle doğrulma. KOL_K durum→k tablosu; GOVDE_ACI 10 değer; DALIS_KAY 63 (dalış başı uzanma başına iner). BUILD_TAG "ARA KARELER".
+EVIDENCE:
+1. Dosya: assets/characters/beden/amca-ara-{itis,acilma,toplanma,uzanma,cokme}.png (kaynak Codex shared/GECIS-ARA-preview; kopya ai_review_evidence/GECIS-ARA-2026-11-26/).
+2. Ölçü/pivot: yüz (ten blob) alanından ölçek; itiş 711×1520 (379,1399), açılma 1162×1273 (751,1176), toplanma 1260×1260 (710,1227), uzanma 514×1098 (210,1092), çökme 558×1141 (278,1135). Havadakiler yüz (+77,−838); itiş yüz (+100,−1000); uzanma ayaklar pivotta; çökme ayak ortası pivot −86.
+3. Katman: ReactionLayer k 7–11, tek gövde kuralı aynı (KOL_K[uk] === k).
+4. Risk: kıyafetli/kirli (patladı) hâlde eski pozlar; uzanma bacakları istenenden bükük; 11 tepki katmanı (5 yeni görünmez katman) performans etkisi telefonda ölçülmedi. Simülatör: sim-ara-kareler.jpg (itiş→fırlama→açılma→süzülme→toplanma→dalış sırası görünüyor; bu atış düşüşle bitti, iniş çökmesi bu kayıtta yok). Telefona kuruldu, kullanıcı videosuyla doğrulanmadı.

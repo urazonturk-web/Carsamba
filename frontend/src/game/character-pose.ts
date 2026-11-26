@@ -94,6 +94,15 @@ export const REACTION_POSES = [
   // Pivot: yüz ağırlık merkezi süzülmedeki yerine (pivotun 77 px sağı, 838 px üstü) oturur — kareler arası baş yerinde kalır.
   { source: require("@/assets/characters/beden/amca-ucus-firlama.png"), w: 1149, h: 1261, pivotX: 809, pivotY: 1174 },
   { source: require("@/assets/characters/beden/amca-ucus-dalis.png"), w: 1204, h: 1204, pivotX: 633, pivotY: 1315 },
+  // GECIS-ARA (2026-11-26, kullanıcı kabul: "Yes, add all 5"): Kıvılcım ara kareleri k 7–11.
+  // Ölçek: yüz alanı uçuş pozlarıyla aynı (×0,96–0,98; çökme duruşla aynı ×1). Pivot: havadakiler yüz noktası
+  // süzülmedeki yerine (+77, −838); itiş yüz (+100, −1000); uzanma yüz (+77, −775), ayaklar pivotta;
+  // çökme ayak ortası pivotun 86 px solunda (charge-000 gibi), dibi pivot satırında.
+  { source: require("@/assets/characters/beden/amca-ara-itis.png"), w: 711, h: 1520, pivotX: 379, pivotY: 1399 },
+  { source: require("@/assets/characters/beden/amca-ara-acilma.png"), w: 1162, h: 1273, pivotX: 751, pivotY: 1176 },
+  { source: require("@/assets/characters/beden/amca-ara-toplanma.png"), w: 1260, h: 1260, pivotX: 710, pivotY: 1227 },
+  { source: require("@/assets/characters/beden/amca-ara-uzanma.png"), w: 514, h: 1098, pivotX: 210, pivotY: 1092 },
+  { source: require("@/assets/characters/beden/amca-ara-cokme.png"), w: 558, h: 1141, pivotX: 278, pivotY: 1135 },
 ] as const;
 
 /** Tepki pozu şu an görünür mü? Yalnız yerde (PHASE.IDLE) ve hiçbir kıyafet/efekt katmanı görünmüyorken.

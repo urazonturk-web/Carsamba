@@ -9,6 +9,7 @@ import { View } from "react-native";
 const LIVE_RN_IMAGE = true as boolean;
 import Animated, { useAnimatedStyle, type SharedValue } from "react-native-reanimated";
 
+import { KOL_K } from "./hareket";
 import { CHARGE_POSES, poseOpacity, REACTION_POSES, reactionVisible, reactionPivotFix, FALL_POSES, FALL_POSES_YAGMUR, FALL_POSES_KIS, FALL_KIS_H, FALL_KIS_TOP, FALL_POSES_SEMSIYE, FALL_SEMSIYE_H, FALL_SEMSIYE_TOP, FALL_BOXES, fallVisible } from "./character-pose";
 import { HAT_BOX, HAT_SOURCE, SLIPPER_BOXES, SLIPPER_SOURCE } from "./pijama";
 import { RAIN_POSE_SOURCES, RAIN_CAP_SOURCE, RAIN_CAP_BOX } from "./yagmur";
@@ -339,7 +340,7 @@ function ReactionLayer({ k, px, py, poseCharge, scale, feetCenterOffset, feetHal
     // Başka bir tepki pozu (silkele/oh be) çiziliyorsa kollu poz eklenmez: aynı anda iki gövde yok.
     // ucusKol: 1 = kollar açık denge pozu (k 2), 2 = süzülme (k 4), 3 = fırlama (k 5), 4 = dalış (k 6).
     const uk = ucusKol ? ucusKol.value : 0;
-    const kolAcik = ((k === 2 && uk === 1) || (k === 4 && uk === 2) || (k === 5 && uk === 3) || (k === 6 && uk === 4)) && outfit <= 0.01 && (tk === 0 || tk === 2 || ph !== 0);
+    const kolAcik = uk > 0 && KOL_K[uk] === k && outfit <= 0.01 && (tk === 0 || tk === 2 || ph !== 0);
     const on = ((tk === k && reactionVisible(tk, ph, outfit)) || kolAcik) && !dusuyor;
     const pulse = landPulse ? landPulse.value : 0;
     const sq = 1 - pulse * 0.14;

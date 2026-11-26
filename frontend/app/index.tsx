@@ -391,7 +391,7 @@ const AnimatedImage = Animated.createAnimatedComponent(Image);
 const BG_SCROLL_TEST = true as boolean;
 const BG_SCROLL_RATIO = 0.45;
 const BG_SCROLL_TILES = 4;
-const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "YUMUSAK GECIS") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
+const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "ARA KARELER") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
 const DIAG_MAX_EXAMPLES = 6;
 const HOUSE_AB_FROZEN = false as boolean;
 // REVIZYON-066 experiment (one variable): expo-linear-gradient's iOS layer
@@ -2887,7 +2887,9 @@ export default function Game() {
       kenarSal.value += (hedefK - kenarSal.value) * Math.min(1, dt * 10);
       if (phase.value === PHASE.AIRBORNE) kenar.value = 0;
       const havada = phase.value === PHASE.AIRBORNE;
-      const kd = kolDurumu(havada, phase.value === PHASE.IDLE && inisCok.value < 0.01, dusus.value !== 0, vy.value, ucusV0.value, releasedCharge.value, kenar.value);
+      let kd = kolDurumu(havada, phase.value === PHASE.IDLE && inisCok.value < 0.01, dusus.value !== 0, vy.value, ucusV0.value, releasedCharge.value, kenar.value);
+      // GECIS-ARA: orta/uzun atıştan inişin ilk ~130 ms'i çizilmiş çökme karesi; sonra şarj kareleriyle doğrulma.
+      if (phase.value === PHASE.IDLE && dusus.value === 0 && inisCok.value > 0.12 && releasedCharge.value >= 0.2) kd = 9;
       kolSure.value += dt;
       // GECIS: uçuş içinde her poz en az POZ_EN_AZ ekranda kalır; iniş/düşüş/kalkış anında beklemez.
       const bekle = havada && kolOnceki.value !== 0 && kd !== 0 && dusus.value === 0 && kolSure.value < POZ_EN_AZ;
@@ -3360,7 +3362,7 @@ export default function Game() {
   const dalisKay = useDerivedValue(() => {
     if (kolOnceki.value !== 4) return 0;
     const r = vy.value / Math.max(1, ucusV0.value);
-    return Math.max(0, Math.min(1, (r - 0.3) / 0.7)) * DALIS_KAY;
+    return Math.max(0, Math.min(1, (r - 0.35) / 0.4)) * DALIS_KAY;
   });
   // Soluk amca: tek görsel (duruş pozu), kutusu açık boyutlu (sıfır boyutlu kapsayıcıda görünmüyordu).
   const GHOST_POSE = CHARGE_POSES[0];
