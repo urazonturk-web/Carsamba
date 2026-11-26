@@ -2073,3 +2073,4 @@ TESLIM_HAZIR: OYNANIS-PAKET-1-IPUCU2 — uzun atışta ipucu çıkmaması düzel
 TESLIM_HAZIR: KURUKAFA-ALT-YAZI — Kurukafa alt satırı koyu hap + krem yazıya çevrildi, telefona kuruldu (OYNANIS PAKET 1 KURUKAFA YAZI); telefonda görülmesi bekleniyor.
 TESLIM_HAZIR: VIDEO-1256 — Kurukafa hap yazısı ve uzun atış ipucu düzeltmesi telefonda doğrulandı (AI_REVIEW.md); kısa/patladı ipuçları henüz cihazda görülmedi.
 TESLIM_HAZIR: HAREKET-2026-11-26 — amcanın uçuş/iniş hareketleri için 3 editör + Kıvılcım değerlendirmesi, ai_review_evidence/HAREKET-2026-11-26/RAPOR.md; Paket A (çizimsiz) ve Paket B (8-10 yeni PNG, Kıvılcım onayı) kullanıcı kararı bekliyor.
+TESLIM_HAZIR: HAREKET-PAKET-A — uçuşta eğilme/esneme/diz pozu, hıza göre iniş çökmesi, kenar sallanması, tepki kuralları; telefona kuruldu (HAREKET PAKET A); kullanıcı videosu bekleniyor.

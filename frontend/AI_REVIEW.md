@@ -3278,3 +3278,26 @@ Kullanıcı onayı ("Yes, fix it"): Kurukafa alındığında çıkan "Kuleler %N
 - Gözlem: Kurukafa anında "💀 Kurukafa!" altında "Kuleler %18 küçüldü 😬 · 8 zıplama" koyu hap + krem yazıyla okunaklı çıktı (eski siyah sistem yazısı yok).
 - Gözlem: ilk 5 oyun sonunda ipucu çıktı (0, 0, 6, 6, 10 puan; 10 puanlık oyun Kurukafa/DAR etkisi altındaydı). Satırlar "Fren de var evlat…" / "Fazla bastın, kuleyi aştım…" sırayla. 6. karttan sonra ipucu yok (IPUCU_MAX=5, beklenen).
 - Gözlem: 3 düşüş kare kare incelendi; amca hepsinde sonraki kuleyi aşıp ileride düşüyor → "uzun" sınıfı doğru. Bu videoda "kısa" ve "patladı" durumu oluşmadı, o satırlar cihazda görülmedi.
+
+## HAREKET PAKET A — amcanın uçuş ve iniş hareketleri — 2026-11-26
+### TASK
+Kullanıcı: "Yes, build A" (rapor ai_review_evidence/HAREKET-2026-11-26/RAPOR.md, Paket A: yeni çizim yok).
+### CHANGED
+- src/game/hareket.ts (yeni): sabitler + `ucusEgim` (yükselirken öne en fazla 12°, tepede 0, inerken geriye en fazla 7°; kısa atışta ×0.2..1) ve `ucusPoz` (tepe civarı şarj %12,5, inişe yakın %25 pozu).
+- app/index.tsx:
+  - karakter sarmalayıcısı (`charOpStyle`) artık ayak noktası etrafında döndürür/esnetir: tüm pozlar, haleler ve kıyafetler birlikte; düşüş karelerinde eğim kapalı.
+  - kalkışta esneme (`ucusEsne`, 45+95 ms; şarja göre 0.5/1/1.3).
+  - eğim her karede yumuşatılır (EGIM_HIZ 18/sn) — inişte ~100 ms'de 0'a döner.
+  - `poseCharge` uçuşta `ucusPoz`'u kullanır (mevcut çizimler).
+  - iniş çökmesi çarpma hızına göre 0.6–1.4 (süreler 45/85/100 ms).
+  - kıl payı kenarda (oran ≤0.12 / ≥0.88) ±7° sönümlü sallanma (ön kenar öne, arka kenar geriye; 600 ms).
+  - tepki kuralları: rekoru ilk geçiş "oh be" (koşuda bir kez) > durak/komşu konuşuyorsa amca poz yapmaz > 3+ kule "oh be" (koşu başına 2) > kıl payı denge > kusursuz seri 2.'den itibaren silkele; 3+ seri ve oh be'de göğüs kabartma (kıyafetliyken de görünür).
+  - durak titreşimi varken kusursuz titreşimi atlanır (inişte tek titreşim).
+  - dokununca sallanma/kabarma anında sıfırlanır; restart sayaçları sıfırlar.
+  - BUILD_TAG "HAREKET PAKET A".
+- Fizik (px/py/vx/vy), kamera, çarpışma, iniş tespiti, puan, kule üretimi DEĞİŞMEDİ (yeni değerler yalnız stillerde okunur).
+### EVIDENCE
+- tsc: yalnız önceden var olan 4 hata (src/theme.ts).
+- Simülatör (iPhone 17, Release): kayıt karelerinde yükselişte öne eğilme, tepede ve inişte dizler bükük poz görüldü; iniş yerleri doğru, Kurukafa ve oyun sonu çalışıyor. Simülatörde dokunma süreleri gerçek cihazdan farklı (1,1 sn basış patladı), kenar sallanması/kabarma simülatörde yakalanmadı.
+### OPEN_ISSUES
+- Telefonda görülmedi; kenar sallanması, seri tepkisi ve rekor kutlaması cihaz videosunda denetlenmeli. Şemsiyeli yağmurda performans ölçülmedi.
