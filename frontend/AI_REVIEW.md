@@ -3332,3 +3332,6 @@ Kullanıcı: (1) bulmacadan sonra havada gaz kalıyor; (2) bulmaca aşağı/orta
 ### OPEN_ISSUES
 - Ödül (2) kullanıcı kararı bekliyor (kurala dokunan seçenekler onay ister).
 - Kollu poz kıyafetli hâllerde yok; kalıcı çözüm yeni çizim (S1–S5, Kıvılcım onayı).
+
+## Bulmaca kapatıldı — 2026-11-26
+Kullanıcı: "bulmacadan vazgeçtim … başka ekrana geçmeyelim". src/game/BagajIstifi.tsx `BAGAJ_ON = false` (kod duruyor, hiç açılmaz). BUILD_TAG "KOL ACIK, BULMACA KAPALI"; telefona kuruldu. Uçuşta açık kol ve gaz düzeltmesi aynen duruyor. Yerine oyun içi durak olayları değerlendirmesi: ai_review_evidence/OYUNICI-OLAY-2026-11-26/RAPOR.md.

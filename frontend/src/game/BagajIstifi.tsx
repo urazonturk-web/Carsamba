@@ -6,7 +6,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Animated, PanResponder, Pressable, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 
-export const BAGAJ_ON = true as boolean;
+export const BAGAJ_ON = false as boolean; // 2026-11-26 kullanıcı: "bulmacadan vazgeçtim" (başka ekrana geçilmesin)
 /** GEÇİCİ deneme: ilk inişte açılır (simülatör). Teslimde false. */
 export const BAGAJ_TEST = false as boolean;
 export const BAGAJ_DURAK = 1; // Harem

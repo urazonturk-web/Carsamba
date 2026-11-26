@@ -1,0 +1,38 @@
+# OYUNICI-OLAY — Teknik editör (React Native + Reanimated)
+
+Satır numaraları, çalışma kopyasındaki `app/index.tsx` dosyasına göredir (commit'lenmemiş değişiklikler dahil). Hiçbir dosya değiştirilmedi.
+
+## 1. Dokunma çakışması: hedef testi worklet içinde yapılabilir
+- Tek giriş katmanı tam ekran `charge-surface` (4077-4083: `onResponderGrant={onPressIn}`, `onResponderRelease={onPressOut}`, `onResponderTerminate={cancelCharge}`). `onPressIn` (2594) yalnız `timestamp` alıp `runOnUI` ile worklet'e geçiyor; şarj kararı 2603'te veriliyor (`running===1 && phase===IDLE`).
+- **Çözüm:** `onPressIn` `event.nativeEvent.locationX/locationY` değerlerini de worklet'e geçirsin. Yüzeyin çocuğu yok ve `root`'un (5533) tamamını kaplıyor. Bu yüzden location değerleri doğrudan ekran koordinatı. Worklet'te, 2603'teki erken dönüşten **önce** ve `poseOverride` sıfırlamasından sonra: `if (mOn.value===1 && martiVur(x,y)) { ...kov...; return; }`. Böylece şarj hiç başlamaz. `onPressOut` (2758) `phase!==CHARGING` olunca zaten hiçbir şey yapmıyor, yani kovma dokunuşunun bırakılması da kalkış üretmez. Ek bir kilit gerekmiyor.
+- **Dünya → ekran:** `worldStyle` (3529) `translate(-camXR*s, -camYR*s) scale(s)` uyguluyor, `transformOrigin 0 0` (5551), `s = CONFIG.cameraZoom = 0.40`. Ekran = `((wx - camXR.value)*s, (wy - camYR.value)*s)`. `camYR` her can için sabit (3213-3216, R059). `camXR` iniş sonrasında bir süre daha yumuşayarak kayıyor (3166). Bu yüzden test, çizimle **aynı** saf worklet fonksiyonunu (`martiKonum(e, t)`) ve **o anki** `camXR.value` değerini kullanmalı. Çizim en fazla 1 kare geride kalır, bu da tolerans payına sığar.
+- **Yarıçap:** en az 44 pt'lik dokunma hedefi (≈ 26 px yarıçap; öneri 34 px). **Amcanın kendi dikdörtgeni hedef dışı tutulmalı:** martı amcanın üstüne bindiğinde oraya yapılan dokunuş zıplama niyetidir ve şarj başlamalıdır. Bunu sağlamak için martıların yörüngesi baş hizasının en az ~60 px üstünde ve yanında kalsın.
+- **Seçim:** Kız Kulesi saldırısında amca çatıda (IDLE). "Hedefe dokun → kov, boşa dokun → şarj" ayrımı akışı durdurmaz. Havadaki olaylar için aynı test, 2603'teki erken dönüşten önce durduğu için havada da çalışır (havada dokunuş şu an zaten boşa gidiyor). `doorLock` (2604, 3036) tarzı "şarj kapalı" kilidine gerek yok. Kilit, oyuncunun ritmini bozan tek seçenek.
+
+## 2. Martı saldırısı: karga havuzu kalıbıyla
+- Mevcut kalıp: `kPool` (1085) + 8 ilerleme SV'si `kPs` (1086-1087) + `kargaPoolStyle` (1219-1248). Her slot × 4 poz için ayrı `useAnimatedStyle` var, yani **32 eşleyici (mapper)**. Görünümler önceden monte ediliyor (3904-3908), açılıp kapanma opaklıkla ve `translateX:-99999` ile yapılıyor. Kalkışları JS tetikliyor (`withDelay(withTiming)`, 1208-1212).
+- **Martı için daha ucuz sürüm:** 3 slot × **1 görünüm**, yani 3 yeni eşleyici. Kanat çırpma pozla değil, `scaleY` ile verilir (`kargaUcus`'taki `sy` formülü, karga.ts). Prototipte görsel olarak `KARGA_HAVALANMA` çizimi (açık renkli bir zemin ya da emoji 🐦 ile) veya AmbientBirds'teki kod çizimi martı silüeti (AmbientBirds.tsx 22-28) büyütülerek kullanılabilir. Kıvılcım'dan yalnız 1-2 kare (uçuş, dalış) gerekir.
+- **Durum:** `mOn` (0/1), `mT` (olay saati, tek bir `withTiming(1, {duration: 9000, easing: linear})`), `mPool` (her martı için `{x0,y0,ax,ay,faz,kovT,kovDx}`). Amcanın konumu olay başında `mPool`'a **anlık görüntü** olarak yazılır. Stil `px/py` okumaz, çünkü `px` havada her karede değişir ve eşleyiciyi olay dışında da her karede çalıştırırdı. Olay kapalıyken bütün girdiler durağan kalır, yani maliyet sıfırdır. Olay açıkken 3 eşleyici, 9 sn boyunca her karede çalışır (karga uçuşu sırasındaki 8 slotla karşılaştırınca küçük).
+- **Tetik:** `onLanding` (1898) içindeki durak geçişi; `BAGAJ` kancasının bulunduğu yer (1951-1965). **Fark:** `running.value = 0` YAPILMAZ ve `setBagaj` gibi ayrı ekran açılmaz. Yarış/meydan okuma dışlanır (`!raceRef.current && !challengeRef.current`). Martılar ~600 ms gecikmeyle ekran dışından gelir ve `durakKonustu` balonuyla çakışmaz.
+- **Kovma:** worklet içinde `mPool` kopyalanıp ilgili girdiye `kovT = mT.value` yazılır; stil o andan sonra kaçış eğrisini çizer. Bildirim için `runOnJS` ile haptik (`Haptics.impactAsync Light`) ve ses (`mahalleSes`/`playSfx`) çağrılır.
+- **Bitiş:** `withTiming` geri çağrısı → `runOnJS(onMartiBitti)(kovulanSayisi)`. Amca olay sırasında zıplarsa (2612'de `phase=CHARGING` olur) aynı geri çağrı "kaçtı" kabul edilir ve ceza verilmez. Bunun için `onPressIn` içinde şarj başladığında `mOn` kapatılmaz, yalnız `mKacti=1` yazılır.
+
+## 3. Fizik/kamera/puana dokunmadan sonuç
+- **Sendeleme** için hazır, salt görsel iki araç var: `sallan` (ayak pivotlu sönümlü sallanma, 3073-3083'teki `withSequence`) ve `tepki=2` ("denge" pozu; atama 2040-2045). Başarısızlıkta JS'ten `runOnUI` ile aynı dizi çalıştırılır. `onPressIn` 2606'da `sallan`'ı zaten iptal ediyor, yani oyuncu sendelerken bile anında zıplayabilir, girdi kaybı olmaz.
+- **Simit kapma:** martının ağzında bir emoji/Image, aynı eşleyicide `opacity` ile gösterilir. Bunun için yeni görünüm gerekmez, mevcut martı görünümüne çocuk olarak eklenir.
+- **Ödül:** ilk sürümde yalnız görsel/işitsel (ör. iç ses `showThought`, konfeti yok). "Sonraki iniş toleransı geniş" ya da puan bonusu, `CONFIG.scorePerfectBonus` ve iniş hesabına dokunur. Bu **kural değişikliğidir, kullanıcı onayı ister.**
+
+## 4. Riskler
+- **R062 kuralı** (GAME_STUDIO.md 832, AI_REVIEW.md 2689): eşleyicinin girdileri yalnız updater'ın kendi `__closure`'ından toplanıyor. `mOn.value`, `mT.value`, `mPool.value` ve `camXR` stil fonksiyonunda **doğrudan** okunmalı, `martiKonum(e, t, B)` yardımcısına parametre olarak geçirilmeli. İç fonksiyonda okunan SV abone olmaz ve martı donar. Web bu hatayı göstermez (R062 notu), denetimi `closure_check.cjs` ile yapın.
+- **Bildirim sırası:** bir `useAnimatedReaction` `mPool` türetecekse stillerden **önce** bildirilmeli (4941-4944'teki `houseGeom` kalıbı). Bu öneride reaksiyon yok, stil her şeyi `mT`'den hesaplıyor, bu yüzden risk yok.
+- **JS→UI gecikmesi:** `onLanding` `runOnJS` ile geliyor, olay SV'leri 1-2 kare sonra yazılıyor. İnişten hemen sonraki dokunuş martıyı göremez ve normal şarj başlar. 600 ms giriş gecikmesi bunu kapatır.
+- **Takılma:** React state ile koşullu montaj YAPILMAMALI (R061/R064: kalkış/iniş render'ları takılma üretiyordu). Önceden monte edilip opaklıkla açılmalı. Stilde `transform` dizisi her çalışmada yeni olduğundan güncelleme her seferinde gönderilir. Kapalı durumda girdilerin durağan kalması bu yüzden şart.
+- **Basılı tutarken olay başlarsa:** tek responder olduğu için ikinci parmak martıya dokunamaz. Kabul edilebilir (oyuncu zaten zıplıyor, olay "kaçtı" ile biter).
+- `kargaPoolStyle` hook'u döngü içinde çağırıyor (1249). Martıda da sabit sayıda (3) tutulursa hook sırası güvenlidir.
+
+## En az maliyetli plan (≈ 120-160 satır, yeni görsel olmadan prototip)
+1. `src/game/marti.ts`: `MARTI_ON`/`MARTI_TEST`, `MARTI_DURAK = 2` (Üsküdar·Kız Kulesi), saf worklet'ler `martiKonum(e,t,B)` (giriş → baş üstü daire → dalış; `kovT` varsa kaçış) ve `martiVur(x,y,pool,t,camX,camY,s,amcaRect)`.
+2. `index.tsx`: `mOn`, `mT`, `mPool` SV'leri ve 3 adet `martiStyle(i)` (R062'ye uygun). Görünümler 3904'teki karga bloğunun yanında, `pointerEvents="none"`.
+3. `onPressIn`: `locationX/Y` worklet'e geçirilir ve 2603'ten önce hedef testi yapılır.
+4. `onLanding`: 1951 civarında `startMarti()` çağrılır (`running` değişmez). Bitişte görsel sonuç `sallan` + `tepki=2` + simit ile verilir. Puan/kural yok.
+5. Doğrulama: `tsc`, worklet derleme kontrolü (closure'da `mT`/`mPool`/`camXR`), simülatörde `MARTI_TEST` ile denenir. Cihazda `FRAME_DIAG` ile olay açıkken uçuş >25 ms sayısı karşılaştırılır.
