@@ -2071,3 +2071,4 @@ TESLIM_HAZIR: OYNANIS-PAKET-1 — hataya göre ipucu, "Tam isabet!", oyun sonu k
 TESLIM_HAZIR: OYNANIS-PAKET-1-EVLAT — oyun sonu ipuçları "evlat" setiyle değişti (6 satır, sırayla), telefona kuruldu (OYNANIS PAKET 1 EVLAT); kanıt AI_REVIEW.md, editör görüşleri ai_review_evidence/IPUCU-METIN-2026-11-26/.
 TESLIM_HAZIR: OYNANIS-PAKET-1-IPUCU2 — uzun atışta ipucu çıkmaması düzeltildi, sayaç sıfırlandı, telefona kuruldu (OYNANIS PAKET 1 IPUCU2); sandbox geri yükleme videoda doğrulandı; Kurukafa alt yazısı stili kullanıcı kararı bekliyor.
 TESLIM_HAZIR: KURUKAFA-ALT-YAZI — Kurukafa alt satırı koyu hap + krem yazıya çevrildi, telefona kuruldu (OYNANIS PAKET 1 KURUKAFA YAZI); telefonda görülmesi bekleniyor.
+TESLIM_HAZIR: VIDEO-1256 — Kurukafa hap yazısı ve uzun atış ipucu düzeltmesi telefonda doğrulandı (AI_REVIEW.md); kısa/patladı ipuçları henüz cihazda görülmedi.

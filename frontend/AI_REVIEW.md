@@ -3272,3 +3272,9 @@ Kullanıcı onayı ("Yes, fix it"): Kurukafa alındığında çıkan "Kuleler %N
 - tsc: yalnız önceden var olan 4 hata (src/theme.ts), yeni hata yok.
 ### OPEN_ISSUES
 - Simülatörde veya telefonda Kurukafa anı görülmedi (kurukafayı yakalamak elle oynamayı gerektiriyor); kullanıcı videosu bekleniyor.
+
+## Video denetimi 12:56 (OYNANIS PAKET 1 KURUKAFA YAZI) — 2026-11-26
+### EVIDENCE
+- Gözlem: Kurukafa anında "💀 Kurukafa!" altında "Kuleler %18 küçüldü 😬 · 8 zıplama" koyu hap + krem yazıyla okunaklı çıktı (eski siyah sistem yazısı yok).
+- Gözlem: ilk 5 oyun sonunda ipucu çıktı (0, 0, 6, 6, 10 puan; 10 puanlık oyun Kurukafa/DAR etkisi altındaydı). Satırlar "Fren de var evlat…" / "Fazla bastın, kuleyi aştım…" sırayla. 6. karttan sonra ipucu yok (IPUCU_MAX=5, beklenen).
+- Gözlem: 3 düşüş kare kare incelendi; amca hepsinde sonraki kuleyi aşıp ileride düşüyor → "uzun" sınıfı doğru. Bu videoda "kısa" ve "patladı" durumu oluşmadı, o satırlar cihazda görülmedi.
