@@ -59,6 +59,8 @@ import { KARGA_ON, KARGA_TUNEMIS, KARGA_BAKIS, KARGA_YEM, KARGA_HAVALANMA, KARGA
 import { CEPHE_HUCRE, CEPHE_DONEM_PX, CEPHE_BASLANGIC_PX } from "../src/game/cepheCesit";
 import { MAHALLE_ON, MAHALLE_SPEECH_ON, CUMBA_SOURCE, CUMBA_KEDI_SOURCE, CUMBA_ASPECT, CUMBA_TEYZE_SOURCE, CUMBA_TEYZE_BAKIS_SOURCE, CUMBA_TEYZE_ASPECT, cumbaBox, MAHALLE_BOX, TEYZE_ASPECT, KEDI_ASPECT, KEDI_UYUYAN_FOOT, KEDI_DIK_FOOT, AMCA_ASPECT, COCUK_ASPECT, KEDI_GERINEN_ASPECT, KEDI_GRI_ASPECT, TEYZE_SOURCE, KEDI_SOURCE, AMCA_SOURCE, COCUK_SOURCE, KEDI_GERINEN_SOURCE, KEDI_GRI_SOURCE, KEDI_ADLARI, sakin, teyzeBox, kediBox, kediAdi, kediGri, kediGriNo, pencereAspect, pencereLafi, kediLafi, KEDI_DEFTER_KEY, mahalleKaynak, kediGorunum, kediGorunumNo, kadinNo, KADIN_KAYNAK, KEDI_YENI, KEDI_YENI_ASPECT, SAKIN_TOHUM } from "../src/game/mahalle";
 import { OZEL_GUN_ON, OZEL_GUN_TEST_TAP, OZEL_GUNLER, OZEL_GUN_TEST_ORDER, todaysEvent } from "../src/game/ozelGun";
+import { RIG_ON, rigUcus, rigInis } from "../src/game/rig";
+import { RigAmca } from "../src/game/RigAmca";
 import { GOVDE_ACI, TELAFI_MAX, TELAFI_SONUM, YUZ_DX, YUZ_DY, POZ_EN_AZ, INIS_TUT, INIS_SURE, DALIS_KAY } from "../src/game/hareket";
 import { kolDurumu, ARA_KARE_EGIM, GECIS_SONUM, GECIS_DONME, GECIS_ESNE, SUZUL_DALGA, SUZUL_NEFES, SUZUL_HZ } from "../src/game/hareket";
 import { HAREKET_ON, ucusEgim, ucusPoz, EGIM_HIZ, ESNE_BOY, ESNE_EN, SALLAN_DERECE, KABAR_ORAN, OHBE_MAX } from "../src/game/hareket";
@@ -391,7 +393,7 @@ const AnimatedImage = Animated.createAnimatedComponent(Image);
 const BG_SCROLL_TEST = true as boolean;
 const BG_SCROLL_RATIO = 0.45;
 const BG_SCROLL_TILES = 4;
-const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "ARA KARELER") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
+const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "PARCALI AMCA") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
 const DIAG_MAX_EXAMPLES = 6;
 const HOUSE_AB_FROZEN = false as boolean;
 // REVIZYON-066 experiment (one variable): expo-linear-gradient's iOS layer
@@ -1425,6 +1427,10 @@ export default function Game() {
   const araKareSV = useSharedValue(1);
   const suzZarf = useSharedValue(0);
   const kolSure = useSharedValue(1);
+  // RIG: parçalı amca görünür mü (0/1) ve özel gün şapkası var mı (kıyafet sayılır → eski pozlar).
+  const rigGor = useSharedValue(0);
+  const sapkaSV = useSharedValue(0);
+  useEffect(() => { sapkaSV.value = curEvent?.hat ? 1 : 0; }, [curEvent?.hat]);
   const fenerS = useSharedValue(FENER_MIN);
   const camX = useSharedValue(0);
   // Render Y is fixed at the spawn composition for the entire life.
@@ -2890,14 +2896,24 @@ export default function Game() {
       let kd = kolDurumu(havada, phase.value === PHASE.IDLE && inisCok.value < 0.01, dusus.value !== 0, vy.value, ucusV0.value, releasedCharge.value, kenar.value);
       // GECIS-ARA: orta/uzun atıştan inişin ilk ~130 ms'i çizilmiş çökme karesi; sonra şarj kareleriyle doğrulma.
       if (phase.value === PHASE.IDLE && dusus.value === 0 && inisCok.value > 0.12 && releasedCharge.value >= 0.2) kd = 9;
+      // RIG: orta/uzun atışta uçuş ve iniş çökmesi parçalı amcayla (kıyafet/şapka/kirli yoksa; tepki pozu başlayınca biter).
+      if (RIG_ON && BEDEN_ON) {
+        const kiyafet = Math.max(rainWear.value, winterWear.value, pajama.value, dirty.value, umbVis.value, snowAmt.value, sapkaSV.value);
+        const rig = kiyafet <= 0.01 && dusus.value === 0 && releasedCharge.value >= 0.2
+          && (havada || (phase.value === PHASE.IDLE && inisCok.value > 0.02 && tepki.value === 0));
+        if (rig) kd = 10;
+        else if (kd === 10) kd = 0;
+        rigGor.value = rig ? 1 : 0;
+      }
       kolSure.value += dt;
       // GECIS: uçuş içinde her poz en az POZ_EN_AZ ekranda kalır; iniş/düşüş/kalkış anında beklemez.
-      const bekle = havada && kolOnceki.value !== 0 && kd !== 0 && dusus.value === 0 && kolSure.value < POZ_EN_AZ;
+      const bekle = havada && kolOnceki.value !== 0 && kd !== 0 && kd !== 10 && dusus.value === 0 && kolSure.value < POZ_EN_AZ;
       if (kd !== kolOnceki.value && !bekle) {
         kolYon.value = kd === 2 || kd === 4 ? 1 : kolOnceki.value === 2 ? -1 : 0.5;
         kolGecis.value = 1;
         // GECIS: yeni çizim eski gövde açısıyla başlar, yüz noktası etrafında kendi açısına döner.
-        if (havada && kd !== 0) {
+        if (kd === 10 || kolOnceki.value === 10) telafi.value = 0;
+        else if (havada && kd !== 0) {
           const t = GOVDE_ACI[kolOnceki.value] - GOVDE_ACI[kd] + telafi.value;
           telafi.value = Math.max(-TELAFI_MAX, Math.min(TELAFI_MAX, t));
         }
@@ -3358,6 +3374,11 @@ export default function Game() {
   // Uzun atışın tepesinde süzülme pozu (2); kısa hopta, inişe yakın ve kenarda dururken kollar açık (1).
   // GECIS: çizim tek kaynaktan — kare döngüsünün tuttuğu durum (en kısa tutma süresi dahil).
   const ucusKol = useDerivedValue(() => (HAREKET_ON ? (dusus.value !== 0 ? 0 : kolOnceki.value) : 0));
+  // RIG: parçalı amcanın pozu (uçuşta r'ye, inişte çökme yaylanmasına göre sürekli karışım).
+  const rigPoz = useDerivedValue(() => {
+    if (phase.value === PHASE.AIRBORNE) return rigUcus(vy.value / Math.max(1, ucusV0.value));
+    return rigInis(inisCok.value / 0.375);
+  });
   // GECIS: dalışta çizim inişe doğru aşağı kayar (temas anında "ışınlanma" olmasın).
   const dalisKay = useDerivedValue(() => {
     if (kolOnceki.value !== 4) return 0;
@@ -4169,6 +4190,10 @@ export default function Game() {
           onLoad={() => { poseLoads.current += 1; if (poseLoads.current >= CHARGE_POSES.length) markArtLoaded("character"); }}
           onError={failArt}
         />
+        {RIG_ON && BEDEN_ON && HAREKET_ON ? (
+          <RigAmca px={px} py={py} scale={SPRITE_SCALE * GLOBAL_VISUAL_SCALE * CHAR_SIZE_TRIAL}
+            feetCenterOffset={SOLE_CENTER_OFFSET + ANCHOR_SHIFT_PX * SPRITE_SCALE} feetHalf={PH / 2} gor={rigGor} poz={rigPoz} />
+        ) : null}
         </Animated.View>
         {/* KIZARAN YÜZ FENER: sis katmanı amcanın üstünde; ortası açık, şarjla büyür (yalnız çizim). */}
         {FENER_ON && (

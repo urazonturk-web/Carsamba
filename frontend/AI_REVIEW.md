@@ -3425,3 +3425,12 @@ EVIDENCE:
 GÖZLEM (30 kare/sn, ziplama-yakin.jpg): uzun atışta 7 poz değişimi, her biri tek karede; pozlar 60–600 ms arası düzensiz kalıyor. Ölçüm (oyun-olcegi.jpg, oyundaki kutu/pivotlarla): çizimler arası baş boyu ±%20 (dalış büyük, uzanma/çökme küçük), gövde boyu ve oranı farklı, yüz ifadesi her karede değişiyor. Her değişimde ayrıca açı telafisi dönmesi biniyor (7 kez).
 DEĞERLENDİRME: ayrı ayrı üretilmiş tam gövde çizimleri birbirine tutarlı değil; kare sayısı arttıkça "kart çevirme" etkisi artıyor. Kod değişmedi.
 NEXT: kullanıcı kararı — (A) havadaki 3 ara kareyi kaldır, iniş (uzanma + çökme) kalsın; (B) parçalı iskelet animasyonu (baş/gövde/kol/bacak ayrı, eklemden döner).
+
+## RIG — parçalı (iskelet) uçuş animasyonu — 2026-11-26
+TASK: "Build the rig" → "Yes, draw parts" (Kıvılcım 1 çağrı, 1 görsel: 9 parçalı sayfa).
+CHANGED: src/game/rig.ts (parça/eklem tablosu, 8 poz açı tablosu, r'ye göre yumuşak adım karışımı, ileri kinematik), src/game/RigAmca.tsx (13 katman: uzak kol/bacak koyulaştırılmış kopya, baş nötr/şaşkın, ön kol el/yumruk), app/index.tsx: orta/uzun atışta (bırakılan ≥ 0,2) uçuş ve iniş çökmesi rig ile (durum 10; ChargePoses gizlenir); kıyafet/şapka/kirli/düşüşte ve tepki pozu başlayınca eski çizimler. RIG_ON bayrağı. BUILD_TAG "PARCALI AMCA". Fizik/kamera/çarpışma/puan değişmedi.
+EVIDENCE:
+1. Dosya: assets/characters/rig/*.png (amca-rig-parcalar.png 1536×1024'ten bağlı bileşenle kesildi; ai_review_evidence/RIG-2026-11-26/).
+2. Ölçü/pivot: eklemler alfa ağırlık merkezinden (eklemler.json); ölçek RIG_K 1,437 (baş yüz alanı charge-000 ile eşit), uzuvlar ×0,8; kalça ayak noktasının RIG_DX −100 solunda, bacak boyu kadar üstünde.
+3. Katman: ChargePoses ile aynı charOpStyle sarmalayıcısı içinde, ondan sonra.
+4. Risk: yer↔hava geçişinde çizim ↔ rig değişimi (aynı baş ama gövde inceliği farklı); kıyafet sürümleri yok; açılar göz kararı (onizle.py ile önizlendi); 13 ek görüntü katmanı telefonda ölçülmedi. Simülatör: sim-rig-30fps.jpg, sim-rig-ucus.jpg (sürekli hareket, poz atlaması yok). Telefona kuruldu; kullanıcı videosuyla doğrulanmadı.
