@@ -1,0 +1,778 @@
+OpenAI Codex v0.171.0-alpha.13.2
+--------
+workdir: /Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend
+model: gpt-6-luna
+provider: openai
+approval: never
+sandbox: read-only
+reasoning effort: medium
+reasoning summaries: none
+session id: 01a2176a-c049-7482-8327-6444c23da9fa
+--------
+user
+# AMAC-2026-11-26 — (1) amca hâlâ "kazık gibi" uçuyor, (2) oyunun amacı / durak ödülleri
+
+## Kullanıcının istekleri (kelimesi kelimesine)
+1. "adam yine kazık gibi atlıyor kollarını falan açsın gibi durumları değerlendirin diğer editörlerle."
+3. "oyunun bir amacı olmalı her durağa vardığında bir şey toplamalı ya da bir bulmaca gibi bir şey olmalı bunun gibi yaratıcı fikirleri bekliyorum diğer editörlerle beraber senden"
+(2. madde, takılmalar, ayrı inceleniyor; bu brief'in konusu değil.)
+
+## Oyun (kısa)
+Byzantion: Expo/React Native iPhone oyunu. Eşofmanlı, bıyıklı İstanbul amcası; basılı tutunca çömelir (şarj), bırakınca gaz izi bırakarak eğik atışla uçar, ileriki kulelerin çatısına iner. Yandan görünüş, sağa ilerler. Tek dokunuş. Ton: sıcak mahalle mizahı. Arapça ünlem yok (maşallah, helal, nazar vb.).
+
+## Şu anki içerik (önemli, tekrar önermeyin; üstüne kurun)
+- **Durak seferi:** Kadıköy'den Boğaz boyunca 12 durak (Harem, Üsküdar·Kız Kulesi, Kuzguncuk, Beylerbeyi, Ortaköy, Arnavutköy, Bebek, Rumeli Hisarı, Kanlıca, Beykoz, Anadolu Kavağı, Rumeli Feneri), her 15 kulede bir; 3 köprü (yaka değişimi). Durakta bant + ses. Düşünce baştan (kayıt noktası yok). Zorluk 4. durağa kadar artıyor.
+- **Kartpostal albümü:** bir durağa ilk varınca o semtin kartpostalı açılır (12 kart, amcanın o semtte bir etkinliği + arka yüzde not). Menüde "Kartpostal 0/12".
+- **Kedi defteri:** bazı çatılarda kediler; inince tanışılır, defter 12 kedi.
+- **Kurukafa:** havada yakalanan bonus; birkaç zıplama boyunca kuleleri büyütür/küçültür.
+- **Puan:** iniş başına puan + çoklu kule bonusu; rekor; Game Center sıralama; "Meydan oku" (arkadaşa aynı harita, 2 dk hayalet yarış).
+- **Mahalle:** cumbada teyzeler, pencereden laf atan komşular, kargalar, kedi balonları; hava durumu gerçek (yağmur/kar/şemsiye), gece pijama, özel günlerde şapka.
+- **Oyun sonu kartı:** skor, rekora kalan, sonraki durağa kalan kule + çubuk, bulanık sonraki kartpostal, lakap, ilk 5 oyunda ipucu.
+- **Çay ısmarla:** tek seferlik bağış (reklamsız, ücretsiz oyun).
+- **Hareket (bugün eklendi, Paket A):** uçuşta en fazla 12° eğilme, kalkışta esneme, tepede/inişte mevcut çömelme pozlarıyla diz bükme; kenarda sallanma. Kullanıcı yine de "kazık gibi" diyor: **sorun kollar ve beden çizgisi** — mevcut pozların hepsi kollar yanda, dik duruş. Bkz. kareler/ucus_*.jpg (13:22 videosu) ve önceki klasör ../HAREKET-2026-11-26/ (RAPOR.md, kareler/: duruş pozu, tepki pozları).
+- Önceki oynanabilirlik raporu: ../OYNANIS-2026-11-26/RAPOR.md (tam orta serisi, "Muhtarın üç işi + rütbe", ayarlar, sırayla oynama vb. önerildi; tam orta serisi puan kuralı değişikliği olduğundan kullanıcı onayı bekliyor).
+
+## Sınırlar
+- Zıplama fiziği, kamera, çatı silüeti, çarpışma DEĞİŞMEZ. Puan kuralı ve kule üretimi değişikliği **ayrı kullanıcı onayı** ister: öneriniz bunlara dokunuyorsa açıkça işaretleyin.
+- Yeni görsel (poz, eşya, kart) üretimi Kıvılcım ile yapılır; **her çağrı ayrı onay**, üretilen görsel kullanıcı kabulü olmadan oyuna bağlanmaz. Bu yüzden her öneride kaç yeni görsel gerektiğini sayın.
+- Tek dokunuş kalmalı; ekstra düğme/kontrol ekleyen bulmacalar oyunun ritmini bozmamalı.
+- Kayıt yalnız cihazda (sunucu yok), Game Center var.
+
+## Sizden istenen (rolünüze göre, Türkçe, ~1 sayfa, madde madde)
+A) **Kollar/beden:** "kazık gibi" görünmemesi için havada ve inişte hangi pozlar çizilmeli? En az sayıda poz ile en çok fark: her poz için kısa betimleme (kollar, bacaklar, yüz, bıyık, eşofman ceketi), uçuşun hangi evresinde gösterileceği, kıyafet sürümleri (pijama, kış, yağmur, şemsiye) dahil toplam görsel sayısı. Çizim yerine kod ile yapılabilecek ara çözüm var mı (ör. kolları ayrı parça olarak döndürmek — mevcut pozlar tek parça PNG)?
+B) **Oyunun amacı / durak ödülleri:** her durağa varınca bir şey toplama, bulmaca, koleksiyon, görev… En az 6 yaratıcı fikir; her biri için: nasıl işler (tek dokunuşla), oyuncuya "bir sonraki durağa kadar gideyim" dedirtir mi, mevcut kartpostal/kedi sistemiyle nasıl birleşir, kaç yeni görsel ister, puan kuralına/kule üretimine dokunur mu, uygulama büyüklüğü (S/M/L). Sonra en iyi 2'sini seçip gerekçelendirin.
+C) Türün başarılı oyunlarından (Alto's Odyssey görevleri, Crossy Road karakter toplama, Stick Hero, Subway Surfers görev/kelime avı, Jetpack Joyride görevleri, Monument Valley, Tiny Wings, Mini Metro vb.) hangi "amaç" kalıpları işe yarıyor? Kaynak gösterin (web araması serbest).
+
+Raporunuzu bu klasöre `editor-<rol>.md` olarak yazın. Oyun kodunu DEĞİŞTİRMEYİN.
+
+
+## Kıvılcım için not
+Sen bu projede görsel tasarım ve karakter dili editörüsün (bu çağrıda görsel üretmiyorsun, yalnız yazılı görüş; dosya yazma, kod değiştirme). A maddesi: kolları açan uçuş/iniş pozlarını senin çizeceğin varsayımıyla nasıl çizerdin, kaç poz, nasıl görünmeli. B maddesi: durak ödülleri için görsel olarak çekici, İstanbul semtlerine özgü fikirler. Türkçe, ~1 sayfa, yanıtı yalnız metin olarak ver.
+
+warning: Under-development features enabled: chronicle. Under-development features are incomplete and may behave unpredictably. To suppress this warning, set `suppress_unstable_features_warning = true` in /Users/bekirurazonturk/.codex/config.toml.
+codex
+İstenen rol kapsamında, mevcut oyun akışını ve sınırları gözeten yaklaşık bir sayfalık editör görüşü hazırlıyorum. Önce hareket kareleri ile önceki değerlendirme raporlarını ve örnek oyunların görev kalıplarına dair kaynakları inceleyeceğim; görsel üretmeyecek ve kodu değiştirmeyeceğim.
+exec
+/bin/zsh -lc 'rg -n "Byzantion|Carsamba|Kazık|Kartpostal|OYNANIS-2026-11-26|HAREKET-2026-11-26" /Users/bekirurazonturk/.codex/memories/MEMORY.md' in /Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend
+ succeeded in 0ms:
+116:# Task Group: Carsamba tea support App Store Connect setup
+119:applies_to: cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend; reuse_rule=observed November 25 status; verify current App Store Connect and test state before acting.
+125:- extensions/skysight/resources/2026-11-25T17-50-00-mDMW-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-25T17-50-00-mDMW-10min-memory-summary.md, updated_at=2026-11-25T17:50:00+00:00, application received) [skysight memory]
+126:- extensions/skysight/resources/2026-11-25T17-40-00-uaQF-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-25T17-40-00-uaQF-10min-memory-summary.md, updated_at=2026-11-25T17:40:00+00:00, bank processing) [skysight memory]
+127:- extensions/skysight/resources/2026-11-25T16-50-00-IGez-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-25T16-50-00-IGez-10min-memory-summary.md, updated_at=2026-11-25T16:50:00+00:00, product setup reported) [skysight memory]
+128:- extensions/skysight/resources/2026-11-25T17-10-00-Lnzo-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-25T17-10-00-Lnzo-10min-memory-summary.md, updated_at=2026-11-25T17:10:00+00:00, sensitive form fields) [skysight memory]
+129:- extensions/skysight/resources/2026-11-25T22-10-00-nemC-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-25T22-10-00-nemC-10min-memory-summary.md, updated_at=2026-11-25T22:10:00+00:00, sandbox creation result not observed) [skysight memory]
+144:# Task Group: Carsamba seasonal Istanbul skyline and tea support
+147:applies_to: cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend; reuse_rule=reported November 25 state; verify branch, store configuration and current device build.
+153:- extensions/skysight/resources/2026-11-25T06-00-00-gHaT-6h-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-25T06-00-00-gHaT-6h-memory-summary.md, updated_at=2026-11-25T06:00:00+00:00, simulator checks and skyline push reported) [skysight memory]
+154:- extensions/skysight/resources/2026-11-25T12-30-00-SxTT-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-25T12-30-00-SxTT-10min-memory-summary.md, updated_at=2026-11-25T12:30:00+00:00, phone install reported; gameplay unverified) [skysight memory]
+164:- extensions/skysight/resources/2026-11-25T13-00-00-Uvey-10min-memory-summary.md (cwd=Carsamba game project, rollout_path=extensions/skysight/resources/2026-11-25T13-00-00-Uvey-10min-memory-summary.md, updated_at=2026-11-25T13:00:00+00:00, launch approach chosen) [skysight memory]
+165:- extensions/skysight/resources/2026-11-25T13-10-00-nJVm-10min-memory-summary.md (cwd=Carsamba game project, rollout_path=extensions/skysight/resources/2026-11-25T13-10-00-nJVm-10min-memory-summary.md, updated_at=2026-11-25T13:10:00+00:00, simulator reported; push and phone build pending) [skysight memory]
+199:# Task Group: Carsamba seasonal facades and neighborhood art
+202:applies_to: cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend; reuse_rule=observed November 24 status and reported tests; verify current assets, branch and device state before work.
+208:- extensions/skysight/resources/2026-11-24T10-00-00-eRNv-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-24T10-00-00-eRNv-10min-memory-summary.md, updated_at=2026-11-24T10:00:00+00:00) [skysight memory]
+209:- extensions/skysight/resources/2026-11-24T09-10-00-NobN-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-24T09-10-00-NobN-10min-memory-summary.md, updated_at=2026-11-24T09:10:00+00:00) [skysight memory]
+210:- extensions/skysight/resources/2026-11-24T08-40-00-aOex-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-24T08-40-00-aOex-10min-memory-summary.md, updated_at=2026-11-24T08:40:00+00:00) [skysight memory]
+211:- extensions/skysight/resources/2026-11-24T08-20-00-zrtr-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-24T08-20-00-zrtr-10min-memory-summary.md, updated_at=2026-11-24T08:20:00+00:00) [skysight memory]
+221:- extensions/skysight/resources/2026-11-24T12-30-00-zzIf-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-24T12-30-00-zzIf-10min-memory-summary.md, updated_at=2026-11-24T12:30:00+00:00, follow-up tests and phone build pending) [skysight memory]
+222:- extensions/skysight/resources/2026-11-24T11-40-00-OSfr-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-24T11-40-00-OSfr-10min-memory-summary.md, updated_at=2026-11-24T11:40:00+00:00, phone video prompted further fixes) [skysight memory]
+223:- extensions/skysight/resources/2026-11-24T11-10-00-ycZO-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-24T11-10-00-ycZO-10min-memory-summary.md, updated_at=2026-11-24T11:10:00+00:00, integration reported) [skysight memory]
+224:- extensions/skysight/resources/2026-11-24T10-20-00-wzpK-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-24T10-20-00-wzpK-10min-memory-summary.md, updated_at=2026-11-24T10:20:00+00:00) [skysight memory]
+225:- extensions/skysight/resources/2026-11-24T10-00-00-eRNv-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-24T10-00-00-eRNv-10min-memory-summary.md, updated_at=2026-11-24T10:00:00+00:00) [skysight memory]
+371:# Task Group: Carsamba landing reactions, crow behavior and restart smoke
+374:applies_to: cwd=Carsamba game project; reuse_rule=observed November 23 status; verify current branch, device build and actual tests.
+380:- extensions/skysight/resources/2026-11-23T11-40-00-roYC-10min-memory-summary.md (cwd=Carsamba game project, rollout_path=extensions/skysight/resources/2026-11-23T11-40-00-roYC-10min-memory-summary.md, updated_at=2026-11-23T11:40:00+00:00, restart smoke fix simulated; deployment pending) [skysight memory]
+381:- extensions/skysight/resources/2026-11-23T11-00-00-ZHDp-10min-memory-summary.md (cwd=Carsamba game project, rollout_path=extensions/skysight/resources/2026-11-23T11-00-00-ZHDp-10min-memory-summary.md, updated_at=2026-11-23T11:00:00+00:00, phone feedback) [skysight memory]
+382:- extensions/skysight/resources/2026-11-23T06-00-00-EkFn-6h-memory-summary.md (cwd=Carsamba game project, rollout_path=extensions/skysight/resources/2026-11-23T06-00-00-EkFn-6h-memory-summary.md, updated_at=2026-11-23T06:00:00+00:00, broader activity arc) [skysight memory]
+386:- Carsamba, amca, landing, düşüş, karga, takılma, restart smoke, 195be17, mahalle sesleri, iPhone
+392:- extensions/skysight/resources/2026-11-23T18-30-00-ATGG-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-23T18-30-00-ATGG-10min-memory-summary.md, updated_at=2026-11-23T18:30:00+00:00, phone installation reported; push unverified) [skysight memory]
+393:- extensions/skysight/resources/2026-11-23T18-20-00-QHzv-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-23T18-20-00-QHzv-10min-memory-summary.md, updated_at=2026-11-23T18:20:00+00:00, combined raincoat and holiday-hat bug) [skysight memory]
+394:- extensions/skysight/resources/2026-11-23T18-10-00-Kkoh-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-23T18-10-00-Kkoh-10min-memory-summary.md, updated_at=2026-11-23T18:10:00+00:00, accessory alignment) [skysight memory]
+395:- extensions/skysight/resources/2026-11-23T18-00-00-FAsM-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-23T18-00-00-FAsM-10min-memory-summary.md, updated_at=2026-11-23T18:00:00+00:00, rain and winter simulation) [skysight memory]
+396:- extensions/skysight/resources/2026-11-23T12-00-00-TxTm-6h-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-23T12-00-00-TxTm-6h-memory-summary.md, updated_at=2026-11-23T12:00:00+00:00, rain poses approved for integration) [skysight memory]
+413:# Task Group: Carsamba game-over screen and Claudex Loop trial
+416:applies_to: cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend; reuse_rule=observed 2026-11-23; inspect checkout, tool installation and phone.
+422:- extensions/skysight/resources/2026-11-23T08-10-00-GLud-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-23T08-10-00-GLud-10min-memory-summary.md, updated_at=2026-11-23T08:10:00+00:00, simulator and phone install reported; phone visual check pending) [skysight memory]
+423:- extensions/skysight/resources/2026-11-23T08-00-00-XtSi-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-23T08-00-00-XtSi-10min-memory-summary.md, updated_at=2026-11-23T08:00:00+00:00, review and coordination) [skysight memory]
+424:- extensions/skysight/resources/2026-11-23T07-50-00-ZYBX-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-23T07-50-00-ZYBX-10min-memory-summary.md, updated_at=2026-11-23T07:50:00+00:00, project-local trial reported) [skysight memory]
+467:# Task Group: Carsamba crow placement and skull timing
+470:applies_to: cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend; reuse_rule=observed November 22–23 status; inspect current checkout and phone before claiming completion.
+476:- extensions/skysight/resources/2026-11-23T07-50-00-ZYBX-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-23T07-50-00-ZYBX-10min-memory-summary.md, updated_at=2026-11-23T07:50:00+00:00, simulator flight reported; phone test pending) [skysight memory]
+477:- extensions/skysight/resources/2026-11-23T07-30-00-OaWV-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-23T07-30-00-OaWV-10min-memory-summary.md, updated_at=2026-11-23T07:30:00+00:00, user feedback) [skysight memory]
+478:- extensions/skysight/resources/2026-11-22T18-40-00-UhJY-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-22T18-40-00-UhJY-10min-memory-summary.md, updated_at=2026-11-22T18:40:00+00:00, video review and accepted crow placement proposal; implementation not shown) [skysight memory]
+479:- extensions/skysight/resources/2026-11-22T18-20-00-SJZE-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-22T18-20-00-SJZE-10min-memory-summary.md, updated_at=2026-11-22T18:20:00+00:00, reported phone install; device test and commit pending) [skysight memory]
+480:- extensions/skysight/resources/2026-11-22T18-00-00-ttSE-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-22T18-00-00-ttSE-10min-memory-summary.md, updated_at=2026-11-22T18:00:00+00:00, user timing request) [skysight memory]
+481:- extensions/skysight/resources/2026-11-22T12-00-00-zHhS-6h-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-22T12-00-00-zHhS-6h-memory-summary.md, updated_at=2026-11-22T12:00:00+00:00, crow poses and phone installation) [skysight memory]
+581:# Task Group: Carsamba window neighbors and dialogue feedback
+584:applies_to: cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend; reuse_rule=observed project discussion on 2026-11-21; verify actual checkout, assets and phone test.
+590:- extensions/skysight/resources/2026-11-21T06-00-00-OGpC-6h-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-21T06-00-00-OGpC-6h-memory-summary.md, updated_at=2026-11-21T06:00:00+00:00, user feedback and editor reports) [skysight memory]
+591:- extensions/skysight/resources/2026-11-21T12-40-00-ByYE-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-21T12-40-00-ByYE-10min-memory-summary.md, updated_at=2026-11-21T12:40:00+00:00, visual request in progress) [skysight memory]
+592:- extensions/skysight/resources/2026-11-21T13-50-00-yLOr-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-21T13-50-00-yLOr-10min-memory-summary.md, updated_at=2026-11-21T13:50:00+00:00, reported scale fix; phone test pending) [skysight memory]
+593:- extensions/skysight/resources/2026-11-21T13-40-00-CCMR-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-21T13-40-00-CCMR-10min-memory-summary.md, updated_at=2026-11-21T13:40:00+00:00, phone recording feedback) [skysight memory]
+603:- extensions/skysight/resources/2026-11-21T20-10-00-NDfx-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-21T20-10-00-NDfx-10min-memory-summary.md, updated_at=2026-11-21T20:10:00+00:00, reported fix; device test pending) [skysight memory]
+607:- game-over freeze, oyun sonu, sıralama, iOS 26, Game Center, ByzantionGameCenterModule.swift, worklet, telefon
+615:- A game-over video showed a stationary 12-point card. An old leaderboard invisibly blocking touches on iOS 26 was a hypothesis, not a confirmed diagnosis; no crash log and no Game Center account in simulator prevented reproduction. A change to `ByzantionGameCenterModule.swift`, typecheck/worklet test and phone installation were reported; opening and closing rankings then replaying on phone remained unverified, and no commit was reported. Verify current checkout and device. [Task 2] [skysight memory]
+678:# Task Group: Carsamba simulator audit and special-day game visuals
+681:applies_to: cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend; reuse_rule=observed 2026-11-20 via project status; verify checkout, remote and physical device before claiming current completion.
+687:- extensions/skysight/resources/2026-11-20T12-00-00-xuot-6h-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-20T12-00-00-xuot-6h-memory-summary.md, updated_at=2026-11-20T12:00:00+00:00, device audit and visual work) [skysight memory]
+688:- extensions/skysight/resources/2026-11-20T14-40-00-pITJ-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-20T14-40-00-pITJ-10min-memory-summary.md, updated_at=2026-11-20T14:40:00+00:00, fix and commit report) [skysight memory]
+698:- extensions/skysight/resources/2026-11-20T17-50-00-vias-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-20T17-50-00-vias-10min-memory-summary.md, updated_at=2026-11-20T17:50:00+00:00, video and phone test) [skysight memory]
+699:- extensions/skysight/resources/2026-11-20T17-30-00-JkkJ-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-20T17-30-00-JkkJ-10min-memory-summary.md, updated_at=2026-11-20T17:30:00+00:00, assets and preview) [skysight memory]
+700:- extensions/skysight/resources/2026-11-20T15-20-00-zBDa-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-20T15-20-00-zBDa-10min-memory-summary.md, updated_at=2026-11-20T15:20:00+00:00, second visual batch) [skysight memory]
+806:# Task Group: Carsamba fog, rain, wind and two-minute game flow
+809:applies_to: cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend; reuse_rule=observed 2026-11-18 through project status; inspect checkout and test the current physical device before asserting completion.
+815:- extensions/skysight/resources/2026-11-20T05-30-00-SLBL-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-20T05-30-00-SLBL-10min-memory-summary.md, updated_at=2026-11-20T05:30:00+00:00, later session reported commit, clean workspace and no push) [skysight memory]
+817:- extensions/skysight/resources/2026-11-18T20-00-00-NEiv-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-18T20-00-00-NEiv-10min-memory-summary.md, updated_at=2026-11-18T20:00:00+00:00, rain and wind installed; final wind visibility unverified) [skysight memory]
+818:- extensions/skysight/resources/2026-11-18T19-20-00-ZHjH-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-18T19-20-00-ZHjH-10min-memory-summary.md, updated_at=2026-11-18T19:20:00+00:00, fog simulator check and phone install) [skysight memory]
+819:- extensions/skysight/resources/2026-11-18T19-10-00-dQpt-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-18T19-10-00-dQpt-10min-memory-summary.md, updated_at=2026-11-18T19:10:00+00:00, short game and visual ratings requested) [skysight memory]
+840:# Task Group: Carsamba shareable score postcard and push status
+842:scope: Byzantion game-over share card and November 18 GitHub Desktop push.
+843:applies_to: cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend; reuse_rule=observed status is time-specific; verify checkout, current device and remote before relying on it.
+849:- extensions/skysight/resources/2026-11-18T18-50-00-aOGq-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-18T18-50-00-aOGq-10min-memory-summary.md, updated_at=2026-11-18T18:50:00+00:00, simulator and phone install; real share pending) [skysight memory]
+850:- extensions/skysight/resources/2026-11-18T18-40-00-oDPb-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-18T18-40-00-oDPb-10min-memory-summary.md, updated_at=2026-11-18T18:40:00+00:00, sharing implementation) [skysight memory]
+851:- extensions/skysight/resources/2026-11-18T18-00-00-UVtQ-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-18T18-00-00-UVtQ-10min-memory-summary.md, updated_at=2026-11-18T18:00:00+00:00, push reported complete) [skysight memory]
+866:# Task Group: Carsamba rain outfit preview and integration status
+869:applies_to: cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend; reuse_rule=check current checkout and device testing; source generation and later reported integration are separate stages.
+875:- extensions/skysight/resources/2026-11-17T12-00-00-TDcE-6h-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-17T12-00-00-TDcE-6h-memory-summary.md, updated_at=2026-11-17T18:00:00+00:00, later reported integration and commit) [skysight memory]
+889:# Task Group: Byzantion weather, winter effects and startup feedback
+892:applies_to: cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend; reuse_rule=observed through 2026-11-17; verify current checkout, device and commit state.
+898:- extensions/skysight/resources/2026-11-17T09-40-00-XAlL-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-17T09-40-00-XAlL-10min-memory-summary.md, updated_at=2026-11-17T09:40:00+00:00, background inconsistency) [skysight memory]
+899:- extensions/skysight/resources/2026-11-17T09-30-00-oTbJ-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-17T09-30-00-oTbJ-10min-memory-summary.md, updated_at=2026-11-17T09:30:00+00:00, physical test pending) [skysight memory]
+900:- extensions/skysight/resources/2026-11-17T09-10-00-jnCN-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-17T09-10-00-jnCN-10min-memory-summary.md, updated_at=2026-11-17T09:10:00+00:00, snow effects approved) [skysight memory]
+901:- extensions/skysight/resources/2026-11-17T09-00-00-IXTh-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-17T09-00-00-IXTh-10min-memory-summary.md, updated_at=2026-11-17T09:00:00+00:00, clothing integration reported) [skysight memory]
+902:- extensions/skysight/resources/2026-11-17T08-30-00-BPtJ-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-17T08-30-00-BPtJ-10min-memory-summary.md, updated_at=2026-11-17T08:30:00+00:00, WeatherKit verification ongoing) [skysight memory]
+903:- extensions/skysight/resources/2026-11-17T07-30-00-rfJv-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-17T07-30-00-rfJv-10min-memory-summary.md, updated_at=2026-11-17T07:30:00+00:00, implementation status) [skysight memory]
+907:- Byzantion, WeatherKit, istanbul.ts, WeatherLayer.tsx, b01bf04, bere, atkı, kar, seasonal backgrounds, physical phone
+913:- extensions/skysight/resources/2026-11-17T08-20-00-bgVY-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-17T08-20-00-bgVY-10min-memory-summary.md, updated_at=2026-11-17T08:20:00+00:00, splash feedback) [skysight memory]
+914:- extensions/skysight/resources/2026-11-17T07-50-00-oCBP-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-17T07-50-00-oCBP-10min-memory-summary.md, updated_at=2026-11-17T07:50:00+00:00, threshold requested) [skysight memory]
+924:- extensions/skysight/resources/2026-11-17T14-40-00-Ymsy-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-17T14-40-00-Ymsy-10min-memory-summary.md, updated_at=2026-11-17T14:40:00+00:00) [skysight memory]
+925:- extensions/skysight/resources/2026-11-17T14-00-00-lJOT-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-17T14-00-00-lJOT-10min-memory-summary.md, updated_at=2026-11-17T14:00:00+00:00) [skysight memory]
+926:- extensions/skysight/resources/2026-11-17T13-30-00-PnSq-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-17T13-30-00-PnSq-10min-memory-summary.md, updated_at=2026-11-17T13:30:00+00:00) [skysight memory]
+927:- extensions/skysight/resources/2026-11-17T13-00-00-RbrY-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-17T13-00-00-RbrY-10min-memory-summary.md, updated_at=2026-11-17T13:00:00+00:00) [skysight memory]
+982:# Task Group: Byzantion three-bridge route, postcards and multiplayer testing
+985:applies_to: cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend; reuse_rule=observed activity through 2026-11-16; verify the current checkout, builds and device results before claiming implementation or release.
+991:- extensions/skysight/resources/2026-11-16T06-00-00-wHbS-6h-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-16T06-00-00-wHbS-6h-memory-summary.md, updated_at=2026-11-16T12:00:00+00:00, activity overview) [skysight memory]
+1001:- extensions/skysight/resources/2026-11-16T13-10-00-irCg-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-16T13-10-00-irCg-10min-memory-summary.md, updated_at=2026-11-16T13:10:00+00:00, race duration decision) [skysight memory]
+1002:- extensions/skysight/resources/2026-11-16T12-50-00-JCoi-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-16T12-50-00-JCoi-10min-memory-summary.md, updated_at=2026-11-16T12:50:00+00:00, ghost-race direction) [skysight memory]
+1003:- extensions/skysight/resources/2026-11-16T12-10-00-RHwr-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-16T12-10-00-RHwr-10min-memory-summary.md, updated_at=2026-11-16T12:10:00+00:00, send side observed; receive untested) [skysight memory]
+1004:- extensions/skysight/resources/2026-11-16T12-00-00-BBBX-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-16T12-00-00-BBBX-10min-memory-summary.md, updated_at=2026-11-16T12:00:00+00:00, TestFlight group selection) [skysight memory]
+1014:- extensions/skysight/resources/2026-11-16T12-00-00-ufcu-6h-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-16T12-00-00-ufcu-6h-memory-summary.md, updated_at=2026-11-16T18:00:00+00:00, activity overview) [skysight memory]
+1015:- extensions/skysight/resources/2026-11-16T17-00-00-GzEr-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-16T17-00-00-GzEr-10min-memory-summary.md, updated_at=2026-11-16T17:00:00+00:00, simulator status reported) [skysight memory]
+1016:- extensions/skysight/resources/2026-11-16T20-10-00-avRv-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-16T20-10-00-avRv-10min-memory-summary.md, updated_at=2026-11-16T20:10:00+00:00, earlier simulator status viewed; phone test and commit not observed) [skysight memory]
+1155:# Task Group: Byzantion Game Center and one-step difficulty adjustment
+1157:scope: Game Center delivery and difficulty follow-up in the Carsamba game.
+1158:applies_to: cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend; reuse_rule=build and device state are time-sensitive; verify current checkout and TestFlight.
+1164:- extensions/skysight/resources/2026-11-15T13-00-00-QKzx-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-15T13-00-00-QKzx-10min-memory-summary.md, updated_at=2026-11-15T13:00:00+00:00, new difficulty and feature evaluation requested) [skysight memory]
+1165:- extensions/skysight/resources/2026-11-15T13-50-00-jdCy-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-15T13-50-00-jdCy-10min-memory-summary.md, updated_at=2026-11-15T13:50:00+00:00, phone installation reported; real-device play and commit pending) [skysight memory]
+1167:- extensions/skysight/resources/2026-11-15T11-50-00-AHsu-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-15T11-50-00-AHsu-10min-memory-summary.md, updated_at=2026-11-15T11:50:00+00:00, reported phone installation and simulation) [skysight memory]
+1169:- extensions/skysight/resources/2026-11-14T12-00-00-SezP-6h-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-14T12-00-00-SezP-6h-memory-summary.md, updated_at=2026-11-14T12:00:00+00:00, Game Center and difficulty work) [skysight memory]
+1171:- extensions/skysight/resources/2026-11-16T06-50-00-KGPV-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-16T06-50-00-KGPV-10min-memory-summary.md, updated_at=2026-11-16T06:50:00+00:00, phone test reported; analysis requested) [skysight memory]
+1172:- extensions/skysight/resources/2026-11-16T00-00-00-GyXE-6h-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-16T00-00-00-GyXE-6h-memory-summary.md, updated_at=2026-11-16T00:00:00+00:00, easier first 14 towers; release installation reported) [skysight memory]
+1176:- Byzantion, Game Center, 362ba26, TestFlight, Arkadaşlar, 1.0.0 (3), src/game/config.ts, difficulty, typecheck
+1276:# Task Group: Carsamba stops, postcard album and iOS distribution preparation
+1279:applies_to: cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend; reuse_rule=observed product and Git states are time-sensitive and require verification.
+1285:- extensions/skysight/resources/2026-11-12T12-20-00-aXJq-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-12T12-20-00-aXJq-10min-memory-summary.md, updated_at=2026-11-12T12:20:00+00:00, reported push) [skysight memory]
+1291:## Task 2: Byzantion naming and TestFlight follow-up
+1295:- extensions/skysight/resources/2026-11-14T04-20-00-wKMd-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-14T04-20-00-wKMd-10min-memory-summary.md, updated_at=2026-11-14T04:20:00+00:00, external approval and enabled link reported) [skysight memory]
+1297:- extensions/skysight/resources/2026-11-13T09-20-00-RNTz-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-13T09-20-00-RNTz-10min-memory-summary.md, updated_at=2026-11-13T09:20:00+00:00, external review pending) [skysight memory]
+1298:- extensions/skysight/resources/2026-11-13T08-50-00-GVFY-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-13T08-50-00-GVFY-10min-memory-summary.md, updated_at=2026-11-13T08:50:00+00:00, external group status) [skysight memory]
+1299:- extensions/skysight/resources/2026-11-12T12-00-00-lRQt-6h-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-12T12-00-00-lRQt-6h-memory-summary.md, updated_at=2026-11-12T12:00:00+00:00, activity overview) [skysight memory]
+1300:- extensions/skysight/resources/2026-11-12T18-00-00-lixS-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-12T18-00-00-lixS-10min-memory-summary.md, updated_at=2026-11-12T18:00:00+00:00, accidental number corrected) [skysight memory]
+1304:- Byzantion, com.urazonturk.carsamba, TestFlight 1.0.0 (1), 1.0.0 (2), Arkadaşlar, Waiting for Review, 16e9dac, aşırı basma, İstanbul gizemi, 21
+
+web search: 
+exec
+/bin/zsh -lc 'pwd && rg --files | head -80 && ls -la ../HAREKET-2026-11-26 ../OYNANIS-2026-11-26' in /Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend
+ exited 1 in 0ms:
+/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend
+src/theme.ts
+src/components/error-boundary.tsx
+src/game/mahalleSes.ts
+src/game/NoClipImage.tsx
+src/game/yagmur.ts
+src/game/config.ts
+src/game/procedural-course.ts
+src/game/landing.ts
+src/game/sfx.ts
+src/game/AmbientBirds.tsx
+src/game/semsiye.ts
+src/game/stops.ts
+src/game/CayKart.tsx
+src/game/ipucu.ts
+src/game/mahalle.ts
+src/game/jump.ts
+src/game/reference-baseline.json
+src/game/postcards.ts
+src/game/amcaSesi.ts
+src/game/copy.ts
+src/game/karga.ts
+src/game/panel-course.ts
+src/game/pijama.ts
+src/game/cepheCesit.ts
+src/game/WeatherLayer.tsx
+src/game/istanbul.ts
+src/game/ozelGun.ts
+src/game/render-camera.ts
+src/game/yaris.ts
+src/game/meydan.ts
+src/game/reference-course.ts
+src/game/ColumnSmoke.tsx
+src/game/column-variant.ts
+src/game/hareket.ts
+src/game/AmbientEvents.tsx
+src/game/daily.ts
+src/game/kurukafa.ts
+src/game/character-pose.ts
+src/game/ChargePoses.tsx
+src/game/ShareCard.tsx
+src/game/cay.ts
+src/game/kis.ts
+src/utils/storage/index.web.ts
+src/utils/storage/index.ts
+src/utils/storage/storage-base.ts
+src/query-client.ts
+CODEX-MESAJI-MEVSIM-MAHALLE-2026-11-24.md
+CODEX-MESAJI-AMCA-DUSUS-DIGER-2026-11-23.md
+CODEX-MESAJI-AMCA-DUSUS-2026-11-23.md
+CODEX-MESAJI-KARTPOSTAL-PAKET2-2026-11-16.md
+CODEX-MESAJI-CAY-2026-11-25.md
+HANDOFF.md
+outputs/gorsel-011-chatgpt-istanbul/column-medium-v1-tile.png
+outputs/gorsel-011-chatgpt-istanbul/columns-tile-measured.json
+outputs/gorsel-011-chatgpt-istanbul/column-tall-v1-tile.png
+outputs/gorsel-011-chatgpt-istanbul/istanbul-background-v1.png
+outputs/gorsel-011-chatgpt-istanbul/columns-measured.json
+outputs/gorsel-011-chatgpt-istanbul/column-wide-v1-tile.png
+outputs/gorsel-011-chatgpt-istanbul/column-wide-v1.png
+outputs/gorsel-011-chatgpt-istanbul/column-wide-v1-cutout.png
+outputs/gorsel-011-chatgpt-istanbul/column-tall-v1-cutout.png
+outputs/gorsel-011-chatgpt-istanbul/column-tall-v1.png
+outputs/gorsel-011-chatgpt-istanbul/column-medium-v1.png
+outputs/gorsel-011-chatgpt-istanbul/column-medium-v1-cutout.png
+outputs/gorsel-008-charge-cokme/charge-075.png
+outputs/gorsel-008-charge-cokme/charge-025.png
+outputs/gorsel-008-charge-cokme/r11-final/charge-100-r11.png
+outputs/gorsel-008-charge-cokme/r11-final/charge-025-r11.png
+outputs/gorsel-008-charge-cokme/r11-final/charge-000-idle-r11.png
+outputs/gorsel-008-charge-cokme/r11-final/charge-050-r11.png
+outputs/gorsel-008-charge-cokme/r11-final/charge-075-r11.png
+outputs/gorsel-008-charge-cokme/r11-final/charge-r11-olcu-pivot.json
+outputs/gorsel-008-charge-cokme/charge-pozlar-olcu.json
+outputs/gorsel-008-charge-cokme/charge-100-max.png
+outputs/gorsel-008-charge-cokme/charge-000-idle-r3.png
+outputs/gorsel-008-charge-cokme/charge-000-idle.png
+CODEX-MESAJI-OSURUK-2026-11-11.md
+CODEX-MESAJI-CESIT-SAKIN-2026-11-25.md
+CLAUDE_HANDOFF.md
+CLAUDE_UPPERCHARGE_EXPERIMENT.md
+ls: ../HAREKET-2026-11-26: No such file or directory
+ls: ../OYNANIS-2026-11-26: No such file or directory
+
+web search: Alto's Odyssey Zen mode goals missions official game objectives ...
+exec
+/bin/zsh -lc "find .. -maxdepth 3 -type d -iname '*HAREKET-2026-11-26*' -o -iname '*OYNANIS-2026-11-26*'; find . -path '*ucus_*' -o -iname 'RAPOR.md' | head -60; rg -n \"Card|durak|kedi|sefer|koleksiyon|görev\" src/game" in /Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend
+ succeeded in 3456ms:
+../frontend/ai_review_evidence/HAREKET-2026-11-26
+../frontend/ai_review_evidence/OYNANIS-2026-11-26
+./ai_review_evidence/FIKIR-GELIR-2026-11-18/RAPOR.md
+./ai_review_evidence/VIDEO-2026-11-23c/RAPOR.md
+./ai_review_evidence/TASARIM-MENU-2026-11-16/RAPOR.md
+./ai_review_evidence/VIDEO-2026-11-23e/RAPOR.md
+./ai_review_evidence/KARTPOSTAL-2026-11-16/RAPOR.md
+./ai_review_evidence/FIKIR-PUAN-2026-11-20/RAPOR.md
+./ai_review_evidence/HAREKET-2026-11-26/RAPOR.md
+./ai_review_evidence/HAREKET-2026-11-26/kareler/ucus_29.0.jpg
+./ai_review_evidence/HAREKET-2026-11-26/kareler/ucus_28.0.jpg
+./ai_review_evidence/HAREKET-2026-11-26/kareler/ucus_28.5.jpg
+./ai_review_evidence/HAREKET-2026-11-26/kareler/ucus_22.0.jpg
+./ai_review_evidence/HAREKET-2026-11-26/kareler/ucus_22.5.jpg
+./ai_review_evidence/HAREKET-2026-11-26/kareler/ucus_23.0.jpg
+./ai_review_evidence/HAREKET-2026-11-26/kareler/ucus_21.0.jpg
+./ai_review_evidence/HAREKET-2026-11-26/kareler/ucus_21.5.jpg
+./ai_review_evidence/KARGA-2026-11-22/RAPOR.md
+./ai_review_evidence/AMCA-DUSUS-2026-11-23/RAPOR.md
+./ai_review_evidence/VIDEO-2026-11-21/RAPOR.md
+./ai_review_evidence/OYNANIS-2026-11-26/RAPOR.md
+./ai_review_evidence/VIDEO-2026-11-20/RAPOR.md
+./ai_review_evidence/KARGA-DONGU-2026-11-23/RAPOR.md
+./ai_review_evidence/ONLINE-YARIS-2026-11-16/RAPOR.md
+./ai_review_evidence/YARATICI-SES-2026-11-21/RAPOR.md
+./ai_review_evidence/MEVSIM-2026-11-17/RAPOR.md
+./ai_review_evidence/GUZERGAH-2026-11-16/RAPOR.md
+./ai_review_evidence/OZEL-GUN-2026-11-20/RAPOR.md
+./ai_review_evidence/YARATICI-FIKIR-2026-11-17/RAPOR.md
+./ai_review_evidence/SATIS-ZAMAN-2026-11-25/RAPOR.md
+./ai_review_evidence/AMAC-2026-11-26/kareler/ucus_16.2.jpg
+./ai_review_evidence/AMAC-2026-11-26/kareler/ucus_16.5.jpg
+./ai_review_evidence/AMAC-2026-11-26/kareler/ucus_20.6.jpg
+./ai_review_evidence/AMAC-2026-11-26/kareler/ucus_19.0.jpg
+./ai_review_evidence/AMAC-2026-11-26/kareler/ucus_18.6.jpg
+./ai_review_evidence/VIDEO-2026-11-22/RAPOR.md
+./ai_review_evidence/KARLI-AMCA-2026-11-17/RAPOR.md
+./ai_review_evidence/ORAN-2026-11-21/RAPOR.md
+./ai_review_evidence/REPO-VIDEO-2026-11-23/RAPOR.md
+./ai_review_evidence/SEMSIYE-2026-11-17/RAPOR.md
+./ai_review_evidence/KURUKAFA-ONLINE-2026-11-15/RAPOR.md
+./ai_review_evidence/SATIS-2026-11-25/RAPOR.md
+./ai_review_evidence/PIJAMA-2026-11-16/RAPOR.md
+./ai_review_evidence/VIDEO-2026-11-22c/RAPOR.md
+./ai_review_evidence/CIHAZ-BOYUT-2026-11-20/RAPOR.md
+./ai_review_evidence/HAVA-GORSEL-2026-11-18/RAPOR.md
+./ai_review_evidence/VIDEO-2026-11-21b/RAPOR.md
+src/game/kurukafa.ts:2:// 5 zıplama, görsel Kıvılcım). İlk duraktan sonra arada bir, iki kule arasındaki
+src/game/procedural-course.ts:57:  // DURAK SEFERİ (2026-11-12): doğrusal artış yerine durak başına bir basamak.
+src/game/procedural-course.ts:77:  // +y aşağı: negatif delta = daha yüksek hedef. Kolay ilk durakta tırmanış ayrıca sınırlı.
+src/game/config.ts:150:// durak durak sonrasında kademeli zorlaştırabiliriz"). Yalnız 1-14. kule
+src/game/config.ts:294:  // dar kule 2. duraktan (Üsküdar, 30. kule) önce hiç çıkmaz; önce 6. kuleden sonra.
+src/game/CayKart.tsx:58:      <View style={styles.albumCard}>
+src/game/pijama.ts:2:// Gece başlarken (Ortaköy, 5. durak) amca çatıda beliren bir kapıdan girip gece
+src/game/pijama.ts:9:// TELEFON DENEMESİ: true iken kapı anı 75. kule (Ortaköy, gece) yerine ilk durakta
+src/game/pijama.ts:13:// 0 dışı bir değer, her koşuyu bu kule kimliğinden başlatır (gökyüzü, durak ve
+src/game/ShareCard.tsx:17:export type ShareCardProps = {
+src/game/ShareCard.tsx:35:export function ShareSheet({ score, newRecord, place, photo, sticker, stamp, time, lakap, onClose }: ShareCardProps) {
+src/game/postcards.ts:7:// GÜZERGÂH 2026-11-16: duraklar değişti (12 durak, Kadıköy → Rumeli Feneri). Kayıt
+src/game/postcards.ts:8:// durak NUMARASI tuttuğu için eski albüm yeni yerleri yanlış açardı -> yeni anahtar
+src/game/postcards.ts:12:// 2026-11-16 KARTPOSTAL v2 (kullanıcı: "her durak için kartpostal", "Evet, bağla"): her durakta
+src/game/postcards.ts:18:  { stop: 3, name: "Kuzguncuk", sub: "Ahşap evler", note: "Kuzguncuk'un kedileri beni evlat edindi.", source: require("@/assets/postcards/v2/kart-03.jpg") },
+src/game/stops.ts:2:// Sonsuz koşunun içine duraklar: her 15 kulede bir (15, 30, 45, 60…).
+src/game/stops.ts:3:// 4. durak iskele ("vapura yetiştin"); sonrası "Gece seferi N" olarak sürer.
+src/game/stops.ts:5:// Zorluk her durakta bir basamak artar (procedural-course.ts); fizik değişmez.
+src/game/stops.ts:10:// 2026-11-12 kullanıcı (video 12-23-01): "baştan 15. kolona vardığında durak yazsa daha
+src/game/stops.ts:11:// tutarlı olur" -> ilk durak da 15. kulede; duraklar 15, 30, 45, 60 (iskele), 75…
+src/game/stops.ts:16:// Kadıköy'den Boğaz boyunca kuzeye, üç köprüyle Karadeniz'e. Önceki duraklar:
+src/game/stops.ts:30:/** Son durak (büyük final: "Karadeniz'e ulaştın!"); sonrası "Gece seferi N". */
+src/game/stops.ts:32:/** Zorluk tavanı: önceki gibi 4. durakta (isimlerden bağımsız; zorluk değişmez). */
+src/game/stops.ts:57:/** Gecenin başladığı durak (skyStepForStops 4): pijama anı burada (Ortaköy). */
+src/game/stops.ts:75:/** Bu kuleye kadar (dahil) geçilen durak sayısı. */
+src/game/stops.ts:87:/** Zorluk basamağı 0..1: durak başına bir basamak, iskelede tavan. */
+src/game/stops.ts:96:  return `Gece seferi ${k - FINAL_STOP}`;
+src/game/stops.ts:99:/** Paylaşım kartpostalı için: "Üsküdar'a kadar geldim" (k = geçilen durak sayısı). */
+src/game/stops.ts:103:  return `Rumeli Feneri'ni geçtim, gece seferindeyim`;
+src/game/amcaSesi.ts:34:  console.warn("[amcaSesi] durak listesi değişmiş: STOP_LOCATIVE güncellenmeli");
+src/game/amcaSesi.ts:40:  return "Gece seferinde";
+src/game/amcaSesi.ts:166:  seyyah: ["durak atlayan", "vapur kıskandıran"],
+src/game/amcaSesi.ts:169:  cambaz: ["çatı kedisi", "ip cambazı"],
+src/game/mahalle.ts:3:// ve çatı saçağında uyuyan kedi. Yalnız görüntü: iniş yüzeyine (kule üst çizgisi) girmez; teyze cephede,
+src/game/mahalle.ts:4:// kedi saçak köşesinde (p.x'in solunda). Fizik/kamera/çarpışma değişmez.
+src/game/mahalle.ts:5:// Amca o kuleye inince: teyze konuşur (inişe göre), kedi miyavlar; kedi ilk kez görülünce adıyla deftere yazılır.
+src/game/mahalle.ts:9:// 2026-11-21 kullanıcı: "diyalogları hiç beğenmedim" -> komşu ve kedi konuşma balonları kapalı (yazı yerine jest).
+src/game/mahalle.ts:14:export const KEDI_SOURCE = require("@/assets/environment/mahalle/kedi-uyuyan.png");
+src/game/mahalle.ts:18:// Tur 2 (kullanıcı 2026-11-20: "Kabul, bağla"): bağıran komşu amca, alkışlayan çocuk, gerinen kedi, gri kedi.
+src/game/mahalle.ts:23:export const KEDI_GERINEN_SOURCE = require("@/assets/environment/mahalle/kedi-gerinen.png");
+src/game/mahalle.ts:25:export const KEDI_GRI_SOURCE = require("@/assets/environment/mahalle/kedi-gri-uyuyan.png");
+src/game/mahalle.ts:32:export const CUMBA_KEDI_SOURCE = require("@/assets/environment/mahalle/cumba-kedi.png"); // cumba-bos + koyu iç
+src/game/mahalle.ts:37:// modunda ... kışın kedi üşür halde gözüksün" -> "Kabul, bağla"). Yağmur/kar hâlleri; tuval ölçüleri orijinalle aynı.
+src/game/mahalle.ts:38:// Teyze ve komşular "serin" hâli (hırka/kazak/bere) iki havada ortak; kediler kışın üşüyen, yağmurda ıslak.
+src/game/mahalle.ts:44:const KEDI_KIS = require("@/assets/environment/mahalle/kedi-uyuyan-kis.png");
+src/game/mahalle.ts:45:const KEDI_YAGMUR = require("@/assets/environment/mahalle/kedi-uyuyan-yagmur.png");
+src/game/mahalle.ts:46:const KEDI_GRI_KIS = require("@/assets/environment/mahalle/kedi-gri-uyuyan-kis.png");
+src/game/mahalle.ts:47:const KEDI_GRI_YAGMUR = require("@/assets/environment/mahalle/kedi-gri-uyuyan-yagmur.png");
+src/game/mahalle.ts:48:const KEDI_GERINEN_KIS = require("@/assets/environment/mahalle/kedi-gerinen-kis.png");
+src/game/mahalle.ts:49:const KEDI_GERINEN_YAGMUR = require("@/assets/environment/mahalle/kedi-gerinen-yagmur.png");
+src/game/mahalle.ts:55:    // CESIT-SAKIN-2: yeni kadınların serin hâli, yeni kedilerin kış/yağmur hâli
+src/game/mahalle.ts:57:    kediYeni: KEDI_YENI.map((k) => (kis ? k.kis : yag ? k.yagmur : k.src)),
+src/game/mahalle.ts:62:    kedi: kis ? KEDI_KIS : yag ? KEDI_YAGMUR : KEDI_SOURCE,
+src/game/mahalle.ts:63:    kediGri: kis ? KEDI_GRI_KIS : yag ? KEDI_GRI_YAGMUR : KEDI_GRI_SOURCE,
+src/game/mahalle.ts:64:    kediGerinen: kis ? KEDI_GERINEN_KIS : yag ? KEDI_GERINEN_YAGMUR : KEDI_GERINEN_SOURCE,
+src/game/mahalle.ts:67:// CESIT-SAKIN (2026-11-25, kullanıcı: "hep aynı kadın ve hep aynı kedi görseli olması çeşitlilik olsun" ->
+src/game/mahalle.ts:88:  { src: require("@/assets/environment/mahalle/kedi-smokin.png"), kis: require("@/assets/environment/mahalle/kedi-smokin-kis.png"), yagmur: require("@/assets/environment/mahalle/kedi-smokin-yagmur.png"), burun: [.26, .65], foot: 190 / 255 },
+src/game/mahalle.ts:89:  { src: require("@/assets/environment/mahalle/kedi-beyaz.png"), kis: require("@/assets/environment/mahalle/kedi-beyaz-kis.png"), yagmur: require("@/assets/environment/mahalle/kedi-beyaz-yagmur.png"), burun: [.375, .63], foot: 225 / 255 },
+src/game/mahalle.ts:90:  { src: require("@/assets/environment/mahalle/kedi-uc-renk.png"), kis: require("@/assets/environment/mahalle/kedi-uc-renk-kis.png"), yagmur: require("@/assets/environment/mahalle/kedi-uc-renk-yagmur.png"), burun: [.40, .67], foot: 193 / 255 },
+src/game/mahalle.ts:91:  { src: require("@/assets/environment/mahalle/kedi-tekir-oturan.png"), kis: require("@/assets/environment/mahalle/kedi-tekir-oturan-kis.png"), yagmur: require("@/assets/environment/mahalle/kedi-tekir-oturan-yagmur.png"), burun: [.53, .47], foot: 247 / 255 },
+src/game/mahalle.ts:116:/** 0 = boş, 1 = teyze, 2 = kedi, 3 = komşu amca, 4 = çocuk. İlk 3 kule boş; komşu kulelerde aynı tür
+src/game/mahalle.ts:117: *  (pencere ya da kedi) üst üste gelmez. */
+src/game/mahalle.ts:118:// GEÇİCİ test: her kulede sırayla teyze/kedi (yalnız simülatör doğrulaması; false bırak).
+src/game/mahalle.ts:125:  const k = h < 0.13 ? 1 : h < 0.24 ? 2 : 0; // 1 = pencere, 2 = kedi
+src/game/mahalle.ts:137:export function kediNo(id: number) {
+src/game/mahalle.ts:141:export function kediAdi(id: number) {
+src/game/mahalle.ts:142:  return KEDI_ADLARI[kediNo(id)];
+src/game/mahalle.ts:145:export function kediGorunumNo(n: number, soguk = false) {
+src/game/mahalle.ts:149:export function kediGorunum(id: number, soguk = false) {
+src/game/mahalle.ts:151:  return kediGorunumNo(kediNo(id), soguk);
+src/game/mahalle.ts:153:export function kediGri(id: number, soguk = false) {
+src/game/mahalle.ts:155:  return kediGorunum(id, soguk) === 1;
+src/game/mahalle.ts:157:export const kediGriNo = (n: number) => kediGorunumNo(n) === 1;
+src/game/mahalle.ts:163:export const KEDI_DEFTER_KEY = "carsamba.kediler.v1";
+src/game/mahalle.ts:189:export function kediLafi() {
+src/game/mahalle.ts:193:/** Teyze ve kedinin kule (ev) koordinatlarındaki yeri; g = { p: { width }, r, rise, fw }. */
+src/game/mahalle.ts:216: *  (ev koordinatında y = 0); kedinin üstü bunun altında kalır (en fazla çatı yüksekliğinin %85'i). */
+src/game/mahalle.ts:217:// 2026-11-21 video: kediler hâlâ küçük ve kule/çatıya göre değişiyordu -> boy AMCAYA sabit (charH'nin %55'i).
+src/game/mahalle.ts:219:// Kuleye sığmıyorsa (genişliğin %65'inden büyükse) o kulede kedi çıkmaz.
+src/game/mahalle.ts:220:// KEDİ YERİ (2026-11-22, kullanıcı: "kedinin çatıdaki yeri bir tuhaf"): kedi artık çatı kiremitlerinin
+src/game/mahalle.ts:221:// önünde değil; kedili kulede de teyzeninkiyle aynı cumba var, kedi cumbanın pervazında uyur.
+src/game/mahalle.ts:222:// Pervaz üst çizgisi cumba-bos.png'de y≈418/660. Cumba kuleye sığmazsa kedi de yok (ölçek sabit).
+src/game/mahalle.ts:225:// Video 2026-11-22 20:29: kedi pervazın ~6 pt üstünde "havada" duruyordu; artık gövde pervaza oturur, biraz da gömülür.
+src/game/mahalle.ts:226:export function kediBox(g: { p: { width: number }; r: number; rise: number; fw: number }, aspect = KEDI_ASPECT, charH = 0, gutterH = 0, foot = 1) {
+
+exec
+/bin/zsh -lc 'cat ai_review_evidence/HAREKET-2026-11-26/RAPOR.md && cat ai_review_evidence/OYNANIS-2026-11-26/RAPOR.md' in /Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend
+ succeeded in 0ms:
+# HAREKET-2026-11-26 — Amcanın uçuş ve iniş hareketleri: ortak rapor
+
+Görüş verenler: animasyon editörü (editor-animasyon.md), oyuncu hissi editörü (editor-oyuncu.md), teknik editör (editor-teknik.md), Kıvılcım (kivilcim-gorusu.md, yalnız yazılı görüş, görsel üretilmedi). Brief: brief.md. Kod değiştirilmedi.
+
+## Teşhis (dördü aynı fikirde)
+- Uçuşta amca, duruş pozunda dik ve kaskatı kalıyor; "çıkartma gibi kayıyor". Şarjda çömelme var ama bırakınca hiçbir yaylanma, eğilme, toparlanma yok.
+- İnişte 3 tepki pozu var, ama kıyafet varken (pijama, kış, yağmur, şemsiye, özel gün şapkası) hiç çizilmiyor. Kışın oyun "ölü" görünüyor.
+- Asıl risk tepkilerin azlığı değil, bazı inişlerde balon, teyze, durak bandı, poz ve iki titreşimin aynı anda üst üste binmesi.
+- İyi haber (teknik + animasyon): kıyafetler gövde pozunun içinde çiziliyor. Gövdeye verilen döndürme/esneme her kıyafete kendiliğinden uyar. Kodda kalkış ve inişte zaten hesaplanan ama hiçbir çizimin kullanmadığı bir "baş sallanması" yayı da var (headTilt).
+
+## Ortak öneri — Paket A (yeni çizim yok, fizik/kamera/çarpışma aynı)
+**Uçuş**
+1. **Kalkış esnemesi:** bırakma anında gövde ~90-120 ms boyunca yukarı uzar (boy %8-16, en %7-10 incelir), sonra yaylanıp normale döner. Şarj fazlaysa biraz daha güçlü.
+2. **Yörüngeye eğilme:** gövde uçuş yönüne en fazla ±12° yatar; yükselişte yörüngeyi izler, tepede düzleşir. Kısa hoplamada neredeyse hiç eğilmez, uzun atışta tam eğilir.
+3. **Tepe anı:** kısa "asılı kalma" (hafif ezilme + dizleri hafif büken mevcut şarj pozu). "Bacaklarını topladı" hissi; yeni çizim gerekmez, şarj pozları zaten kıyafetli.
+4. **İniş öncesi dikleşme:** temastan ~120-150 ms önce açı 0'a döner, dizler hafif bükülür. Amca her zaman dik iner; oyuncu iniş yerini ayaklardan okur.
+5. Gaz izi gövdenin açısına göre kalça arkasından çıkar.
+6. **Ters takla / sürekli dönme yok** (dördü de karşı: iniş yeri okunmaz, mide bulandırır, amcanın karakterine uymaz).
+
+**İniş**
+7. **İnişin sertliği hıza göre:** kısa hopta hafif, uzun düşüşte daha derin çökme (şu an hep aynı).
+8. **Kıl payı kenar:** ön kenarda öne, arka kenarda geriye sönümlü sallanma (±7°, ~600 ms). Kıyafetliyken de çalışır.
+9. **Kusursuz inişte seriye göre artan tepki:** 1. seferde yalnız ses, 2. seferde silkele, 3+ seride silkele + "göğüs kabartma".
+10. **3+ kule ve rekor:** "oh be", koşu başına sınırlı (ilk 2 sefer / rekorda bir kez).
+11. **Sıradan inişler (~%70) sessiz kalsın:** yalnız çökme + toz + ses. Aynı poz art arda gelmesin.
+12. **Tek sözcü kuralı:** teyze, kedi, karga veya durak bandı konuşuyorsa amca poz yapmaz. Bir inişte en fazla bir titreşim, temas anında.
+13. **Kıyafetliyken de tepki:** poz çizilemese de sallanma/silkeleme gövde dönüşümüyle verilir.
+14. Dokunulunca tepki anında kesilsin, şarj gecikmesin.
+
+## Paket B (yeni çizim; her Kıvılcım çağrısı ayrı onay)
+- En çok fark: **2 yeni gövde pozu** — (1) havada uçuş pozu (kollar geride, bacaklar toplu, yanaklar rüzgârda), (2) iniş hazırlığı (kollar açık, dizler bükük, gözler aşağıda).
+- Kıyafet sürümleriyle birlikte **8-10 PNG** (poz başına çıplak + pijama + kış + yağmur ± şemsiye) ve şapka kutu ölçümleri.
+- Sonraki aday: "ah belim" (3+ kule sonrası) ve "bıyık sıvazlama" (kusursuz seri) — 2 poz × 5 = 10 PNG daha.
+- Alternatif: mevcut 3 tepki pozunun kıyafetli sürümleri (~9 PNG).
+- Bellek: büyük poz başına ~4,9 MB + 5 görüntü katmanı.
+
+## Editörlerin ayrıştığı yerler ve kararım
+- **Dönme noktası:** animasyon editörü gövde ortası, teknik + oyuncu editörü ayak noktası dedi. **Ayak noktası** öneriyorum: iniş yeri ve kıyafet kutuları hiç kaymaz; 12° sınırında baş kayması kabul edilebilir.
+- **Takla:** animasyon editörü en uzun atışların %10'unda tek tur dedi; diğerleri hiç. **Hiç** öneriyorum (ilk pakette).
+
+## Teknik notlar
+- Tek bir sarmalayıcı görünüme döndürme/esneme (app/index.tsx:3893 civarı); tüm pozlar, haleler ve kıyafetler birlikte döner. Fiziğe, kameraya, iniş tespitine dokunulmaz.
+- Düşüş karelerinde eğilme kapalı (pivotları baş hizasında).
+- Yeni animasyon stilleri okudukları değerlerden sonra tanımlanmalı (worklet sırası, R062). Şemsiyeli yağmurda performans ölçülmeli.
+- Hayalet yarıştaki rakip amcaya da aynı eğilme uygulanabilir.
+
+## Tür kaynakları (oyuncu editörü)
+Stick Hero (Instructables), Spring Ninja (PocketGamer), "Juice it or lose it", Game Developer "12 principles for game animation", Amazon GameMaker "Juicing your movements" — bağlantılar editor-oyuncu.md içinde.
+# Byzantion — Oynanabilirliği nasıl artırırız? (2026-11-26)
+
+Kullanıcı: "oyunun oynanılabilitesini arttırmak için neler yapılabilir diğer editörlerle bir değerlendirme yapın ve bana rapor sunun; bunu yaparken en çok oynanan bu tarz oyunların içeriğini de kontrol edin".
+Danışılan (birbirini görmeden): Kıvılcım (`kivilcim-gorusu.md`), oyun tasarımı editörü (`editor-tasarim.md`), oyuncu deneyimi editörü (`editor-oyuncu.md`), pazar araştırması editörü (`editor-pazar.md`, kaynaklı). Brif: `brief.md`. Kod değişmedi.
+
+## 1. Türün en çok oynananları bize ne söylüyor
+- **WeChat Jump Jump** (bizim birebir atamız: basılı tut-bırak-zıpla): iki haftada ~100 milyon günlük oyuncu, 1. gün tutma %65. Gücü iki şeyde: **ortaya iniş serisi** (+2, +4, +6… kaçınca sıfırlanır) ve **bekleme sürprizleri** (bazı bloklarda 2 sn durunca müzik çalar, kapı açılır, ek puan). Bayramda tek telefonda aileyle sırayla oynama modu.
+- **Stick Hero / Stack:** tam ortaya koyunca "PERFECT" + ek puan; seri ödülü.
+- **Crossy Road** (250 milyon+): oynayarak kazanılan karakter koleksiyonu, görevler.
+- **Alto:** seviye başına 3 hedef (toplam 180), skorsuz "Zen" modu.
+- **Subway Surfers** (4 milyar+): birkaç haftada bir değişen şehir, görevler.
+- **Mr Jump:** "çok zor, hep baştan" şikâyeti yüzünden kolay sürüm çıkarıldı.
+- Ortak ders: ilk dakikada neredeyse hiç yazı yok, mekanik denerken öğreniliyor; ustalık için **görünür ikinci bir hedef** (ortayı tutturmak) var; rekor kırılamayan günde de **küçük görevler** oturumu anlamlı kılıyor.
+
+## 2. Koddan tespitler (editörlerin bulgusu, benim kontrolüm)
+- Ortaya iniş algılanıyor ama **puan vermiyor** (`scorePerfectBonus: 0`, `src/game/config.ts:198`), ortayı gösteren şerit gizli. Oyuncu bu ödülün varlığını bilmiyor.
+- İniş yazısı hâlâ İngilizce **"PERFECT!"** (`app/index.tsx:1041, 1991`) — 20 Kasım'da da önerilmişti.
+- Öğretim tek satır ("Basılı tut… bırak, zıpla!"), ilk 3 koşudan sonra kalkıyor (`app/index.tsx:4027`). Tam kıvam, ortaya iniş, çok kule anlatılmıyor.
+- Zorluk her durakta artıp 60. kulede tavana varıyor, sonrası düz (`src/game/stops.ts:87-91`).
+- İlk durak (ilk ödül) 15. kulede; ilk koşularda çoğu oyuncu oraya varamayabilir (tahmin).
+- Ayarlar ekranı yok (yalnız ses düğmesi). Dil desteği yok.
+- **Düzeltme:** Brifte "günün haritası var" yazdım; 12 Kasım'da senin kararınla kapalı ("tekrara düşmemeli", `DAILY_MAP=false`). Kıvılcım ve oyuncu editörünün "günlük haritaya hedef / ana kapı yap" önerileri bu karara ters; aşağıda günlük olmayan biçimine çevirdim.
+
+## 3. Puanlar (oynanış/his · geri gelme isteği)
+| Editör | Oynanış/his | Geri gelme |
+|---|---|---|
+| Kıvılcım | 7 | 7 |
+| Oyun tasarımı | 6,5 | 7 |
+| (20 Kasım: Kıvılcım 7 / 7, Claude editörü 6,5 / 6) | | |
+Ortak gerekçe: dünya ve kimlik güçlü; zayıf olan **ustalığın görünür hedefi** ve **oturum içi kısa hedefler**.
+
+## 4. Editörlerin ortak önerileri (en güçlü sinyal)
+
+| # | Öneri | Kimden | Efor | Onay gerekir mi |
+|---|---|---|---|---|
+| 1 | **Hataya göre ipucu + kademeli öğretim**: düşünce "Amca uçtu gitti, biraz az bas" / "Kısa kaldın, biraz daha tut"; ilk kez yaşanan şeyde tek satır ("Tam ortaya! Mahalle alkışlar") | Tasarım, Oyuncu, Kıvılcım | Yalnız kod | Hayır |
+| 2 | **Tam orta serisi** (Jump Jump'ın kalbi): ortaya inince puan, art arda orta inişte katlanır (+1, +2, +3…), kaçınca sıfırlanır; çatıda ortayı gösteren küçük işaret | Pazar, Tasarım, Kıvılcım | Kod + 1 görsel (orta işareti) | **Evet — puan kuralı değişir**, eski Game Center rekorlarıyla kıyas bozulur (yeni tablo gerekebilir) |
+| 3 | **"Muhtarın üç işi" + rütbe**: ekranda her an 3 küçük iş ("üst üste 3 tam orta", "bir koşuda 2 kediyle tanış", "Galata'yı geç"); üçü bitince rütbe (Çırak → Kalfa → Usta → Mahalle Ağası). Günlük değil, bitince yenilenir | Pazar, Tasarım, Kıvılcım | Kod + 0–1 görsel | Hayır |
+| 4 | **Oyun sonu kartında sonraki durak**: "Kuzguncuk'a 4 kule" çubuğu + sıradaki kartpostal bulanık görünür | Tasarım, Oyuncu, Kıvılcım | Yalnız kod | Hayır |
+| 5 | **Daha hızlı yeniden başlama**: sonuç kartı açıldıktan kısa süre sonra boş yere dokunmak "Bir daha" sayılır | Tasarım, Kıvılcım | Yalnız kod | Hayır |
+| 6 | **Ayarlar paneli**: titreşim, az hareket (sarsıntı/kar/yağmur yoğunluğu), büyük yazı, osuruk sesini ayrı kapatma, sol el | Dördü de | Yalnız kod | Hayır |
+| 7 | **Tek telefonda sırayla oynama** ("Bayram sofrası": 2–4 isim, her koşudan sonra "Sıra Ayşe teyzede", sonunda kürsü kartı) | Pazar, Oyuncu | Yalnız kod | Hayır |
+| 8 | **Ulaşılan duraktan alıştırma** (skor tabloya yazılmaz; geç semtleri görmeyi kolaylaştırır) | Pazar, Tasarım | Kod (+1 görsel) | **Evet — kule üretimine başlangıç noktası** |
+
+## 5. Tek editörden gelen öne çıkanlar
+- **Bekleme sürprizi çatıları** (Pazar): laterna (2 sn bekle, çalar), simitçi tablası (martılar iner), kahveci cumbası — 3 görsel. Paylaşılan "sır" etkisi.
+- **Oynayarak kazanılan baş aksesuarları** (Pazar): rütbe/durak ödülü kasket, balıkçı şapkası, kaptan şapkası — satış değil ödül; ilk set 4 görsel.
+- **Durak pulları** (Oyuncu): her durakta 3 pul, toplam 36 hedef — 1 görsel.
+- **Baskısız bildirim** (Oyuncu): gerçek İstanbul havasına bağlı, izni geç isteyen, günde en fazla 1 ("Kadıköy'e kar yağıyor, amca çatıda"). Gurbetçi için en güçlü kanca.
+- **"PERFECT!" Türkçeleşsin** ("Tam isabet!") ve **çatıya göre iniş sesi** (kiremit "tak", baca "tın") (Tasarım/Oyuncu).
+- **Rekor gerilimi** (Tasarım): rekora 5 kule kala bayrak dalgalanır, geçince vapur düdüğü.
+- **İngilizce** (Oyuncu): yabancı turist ilk 2 dakikada Türkçe yazılar yüzünden bırakabilir (tahmin); mağaza öncesi gerekli.
+- **Son duraktan sonra "2. sefer"** (Oyuncu) ve **60. kuleden sonra semt karakteri dizileri** (Tasarım; kule üretimine dokunur, onay gerekir).
+
+## 6. Önerim (sıra)
+1. **Hemen, onaysız, yalnız kod:** hataya göre ipucu + kademeli öğretim (1), "PERFECT!" → Türkçe, oyun sonu kartında sonraki durak (4), hızlı yeniden başlama (5). Hepsi küçük; ilk dakikayı ve "bir daha" isteğini doğrudan etkiler.
+2. **Senin kararınla: tam orta serisi** (2). Türün en kanıtlanmış el hissi döngüsü; tek bedeli rekorların sıfırlanması/yeni tablo.
+3. **Muhtarın üç işi + rütbe** (3) — oturumu uzatan ve geri getiren ikinci hedef.
+4. **Ayarlar paneli** (6) ve **sırayla oynama** (7).
+5. Sonra: bekleme sürprizi çatıları (3 görsel, Kıvılcım onayıyla), baş aksesuarları, baskısız bildirim, İngilizce.
+6. Onay isteyenler ayrı konuşulsun: alıştırma modu (8), 60. kule sonrası eğri.
+
+Ölçüm (Kıvılcım + Oyuncu): TestFlight'ta yeni oyuncunun ilk 60 saniyesi, ilk oturumdaki tekrar sayısı, ertesi gün açılış. Testçi az olduğu için sonuçlar yön gösterir, kesin değildir.
+Kaynaklar `editor-pazar.md` sonunda. Doğrulanmamış rakamlar orada işaretli.
+
+exec
+/bin/zsh -lc "sed -n '1,220p' ai_review_evidence/HAREKET-2026-11-26/editor-teknik.md; sed -n '1,220p' ai_review_evidence/HAREKET-2026-11-26/editor-animasyon.md; sed -n '1,220p' ai_review_evidence/HAREKET-2026-11-26/editor-oyuncu.md; sed -n '1,220p' ai_review_evidence/OYNANIS-2026-11-26/editor-tasarim.md" in /Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend
+ succeeded in 0ms:
+# HAREKET-2026-11-26 — Teknik editör (React Native + Reanimated) değerlendirmesi
+
+Hiçbir kod dosyası değiştirilmedi. Satır numaraları 26 Kas `main` (f6f34d8) içindir.
+
+## 1. Uçuşta eğilme/dönme/esneme: nereye, nasıl (yalnız görsel)
+- **Hazır kaynak var, kullanılmıyor:** `headTilt`/`headVelocity` (app/index.tsx:1391, sönümlü yay 2760-2768, ±12°). Kalkışta `-65 - c*55` ile (2644), inişte `45 + |vy|*0.06` ile (2889) itiliyor, ama hiçbir stil okumuyor. Fizik dışında, her karede zaten hesaplanıyor. Sıfır ek maliyetle "kalkış silkinmesi + iniş sallanması" verir.
+- **Yörünge eğimi:** `vx` uçuşta sabit (advanceFlight yalnız `vy`'yi değiştiriyor, src/game/jump.ts:30-34), `vy` artıyor. Açıyı şöyle türet: `θ = clamp(atan2(vy, vx)·k, -14°, +14°) · min(1, vx/vxRef)`. Aynı kulede kısa sekmede vx küçük kalır, bu çarpan dik dönmeyi önler. Kalkış ve yükselişte geriye yaslanır, tepede düzleşir, düşüşte öne eğilir.
+- **Yer: tek sarmalayıcı.** Bunu PoseLayer'ın içine değil, `<ChargePoses>`'ı saran `Animated.View`'e koy (app/index.tsx:3893, şu an yalnız `charOpStyle` var). Yeni ve ayrı bir sarmalayıcı açmak daha temiz olur. Tek mapper ve tek stil yeter. Bütün şarj, tepki ve düşüş pozları, 4 hale kopyası ve kıyafetler (alt görünüm oldukları için) kendiliğinden döner. Her katmana rotate eklemek ~14 katman × ayrı updater demek: gereksiz.
+- **Pivot = ayak noktası:** dünya koordinatında `(px + SOLE_CENTER_OFFSET + ANCHOR_SHIFT_PX*SPRITE_SCALE, py + PH/2)`, yani ChargePoses'a verilen `feetCenterOffset`/`feetHalf` ile aynı nokta. Sarmalayıcı (0,0)'da ve 0×0 olduğu için şu sıra gerekir: `translateX(pivX), translateY(pivY), rotate(θ), translateX(-pivX), translateY(-pivY)`. Bu durumda `transformOrigin` gerekmez. Ayak noktası dönmeyle hiç kaymaz. İniş anında θ sıfır olmasa bile ayaklar çatı çizgisinde kalır, landPulse'ın ayak pivotu (ChargePoses.tsx:92-96) bozulmaz.
+- **Gövde merkezli takla isteniyorsa** pivot `feetY - FART_CHAR_H*0.45` olmalı ve dönüş yalnız yükseliş/tepe evresinde bitmeli. `vy > 0`'dan sonra θ ayak pivotlu eğilmeye geri dönmeli. Aksi hâlde inişte ayak çizgisi görsel olarak çatıdan kopar.
+- **İnişte sıfırlama:** temas karesinde (2879 civarı) `phase` IDLE'a geçer. Stil `phase !== AIRBORNE` iken θ'yı 80-120 ms'de 0'a çeksin (ayrı bir `tiltSV` ile `withTiming`, ya da yay). Pivot ayakta olduğu için bu geçiş kaymaz.
+- **Esneme (stretch):** yükselişte `scaleY 1+0.06·(-vy/|vy0|)`, `scaleX` bunun tersi. Pivot yine ayak olmalı ki gövde yukarı uzasın. Düşüşte esneme yapma: ayakla temas okunurluğu öncelikli.
+- **Fizik/kamera/çarpışma:** sarmalayıcı yalnız okur (px, py, vx, vy, phase). Kamera (`camXR/camYR`), `findFootLanding`, `dususKesin` ve gaz izi (`FART_FEET_DX`) dönmeyen değerlerle çalışmaya devam eder. Tek uyumsuzluk Kurukafa temas kutusu (2858-2860, dönmeyen dikdörtgen). ±14°'de baş en fazla ~%25 gövde genişliği kayar, bu kabul edilebilir.
+
+## 2. Kıyafet katmanları
+- Pijama (külah ve terlik), kış (bere, atkı, kar, burun, buhar), yağmur gövdesi ve kasketi, şemsiye ve özel gün şapkası PoseLayer'ın **çocukları** (ChargePoses.tsx:159-259). Sarmalayıcı dönmesine hepsi birebir uyar, kutu hizaları bozulmaz.
+- Şemsiyenin kendi `rotate(pulse*7°)`'si (146) ve kumaş scaleY'si (151) üst dönmeye eklenir, çakışmaz. Düşüşte şemsiye açılırken öne eğilme ±10° ile sınırlansın, yoksa kubbe "rüzgârda devriliyor" gibi okunur.
+- `offsetX/offsetY` (pijama kapı yürüyüşü) PoseLayer içinde. Yürüyüş yerde (IDLE) olduğu için θ=0'dır, çatışma yoktur.
+- Buhar (`breath`) ve kar dökülmesi (`shed`, 2616-2621) dünya koordinatlı ayrı katmanlarda kalır, dönmez. Sorun değil.
+
+## 3. Yeni tepki türlerinin maliyeti
+- **Şu an monte olan:** 9 şarj pozu × (1 + 4 hale) = 45 Image, 3 tepki × 5 = 15 Image, 2 düşüş × (5 + yağmur/kış/şemsiye kareleri + bindirmeler) = ~20 Image. Hepsi sürekli monte, opaklıkla açılıp kapanıyor. PoseLayer başına ~16 `useAnimatedStyle` var, toplamda 150+ mapper.
+- **Çözülmüş bitmap:** 516×1103 RGBA ≈ 2,3 MB, 1100×1103 ≈ 4,9 MB. Hale kopyaları aynı `source`'u `tintColor` ile çiziyor; iOS'ta büyük olasılıkla aynı bitmap paylaşılıyor (ölçülmeli). Asıl maliyet her kopyanın ayrı çizim katmanı olması.
+- **Yeni gövde pozu (B paketi):** 1 PNG (1100 genişlik ≈ 4,9 MB), +5 Image (hale), +2 mapper. Kıyafetli görünmesi için düşüşteki örnek gibi 3 PNG daha gerekir (yağmur, kış, şemsiye) ve pijama ile 6 özel gün şapkası için kutu ölçümü (`FALL_BOXES` gibi, character-pose.ts:129-132). Yani **poz başına ~4 PNG + 9 kutu**. Bunu yapmayan tepki bugünkü gibi kıyafette hiç görünmez (`reactionVisible`, character-pose.ts:148-151).
+- **A paketi, dönüşüm tabanlı tepkiler (ucuz ve kıyafetle uyumlu):** Mevcut PoseLayer'a, ya da sarmalayıcıya, ayak pivotlu küçük dönüşümler:
+  - ön kenar kıl payı → öne +8° sendeleme, yay ile geri;
+  - arka kenar → geriye −8° ve kısa geri kayma (`offsetX` benzeri ayrı SV);
+  - tek kule / kısa sekme → yalnız landPulse;
+  - seri ya da rekor → 1-2 kare 18 px'lik küçük zıplama (translateY);
+  - Kurukafa altında → scaleX/scaleY "jöle" sallanması.
+  Hepsi kıyafetle çalışır, çünkü gövde değişmez.
+- **Mevcut pozla tepki:** `poseCharge` (app/index.tsx:3166) `useDerivedValue` ile `charge`'dan türüyor. Uzun düşüşten sonra yumuşak diz kırma için buna inişten sonra kısa bir `tepkiCharge` eklenebilir (örneğin 0,25 → 0, 200 ms). Sonuç charge-025/037 pozu olur, `poseOpacity` tek-poz garantisini korur, kıyafet kutuları zaten her poz için var. Yeni PNG gerekmez.
+
+## 4. Riskler
+- **Worklet ve bildirim sırası:** yeni `useAnimatedStyle`/`useDerivedValue`, okuduğu SV'lerden (`headTilt` 1391, `vx/vy` 1360-1361, `phase`) ve kullandığı `const` worklet yardımcılarından **sonra** tanımlanmalı. Yoksa TDZ hatası alınır ya da kapanış bayat kalır. R062 kuralı (ChargePoses.tsx:125) geçerli: her SV kendi updater'ında doğrudan okunmalı. `atan2`/`clamp` yardımcıları `"worklet"` işaretli olmalı.
+- **60 fps:** tek sarmalayıcıda rotate, Core Animation katman dönüşümüdür ve ucuzdur. Sarmalayıcıya `overflow: hidden`, gölge ya da opaklık<1 animasyonu ekleme: offscreen geçiş açar (REVIZYON-072 notu, ChargePoses.tsx:5-9). Şemsiye kubbesindeki mevcut `overflow:"hidden"` (288) dönen ebeveyn altında maske maliyetini artırabilir. Mevcut `PERF_PROBE` sayaçlarıyla (`pAirHitch`, 2728-2733) şemsiyeli yağmurda ölçülmeli.
+- **İki gövde kuralı:** dönüşüm tabanlı her şey aynı gövdeyi taşır, kural korunur. Yeni poz eklenirse hem `PoseLayer.hideAll`'a (106) hem `ReactionLayer.on`'a (333) eklenmeli. Düşüş karesi (`fallVisible`) her zaman öncelikli kalmalı. Uçuş eğimi düşüşte (`dusus > 0`) ya kapatılmalı ya da ±5° çırpınma sallanmasına inmeli, çünkü düşüş karelerinin pivotu baş hizasında (character-pose.ts:100-104), ayak pivotlu dönme onları yanlış yerden çevirir.
+- **Tepki ile yeni pozun yarışı:** tepki `withDelay(900/1100)` ile kapanıyor (1992). Yeni bir şarj `phase` üzerinden tepkiyi anında gizliyor, ama dönüşüm tepkileri ayrı SV ile yapılırsa `onPressIn`'de `cancelAnimation` ile sıfırlanmalı. Aksi hâlde eğik başlayan şarj, zamanlamayı şaşırtır.
+- **Hayalet yarış:** `ghostBodyStyle` ayrı çiziliyor. Rakip düz, oyuncu eğik görünür; isteniyorsa aynı formül ona da uygulanmalı.
+# Editör görüşü: 2D karakter animasyonu (HAREKET-2026-11-26)
+
+Bakılanlar: brief, kareler/ (8 uçuş karesi, duruş, 3 tepki, düşüş-1), `ChargePoses.tsx` (PoseLayer transform'u), `character-pose.ts`, `app/index.tsx` (landPulse 35+75+80 ms, tepki 180 ms yerleşme + 900/1100 ms tutma).
+
+## Teşhis
+- Uçuş karelerinde amca bir **"çıkartma" gibi kayıyor**: dik, kolları yanda, gözler yarı kapalı (duruş pozu). Kalkışta anticipation (çömelme) var ama **release yok**; çömelmeden dik duruşa tek karede geçiyor, havada hiçbir arc/follow-through yok. "Direk gibi" hissinin asıl sebebi bu.
+- İyi haber: kıyafet katmanları (pijama, mont, yağmurluk, şapka, şemsiye) PoseLayer'ın **içindeki çocuklar**. Yani üst görünüme verilen rotate/scale **her kıyafete kendiliğinden uyar**. Paket A kıyafet engeline takılmaz; tepki pozlarındaki "kıyafetliyken çizme" sorunu burada yok.
+
+## A) Mevcut görsellerle uçuş (yalnız transform; px/py, çarpışma kutusu ve footSoles aynı)
+Dönme pivotu: **gövde ortası** (yaklaşık pivotY − 0.45·h). Ayak pivotu kullanılmasın; kafa büyük yay çizer, mide bulandırır. `rotate` translate'lerden sonra, scale'den önce uygulanmalı.
+1. **Kalkış (0–90 ms): stretch.** scaleY 1.00→1.16→1.00, scaleX 1.00→0.90→1.00 (hacim korunur). Tepe noktası 40 ms'de, ease-out. Aynı anda öne eğilme 0→+8°. Şarj %75 üstündeyse stretch 1.20 / 0.88.
+2. **Yükseliş: hıza bağlı eğilme.** `tilt = clamp(-vy/|vy0| · 12°, -10°, +12°)` → yükselirken öne +10–12°, inişte geriye −6–8°. Gövde yolu izlediği için yay okunur hale gelir. Ek olarak hıza bağlı uzama: `scaleY = 1 + 0.06·|vy|/|vy0|` (scaleX bunun tersi).
+3. **Tepe noktası (|vy| küçük, ~120–160 ms): "hang time".** Eğilme 0°'ye yaklaşır, scale 1.0, ±1.5° hafif sallanma (sin, 6 Hz). Burada **charge-012 veya 025 pozuna geçmek** (hafif dizler bükülü) "bacakları toplama" etkisi verir; yeni çizim istemez, şarj pozları zaten kıyafetli çiziliyor.
+4. **İniş öncesi (tahmini temas −120 ms): hazırlık.** Gövde −6°'den 0°'ye döner (ayak düzgün değsin), charge-025/037'ye geçer (dizler iner = iniş anticipation'ı). Temas anında açı **mutlaka 0° ±2°** olsun; yoksa iniş noktası kaymış gibi okunur.
+5. **Şarja göre farklılık:** kısa atış (şarj <%35): eğilme ×0.5, stretch yok, tepe pozu yok, yani "küçük hop". Uzun atış (>%75): eğilme ×1.0, tepe noktasında **gaz itişiyle +4° öne "tekme"** ve 1 kez hafif scale nabzı (1.04). **Tam ters takla (360°) önermiyorum**; ancak en uzun atışın %10'unda, 3+ kule aşınca ve 450 ms'de tek tur olabilir. Bu durumda iniş öncesi 150 ms içinde 0°'ye gelmeli.
+6. **Secondary motion:** gaz izinin çıkış noktası gövde açısıyla birlikte dönsün (kalça arkası); aksi halde iz amcadan kopuk görünür.
+
+## A) Mevcut görsellerle iniş
+- **landPulse'u iniş hızına bağla:** şu an her inişte sabit 0.14 sıkışma. `pulse = 0.7 + 0.6·(|vy|/vyMax)` olsun: kısa hop 0.10, uzun düşüş 0.20 sıkışma; süre 35/75/80 → 50/90/110 ms.
+- **Kıl payı kenar:** denge pozu var. Onun yerine (ya da kıyafetliyken) **duruş pozunu kenarın tersine ±7° sallamak**: 3 salınım, 600 ms, sönümlü (7°→4°→1.5°), pivot ayak. Ön/arka kenar yönü farklı olsun (ön kenarda öne devrilip geri gelir). **Bu, kıyafetliyken de tepki verir.**
+- **Mevcut 3 tepki pozundan dönüşümlerle çeşitlilik:** her poz ×{yatay ayna değil, çünkü yön sağa sabit} × {±4° eğim, 0.96–1.04 scale "boing", 2 tutma süresi 600/1000 ms} × {giriş: pop-in 180 ms veya 2 kare "zıpla-otur" −6 px} ile göze 3'ten ~8–10 ayırt edilebilir varyant çıkar. Silkele pozu tepe tarafına 2 kez ±3° "omuz silkme" (2×120 ms) ile canlanır; oh be pozu nefes alma (scaleY 1.00↔1.03, 2 döngü 700 ms).
+- **Tekrar yorgunluğu:** çoğu iniş sessiz kalsın, ama **sıradan inişte de mikro tepki** (pulse + 1 kez 2° geri sallanma) olsun. Tam poz tepkisi inişlerin **en fazla ~%25–30'unda**, aynı tepki art arda 2 kez çıkmasın.
+- **Seri (3 ardışık iyi iniş):** silkele + charge-100 yüzü değil; duruş pozuna kısa "göğüs kabartma" (scaleX 1.06, 250 ms). Rekor geçince 1 kez oh be + kamera dokunulmadan toz ×2.
+
+## B) Yeni poz gerekenler (en az PNG, en çok fark)
+Sıra etkiye göre. Her biri 1 gövde + kıyafet sürümleri (pijama, mont, yağmurluk; şapka/şemsiye bindirme ile çözülebilir) yani **~4 PNG/poz**:
+1. **Havada "yıldız/tekme" uçuş pozu** (kollar geride, bacaklar toplu, yüz rüzgârda gerilmiş): tüm yükseliş ve tepeyi taşır. Tek başına "dümdüz" şikâyetini %70 çözer. **En yüksek öncelik.**
+2. **İniş öncesi pozu** (kollar öne/yana açılmış, dizler hafif bükük, gözler aşağıda, yere bakıyor): temas anticipation'ı. Düşüş-1 pozuyla karışmasın diye ağız kapalı, ifade sakin olmalı.
+3. (İsteğe bağlı) **Kıl payı ön kenar "kollar çark"** pozu: denge pozunun kıyafetli eksikliğini kapatmak yerine önce mevcut 3 pozun kıyafet sürümleri (3×3 = 9 PNG) daha ucuz bir kazanç olabilir; karar kullanıcının.
+→ Asgari paket: **2 poz × 4 sürüm = 8 PNG.** Tüm uçuşu ve inişi ciddi değiştirir.
+
+## Kaçınılacaklar
+- Temas anında 0°'den farklı açı, iniş noktasıyla oynayan translate, ayak pivotlu büyük dönme.
+- >15° eğilme veya uçuş boyunca sürekli dönme: kafa büyük olduğu için baş dönmesi yaratır; zamanlama okunurluğu bozulur.
+- Şarj sırasında ve kalkıştan önceki ilk 30 ms'de transform (oyuncunun bırakma geri bildirimiyle çakışır).
+- İki gövdenin aynı anda görünmesi (çapraz solma yok, sert geçiş kuralı korunmalı); tepki pozları da dahil.
+- Düşüş pozlarını iniş tepkisinde kullanmak: "öldüm" gibi okunur.
+# Editör görüşü: oyuncu deneyimi / game feel (HAREKET-2026-11-26)
+
+## Ne gördüm
+- Uçuş karelerinde (ucus_21–23) amca dik ve kaskatı duruyor. Gaz izi hareketi taşıyor ama gövde "kesilip yapıştırılmış" gibi. Kullanıcının "direk gibi" demesi yerinde.
+- `onLanding` tek inişte birden çok şeyi aynı anda tetikleyebiliyor: iç ses balonu, teyze/kedi balonu, karga, durak bandı, "Tam isabet!", +puan, beden pozu ve iki ayrı haptik (durak inişi kusursuzsa hem Medium/Success hem Light). Asıl tehlike tepkilerin az olması değil, **aynı anda üst üste binmesi**.
+
+## 1. Uçuş (A: yalnız transform, yeni PNG yok)
+- **Kalkış (ilk ~120 ms):** dikey esneme (scaleY 1.08, scaleX 0.93), ardından 1.0'a yaylanma. Şarj çömelmesinin doğal karşılığı bu.
+- **Yükseliş:** gövde hız yönüne eğilsin, açı `atan(vy/vx)` ile hesaplanıp **±12°** ile sınırlansın. Pivot **taban ortası** olsun, böylece ayaklar gerçek yörüngede kalır.
+- **Tepe:** 80–100 ms hafif "asılı kalma" ezilmesi (scaleY 0.97). Gaz puflarının her birine 1–2°'lik küçük bir öne itme titremesi eklenebilir: "osurukla itiliyor" esprisi sözsüz anlatılmış olur.
+- **İniş öncesi:** çatıya son ~150 ms kala açı 0'a dönsün, yani amca **dik insin**. Oyuncu iniş noktasını ayakların altından okuyor, eğik gövde kenarı yanlış gösterir.
+- **Şarja göre fark:** tam şarjda eğilme ve esneme %30 daha fazla olsun, kısa atışta neredeyse hiç olmasın. Ters takla veya tam dönüş **yok**: ayak noktası kayar, tekrarlanınca mide bulandırır.
+
+## 2. İniş: hangi durum ayrı tepki hak ediyor
+Kural şu: tepkinin **çıkıp çıkmayacağı rastgele olmamalı**, çünkü oyuncu tepkiyi sonucun bilgisi olarak okur. Rastgelelik yalnız aynı durumun **varyantında** kullanılsın. İnişlerin kabaca %70'i sessiz kalsın: yalnız ezilme, toz ve ses.
+| Durum | Tepki | Paket |
+|---|---|---|
+| Sıradan iniş / tek kule kısa atış | sessiz | – |
+| Kıl payı **ön** kenar (≥0.88) | denge pozu + **öne** sallanma (rotasyon ±6° ×2) | A |
+| Kıl payı **arka** kenar (≤0.12) | aynı poz, **arkaya** sallanma, ilk salınım daha büyük | A |
+| Kusursuz | **seriyle artan** tepki: 1. seferde yalnız sesin perdesi, 2. seferde silkele, 3 ve sonrasında silkele + ses bir perde yukarı | A |
+| 3+ kule | oh be (koşu başına ilk 2 seferde; sonra yalnız ses) | A |
+| Rekoru ilk geçiş | koşuda bir kez: oh be + rekor sesi + Success haptiği | A |
+| Teyze/kedi/kargalı çatı | **amca poz yapmaz**, sahneyi komşu konuşur. "Tek sözcü" kuralı | A |
+| Durak/kartpostal | bant yeterli, amcanın pozu bastırılır | A |
+| Kurukafa etkisi altında | ek tepki yok (sahne zaten kalabalık) | – |
+- **Aynı poz art arda 3 inişte bir defadan fazla çıkmasın.** Tek istisna, seri tırmanırken çıkan kusursuz tepkisi.
+- **Kıyafet varken tepki tamamen kayboluyor.** Kışın oyun "ölü" hissettirir. Poz çizilmese de sallanma ve silkeleme **transformla** (rotasyon titremesi) uygulanabilir.
+- Tepki 0.9–1.1 sn sürüyor. Oyuncu ritmi hızlıysa **dokunuş tepkiyi anında kesmeli** ve şarj pozuna geçilmeli. Kodda bunun gerçekten olduğu telefonda doğrulanmalı.
+
+## 3. Ses ve haptik eşleşmesi
+- Haptik, tepki pozunun belirdiği anda (+180 ms) değil, **temas karesinde** atılsın. Bir inişte **en fazla bir haptik** olsun. Öncelik: rekor/iskele (Success) > 3+ kule (Medium) > kusursuz (Light) > kıl payı (salınım ritminde iki Light tık).
+- Sıradan inişte haptik olmasın. Her inişte titreşim birkaç dakikada körleşir.
+- Kalkışta bırakma anında tek Light haptik ve "pırt" sesi. Esneme de aynı karede başlamalı, yani girdi hemen cevap vermeli.
+
+## 4. Mizah tonu (eşofmanlı İstanbul amcası)
+- Bu amca kahraman değil, emekli. Komedi **efor ve rahatlama** üzerine kurulu: gergin kalkış, havada şaşkın yüz, inişte "ohh". Arapça ünlem yok, yazıyı az kullan, beden dili konuşsun.
+
+## 5. İkinci paket (B: yeni PNG ister)
+- **Uçuş-yükseliş** pozu (kollar geride, yanaklar şişik) ve **iniş-hazırlık** pozu (bacaklar öne, kollar açık): 2 poz × (çıplak + pijama + kış + yağmurluk + şemsiye) = **10 PNG**. Şapka ayrı katmansa ek çizim gerekmez. Etkisi en yüksek B işi bu.
+- **"Ah belim"** (3+ kule sonrası bel tutma) ve **"bıyık sıvazlama"** (kusursuz seri 3+): 2 poz × 5 sürüm = 10 PNG. Bunlar hem komik hem okunaklı, ama uçuş pozlarından sonra gelmeli.
+- İlk paket risksiz ve hızlı: eğilme, esneme, sallanma, tek sözcü, haptik birleştirme, seri artışı. B için her Kıvılcım çağrısı ayrı onay ister.
+
+## 6. Kaçınılacaklar
+- Tam takla ya da 360° dönüş. Temas anında eğik gövde. Pivotu merkezde döndürme (ayaklar kayar).
+- Her inişte ekran sarsıntısı. Sonuçla çelişen poz (kusursuzda denge pozu gibi).
+- Aynı inişte iki balon ya da iki haptik. Bir sonraki dokunuşu geciktiren tepki.
+
+## Tür örnekleri
+- **Stick Hero:** kırmızı noktaya (merkez) basınca +1 alırsın. Ödül görünür ama küçük, kaçırmak oyunu bitirmez ([Instructables](https://www.instructables.com/How-To-Play-The-Game-Stick-Hero)). Klonlarda oyuncular, göstergesi olmayan "perfect" mekaniğinin kafa karıştırdığını yazıyor ([itch.io](https://itch.io/post/16822740)). Kusursuzun her zaman aynı, net bir işareti olmalı.
+- **Spring Ninja (Ketchapp):** tek dokunuşla yay kurma. Ustalaşması zor ama tekrar oynatıyor ([PocketGamer](https://www.pocketgamer.com/spring-ninja/review/)). Oyuncu ölümleri çoğunlukla merkez dışı inişe bağlıyor ([Kiz10](https://kiz10.com/spring-ninja), gayriresmî kaynak). Kenar inişini ayrıca göstermek bu yüzden değerli.
+- **Squash & stretch / juice:** kalkışta esneme, inişte ezilme. Fiziği değiştirmeden zıplamayı güçlü hissettirir ([Amazon GameMaker](https://developer.amazon.com/docs/gamemaker/juicing-your-movements.html), [12 principles for game animation](https://www.gamedeveloper.com/game-platforms/12-principles-for-game-animation)). Hitbox ile çizimin ayrışmaması için aşırı deformasyon birkaç kareyle sınırlı tutulmalı. Ses tekrar etmemeli ([Wikipedia: Game feel](https://en.wikipedia.org/wiki/Game_feel), Jonasson & Purho, "Juice it or lose it").
+# Editör görüşü (oyun tasarımı) — el hissi, zorluk eğrisi, oturum döngüsü
+
+Kod yalnız okundu, değiştirilmedi. Satır numaraları 2026-11-26 tarihli `main` dalına göre.
+
+## Koddan tespitler
+
+- **Öğretim:** Tek bir yazı var: "Basılı tut… bırak, zıpla!". Yalnız skor 0 iken ve ilk 3 koşuda görünüyor (`app/index.tsx:4027-4031`, `runsDone` `:1263`). Bunun dışında öğretim yok: aşırı basma/"Tam kıvam" penceresi (`:546-552`), kusursuz iniş ve çok kule atlama hiç anlatılmıyor. Asıl öğretim kolay başlangıçtan geliyor: 1-14. kulelerin hepsi geniş, tırmanış ≤160, aralık ≤300 (`config.ts:155-157`, `procedural-course.ts:62-99`).
+- **Zorluk eğrisi:** Zorluk her durakta bir basamak artıyor ve 4. durakta (60. kule) tavana varıyor (`stops.ts:87-91`, `DIFFICULTY_CAP_STOP` `:33`). Basamaklar t = 0 / 0,25 / 0,5 / 0,75 / 1. Aralık 110-340'tan 140-260'a gidiyor. Geç dönemde azami aralık *daralıyor* (`config.ts:62, 291`), yükseklik farkı 220'den 180'e iniyor (`:67, 292`). Kule genişliğinde geniş kulenin ağırlığı 0,55'ten 0,2'ye düşüyor, dar kulenin ağırlığı 0,05'ten 0,42'ye çıkıyor (`:74-75`). Dar kule 30. kuleden önce hiç çıkmıyor (`:295`), iki dar kule art arda gelmiyor (`procedural-course.ts:101`). Durak kulesi bir nefes molası: geniş, alçak, orta aralık (`:60, 102-106`). **Sonuç:** 60. kuleden sonra eğri tamamen düz. 15. kulede ise "hep geniş"ten "orta da var"a sert bir geçiş oluyor.
+- **Ortaya iniş ödülü:** Puan yok (`scorePerfectBonus: 0`, `config.ts:198`). Kusursuz bölge ±22 px (`:85`). Ortaya inince parçacık patlaması (`index.tsx:2921-2926`), hafif titreşim (`:1987-1989`), %45 olasılıkla, 4 saniyede en fazla bir kez ıslık veya alkış (`mahalleSes.ts:55-63`) ve beden dili pozu (`index.tsx:1976`) geliyor. Kulenin ortasını gösteren şerit gizli (`opacity 0`, `GORUNUM_REV`, `:5188`). Yani oyuncu ortanın ödüllendirildiğini bilemiyor.
+- **İniş geri bildirimi:** Her temasta "tak" sesi ve 190 ms'lik ezilme var (`:2891, 2901-2905`). Yeni kuleye inişte toz çıkıyor (`:2914-2919`). Çok kule atlamada "+N" ve emoji (`:1990-1995`, `copy.ts:62-67`) ile `multi` sesi (`:1972`) var. Kıl payı inişte "iiih" sesi duyuluyor (`mahalleSes.ts:50`). Durak geçişinde afiş, `record` sesi ve orta titreşim var (`index.tsx:1911-1918`). Tek kuleye normal inişte titreşim ve yazı yok.
+- **Ölüm → yeniden başlama:** Ölüm, amca görünür kameranın H+60 px altına düşünce tetikleniyor (`:2986-2989`). Düşüş süresi ~0,5-1 sn (tahmin). Ardından kart 380 ms'de kayarak geliyor (`:4110`) ve **1 dokunuşla** "Bir daha" (`:4181`). Toplam ~1,5-2 sn (tahmin). Yarış modunda yeniden doğma otomatik, 700 ms (`yaris.ts:10`).
+- **Oturum içi hedefler:** Sonuç kartında "X'e N kule kaldı" yazıyor (`stops.ts:107-112`). Bunun dışında rekor bayrağı (`index.tsx:3248`), kartpostal ve kedi kilitleri, "Tam kıvam" (+2) ve günün haritası var. Görev ya da meydan okuma listesi yok.
+
+## Öncelikli öneriler
+
+| # | Sorun | Tasarım | Efor | Risk | Sabitlere dokunur mu? |
+|---|---|---|---|---|---|
+| 1 | İlk dakika | **Hataya göre ipucu:** İlk 3 koşuda düşüşün yönüne bakılır (kuleyi aştı mı, kısa mı kaldı). Kartta tek satır çıkar: "Amca uçtu gitti, biraz az bas" ya da "Kısa kaldın, biraz daha tut". | Yalnız kod | Düşük | Hayır (yalnız okuma) |
+| 2 | İlk dakika | **Kademeli öğretim kartları:** Yeni mekanik ilk kez yaşanınca bir kez kısa yazı çıkar. İlk kusursuz inişte "Tam ortaya! Mahalle alkışlar". İlk tam şarjda "Bekle… tam kıvamda bırak". İlk dar kulede (30.) "Baca dar, dikkat". | Yalnız kod | Düşük | Hayır |
+| 3 | El hissi | **Ortayı görünür kıl:** Gizli şerit yerine çatı mahyasının ortasına küçük bir mahya alemi ya da bir kiremit sırası işareti koyulur. Ortaya inince işaret parlar. | 1 görsel | Düşük; görsel kalabalık olabilir | Hayır |
+| 4 | El hissi | **Ortaya iniş +1 puan** (`scorePerfectBonus` 0 → 1). Şu an ödül yalnız süs; puan olunca beceri anlam kazanır. *Seri ödülü daha önce önerildi*, bu yalnız tek iniş. | Yalnız kod | Orta: eski rekorlarla kıyas bozulur. Game Center tablosu için yeni sezon gerekebilir | Fizik değil; puan kuralı, ayrıca onay gerekli |
+| 5 | El hissi | **Çatıya göre iniş sesi:** Kiremitte tok "tak", bacada teneke "tın", durak kulesinde ahşap iskele "küt". (*Semte göre ses daha önce önerildi*, bu yüzeye göre.) Normal tek kule inişine de çok hafif bir titreşim (`selectionAsync`) eklenir. | 3 ses | Düşük | Hayır |
+| 6 | Oturum | **Sefer görevleri:** Oturumda 3 küçük görev, örneğin "Kuzguncuk'tan önce 3 kez tam ortaya in", "Bir zıplayışta 3 kule geç", "2 kez tam kıvam". Tamamlanan görev sonuç kartındaki vapur biletine zımba deliği olarak işlenir. Ödül yalnız kozmetik bir damga. | Kod + 1 görsel (zımbalı bilet) | Orta: arayüz kalabalığı | Hayır |
+| 7 | Oturum | **Rekor gerilimi:** Rekor bayrağına 5 kule kala HUD'da "Rekorun ileride 🚩" yazar, bayrak dalgalanır. Bayrağı geçince kısa bir vapur düdüğü çalar. | Yalnız kod (mevcut ses) | Düşük | Hayır |
+| 8 | Zorluk | **60. kuleden sonra düz eğriyi kır:** Durak başına "semt karakteri" dizileri. Örneğin Bebek'te alçak-yüksek merdiven, Rumeli Hisarı'nda art arda 3 orta burç, Kanlıca'da geniş ama uzak kuleler. Hepsi mevcut sınırlar içinde kalır. 15. kuledeki sert geçiş için 15-20. kulelerde geniş kule ağırlığı yumuşakça düşürülür. | Yalnız kod + benzetim betiği | Orta | **EVET: kule üretimi. Ayrı onay ister** |
+| 9 | Yeniden başlama | **Daha hızlı dönüş:** Sonuç kartında, kart açıldıktan 400 ms sonra ekranın boş yerine dokunmak da "Bir daha" sayılır. Kartın kayma süresi 380 ms'den ~250 ms'ye iner. | Yalnız kod | Düşük: yanlışlıkla dokunma (400 ms bekleme bunu önler) | Hayır. Ölüm eşiği (H+60) kameraya bağlı ve **ona dokunulmaz** |
+| 10 | Geri dönüş | **Yarım kartpostal:** Sonuç kartında sıradaki durağın kartpostalı bulanık ya da yarı yırtık görünür, yanında "Kuzguncuk'a 4 kule" yazar. Oyuncu ödülü görür ve az kaldığını hisseder. | Yalnız kod (mevcut kartlar, bulanıklık kodla) | Düşük | Hayır |
+| 11 | Geri dönüş / beceri | **Aktarma bileti:** Günde bir kez, ulaşılan son duraktan *alıştırma* başlatılır. Skor tabloya ve rekora yazılmaz. Geç dönem zorluğunu 5 dakika uğraşmadan çalışmayı sağlar. | Kod + 1 görsel (bilet simgesi) | Orta: yolculuk hissini sulandırabilir. Kesinlikle satılmaz | Hayır (başlangıç kulesi var: `TEST_START_TOWER`) |
+| 12 | Erişilebilirlik | Ayarlara titreşim aç/kapa, "az hareket" (konfeti, sallantı, kar ve yağmur yoğunluğu azalır), sol el ve sağ el için eşit dokunma alanı, ipucu yazılarına büyük yazı desteği eklenir. Şu an yalnız ses düğmesinde erişilebilirlik etiketi var (`:3954`). | Yalnız kod | Düşük | Hayır |
+
+**Sıralama önerisi:** Önce 1, 2, 3, 9 ve 10 gelir. Bunlar hızlı kazanç sağlar ve sabitlere dokunmaz. Ardından 6 ve 7 gelir. 4 ile 8 ayrı onaydan sonra yapılır.
+
+## Puanlar
+
+- **Oynanış ve his: 6,5/10.** Tek dokunuşlu çekirdek sağlam ve kolay ilk durak adil. "Tak" sesi, ezilme, toz, ortaya inişte patlama ve mahalle tepkileri iyi bir katman oluşturuyor. Eksikler şunlar: ortaya inmek görünmüyor ve puan getirmiyor, bu yüzden ustalaşmanın bir hedefi yok. Normal inişte titreşim yok. Tam kıvam penceresi keşfedilmesi zor bir gizli kural olarak kalıyor. 60. kuleden sonra zorluk düz.
+- **Geri gelme isteği: 7/10.** Gerçek saat ve hava, mevsim, özel günler, kartpostal ve kedi albümleri, günün haritası ve meydan okuma, türdeşlerin çoğundan zengin bir "yarın farklı olacak" katmanı kuruyor. Eksik olan, oturum içindeki kısa hedefler (görev ya da yakın ödül görseli) ve ilerlemeyi pratikle hızlandıran bir yol. Duraklar baştan oynanmak zorunda olduğu için geç semtler çoğu oyuncuya hiç görünmeyebilir (tahmin).
+
+web search: 
+web search: site:altosodyssey.com Alto's Odyssey goals 180 goals ...
+2026-11-26T10:34:42.706194Z ERROR codex_core::tools::router: error=patch rejected: writing is blocked by read-only sandbox; rejected by user approval settings
+codex
+Bu çalışma alanı oturumda **salt okunur** olduğundan `editor-kivilcim.md` dosyasını yazma girişimi engellendi. İstenen raporu aşağıya bırakıyorum; oyun koduna dokunmadım ve görsel üretmedim.
+
+# Kıvılcım — görsel tasarım ve karakter dili görüşü
+
+## A) Amcanın uçuşu ve inişi
+
+Mevcut karelerde gövde dik, kollar yanda ve yüz sakin kaldığı için eğim tek başına “uçuyor” hissi vermiyor. En az çizimle en görünür fark için **iki yeni ana poz** öneriyorum:
+
+1. **Havada rüzgâr pozu:** Gövde uçuş yönünün tersine hafif yatık; kollar omuzdan açılıp geriye savrulmuş, dirsekler yumuşak; dizler geride/toplu, ayak uçları farklı açıda. Gözler kısık, yanaklar rüzgârla geriye çekilmiş; bıyık ve ceket eteği geriye akıyor. Kalkıştan hemen sonra ve yükseliş boyunca gösterilsin; tepeye yaklaşınca mevcut nötr veya çömelme pozuna yumuşak geçsin.
+2. **İnişe hazırlanma:** Gövde dikleşmiş, kollar iki yana denge için açık (biri biraz önde), dizler belirgin bükülü ve ayaklar çatıyı arıyor. Gözler aşağıda, bıyık hafif yukarı kalkmış; ceket eteği hâlâ geride. Temastan yaklaşık 120–150 ms önce başlayıp inişin ilk ezilmesine bağlansın.
+
+Pijamada külah ve terlik; kışta bere, atkı ve mont; yağmurda yağmurluk; şemsiyeli yağmurda bir elde açık şemsiye korunmalı. Şemsiyeli karede diğer kol açık kalsın. **Poz başına 4 temel PNG** gerekir: normal, pijama, kış, yağmur. Şemsiyeli yağmur da ayrı çizilecekse poz başına bir ek PNG gelir: **toplam 8–10 PNG**. Mevcut özel gün şapkaları bindirme olarak kullanılabiliyorsa ayrıca tam poz çizimi gerekmeyebilir; hizalama kontrolü gerekir. İlk adım yalnız havadaki rüzgâr pozu olursa **4–5 PNG** yeter.
+
+Tek parça PNG’nin tamamı kodla ayaktan en fazla ±12° döndürülüp kalkışta kısa esnetilebilir. Bu, gövde çizgisini iyileştirir ama kolları açmaz. **Kolları bağımsız döndürmek için kolun ayrı şeffaf parça olması gerekir**; mevcut tek parça görselde kodla eklem yaratmak temiz sonuç vermez. Her görsel üretim çağrısı ayrıca onaylanmalı; üretilen görsel kabul edilmeden oyuna bağlanmamalı.
+
+## B) Duraklara amaç ve ödül fikirleri
+
+| Fikir | Tek dokunuşla işleyiş ve sonraki durak hedefi | Kartpostal/kedi bağı | Yeni görsel | Puan/kule üretimi | Efor |
+|---|---|---|---:|---|---|
+| **Sefer bileti damgaları** | Her durağa ilk varışta bilete semt damgası basılır; sonraki damga silik görünür. | Kartpostal açılışı bilete işlenir; durak kedisi varsa pati damgası eklenir. | 1 bilet şablonu; 12 damga kartpostallardan türetilebilir | Dokunmaz | S |
+| **Semt hatırası** | Durak çatısında görülen semte özgü eşya inişle koleksiyona eklenir: Kanlıca yoğurt kasesi, Beykoz camı gibi. | Kartpostal arkası eşyanın kısa hikâyesini tamamlar; kediye bir anekdot bağlanabilir. | 12 eşya ikonu | Dokunmaz | M |
+| **Muhtarın üç işi** | Her koşuda üç kısa görev: iki kediyle tanış, üç kez tam ortaya in, bir sıçrayışta iki kule geç. Biten iş bilette işaretlenir. | Görevlerden biri kedi karşılaşmasına yönlendirir; kartpostal yeni semt hedefi olur. | 0–1 bilet/işaret görseli | Mevcut puan ve üretime dokunmaz. Tam orta puan bonusu eklenirse ayrı onay gerekir. | M |
+| **Eksik kartpostal notu** | Kartın arkasındaki kısa cümlenin kelimeleri farklı semtlerde otomatik toplanır; oyuncunun ek dokunuşu gerekmez. | Kedi notu bir kelimeyi tamamlayabilir. | 12 kart arkası düzeni; yeni çizim şart değil | Dokunmaz | M |
+| **Boğaz selamları** | Bazı duraklarda teyze, kedi veya karga görünür; güvenli inişten sonra kısa selam sahnesi açılır. | Kedi defteri ve kartpostal aynı semt anısına bağlanır. | 0 yeni; mevcut görseller | Dokunmaz | S–M |
+| **Tek dokunuşlu semt bilmecesi** | Durak bandında kısa bir soru görünür; iniş sonrası kartta bir seçim yapılır. Doğru cevap dekoratif hatıra açar. | Cevap kartpostal arkasında açıklanır; kediler ipucu karakteri olabilir. | 0–12 küçük ikon | Dokunmaz | M; akışı kesme riski |
+
+**En iyi iki seçimim:**
+
+1. **Sefer bileti damgaları:** Var olan 12 durak ve kartpostal ilerlemesini tek, anlaşılır koleksiyonda görünür kılar. Yeni mekanik veya dünya kuralı eklemeden “bir durak daha” hedefi verir.
+2. **Muhtarın üç işi:** Her koşuda ulaşılabilir kısa hedef sunar; görevleri doğal inişlere ve mevcut kedi karşılaşmalarına bağlayarak tek dokunuş ritmini korur. Ödüller kozmetik veya ilerleme olmalı. Tam orta iniş için yeni puan verilmesi puan kuralını değiştirir ve ayrıca onay gerektirir. Kule dizisini değiştiren bir fikir önermiyorum.
+
+## C) Türden alınabilecek amaç kalıpları
+
+- **Alto’s Odyssey:** 180 küçük hedef, ana koşuyu tekrar oynatıyor; Zen modu hedef baskısı olmadan aynı hissi sunuyor. Byzantion’a uygun ders: ayrı kontrol gerektirmeyen kısa görevler. [Resmî basın kiti](https://altosodyssey.com/press/)
+- **Subway Surfers:** Üçlü görev seti ve harf/kelime toplama, koşu içinde küçük hedefler yaratıyor. Burada HUD’ı dolduran harf avı yerine semt damgası veya otomatik görev sayacı daha uygun. [Missions](https://sybo.helpshift.com/hc/en/5-subway-surfers/faq/143-missions/), [Word Hunt](https://sybo.helpshift.com/hc/en/5-subway-surfers/faq/134-word-hunt/)
+- **Crossy Road:** Oynayarak açılan karakter koleksiyonu skor dışı kalıcı ilerleme sağlıyor. Byzantion’da bunun karşılığı yeni oynanış karakterleri yerine semt hatıraları ve kartpostallar olabilir. [Oyun özeti](https://time.com/3602328/crossy-road/)
+- **Jetpack Joyride:** Görevleri bitirip yenisini alma döngüsü kısa oturumlara hedef veriyor; görevler koşu içinde sayılabilir ve anlaşılır olmalı. [Görev sistemi özeti](https://en.wikipedia.org/wiki/Jetpack_Joyride)
+- **Tiny Wings:** Tek düğmeli beceri döngüsüne görev ve yuva ilerlemesi ekliyor; amaç ana mekanikle aynı ritimde kalıyor. [App Store](https://apps.apple.com/us/app/tiny-wings/id417817520)
+- **Monument Valley:** Bulmaca hedefi, ana mekaniğe uygun ve özel tasarlanmış seviyelerde çalışıyor. Byzantion’un kesintisiz atlayışına yeni bir bulmaca kontrolü eklemek yerine bilmeceyi durak kartına, yani iniş sonrasına koymak daha uygun. [Resmî SSS](https://monumentvalleygame.squarespace.com/faq)
+
+Stick Hero ve Mini Metro’dan çıkarılabilecek genel ders, beceriyi net bir ölçüyle görünür kılmak ve bulmacayı ana döngü taşıyabildiğinde eklemek. Bu oyunda öncelik durak koleksiyonu ve kısa görevler; uçuş sırasında ek düğme ya da kule düzenine bağlı görev değil.
+tokens used
+69.083
+Bu çalışma alanı oturumda **salt okunur** olduğundan `editor-kivilcim.md` dosyasını yazma girişimi engellendi. İstenen raporu aşağıya bırakıyorum; oyun koduna dokunmadım ve görsel üretmedim.
+
+# Kıvılcım — görsel tasarım ve karakter dili görüşü
+
+## A) Amcanın uçuşu ve inişi
+
+Mevcut karelerde gövde dik, kollar yanda ve yüz sakin kaldığı için eğim tek başına “uçuyor” hissi vermiyor. En az çizimle en görünür fark için **iki yeni ana poz** öneriyorum:
+
+1. **Havada rüzgâr pozu:** Gövde uçuş yönünün tersine hafif yatık; kollar omuzdan açılıp geriye savrulmuş, dirsekler yumuşak; dizler geride/toplu, ayak uçları farklı açıda. Gözler kısık, yanaklar rüzgârla geriye çekilmiş; bıyık ve ceket eteği geriye akıyor. Kalkıştan hemen sonra ve yükseliş boyunca gösterilsin; tepeye yaklaşınca mevcut nötr veya çömelme pozuna yumuşak geçsin.
+2. **İnişe hazırlanma:** Gövde dikleşmiş, kollar iki yana denge için açık (biri biraz önde), dizler belirgin bükülü ve ayaklar çatıyı arıyor. Gözler aşağıda, bıyık hafif yukarı kalkmış; ceket eteği hâlâ geride. Temastan yaklaşık 120–150 ms önce başlayıp inişin ilk ezilmesine bağlansın.
+
+Pijamada külah ve terlik; kışta bere, atkı ve mont; yağmurda yağmurluk; şemsiyeli yağmurda bir elde açık şemsiye korunmalı. Şemsiyeli karede diğer kol açık kalsın. **Poz başına 4 temel PNG** gerekir: normal, pijama, kış, yağmur. Şemsiyeli yağmur da ayrı çizilecekse poz başına bir ek PNG gelir: **toplam 8–10 PNG**. Mevcut özel gün şapkaları bindirme olarak kullanılabiliyorsa ayrıca tam poz çizimi gerekmeyebilir; hizalama kontrolü gerekir. İlk adım yalnız havadaki rüzgâr pozu olursa **4–5 PNG** yeter.
+
+Tek parça PNG’nin tamamı kodla ayaktan en fazla ±12° döndürülüp kalkışta kısa esnetilebilir. Bu, gövde çizgisini iyileştirir ama kolları açmaz. **Kolları bağımsız döndürmek için kolun ayrı şeffaf parça olması gerekir**; mevcut tek parça görselde kodla eklem yaratmak temiz sonuç vermez. Her görsel üretim çağrısı ayrıca onaylanmalı; üretilen görsel kabul edilmeden oyuna bağlanmamalı.
+
+## B) Duraklara amaç ve ödül fikirleri
+
+| Fikir | Tek dokunuşla işleyiş ve sonraki durak hedefi | Kartpostal/kedi bağı | Yeni görsel | Puan/kule üretimi | Efor |
+|---|---|---|---:|---|---|
+| **Sefer bileti damgaları** | Her durağa ilk varışta bilete semt damgası basılır; sonraki damga silik görünür. | Kartpostal açılışı bilete işlenir; durak kedisi varsa pati damgası eklenir. | 1 bilet şablonu; 12 damga kartpostallardan türetilebilir | Dokunmaz | S |
+| **Semt hatırası** | Durak çatısında görülen semte özgü eşya inişle koleksiyona eklenir: Kanlıca yoğurt kasesi, Beykoz camı gibi. | Kartpostal arkası eşyanın kısa hikâyesini tamamlar; kediye bir anekdot bağlanabilir. | 12 eşya ikonu | Dokunmaz | M |
+| **Muhtarın üç işi** | Her koşuda üç kısa görev: iki kediyle tanış, üç kez tam ortaya in, bir sıçrayışta iki kule geç. Biten iş bilette işaretlenir. | Görevlerden biri kedi karşılaşmasına yönlendirir; kartpostal yeni semt hedefi olur. | 0–1 bilet/işaret görseli | Mevcut puan ve üretime dokunmaz. Tam orta puan bonusu eklenirse ayrı onay gerekir. | M |
+| **Eksik kartpostal notu** | Kartın arkasındaki kısa cümlenin kelimeleri farklı semtlerde otomatik toplanır; oyuncunun ek dokunuşu gerekmez. | Kedi notu bir kelimeyi tamamlayabilir. | 12 kart arkası düzeni; yeni çizim şart değil | Dokunmaz | M |
+| **Boğaz selamları** | Bazı duraklarda teyze, kedi veya karga görünür; güvenli inişten sonra kısa selam sahnesi açılır. | Kedi defteri ve kartpostal aynı semt anısına bağlanır. | 0 yeni; mevcut görseller | Dokunmaz | S–M |
+| **Tek dokunuşlu semt bilmecesi** | Durak bandında kısa bir soru görünür; iniş sonrası kartta bir seçim yapılır. Doğru cevap dekoratif hatıra açar. | Cevap kartpostal arkasında açıklanır; kediler ipucu karakteri olabilir. | 0–12 küçük ikon | Dokunmaz | M; akışı kesme riski |
+
+**En iyi iki seçimim:**
+
+1. **Sefer bileti damgaları:** Var olan 12 durak ve kartpostal ilerlemesini tek, anlaşılır koleksiyonda görünür kılar. Yeni mekanik veya dünya kuralı eklemeden “bir durak daha” hedefi verir.
+2. **Muhtarın üç işi:** Her koşuda ulaşılabilir kısa hedef sunar; görevleri doğal inişlere ve mevcut kedi karşılaşmalarına bağlayarak tek dokunuş ritmini korur. Ödüller kozmetik veya ilerleme olmalı. Tam orta iniş için yeni puan verilmesi puan kuralını değiştirir ve ayrıca onay gerektirir. Kule dizisini değiştiren bir fikir önermiyorum.
+
+## C) Türden alınabilecek amaç kalıpları
+
+- **Alto’s Odyssey:** 180 küçük hedef, ana koşuyu tekrar oynatıyor; Zen modu hedef baskısı olmadan aynı hissi sunuyor. Byzantion’a uygun ders: ayrı kontrol gerektirmeyen kısa görevler. [Resmî basın kiti](https://altosodyssey.com/press/)
+- **Subway Surfers:** Üçlü görev seti ve harf/kelime toplama, koşu içinde küçük hedefler yaratıyor. Burada HUD’ı dolduran harf avı yerine semt damgası veya otomatik görev sayacı daha uygun. [Missions](https://sybo.helpshift.com/hc/en/5-subway-surfers/faq/143-missions/), [Word Hunt](https://sybo.helpshift.com/hc/en/5-subway-surfers/faq/134-word-hunt/)
+- **Crossy Road:** Oynayarak açılan karakter koleksiyonu skor dışı kalıcı ilerleme sağlıyor. Byzantion’da bunun karşılığı yeni oynanış karakterleri yerine semt hatıraları ve kartpostallar olabilir. [Oyun özeti](https://time.com/3602328/crossy-road/)
+- **Jetpack Joyride:** Görevleri bitirip yenisini alma döngüsü kısa oturumlara hedef veriyor; görevler koşu içinde sayılabilir ve anlaşılır olmalı. [Görev sistemi özeti](https://en.wikipedia.org/wiki/Jetpack_Joyride)
+- **Tiny Wings:** Tek düğmeli beceri döngüsüne görev ve yuva ilerlemesi ekliyor; amaç ana mekanikle aynı ritimde kalıyor. [App Store](https://apps.apple.com/us/app/tiny-wings/id417817520)
+- **Monument Valley:** Bulmaca hedefi, ana mekaniğe uygun ve özel tasarlanmış seviyelerde çalışıyor. Byzantion’un kesintisiz atlayışına yeni bir bulmaca kontrolü eklemek yerine bilmeceyi durak kartına, yani iniş sonrasına koymak daha uygun. [Resmî SSS](https://monumentvalleygame.squarespace.com/faq)
+
+Stick Hero ve Mini Metro’dan çıkarılabilecek genel ders, beceriyi net bir ölçüyle görünür kılmak ve bulmacayı ana döngü taşıyabildiğinde eklemek. Bu oyunda öncelik durak koleksiyonu ve kısa görevler; uçuş sırasında ek düğme ya da kule düzenine bağlı görev değil.

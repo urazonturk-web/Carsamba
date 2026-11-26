@@ -2074,3 +2074,4 @@ TESLIM_HAZIR: KURUKAFA-ALT-YAZI — Kurukafa alt satırı koyu hap + krem yazıy
 TESLIM_HAZIR: VIDEO-1256 — Kurukafa hap yazısı ve uzun atış ipucu düzeltmesi telefonda doğrulandı (AI_REVIEW.md); kısa/patladı ipuçları henüz cihazda görülmedi.
 TESLIM_HAZIR: HAREKET-2026-11-26 — amcanın uçuş/iniş hareketleri için 3 editör + Kıvılcım değerlendirmesi, ai_review_evidence/HAREKET-2026-11-26/RAPOR.md; Paket A (çizimsiz) ve Paket B (8-10 yeni PNG, Kıvılcım onayı) kullanıcı kararı bekliyor.
 TESLIM_HAZIR: HAREKET-PAKET-A — uçuşta eğilme/esneme/diz pozu, hıza göre iniş çökmesi, kenar sallanması, tepki kuralları; telefona kuruldu (HAREKET PAKET A); kullanıcı videosu bekleniyor.
+TESLIM_HAZIR: AMAC-2026-11-26 — kollar (3 yeni uçuş pozu), takılma ölçümü (yeni paketle gelmedi), oyunun amacı (yapboz kartpostal, teyzenin siparişi, Limon'un izi…) raporu ai_review_evidence/AMAC-2026-11-26/RAPOR.md; Kıvılcım çağrıları, Instruments ölçümü ve amaç seçimi kullanıcı kararı bekliyor.
