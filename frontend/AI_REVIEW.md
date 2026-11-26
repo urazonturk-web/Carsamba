@@ -3365,3 +3365,9 @@ Kullanıcı: "fena olmamış (fener). ama havada süzülürken daha farklı gör
 ### OPEN_ISSUES
 - Telefonda ve simülatörde kenar inişi görülmedi (simülatörde kenara indirmek denetlenemiyor). Kıyafetliyken kollu poz yok (yalnız sallanma).
 - "Havada daha farklı görseller": yeni poz çizimi gerekir (Kıvılcım; DURAK-OYUN-2026-11-26 S1–S5 istemleri hazır), kullanıcı onayı bekliyor.
+
+## UCUS-POZ — Kıvılcım "ağır çekim süzülme" önizlemesi — 2026-11-26
+- Kullanıcı onayı: "Yes, draw it" → 1 görsel üretim çağrısı (codex exec, image_generation; ilk deneme klasör güven kontrolünde çağrı yapılmadan durdu, ikinci deneme 1 üretim yaptı).
+- Dosya: ai_review_evidence/UCUS-POZ-2026-11-26/amca-ucus-suzulme.png (1100×1103 RGBA; Kıvılcım 1300×1210 üretti, oranı koruyarak 1100×1103 tuvale küçülttü), karsilastirma.jpg (duruş / denge / yeni poz yan yana).
+- Gözlem: aynı karakter ve üslup; sağa bakıyor; makas bacak, önde bıçak gibi kol, arkada kol, ceket ve saç geriye savruluyor, yüz "havalı ciddi". Ölçek: baş genişliği referansın ~%87'si (küçültme nedeniyle) — bağlanırsa poz ölçeği ~1,15 ile denkleştirilmeli; pivot (baş hizası) ölçülmeli.
+- KABUL EDİLMEDİ: oyuna bağlanmadı; kullanıcı kararı bekliyor. Kıyafetli sürümler (yağmur vb.) yok.
