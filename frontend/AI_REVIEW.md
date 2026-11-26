@@ -3396,3 +3396,8 @@ EVIDENCE:
 3. Katman: ReactionLayer içinde, süzülme ile aynı kural (kıyafet görünmüyorken, düşüş yokken); PoseLayer şarj pozlarını ucusKol ≥ 1 iken gizler.
 4. Risk: kıyafetli (yağmur/kış/pijama) sürümler yok → kıyafette eski pozlar. Fırlamada ayak ucu kalkışın ilk karelerinde çatı çizgisinin biraz altına inebilir (görsel). Simülatörde görüldü (sim-firlama-suzulme-dalis.jpg, 15 kare/sn); telefonda kuruldu, kullanıcı videosuyla doğrulanmadı.
 OPEN_ISSUES: telefonda akış ve baş ölçeği sıçraması gözle denetlenecek.
+
+## GECIS-VIDEO — zıplama geçişleri rapor turu — 2026-11-26
+TASK: Kullanıcı videosu 19:57, "geçişler sert" → 3 editör + Kıvılcım. Kod değişmedi.
+EVIDENCE: ai_review_evidence/GECIS-VIDEO-2026-11-26/ (RAPOR.md, editor-*.md, kivilcim-gorusu.md, 60 fps şeritler). Ölçüm: her poz değişimi tek karede; en sert dalış→duruş 8,45 sn; ARA_KARE_EGIM ve darbe yönünden 11–13° tek kare açı sıçraması (kod okuması + video).
+NEXT: Paket 1 (çizimsiz) kullanıcı onayı bekliyor.
