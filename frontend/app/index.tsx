@@ -61,6 +61,7 @@ import { MAHALLE_ON, MAHALLE_SPEECH_ON, CUMBA_SOURCE, CUMBA_KEDI_SOURCE, CUMBA_A
 import { OZEL_GUN_ON, OZEL_GUN_TEST_TAP, OZEL_GUNLER, OZEL_GUN_TEST_ORDER, todaysEvent } from "../src/game/ozelGun";
 import { HAREKET_ON, ucusEgim, ucusPoz, EGIM_HIZ, ESNE_BOY, ESNE_EN, SALLAN_DERECE, KABAR_ORAN, OHBE_MAX } from "../src/game/hareket";
 import BagajIstifi, { BAGAJ_ON, BAGAJ_TEST, BAGAJ_DURAK } from "../src/game/BagajIstifi";
+import { FENER_ON, FENER_MIN, FENER_MAX, FENER_BOY, FENER_KAYNAK, FENER_MESAJ, FENER_BAS, FENER_TEST, fenerAktif } from "../src/game/fener";
 import { IPUCU_ON, IPUCU_MAX, IPUCU_KEY, IPUCU_METIN, HIZLI_TEKRAR_MS } from "../src/game/ipucu";
 import { HANIM_ON, ICSES_ON, LAKAP_ON, newRunStats, noteLanding, icSesAfterLanding, icSesIdle, hanimMessage, lakap } from "../src/game/amcaSesi";
 import { jumpVelocity, advanceFlight } from "../src/game/jump";
@@ -388,7 +389,7 @@ const AnimatedImage = Animated.createAnimatedComponent(Image);
 const BG_SCROLL_TEST = true as boolean;
 const BG_SCROLL_RATIO = 0.45;
 const BG_SCROLL_TILES = 4;
-const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "KOL ACIK, BULMACA KAPALI") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
+const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "KIZARAN YUZ FENER") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
 const DIAG_MAX_EXAMPLES = 6;
 const HOUSE_AB_FROZEN = false as boolean;
 // REVIZYON-066 experiment (one variable): expo-linear-gradient's iOS layer
@@ -1405,6 +1406,9 @@ export default function Game() {
   const ucusEsne = useSharedValue(0);
   const sallan = useSharedValue(0);
   const kabar = useSharedValue(0);
+  // KIZARAN YÜZ FENER: sis görünürlüğü (0..1) ve ışık ölçeği. Yalnız çizim.
+  const fenerOp = useSharedValue(0);
+  const fenerS = useSharedValue(FENER_MIN);
   const camX = useSharedValue(0);
   // Render Y is fixed at the spawn composition for the entire life.
   const camYR = useSharedValue(0);
@@ -2011,6 +2015,9 @@ export default function Game() {
     }
     if (SFX_ON && towersCrossed > 1) playSfx("multi");
     if (SFX_ON) mahalleSes({ tur: "inis", perfect, ratio, towersCrossed });
+    if (FENER_ON && !raceRef.current && (FENER_TEST ? landedId === 1 : landedId - towersCrossed < FENER_BAS && landedId >= FENER_BAS)) {
+      showToast(FENER_MESAJ);
+    }
     if (BEDEN_ON) {
       // İniş başına tek karar (öncelik: 3+ kule > kıl payı > kusursuz); çoğu inişte tepki yok.
       let k = towersCrossed >= 3 ? 3 : ratio <= 0.12 || ratio >= 0.88 ? 2 : perfect > 0 ? 1 : 0;
@@ -2847,6 +2854,14 @@ export default function Game() {
       const hedef = phase.value === PHASE.AIRBORNE && dusus.value === 0 ? ucusEgim(vy.value, ucusV0.value, releasedCharge.value) : 0;
       ucusAci.value += (hedef - ucusAci.value) * Math.min(1, dt * EGIM_HIZ);
     }
+    if (FENER_ON) {
+      const sis = fenerAktif(lastLandedId.value) ? 1 : 0;
+      fenerOp.value += (sis - fenerOp.value) * Math.min(1, dt * 2.5);
+      const c = phase.value === PHASE.CHARGING ? charge.value : phase.value === PHASE.AIRBORNE ? releasedCharge.value : 0;
+      const hedefS = FENER_MIN + (FENER_MAX - FENER_MIN) * Math.max(0, Math.min(1, c));
+      // Kızarma hızlı açılır, inince yavaş söner.
+      fenerS.value += (hedefS - fenerS.value) * Math.min(1, dt * (hedefS > fenerS.value ? 14 : 2.2));
+    }
 
     fps.value = fps.value * 0.9 + (1 / dt) * 0.1;
     const list = platforms.value;
@@ -3344,6 +3359,16 @@ export default function Game() {
     };
   });
   const HAREKET_FEET_DX = SOLE_CENTER_OFFSET + ANCHOR_SHIFT_PX * SPRITE_SCALE;
+  const fenerStyle = useAnimatedStyle(() => {
+    const op = fenerOp.value;
+    // Işık amcanın yüzünde: ayak noktasından gövde boyunun ~%75'i yukarı.
+    const cx = px.value + HAREKET_FEET_DX;
+    const cy = py.value + PH / 2 - FART_CHAR_H * 0.75;
+    return {
+      opacity: op,
+      transform: [{ translateX: cx - FENER_BOY / 2 }, { translateY: cy - FENER_BOY / 2 }, { scale: fenerS.value }],
+    };
+  });
   const charOpStyle = useAnimatedStyle(() => {
     if (!HAREKET_ON) return { opacity: charOp.value };
     // HAREKET: tüm amca (pozlar, hale, kıyafetler) ayak noktası etrafında döner/esner; iniş yeri kaymaz.
@@ -4054,6 +4079,12 @@ export default function Game() {
           onError={failArt}
         />
         </Animated.View>
+        {/* KIZARAN YÜZ FENER: sis katmanı amcanın üstünde; ortası açık, şarjla büyür (yalnız çizim). */}
+        {FENER_ON && (
+          <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, width: FENER_BOY, height: FENER_BOY }, fenerStyle]}>
+            <Image source={FENER_KAYNAK} style={{ width: "100%", height: "100%" }} resizeMode="stretch" fadeDuration={0} />
+          </Animated.View>
+        )}
 
       </Animated.View>
 

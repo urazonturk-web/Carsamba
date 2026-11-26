@@ -3335,3 +3335,18 @@ Kullanıcı: (1) bulmacadan sonra havada gaz kalıyor; (2) bulmaca aşağı/orta
 
 ## Bulmaca kapatıldı — 2026-11-26
 Kullanıcı: "bulmacadan vazgeçtim … başka ekrana geçmeyelim". src/game/BagajIstifi.tsx `BAGAJ_ON = false` (kod duruyor, hiç açılmaz). BUILD_TAG "KOL ACIK, BULMACA KAPALI"; telefona kuruldu. Uçuşta açık kol ve gaz düzeltmesi aynen duruyor. Yerine oyun içi durak olayları değerlendirmesi: ai_review_evidence/OYUNICI-OLAY-2026-11-26/RAPOR.md.
+
+## KIZARAN YÜZ FENER (prototip) — 2026-11-26
+### TASK
+Kullanıcı: "Yes, build it" (ai_review_evidence/YARATICI-OLAY-2026-11-26/RAPOR.md, en iyi 1). Sisli bölümde basılı tutmak hem güç hem görüş.
+### CHANGED
+- src/game/fener.ts (yeni): FENER_ON/TEST, sisli bölüm kule 17–22 (Harem'den hemen sonra), ışık ölçeği 0,45 (şarjsız) → 1,8 (tam şarj), giriş mesajı.
+- assets/environment/fener-sis.png (yeni, kodla üretildi — Kıvılcım değil): 1024², ortası saydam, %3,5'ten %10 yarıçapa yumuşak geçişle koyu lacivert (12,16,36) %90 opak.
+- app/index.tsx: dünya katmanında amcanın üstünde sis görseli (8000 dünya birimi), merkezi amcanın yüzünde; oyun döngüsünde sis görünürlüğü (kule kimliğine göre, yumuşak) ve ışık ölçeği (CHARGING'de şarj, havada bırakılan şarj; açılış hızlı, sönüş yavaş). Sise ilk girişte toast: "🌫️ Sis bastı! Basılı tut: amcanın yüzü kızarsın, yol aydınlansın." BUILD_TAG "KIZARAN YUZ FENER".
+- Fizik, kamera, çarpışma, puan, kule üretimi DEĞİŞMEDİ (yalnız çizim).
+### EVIDENCE
+- Simülatör (geçici FENER_TEST, ilk 6 kule): şarjsız hâlde amcanın çevresi açık, uzak kuleler kararık; basılı tutunca ışık büyüdü. İlk ayarda (2,6) tam şarjda ekran tamamen aydınlanıyordu → 1,8'e indirildi (bu değer simülatörde yeniden görülmedi).
+- tsc: yalnız önceden var olan 4 hata.
+### OPEN_ISSUES
+- Telefonda 17–22. kulelerde görülmedi; takılmaya etkisi ölçülmedi (tek büyük görsel katmanı, opaklık 0 iken çizilmez).
+- Işık aralığı (0,45–1,8) ve sisli bölüm uzunluğu oyun hissine göre ayar ister. Zorluk fiilen artar: hafif kural etkisi (eleştirmen notu).
