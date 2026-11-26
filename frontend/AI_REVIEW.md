@@ -3420,3 +3420,8 @@ EVIDENCE:
 2. Ölçü/pivot: yüz (ten blob) alanından ölçek; itiş 711×1520 (379,1399), açılma 1162×1273 (751,1176), toplanma 1260×1260 (710,1227), uzanma 514×1098 (210,1092), çökme 558×1141 (278,1135). Havadakiler yüz (+77,−838); itiş yüz (+100,−1000); uzanma ayaklar pivotta; çökme ayak ortası pivot −86.
 3. Katman: ReactionLayer k 7–11, tek gövde kuralı aynı (KOL_K[uk] === k).
 4. Risk: kıyafetli/kirli (patladı) hâlde eski pozlar; uzanma bacakları istenenden bükük; 11 tepki katmanı (5 yeni görünmez katman) performans etkisi telefonda ölçülmedi. Simülatör: sim-ara-kareler.jpg (itiş→fırlama→açılma→süzülme→toplanma→dalış sırası görünüyor; bu atış düşüşle bitti, iniş çökmesi bu kayıtta yok). Telefona kuruldu, kullanıcı videosuyla doğrulanmadı.
+
+## GECIS-VIDEO3 — 21:22 videosu "şimdi daha sert" — 2026-11-26
+GÖZLEM (30 kare/sn, ziplama-yakin.jpg): uzun atışta 7 poz değişimi, her biri tek karede; pozlar 60–600 ms arası düzensiz kalıyor. Ölçüm (oyun-olcegi.jpg, oyundaki kutu/pivotlarla): çizimler arası baş boyu ±%20 (dalış büyük, uzanma/çökme küçük), gövde boyu ve oranı farklı, yüz ifadesi her karede değişiyor. Her değişimde ayrıca açı telafisi dönmesi biniyor (7 kez).
+DEĞERLENDİRME: ayrı ayrı üretilmiş tam gövde çizimleri birbirine tutarlı değil; kare sayısı arttıkça "kart çevirme" etkisi artıyor. Kod değişmedi.
+NEXT: kullanıcı kararı — (A) havadaki 3 ara kareyi kaldır, iniş (uzanma + çökme) kalsın; (B) parçalı iskelet animasyonu (baş/gövde/kol/bacak ayrı, eklemden döner).
