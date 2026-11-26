@@ -3241,3 +3241,8 @@ Kullanıcı: "İlk paketi yap" (OYNANIS-2026-11-26/RAPOR.md §6.1). Fizik, kamer
 ### OPEN_ISSUES
 - Cihazda his/okunurluk kullanıcı videosuyla doğrulanmadı. İpucu sayacı cihazda kalıcı (5 kez sonra çıkmaz).
 - Telefon (2026-11-26): Release derlendi, `strings main.jsbundle | grep -c OYNANIS PAKET 1` = 1, devicectl "App installed".
+
+## OYNANIS-PAKET-1 ipucu metinleri: "evlat" seti (2026-11-26)
+- Kullanıcı ilk metinleri beğenmedi ("bunları beğenmedim"), editörlere danışıldı (`ai_review_evidence/IPUCU-METIN-2026-11-26/`: Kıvılcım iç ses, diyalog editörü "evlat" seti), kullanıcı: "\"Evlat\" seti".
+- `src/game/ipucu.ts`: her duruma 2 satır (sırayla, ilk satır favori; kısa satırdaki "uçayım" Claude Code önerisiyle çıkarıldı). Sayaç anahtarı v1 → v2 (eski 5 hak sıfırlandı).
+- Telefon: Release, etiket "OYNANIS PAKET 1 EVLAT" (`strings` = 1); Türkçe harfli metinler pakette UTF-16 tutulduğu için `strings` görmüyor, Python ile UTF-16 aramasında "Fren de var evlat, biraz erken bırak." ve "Az bastın evlat! Biraz daha tut." bulundu. devicectl "App installed".
