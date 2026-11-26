@@ -2070,3 +2070,4 @@ TESLIM_HAZIR: OYNANIS-2026-11-26 — oynanabilirlik değerlendirmesi (Kıvılcı
 TESLIM_HAZIR: OYNANIS-PAKET-1 — hataya göre ipucu, "Tam isabet!", oyun sonu kartında sonraki durak çubuğu + bulanık kartpostal, boş yere dokunarak hızlı yeniden başlama; telefona kuruldu (OYNANIS PAKET 1), kanıt AI_REVIEW.md; kullanıcı videosu bekleniyor.
 TESLIM_HAZIR: OYNANIS-PAKET-1-EVLAT — oyun sonu ipuçları "evlat" setiyle değişti (6 satır, sırayla), telefona kuruldu (OYNANIS PAKET 1 EVLAT); kanıt AI_REVIEW.md, editör görüşleri ai_review_evidence/IPUCU-METIN-2026-11-26/.
 TESLIM_HAZIR: OYNANIS-PAKET-1-IPUCU2 — uzun atışta ipucu çıkmaması düzeltildi, sayaç sıfırlandı, telefona kuruldu (OYNANIS PAKET 1 IPUCU2); sandbox geri yükleme videoda doğrulandı; Kurukafa alt yazısı stili kullanıcı kararı bekliyor.
+TESLIM_HAZIR: KURUKAFA-ALT-YAZI — Kurukafa alt satırı koyu hap + krem yazıya çevrildi, telefona kuruldu (OYNANIS PAKET 1 KURUKAFA YAZI); telefonda görülmesi bekleniyor.

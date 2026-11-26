@@ -3261,3 +3261,14 @@ Kullanıcı videosu (11:51, 124 sn) denetimi: evlat ipuçları, hızlı yeniden 
 ### OPEN_ISSUES
 - Kurukafa alt yazısı ("Kuleler %27 küçüldü · 4 zıplama") `bigPopSub` stilinde renksiz, 40 pt siyah sistem yazısı olarak çıkıyor; stil 7309bd5'ten beri emoji için tanımlı. Bu değişiklikle ilgisi yok, kullanıcı kararı bekliyor.
 - Düzeltme cihazda henüz görülmedi.
+
+## Kurukafa alt yazısı stili — 2026-11-26
+### TASK
+Kullanıcı onayı ("Yes, fix it"): Kurukafa alındığında çıkan "Kuleler %N küçüldü/büyüdü · N zıplama" satırı renksiz 40 pt siyah sistem yazısıydı (bigPopSub emoji için tanımlı, 7309bd5).
+### CHANGED
+- app/index.tsx PerfectPop: alt satırda harf varsa `bigPopSubPill` (koyu yarı saydam hap, rgba(32,20,12,0.72)) içinde `bigPopSubText` (krem #fff8ec, 16 pt, 800) çiziliyor; yalnız emoji/sayı olan alt satırlar (👏 🔥 🚀, "+N 👌", 💨) eski bigPopSub ile aynı kalıyor. Stil oyundaki "Basılı tut… bırak, zıpla!" hapıyla aynı.
+- BUILD_TAG "OYNANIS PAKET 1 KURUKAFA YAZI".
+### EVIDENCE
+- tsc: yalnız önceden var olan 4 hata (src/theme.ts), yeni hata yok.
+### OPEN_ISSUES
+- Simülatörde veya telefonda Kurukafa anı görülmedi (kurukafayı yakalamak elle oynamayı gerektiriyor); kullanıcı videosu bekleniyor.
