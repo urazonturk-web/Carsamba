@@ -106,7 +106,7 @@ function PoseLayer({ i, px, py, poseCharge, scale, feetCenterOffset, feetHalf, l
     const outfit = Math.max(rain ? rain.value : 0, winter ? winter.value : 0, pajama ? pajama.value : 0, dirty ? dirty.value : 0,
       umbrella ? umbrella.value : 0, snow ? snow.value : 0, eventHat ? 1 : 0);
     const giysi = 0; // hiçbir kıyafet düşüşü engellemez
-    const kolAcik = !!ucusKol && ucusKol.value === 1 && outfit <= 0.01;
+    const kolAcik = !!ucusKol && ucusKol.value >= 1 && outfit <= 0.01;
     const hideAll = reactionVisible(tk, ph, outfit) || fallVisible(dusus ? dusus.value : 0, giysi) || kolAcik; // tepki/düşüş/uçuş kolu varken şarj/idle pozu çizilmez
     return {
       opacity: hideAll ? 0 : poseOpacity(i, poseCharge.value),
@@ -336,7 +336,9 @@ function ReactionLayer({ k, px, py, poseCharge, scale, feetCenterOffset, feetHal
     const giysi = 0; // hiçbir kıyafet düşüşü engellemez
     const dusuyor = fallVisible(dusus ? dusus.value : 0, giysi);
     // Başka bir tepki pozu (silkele/oh be) çiziliyorsa kollu poz eklenmez: aynı anda iki gövde yok.
-    const kolAcik = k === 2 && !!ucusKol && ucusKol.value === 1 && outfit <= 0.01 && (tk === 0 || tk === 2 || ph !== 0);
+    // ucusKol: 1 = kollar açık denge pozu (k 2), 2 = uçuş tepesinde süzülme pozu (k 4).
+    const uk = ucusKol ? ucusKol.value : 0;
+    const kolAcik = ((k === 2 && uk === 1) || (k === 4 && uk === 2)) && outfit <= 0.01 && (tk === 0 || tk === 2 || ph !== 0);
     const on = ((tk === k && reactionVisible(tk, ph, outfit)) || kolAcik) && !dusuyor;
     const pulse = landPulse ? landPulse.value : 0;
     const sq = 1 - pulse * 0.14;

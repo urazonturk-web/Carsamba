@@ -85,6 +85,10 @@ export const REACTION_POSES = [
   { source: require("@/assets/characters/beden/amca-silkele.png"), w: 516, h: 1103, pivotX: 306, pivotY: 1103 },
   { source: require("@/assets/characters/beden/amca-denge.png"), w: 1100, h: 1103, pivotX: 629, pivotY: 1103 },
   { source: require("@/assets/characters/beden/amca-ohbe.png"), w: 1100, h: 1103, pivotX: 636, pivotY: 1103 },
+  // UCUS-POZ (2026-11-26, kullanıcı kabul: "Yes, add it"): Kıvılcım "ağır çekim süzülme" (k = 4, yalnız uçuşta).
+  // Kıvılcım 1300×1210 çizip 1100×1103'e küçülttü → referanstan ~%13 küçük; kutu ×1,15 büyütülür.
+  // Pivot: ağırlık merkezi (551,519)×1,15 + denge pozundaki merkez→ayak farkı (75,595) — gövde, duruş pozuyla aynı yerde.
+  { source: require("@/assets/characters/beden/amca-ucus-suzulme.png"), w: 1265, h: 1268, pivotX: 708, pivotY: 1192 },
 ] as const;
 
 /** Tepki pozu şu an görünür mü? Yalnız yerde (PHASE.IDLE) ve hiçbir kıyafet/efekt katmanı görünmüyorken.

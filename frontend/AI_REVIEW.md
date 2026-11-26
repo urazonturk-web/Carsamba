@@ -3371,3 +3371,11 @@ Kullanıcı: "fena olmamış (fener). ama havada süzülürken daha farklı gör
 - Dosya: ai_review_evidence/UCUS-POZ-2026-11-26/amca-ucus-suzulme.png (1100×1103 RGBA; Kıvılcım 1300×1210 üretti, oranı koruyarak 1100×1103 tuvale küçülttü), karsilastirma.jpg (duruş / denge / yeni poz yan yana).
 - Gözlem: aynı karakter ve üslup; sağa bakıyor; makas bacak, önde bıçak gibi kol, arkada kol, ceket ve saç geriye savruluyor, yüz "havalı ciddi". Ölçek: baş genişliği referansın ~%87'si (küçültme nedeniyle) — bağlanırsa poz ölçeği ~1,15 ile denkleştirilmeli; pivot (baş hizası) ölçülmeli.
 - KABUL EDİLMEDİ: oyuna bağlanmadı; kullanıcı kararı bekliyor. Kıyafetli sürümler (yağmur vb.) yok.
+
+## UCUS-POZ — süzülme pozu oyuna bağlandı — 2026-11-26
+Kullanıcı kabulü: "Yes, add it".
+1. **Dosya:** ai_review_evidence/UCUS-POZ-2026-11-26/amca-ucus-suzulme.png → assets/characters/beden/amca-ucus-suzulme.png (Kıvılcım, 1 çağrı).
+2. **Ölçü/pivot:** 1100×1103 tuval, çizim referanstan ~%13 küçük (Kıvılcım 1300×1210'u küçülttü) → çizim kutusu 1265×1268 (×1,15). Pivot (708, 1192): alfa ağırlık merkezi (551, 519)×1,15 + denge pozundaki merkez→ayak farkı (75, 595). Ölçüm yöntemi: alfa>40 piksel ortalaması (numpy).
+3. **Katman:** REACTION_POSES[3] (k 4), ReactionLayer ile aynı dönüşüm ve hale; ucusKol=2 iken görünür. ucusKol: uçuşta bırakılan şarj ≥0,4 ve vy/vy0 ∈ (−0,55, 0,4) → 2 (süzülme); diğer uçuş anları → 1 (kollar açık denge); kenarda duruş → 1. Aynı anda tek gövde (PoseLayer hideAll, başka tepki pozu varken eklenmez). Uçuş eğimi/esnemesi sarmalayıcıdan aynen uygulanır.
+4. **Risk:** kıyafetli sürüm yok (pijama/kış/yağmur/şemsiye/şapkada eski poz). Bellek: +1 büyük görsel ×5 (hale) ≈ 5 MB. Telefonda görülmedi; takılmaya etkisi ölçülmedi.
+- Kanıt: sim-ucus.jpg (simülatör: duruş, süzülme, iniş öncesi kollar açık; baş boyu diğer pozlarla uyumlu). tsc: yalnız önceden var olan 4 hata. BUILD_TAG "SUZULME POZU".
