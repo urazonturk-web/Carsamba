@@ -42,3 +42,26 @@ export function ucusPoz(vy: number, vy0: number) {
   if (r > -0.3) return 0.125;
   return 0;
 }
+
+/**
+ * Uçuş/kenar kol durumu: 0 normal poz, 1 kollar açık denge, 2 süzülme (uzun atışın tepesi).
+ * Hem çizim (ucusKol) hem geçiş yumuşatması aynı kuralı kullanır.
+ */
+export function kolDurumu(airborne: boolean, idle: boolean, dususVar: boolean, vy: number, vy0: number, birakilan: number, kenar: number) {
+  "worklet";
+  if (dususVar) return 0;
+  if (airborne) {
+    const r = vy / Math.max(1, vy0);
+    if (birakilan >= 0.4 && r > -0.55 && r < 0.4) return 2;
+    return r > -0.6 ? 1 : 0;
+  }
+  return idle && kenar !== 0 ? 1 : 0;
+}
+/** Poz değişiminde kısa "geçiş darbesi" sönüm hızı (1/sn) ve büyüklükleri: tek kare atlamayı gizler. */
+export const GECIS_SONUM = 9;
+export const GECIS_DONME = 9; // derece
+export const GECIS_ESNE = 0.1;
+/** Süzülürken canlılık: hafif dalgalanma (derece) ve nefes (ölçek), frekans Hz. */
+export const SUZUL_DALGA = 3.5;
+export const SUZUL_NEFES = 0.03;
+export const SUZUL_HZ = 1.8;

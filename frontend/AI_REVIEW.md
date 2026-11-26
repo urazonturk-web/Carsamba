@@ -3379,3 +3379,10 @@ Kullanıcı kabulü: "Yes, add it".
 3. **Katman:** REACTION_POSES[3] (k 4), ReactionLayer ile aynı dönüşüm ve hale; ucusKol=2 iken görünür. ucusKol: uçuşta bırakılan şarj ≥0,4 ve vy/vy0 ∈ (−0,55, 0,4) → 2 (süzülme); diğer uçuş anları → 1 (kollar açık denge); kenarda duruş → 1. Aynı anda tek gövde (PoseLayer hideAll, başka tepki pozu varken eklenmez). Uçuş eğimi/esnemesi sarmalayıcıdan aynen uygulanır.
 4. **Risk:** kıyafetli sürüm yok (pijama/kış/yağmur/şemsiye/şapkada eski poz). Bellek: +1 büyük görsel ×5 (hale) ≈ 5 MB. Telefonda görülmedi; takılmaya etkisi ölçülmedi.
 - Kanıt: sim-ucus.jpg (simülatör: duruş, süzülme, iniş öncesi kollar açık; baş boyu diğer pozlarla uyumlu). tsc: yalnız önceden var olan 4 hata. BUILD_TAG "SUZULME POZU".
+
+## UCUS-POZ — akıcılık — 2026-11-26
+- Kullanıcı (17:01 videosu): "brava güzel olmuş ama bu hareketi tek kare olarak düşünmeyelim. biraz daha akıcılığı olan bir eylem olsun".
+- Gözlem (video, 2 fps): poz değişimleri tek karede: dik uçuş → süzülme → kollar açık; süzülme boyunca poz donuk.
+- CHANGED: src/game/hareket.ts `kolDurumu` (çizim ve geçiş için tek kural) + sabitler; app/index.tsx oyun döngüsünde kol durumu değişince `kolGecis` darbesi (1→0, sönüm 9/sn): girişte öne, çıkışta geriye 9° dönme, %10 yatay esneme/%6 dikey basılma (ayak noktası etrafında, sarmalayıcıda); süzülme pozunda 1,8 Hz ±3,5° dalgalanma ve ±%3 nefes. Fizik/kamera/çarpışma aynı. BUILD_TAG "SUZULME AKICI".
+- EVIDENCE: simülatör 20 fps kareleri (sim-akici.jpg): süzülme ~0,65 sn, açılarda küçük değişimler görülüyor. Gerçek akıcılık ölçülemedi (simülatör), telefonda görülmedi.
+- OPEN: kod ancak geçişi gizleyebilir; gerçek ara kareler (fırlama → süzülme → iniş hazırlığı) için 2 ek Kıvılcım çizimi gerekir (S1 fırlama, S3 dalış istemleri hazır), kullanıcı onayı bekler.
