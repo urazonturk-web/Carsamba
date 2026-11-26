@@ -3315,3 +3315,20 @@ Kullanıcı: "Harem luggage puzzle" (rapor ai_review_evidence/DURAK-OYUN-2026-11
 ### OPEN_ISSUES
 - "Bagaj tamam!" (kazanma) sonu simülatörde görülmedi (süre yetmedi); kod yolu aynı.
 - Telefonda Harem'e varışla denenmedi. Android doğrulanmadı.
+
+## 14:12 videosu düzeltmeleri — 2026-11-26
+### TASK
+Kullanıcı: (1) bulmacadan sonra havada gaz kalıyor; (2) bulmaca aşağı/ortaya, renk skalamıza uygun, çözünce bir şey kazanılmalı; (3) amca hâlâ kazık gibi; (4) bulmacasız son hâl ayrıca kaydedilsin; (5) bütünlüğü bozuyor gibi.
+### CHANGED
+- (4) Bulmacasız son hâl: dal `bulmacasiz-son` (= 46568fa, Hareket Paket A dahil) GitHub'a yayınlandı; yerelde etiket `bulmacasiz-son-2026-11-26`. Ayrıca `BAGAJ_ON` bayrağı false yapılınca bulmaca tamamen kapanır.
+- (1) app/index.tsx: mola başında gaz izi (fartPuffs) temizlenir. Neden: gaz izinin saati (`fartNow`) yalnız son puftan sonraki ~1,3 sn güncelleniyor; uzun moladan sonra bulutlar eski zamanda donup kalıyordu.
+- (2) src/game/BagajIstifi.tsx: oyun kartı ortada, oyun sonu kartının dili (krem kâğıt #fbf3e4, kırmızı-lacivert pul şeridi, kesik çizgi çerçeve, lacivert süre hapı, son 15 sn kırmızı); bagaj gözü sıcak koyu kahve (#4a3a2e); arka plan daha az karartıldı (oyun görünür). Kart yüksekliği tüm parçalar tepsideyken hesaplanır.
+- (3) Uçuşta kollar açık: kalkışın ilk anından sonra (vy/vy0 > −0,6) mevcut `amca-denge.png` (kollar iki yana açık) gösterilir; ChargePoses `ucusKol`. Kıyafet (pijama/kış/yağmur/şapka) varken eski poz kalır (o pozun kıyafetli çizimi yok). Yeni çizim yok.
+- BAGAJ_TEST yalnız simülatör için: koşu başında bulmacayı açar; teslimde false.
+- BUILD_TAG "HAREM BAGAJ 2 + KOL".
+### EVIDENCE
+- Simülatör: uçuş karelerinde kollar açık "uçak" pozu; bulmaca kartı ortada krem kart olarak görüldü.
+- tsc: yalnız önceden var olan 4 hata.
+### OPEN_ISSUES
+- Ödül (2) kullanıcı kararı bekliyor (kurala dokunan seçenekler onay ister).
+- Kollu poz kıyafetli hâllerde yok; kalıcı çözüm yeni çizim (S1–S5, Kıvılcım onayı).

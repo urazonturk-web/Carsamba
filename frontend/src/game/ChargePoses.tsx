@@ -64,6 +64,9 @@ type Props = {
   // BEDEN DİLİ (2026-11-23): tepki 0 yok, 1 silkele, 2 denge, 3 oh be; phase = PHASE (0 yerde).
   tepki?: SharedValue<number>;
   tepkiP?: SharedValue<number>; // yerleşme ilerlemesi 0→1 (180 ms)
+  // HAREKET (2026-11-26, kullanıcı: "kazık gibi"): 1 iken uçuşta kolları açık denge pozu gösterilir
+  // (mevcut çizim; yalnız düz eşofmanda — kıyafet varken eski poz kalır).
+  ucusKol?: { value: number };
   dusus?: SharedValue<number>; // DÜŞÜŞ: 0 yok, 1/2 çırpınma karesi
   phase?: SharedValue<number>;
   onLoad?: () => void;
@@ -81,7 +84,7 @@ const DIRT_SPOTS = [
 ];
 const DIRT_COLORS = ["rgba(150,104,48,0.92)", "rgba(126,86,40,0.92)", "rgba(171,124,62,0.9)"];
 
-function PoseLayer({ i, px, py, poseCharge, scale, feetCenterOffset, feetHalf, landPulse, halo, strain, dirty, pajama, winter, snow, nose, breath, rain, rainLayers, eventHat, umbrella, umbOpen, umbFlip, offsetX, offsetY, tepki, phase, dusus, ...cb }: Props & { i: number }) {
+function PoseLayer({ i, px, py, poseCharge, scale, feetCenterOffset, feetHalf, landPulse, halo, strain, dirty, pajama, winter, snow, nose, breath, rain, rainLayers, eventHat, umbrella, umbOpen, umbFlip, offsetX, offsetY, tepki, phase, dusus, ucusKol, ...cb }: Props & { i: number }) {
   const pose = CHARGE_POSES[i];
   const style = useAnimatedStyle(() => {
     // Squash toward the FOOT line (feetHalf), not the sprite's own center,
@@ -103,7 +106,8 @@ function PoseLayer({ i, px, py, poseCharge, scale, feetCenterOffset, feetHalf, l
     const outfit = Math.max(rain ? rain.value : 0, winter ? winter.value : 0, pajama ? pajama.value : 0, dirty ? dirty.value : 0,
       umbrella ? umbrella.value : 0, snow ? snow.value : 0, eventHat ? 1 : 0);
     const giysi = 0; // hiçbir kıyafet düşüşü engellemez
-    const hideAll = reactionVisible(tk, ph, outfit) || fallVisible(dusus ? dusus.value : 0, giysi); // tepki/düşüş varken şarj/idle pozu çizilmez
+    const kolAcik = !!ucusKol && ucusKol.value === 1 && outfit <= 0.01;
+    const hideAll = reactionVisible(tk, ph, outfit) || fallVisible(dusus ? dusus.value : 0, giysi) || kolAcik; // tepki/düşüş/uçuş kolu varken şarj/idle pozu çizilmez
     return {
       opacity: hideAll ? 0 : poseOpacity(i, poseCharge.value),
       transform: [
@@ -322,7 +326,7 @@ function SnowLump({ b, scale }: { b: SnowBlob; scale: number }) {
 
 // BEDEN DİLİ: tepki pozu katmanı (k = 1..3). PoseLayer ile aynı dönüşüm ve hale; kıyafet katmanı yok
 // (kıyafet görünürken reactionVisible false olur, tepki hiç çizilmez).
-function ReactionLayer({ k, px, py, poseCharge, scale, feetCenterOffset, feetHalf, landPulse, halo, dirty, pajama, winter, snow, rain, eventHat, umbrella, offsetX, offsetY, tepki, tepkiP, phase, dusus }: Props & { k: number }) {
+function ReactionLayer({ k, px, py, poseCharge, scale, feetCenterOffset, feetHalf, landPulse, halo, dirty, pajama, winter, snow, rain, eventHat, umbrella, offsetX, offsetY, tepki, tepkiP, phase, dusus, ucusKol }: Props & { k: number }) {
   const pose = REACTION_POSES[k - 1];
   const style = useAnimatedStyle(() => {
     const tk = tepki ? tepki.value : 0;
@@ -330,7 +334,9 @@ function ReactionLayer({ k, px, py, poseCharge, scale, feetCenterOffset, feetHal
     const outfit = Math.max(rain ? rain.value : 0, winter ? winter.value : 0, pajama ? pajama.value : 0, dirty ? dirty.value : 0,
       umbrella ? umbrella.value : 0, snow ? snow.value : 0, eventHat ? 1 : 0);
     const giysi = 0; // hiçbir kıyafet düşüşü engellemez
-    const on = tk === k && reactionVisible(tk, ph, outfit) && !fallVisible(dusus ? dusus.value : 0, giysi);
+    const dusuyor = fallVisible(dusus ? dusus.value : 0, giysi);
+    const kolAcik = k === 2 && !!ucusKol && ucusKol.value === 1 && outfit <= 0.01;
+    const on = ((tk === k && reactionVisible(tk, ph, outfit)) || kolAcik) && !dusuyor;
     const pulse = landPulse ? landPulse.value : 0;
     const sq = 1 - pulse * 0.14;
     const bulge = 1 + pulse * 0.08;

@@ -112,12 +112,34 @@ export default function BagajIstifi({ onBitti }: { onBitti: (kazandi: boolean | 
   const pan = useRef(new Animated.ValueXY()).current;
   const tutma = useRef({ x: 0, y: 0, sx: 0, sy: 0, tepsi: false });
 
-  const cell = Math.floor(Math.min((W - 56) / COLS, 54));
+  // Yerleşim (14:12 videosu: "aşağı alıp ortala, renk skalamıza uygun"): her şey ortada, kartpostal
+  // kartı gibi krem bir kartın içinde. Kart yüksekliği tüm parçalar tepsideyken hesaplanır (sabit kalır).
+  const cardW = Math.min(W - 24, 380);
+  const cardX = Math.round((W - cardW) / 2);
+  const cell = Math.floor(Math.min((cardW - 40) / COLS, 52));
   const gridW = cell * COLS;
-  const gridX = Math.round((W - gridW) / 2);
-  const gridY = Math.round(H * 0.2);
+  const gridX = Math.round(cardX + (cardW - gridW) / 2);
   const tc = Math.round(cell * 0.6); // tepsi hücresi
-  const tepsiY = gridY + cell * ROWS + 34;
+  const trayX0 = cardX + 16, trayW = cardW - 32;
+  const akis = (list: Piece[], skip: (i: number) => boolean) => {
+    const pos: Record<number, { x: number; y: number }> = {};
+    let x = 0, y = 0, satirH = 0;
+    list.forEach((p, i) => {
+      if (skip(i)) return;
+      const b = boyut(p.cells);
+      if (x > 0 && x + b.w * tc > trayW) { x = 0; y += satirH + 12; satirH = 0; }
+      pos[i] = { x, y };
+      x += b.w * tc + 14;
+      satirH = Math.max(satirH, b.h * tc);
+    });
+    return { pos, h: y + satirH };
+  };
+  const tamTepsiH = useMemo(() => akis(parcalar, () => false).h, [parcalar, tc, trayW]); // eslint-disable-line react-hooks/exhaustive-deps
+  const HEAD = 86;
+  const cardH = 14 + HEAD + cell * ROWS + 24 + tamTepsiH + 20;
+  const cardY = Math.max(60, Math.round((H - cardH) / 2));
+  const gridY = cardY + 14 + HEAD;
+  const tepsiY = gridY + cell * ROWS + 24;
 
   useEffect(() => { setYerler(parcalar.map(() => null)); }, [parcalar]);
 
@@ -143,18 +165,11 @@ export default function BagajIstifi({ onBitti }: { onBitti: (kazandi: boolean | 
 
   // Tepsi yerleşimi (yerleşmemiş parçalar, akış düzeni).
   const tepsi = useMemo(() => {
-    const pos: Record<number, { x: number; y: number }> = {};
-    let x = 20, y = tepsiY, satirH = 0;
-    parcalar.forEach((p, i) => {
-      if (yerler[i]) return;
-      const b = boyut(p.cells);
-      if (x + b.w * tc > W - 20) { x = 20; y += satirH + 14; satirH = 0; }
-      pos[i] = { x, y };
-      x += b.w * tc + 16;
-      satirH = Math.max(satirH, b.h * tc);
-    });
-    return pos;
-  }, [parcalar, yerler, tc, W, tepsiY]);
+    const { pos } = akis(parcalar, (i) => !!yerler[i]);
+    const out: Record<number, { x: number; y: number }> = {};
+    Object.keys(pos).forEach((k) => { const i = Number(k); out[i] = { x: trayX0 + pos[i].x, y: tepsiY + pos[i].y }; });
+    return out;
+  }, [parcalar, yerler, tc, trayX0, trayW, tepsiY]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const bitti = yerler.length > 0 && yerler.every((y) => y);
   useEffect(() => { if (asama === "oyun" && bitti) { setKazandi(true); setAsama("son"); } }, [bitti, asama]);
@@ -205,14 +220,14 @@ export default function BagajIstifi({ onBitti }: { onBitti: (kazandi: boolean | 
 
   const ciz = (p: Piece, cs: number) =>
     p.cells.map(([c, r], k) => (
-      <View key={k} style={{ position: "absolute", left: c * cs, top: r * cs, width: cs, height: cs, backgroundColor: p.renk, borderWidth: 1.5, borderColor: "rgba(0,0,0,0.35)", borderRadius: cs * 0.14, alignItems: "center", justifyContent: "center" }}>
+      <View key={k} style={{ position: "absolute", left: c * cs, top: r * cs, width: cs, height: cs, backgroundColor: p.renk, borderWidth: 1.5, borderColor: "rgba(58,40,28,0.55)", borderRadius: cs * 0.16, alignItems: "center", justifyContent: "center" }}>
         {k === 0 ? <Text style={{ fontSize: cs * 0.55 }}>{p.emoji}</Text> : null}
       </View>
     ));
 
   return (
     <View style={[StyleSheet.absoluteFill, { zIndex: 9999, elevation: 9999 }]} testID="bagaj-istifi">
-      <View style={[StyleSheet.absoluteFill, { backgroundColor: "rgba(28,20,14,0.93)" }]} />
+      <View style={[StyleSheet.absoluteFill, { backgroundColor: "rgba(40,26,16,0.62)" }]} />
       {asama === "kart" && (
         <View style={st.kartWrap}>
           <View style={st.kart}>
@@ -231,12 +246,26 @@ export default function BagajIstifi({ onBitti }: { onBitti: (kazandi: boolean | 
       )}
       {asama !== "kart" && (
         <>
-          <Text style={[st.hud, { top: gridY - 74 }]}>Bagaj gözü · {Math.max(0, kalan)} sn</Text>
-          <Text style={[st.muavin, { top: gridY - 44 }]}>{kalan > 15 ? "Muavin: \"Sıkıştır amca, sıkıştır!\"" : "Muavin: \"Kalkıyoruz, kalkıyoruz!\""}</Text>
-          {/* Bagaj gözü ızgarası */}
-          <View style={{ position: "absolute", left: gridX - 6, top: gridY - 6, width: gridW + 12, height: cell * ROWS + 12, borderRadius: 10, backgroundColor: "#2b2f36", borderWidth: 3, borderColor: "#c9ced6" }} />
+          {/* Kartpostal kartı (oyun sonu kartıyla aynı dil: krem kâğıt, kırmızı-lacivert pul şeridi, kesik çizgi) */}
+          <View style={[st.oyunKart, { left: cardX, top: cardY, width: cardW, height: cardH }]}>
+            <View style={st.serit}>
+              {Array.from({ length: 24 }).map((_, k) => (
+                <View key={k} style={{ width: 14, height: 8, marginRight: 4, backgroundColor: k % 2 ? "#1f4e79" : "#c0472b", transform: [{ skewX: "-30deg" }] }} />
+              ))}
+            </View>
+            <View style={st.kesik} />
+            <View style={st.basRow}>
+              <Text style={st.oyunBaslik}>🚌 Bagaj gözü</Text>
+              <View style={[st.sure, kalan <= 15 && { backgroundColor: "#c0472b" }]}>
+                <Text style={st.sureT}>{Math.max(0, kalan)} sn</Text>
+              </View>
+            </View>
+            <Text style={st.muavinK}>{kalan > 15 ? "Muavin: \"Sıkıştır amca, sıkıştır!\"" : "Muavin: \"Kalkıyoruz, kalkıyoruz!\""}</Text>
+          </View>
+          {/* Bagaj gözü ızgarası: otobüsün altındaki bölme (sıcak koyu kahve) */}
+          <View style={{ position: "absolute", left: gridX - 6, top: gridY - 6, width: gridW + 12, height: cell * ROWS + 12, borderRadius: 10, backgroundColor: "#4a3a2e", borderWidth: 3, borderColor: "#3a281c" }} />
           {Array.from({ length: ROWS * COLS }).map((_, k) => (
-            <View key={k} style={{ position: "absolute", left: gridX + (k % COLS) * cell, top: gridY + Math.floor(k / COLS) * cell, width: cell, height: cell, borderWidth: 0.5, borderColor: "rgba(255,255,255,0.12)" }} />
+            <View key={k} style={{ position: "absolute", left: gridX + (k % COLS) * cell, top: gridY + Math.floor(k / COLS) * cell, width: cell, height: cell, borderWidth: 0.5, borderColor: "rgba(251,243,228,0.14)" }} />
           ))}
           {parcalar.map((p, i) => {
             const y = yerler[i];
@@ -286,6 +315,14 @@ const st = StyleSheet.create({
   btn: { marginTop: 18, backgroundColor: "#c0472b", borderRadius: 14, paddingVertical: 13, paddingHorizontal: 44 },
   btnT: { color: "#fff", fontSize: 18, fontWeight: "900" },
   gec: { marginTop: 14, fontSize: 15, fontWeight: "700", color: "#8a6a55" },
+  oyunKart: { position: "absolute", backgroundColor: "#fbf3e4", borderRadius: 18, overflow: "hidden", borderWidth: 1, borderColor: "rgba(58,40,28,0.25)" },
+  serit: { flexDirection: "row", height: 8, marginLeft: -6 },
+  kesik: { position: "absolute", left: 8, right: 8, top: 16, bottom: 8, borderWidth: 1.5, borderColor: "rgba(160,120,80,0.45)", borderStyle: "dashed", borderRadius: 12 },
+  basRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 20, marginTop: 16 },
+  oyunBaslik: { fontSize: 22, fontWeight: "900", color: "#3a281c" },
+  sure: { backgroundColor: "#1f4e79", borderRadius: 999, paddingHorizontal: 12, paddingVertical: 4 },
+  sureT: { color: "#fbf3e4", fontSize: 16, fontWeight: "900" },
+  muavinK: { fontSize: 14, fontWeight: "700", fontStyle: "italic", color: "#1f4e79", paddingHorizontal: 20, marginTop: 8 },
   hud: { position: "absolute", left: 0, right: 0, textAlign: "center", color: "#fff8ec", fontSize: 20, fontWeight: "900" },
   muavin: { position: "absolute", left: 0, right: 0, textAlign: "center", color: "#ffd58a", fontSize: 14, fontWeight: "700" },
 });
