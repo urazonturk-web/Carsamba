@@ -3401,3 +3401,13 @@ OPEN_ISSUES: telefonda akış ve baş ölçeği sıçraması gözle denetlenecek
 TASK: Kullanıcı videosu 19:57, "geçişler sert" → 3 editör + Kıvılcım. Kod değişmedi.
 EVIDENCE: ai_review_evidence/GECIS-VIDEO-2026-11-26/ (RAPOR.md, editor-*.md, kivilcim-gorusu.md, 60 fps şeritler). Ölçüm: her poz değişimi tek karede; en sert dalış→duruş 8,45 sn; ARA_KARE_EGIM ve darbe yönünden 11–13° tek kare açı sıçraması (kod okuması + video).
 NEXT: Paket 1 (çizimsiz) kullanıcı onayı bekliyor.
+
+## GECIS PAKET 1 — çizimsiz geçiş yumuşatma — 2026-11-26
+TASK: Kullanıcı "Yes, do package 1" (rapor GECIS-VIDEO-2026-11-26/RAPOR.md).
+CHANGED (yalnız çizim; fizik/kamera/çarpışma/puan aynı):
+- İniş çömelmesi: temas anında `inisCok` 0,25/0,375/0,5 → 35 ms tut, 170 ms ease-out; `poseCharge` yerde max(charge, inisCok) → charge-037/025/012/000 sırası. landPulse genliği ×0,6. Tepki pozu 140 ms gecikmeli.
+- Dalış kayması: `dalisKay` r 0,3→1 arasında 0→170 sprite px (ReactionLayer k6 translateY).
+- Açı: sabit +9° darbe kaldırıldı (GECIS_DONME 0, esneme 0,10→0,04); yerine GOVDE_ACI [3,3,25,41,20] farkıyla telafi, yüz noktası (pivot +77,−838) etrafında, sönüm 12/sn, ±25°. ARA_KARE çarpanı ve süzülme dalgası yumuşak geçer (araKareSV, suzZarf).
+- Tek kaynak: ucusKol artık kare döngüsünün tuttuğu `kolOnceki`; uçuşta her poz en az 110 ms. Dalış eşiği r 0,4→0,3; r ≥ 1,3 → kollar açık (düşüş).
+- BUILD_TAG "YUMUSAK GECIS".
+EVIDENCE: simülatör kaydı (sim-paket1-inis.jpg, 30 kare/sn): dalış çatı hizasına iniyor, temas sonrası 3 çömelme karesi ardından duruş. tsc yeni hata yok. Telefona kuruldu; kullanıcı videosuyla doğrulanmadı. GOVDE_ACI süzülme/dalış değerleri göz kararı (25/20).

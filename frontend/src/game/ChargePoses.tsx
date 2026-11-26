@@ -67,6 +67,7 @@ type Props = {
   // HAREKET (2026-11-26, kullanıcı: "kazık gibi"): 1 iken uçuşta kolları açık denge pozu gösterilir
   // (mevcut çizim; yalnız düz eşofmanda — kıyafet varken eski poz kalır).
   ucusKol?: { value: number };
+  dalisKay?: { value: number }; // GECIS: dalış pozu (k 6) aşağı kayması, sprite px
   dusus?: SharedValue<number>; // DÜŞÜŞ: 0 yok, 1/2 çırpınma karesi
   phase?: SharedValue<number>;
   onLoad?: () => void;
@@ -326,7 +327,7 @@ function SnowLump({ b, scale }: { b: SnowBlob; scale: number }) {
 
 // BEDEN DİLİ: tepki pozu katmanı (k = 1..3). PoseLayer ile aynı dönüşüm ve hale; kıyafet katmanı yok
 // (kıyafet görünürken reactionVisible false olur, tepki hiç çizilmez).
-function ReactionLayer({ k, px, py, poseCharge, scale, feetCenterOffset, feetHalf, landPulse, halo, dirty, pajama, winter, snow, rain, eventHat, umbrella, offsetX, offsetY, tepki, tepkiP, phase, dusus, ucusKol }: Props & { k: number }) {
+function ReactionLayer({ k, px, py, poseCharge, scale, feetCenterOffset, feetHalf, landPulse, halo, dirty, pajama, winter, snow, rain, eventHat, umbrella, offsetX, offsetY, tepki, tepkiP, phase, dusus, ucusKol, dalisKay }: Props & { k: number }) {
   const pose = REACTION_POSES[k - 1];
   const style = useAnimatedStyle(() => {
     const tk = tepki ? tepki.value : 0;
@@ -352,7 +353,7 @@ function ReactionLayer({ k, px, py, poseCharge, scale, feetCenterOffset, feetHal
       opacity: on ? 1 : 0,
       transform: [
         { translateX: px.value + feetCenterOffset - pose.pivotX * scale + fix.dx + (offsetX ? offsetX.value : 0) },
-        { translateY: py.value + feetHalf - pose.pivotY * scale + fix.dy + (offsetY ? offsetY.value : 0) },
+        { translateY: py.value + feetHalf - pose.pivotY * scale + fix.dy + (offsetY ? offsetY.value : 0) + (k === 6 && dalisKay ? dalisKay.value * scale : 0) },
         { scaleY: SY },
         { scaleX: SX },
       ],

@@ -53,15 +53,33 @@ export function kolDurumu(airborne: boolean, idle: boolean, dususVar: boolean, v
   if (dususVar) return 0;
   if (airborne) {
     const r = vy / Math.max(1, vy0);
-    if (birakilan >= 0.4) return r <= -0.55 ? 3 : r < 0.4 ? 2 : 4;
+    // GECIS (19:57 videosu): dalış r 0,3'te başlar (daha okunur); kalkış yüksekliğinin çok altına
+    // inince (r ≥ 1,3: büyük olasılıkla düşüş) top hâli yerine kollar açık "eyvah".
+    if (birakilan >= 0.4) return r <= -0.55 ? 3 : r < 0.3 ? 2 : r < 1.3 ? 4 : 1;
     return r > -0.6 ? 1 : 0;
   }
   return idle && kenar !== 0 ? 1 : 0;
 }
 /** Poz değişiminde kısa "geçiş darbesi" sönüm hızı (1/sn) ve büyüklükleri: tek kare atlamayı gizler. */
 export const GECIS_SONUM = 9;
-export const GECIS_DONME = 9; // derece
-export const GECIS_ESNE = 0.1;
+export const GECIS_DONME = 0; // derece — GECIS: sabit yönlü darbe açı sıçramasını büyütüyordu, yerine GOVDE_ACI telafisi
+export const GECIS_ESNE = 0.04;
+/** GECIS (19:57 videosu, "geçişler sert"; rapor ai_review_evidence/GECIS-VIDEO-2026-11-26/RAPOR.md, Paket 1).
+ *  Çizimlerdeki gövde ekseni (derece, öne +): 0 şarj/duruş, 1 denge, 2 süzülme, 3 fırlama, 4 dalış.
+ *  Poz değişiminde yeni çizim eski gövde açısıyla başlar, YÜZ noktası etrafında kendi açısına döner. */
+export const GOVDE_ACI = [3, 3, 25, 41, 20];
+export const TELAFI_MAX = 25;
+export const TELAFI_SONUM = 12; // 1/sn (~85 ms zaman sabiti)
+/** Uçuş pozlarında yüz noktası, pozun ayak/pivot noktasına göre (sprite px; süzülmede ölçüldü). */
+export const YUZ_DX = 77;
+export const YUZ_DY = 838;
+/** Uçuşta bir poz en az bu kadar ekranda kalır (sn). */
+export const POZ_EN_AZ = 0.11;
+/** İniş çömelmesi: mevcut şarj kareleriyle (037→025→012→000) doğrulma; tutma ve sönüm süresi (ms). */
+export const INIS_TUT = 35;
+export const INIS_SURE = 170;
+/** Dalışta çizimi inişe doğru aşağı kaydırma (sprite px, r 0,3→1 arasında 0→170). */
+export const DALIS_KAY = 170;
 /** Süzülürken canlılık: hafif dalgalanma (derece) ve nefes (ölçek), frekans Hz. */
 export const SUZUL_DALGA = 3.5;
 export const SUZUL_NEFES = 0.03;

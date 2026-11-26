@@ -2088,3 +2088,4 @@ TESLIM_HAZIR: UCUS-AKICI — poz geçişlerinde dönme/esneme darbesi ve süzül
 TESLIM_HAZIR: UCUS-ARA-KARE-2026-11-26 — Kıvılcım fırlama + dalış ara kareleri (ai_review_evidence/UCUS-ARA-KARE-2026-11-26/, karsilastirma.jpg); oyuna bağlanmadı, kullanıcı kabulü bekleniyor.
 TESLIM_HAZIR: UCUS-ARA-KARE-2026-11-26 — fırlama + dalış oyuna bağlandı (BUILD_TAG FIRLAMA + DALIS; ai_review_evidence/UCUS-ARA-KARE-2026-11-26/sim-firlama-suzulme-dalis.jpg); telefonda kullanıcı denetimi bekleniyor.
 TESLIM_HAZIR: GECIS-VIDEO-2026-11-26 — geçiş yumuşatma raporu (ai_review_evidence/GECIS-VIDEO-2026-11-26/RAPOR.md); Paket 1 (çizimsiz) için kullanıcı onayı bekleniyor.
+TESLIM_HAZIR: GECIS-PAKET1-2026-11-26 — çizimsiz geçiş yumuşatma telefonda (YUMUSAK GECIS; ai_review_evidence/GECIS-VIDEO-2026-11-26/sim-paket1-inis.jpg); telefon videosu ve Paket 2 (çizim) kararı bekleniyor.

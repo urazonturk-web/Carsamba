@@ -59,6 +59,7 @@ import { KARGA_ON, KARGA_TUNEMIS, KARGA_BAKIS, KARGA_YEM, KARGA_HAVALANMA, KARGA
 import { CEPHE_HUCRE, CEPHE_DONEM_PX, CEPHE_BASLANGIC_PX } from "../src/game/cepheCesit";
 import { MAHALLE_ON, MAHALLE_SPEECH_ON, CUMBA_SOURCE, CUMBA_KEDI_SOURCE, CUMBA_ASPECT, CUMBA_TEYZE_SOURCE, CUMBA_TEYZE_BAKIS_SOURCE, CUMBA_TEYZE_ASPECT, cumbaBox, MAHALLE_BOX, TEYZE_ASPECT, KEDI_ASPECT, KEDI_UYUYAN_FOOT, KEDI_DIK_FOOT, AMCA_ASPECT, COCUK_ASPECT, KEDI_GERINEN_ASPECT, KEDI_GRI_ASPECT, TEYZE_SOURCE, KEDI_SOURCE, AMCA_SOURCE, COCUK_SOURCE, KEDI_GERINEN_SOURCE, KEDI_GRI_SOURCE, KEDI_ADLARI, sakin, teyzeBox, kediBox, kediAdi, kediGri, kediGriNo, pencereAspect, pencereLafi, kediLafi, KEDI_DEFTER_KEY, mahalleKaynak, kediGorunum, kediGorunumNo, kadinNo, KADIN_KAYNAK, KEDI_YENI, KEDI_YENI_ASPECT, SAKIN_TOHUM } from "../src/game/mahalle";
 import { OZEL_GUN_ON, OZEL_GUN_TEST_TAP, OZEL_GUNLER, OZEL_GUN_TEST_ORDER, todaysEvent } from "../src/game/ozelGun";
+import { GOVDE_ACI, TELAFI_MAX, TELAFI_SONUM, YUZ_DX, YUZ_DY, POZ_EN_AZ, INIS_TUT, INIS_SURE, DALIS_KAY } from "../src/game/hareket";
 import { kolDurumu, ARA_KARE_EGIM, GECIS_SONUM, GECIS_DONME, GECIS_ESNE, SUZUL_DALGA, SUZUL_NEFES, SUZUL_HZ } from "../src/game/hareket";
 import { HAREKET_ON, ucusEgim, ucusPoz, EGIM_HIZ, ESNE_BOY, ESNE_EN, SALLAN_DERECE, KABAR_ORAN, OHBE_MAX } from "../src/game/hareket";
 import BagajIstifi, { BAGAJ_ON, BAGAJ_TEST, BAGAJ_DURAK } from "../src/game/BagajIstifi";
@@ -390,7 +391,7 @@ const AnimatedImage = Animated.createAnimatedComponent(Image);
 const BG_SCROLL_TEST = true as boolean;
 const BG_SCROLL_RATIO = 0.45;
 const BG_SCROLL_TILES = 4;
-const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "FIRLAMA + DALIS") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
+const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "YUMUSAK GECIS") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
 const DIAG_MAX_EXAMPLES = 6;
 const HOUSE_AB_FROZEN = false as boolean;
 // REVIZYON-066 experiment (one variable): expo-linear-gradient's iOS layer
@@ -1418,6 +1419,12 @@ export default function Game() {
   const kolGecis = useSharedValue(0); // 1 → 0 sönen darbe
   const kolYon = useSharedValue(1);
   const suzulFaz = useSharedValue(0); // süzülme pozunda geçen süre (sn)
+  // GECIS (19:57 videosu, Paket 1): iniş çömelmesi, açı telafisi, yumuşak eğim çarpanı, süzülme zarfı, poz tutma süresi.
+  const inisCok = useSharedValue(0);
+  const telafi = useSharedValue(0);
+  const araKareSV = useSharedValue(1);
+  const suzZarf = useSharedValue(0);
+  const kolSure = useSharedValue(1);
   const fenerS = useSharedValue(FENER_MIN);
   const camX = useSharedValue(0);
   // Render Y is fixed at the spawn composition for the entire life.
@@ -2055,11 +2062,18 @@ export default function Game() {
       if (BEDEN_TEST) { bedenTest.current = (bedenTest.current % 3) + 1; k = bedenTest.current; }
       if (k > 0) {
         cancelAnimation(tepki);
-        tepki.value = k;
         cancelAnimation(tepkiP);
         tepkiP.value = 0;
-        tepkiP.value = withTiming(1, { duration: 180, easing: Easing.out(Easing.quad) });
-        tepki.value = withDelay(k === 3 ? 1100 : 900, withTiming(0, { duration: 0 }));
+        if (HAREKET_ON) {
+          // GECIS: tepki pozu iniş çömelmesinden sonra başlar (~140 ms); süresi aynı.
+          tepki.value = 0;
+          tepki.value = withSequence(withDelay(140, withTiming(k, { duration: 0 })), withDelay(k === 3 ? 1100 : 900, withTiming(0, { duration: 0 })));
+          tepkiP.value = withDelay(140, withTiming(1, { duration: 180, easing: Easing.out(Easing.quad) }));
+        } else {
+          tepki.value = k;
+          tepkiP.value = withTiming(1, { duration: 180, easing: Easing.out(Easing.quad) });
+          tepki.value = withDelay(k === 3 ? 1100 : 900, withTiming(0, { duration: 0 }));
+        }
       }
     }
     if (perfect && !(HAREKET_ON && durakKonustu) && Platform.OS !== "web") { // HAREKET: inişte tek titreşim
@@ -2872,16 +2886,30 @@ export default function Game() {
       const hedefK = sabit ? kenar.value * (4.5 + 3 * Math.sin(zaman * 4.2)) : 0;
       kenarSal.value += (hedefK - kenarSal.value) * Math.min(1, dt * 10);
       if (phase.value === PHASE.AIRBORNE) kenar.value = 0;
-      const kd = kolDurumu(phase.value === PHASE.AIRBORNE, phase.value === PHASE.IDLE, dusus.value !== 0, vy.value, ucusV0.value, releasedCharge.value, kenar.value);
-      if (kd !== kolOnceki.value) {
-        // Süzülmeye girişte öne, çıkışta geriye kısa bir dönme + esneme: değişim tek karede "zıplamasın".
+      const havada = phase.value === PHASE.AIRBORNE;
+      const kd = kolDurumu(havada, phase.value === PHASE.IDLE && inisCok.value < 0.01, dusus.value !== 0, vy.value, ucusV0.value, releasedCharge.value, kenar.value);
+      kolSure.value += dt;
+      // GECIS: uçuş içinde her poz en az POZ_EN_AZ ekranda kalır; iniş/düşüş/kalkış anında beklemez.
+      const bekle = havada && kolOnceki.value !== 0 && kd !== 0 && dusus.value === 0 && kolSure.value < POZ_EN_AZ;
+      if (kd !== kolOnceki.value && !bekle) {
         kolYon.value = kd === 2 || kd === 4 ? 1 : kolOnceki.value === 2 ? -1 : 0.5;
         kolGecis.value = 1;
+        // GECIS: yeni çizim eski gövde açısıyla başlar, yüz noktası etrafında kendi açısına döner.
+        if (havada && kd !== 0) {
+          const t = GOVDE_ACI[kolOnceki.value] - GOVDE_ACI[kd] + telafi.value;
+          telafi.value = Math.max(-TELAFI_MAX, Math.min(TELAFI_MAX, t));
+        }
         kolOnceki.value = kd;
+        kolSure.value = 0;
         if (kd === 2) suzulFaz.value = 0;
       }
       kolGecis.value *= Math.exp(-dt * GECIS_SONUM);
-      if (kd === 2) suzulFaz.value += dt;
+      telafi.value *= Math.exp(-dt * TELAFI_SONUM);
+      const kc = kolOnceki.value;
+      if (kc === 2) suzulFaz.value += dt;
+      // GECIS: eğim çarpanı ve süzülme dalgası anında değil, ~70–100 ms'de geçer (gizli açı sıçraması yok).
+      araKareSV.value += ((kc >= 3 ? ARA_KARE_EGIM : 1) - araKareSV.value) * Math.min(1, dt * 15);
+      suzZarf.value += ((kc === 2 ? 1 : 0) - suzZarf.value) * Math.min(1, dt * 10);
     }
     if (FENER_ON) {
       const sis = fenerAktif(lastLandedId.value) ? 1 : 0;
@@ -3055,8 +3083,16 @@ export default function Game() {
           }
           // HAREKET: kısa hopta hafif, uzun düşüşte derin çökme (eskiden hep 1).
           const sert = HAREKET_ON ? Math.max(0.6, Math.min(1.4, 0.6 + 0.8 * carpma / Math.max(1, ucusV0.value))) : 1;
+          // GECIS: en derin çömelme ilk temas karesinde (mevcut şarj kareleri), sonra yaylanarak doğrulur.
+          if (HAREKET_ON) {
+            const cok = releasedCharge.value < 0.25 ? 0.25 : sert > 1 ? 0.5 : 0.375;
+            cancelAnimation(inisCok);
+            inisCok.value = cok;
+            inisCok.value = withDelay(INIS_TUT, withTiming(0, { duration: INIS_SURE, easing: Easing.out(Easing.quad) }));
+            telafi.value = 0;
+          }
           landPulse.value = withSequence(
-            withTiming(sert, { duration: HAREKET_ON ? 45 : 35 }),
+            withTiming(HAREKET_ON ? sert * 0.6 : sert, { duration: HAREKET_ON ? 45 : 35 }),
             withTiming(-0.2 * sert, { duration: HAREKET_ON ? 85 : 75 }),
             withTiming(0, { duration: HAREKET_ON ? 100 : 80 }),
           );
@@ -3313,13 +3349,19 @@ export default function Game() {
     if (poseOverride.value >= 0) return poseOverride.value;
     // HAREKET: uçuşta mevcut şarj pozlarıyla tepe toplanması ve iniş hazırlığı (yalnız çizim).
     if (HAREKET_ON && phase.value === PHASE.AIRBORNE && dusus.value === 0) return ucusPoz(vy.value, ucusV0.value);
+    if (HAREKET_ON && phase.value === PHASE.IDLE) return Math.max(charge.value, inisCok.value);
     return charge.value;
   });
   // HAREKET: kalkışın ilk anından sonra uçuşta kollar açık (mevcut denge çizimi).
   // Uzun atışın tepesinde süzülme pozu (2); kısa hopta, inişe yakın ve kenarda dururken kollar açık (1).
-  const ucusKol = useDerivedValue(() => (HAREKET_ON
-    ? kolDurumu(phase.value === PHASE.AIRBORNE, phase.value === PHASE.IDLE, dusus.value !== 0, vy.value, ucusV0.value, releasedCharge.value, kenar.value)
-    : 0));
+  // GECIS: çizim tek kaynaktan — kare döngüsünün tuttuğu durum (en kısa tutma süresi dahil).
+  const ucusKol = useDerivedValue(() => (HAREKET_ON ? (dusus.value !== 0 ? 0 : kolOnceki.value) : 0));
+  // GECIS: dalışta çizim inişe doğru aşağı kayar (temas anında "ışınlanma" olmasın).
+  const dalisKay = useDerivedValue(() => {
+    if (kolOnceki.value !== 4) return 0;
+    const r = vy.value / Math.max(1, ucusV0.value);
+    return Math.max(0, Math.min(1, (r - 0.3) / 0.7)) * DALIS_KAY;
+  });
   // Soluk amca: tek görsel (duruş pozu), kutusu açık boyutlu (sıfır boyutlu kapsayıcıda görünmüyordu).
   const GHOST_POSE = CHARGE_POSES[0];
   const GHOST_SCALE = SPRITE_SCALE * GLOBAL_VISUAL_SCALE * CHAR_SIZE_TRIAL;
@@ -3396,6 +3438,7 @@ export default function Game() {
     };
   });
   const HAREKET_FEET_DX = SOLE_CENTER_OFFSET + ANCHOR_SHIFT_PX * SPRITE_SCALE;
+  const TELAFI_S = SPRITE_SCALE * GLOBAL_VISUAL_SCALE * CHAR_SIZE_TRIAL;
   const fenerStyle = useAnimatedStyle(() => {
     const op = fenerOp.value;
     // Işık amcanın yüzünde: ayak noktasından gövde boyunun ~%75'i yukarı.
@@ -3414,9 +3457,8 @@ export default function Game() {
     const e = ucusEsne.value;
     const kb = kabar.value;
     const gc = kolGecis.value;
-    const suz = ucusKol.value === 2;
-    const dalga = suz ? Math.sin(suzulFaz.value * Math.PI * 2 * SUZUL_HZ) : 0;
-    const araKare = ucusKol.value >= 3 ? ARA_KARE_EGIM : 1;
+    const dalga = suzZarf.value * Math.sin(suzulFaz.value * Math.PI * 2 * SUZUL_HZ);
+    const araKare = araKareSV.value;
     const aci = (dusus.value > 0 ? 0 : ucusAci.value * araKare) + sallan.value + kenarSal.value
       + GECIS_DONME * gc * kolYon.value + SUZUL_DALGA * dalga;
     return {
@@ -3427,6 +3469,10 @@ export default function Game() {
         { scaleX: (1 - ESNE_EN * e) * (1 + KABAR_ORAN * kb) * (1 + GECIS_ESNE * gc) },
         { scaleY: (1 + ESNE_BOY * e) * (1 - GECIS_ESNE * 0.6 * gc) * (1 + SUZUL_NEFES * dalga) },
         { translateX: -fx }, { translateY: -fy },
+        // GECIS: poz değişiminde gövde açısı telafisi, yüz noktası etrafında (baş savrulmaz).
+        { translateX: fx + YUZ_DX * TELAFI_S }, { translateY: fy - YUZ_DY * TELAFI_S },
+        { rotate: `${telafi.value}deg` },
+        { translateX: -(fx + YUZ_DX * TELAFI_S) }, { translateY: -(fy - YUZ_DY * TELAFI_S) },
       ],
     };
   });
@@ -4114,6 +4160,7 @@ export default function Game() {
           tepki={BEDEN_ON ? tepki : undefined}
           tepkiP={BEDEN_ON ? tepkiP : undefined}
           ucusKol={HAREKET_ON && BEDEN_ON ? ucusKol : undefined}
+          dalisKay={HAREKET_ON && BEDEN_ON ? dalisKay : undefined}
           dusus={DUSUS_ON ? dusus : undefined}
           phase={phase}
           onLoadStart={() => markArtStarted("character")}
