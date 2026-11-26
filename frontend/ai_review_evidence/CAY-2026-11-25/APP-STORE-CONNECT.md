@@ -39,4 +39,5 @@ Açıklamaya ilk günden: "Ücretsiz, reklamsız. Satılan her şey yalnız gör
 ## 5. Deneme (para harcamadan)
 - Simülatörde: Xcode'da **frontend-cay-deneme** şeması (ios/Byzantion-Cay.storekit dosyasını kullanır) — gerçek para yok.
 - 2026-11-26: Sandbox deneme hesabı oluşturuldu (Byzantion Deneme, Türkiye, Hotmail adresinin +byzantion1 takma adı; şifreyi kullanıcı girdi). Telefondaki Release paketi (25 Kas 19:57) byzantion.cay/demlik/semaver kimliklerini içeriyor (strings ile doğrulandı).
+- 2026-11-26 telefon denemesi (kullanıcı): Semaver sandbox hesabıyla satın alındı; teşekkür ekranı, menüde "Çayın için sağ ol" + semaver rozeti ve kartta "Ismarlandı ✓" görüldü (kullanıcı: "tamamdır hepsi geldi"). Geri yükleme ayrıca denenmedi.
 - Telefonda gerçek akış: App Store Connect → Kullanıcılar ve Erişim → **Sandbox test hesabı**; TestFlight sürümünde satın almalar da ücretsizdir.

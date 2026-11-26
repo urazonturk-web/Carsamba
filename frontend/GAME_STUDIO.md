@@ -2065,3 +2065,4 @@ TESLIM_HAZIR: CAY-GORSEL-2026-11-25 — çay/demlik/semaver rozetleri ve çaylı
 TESLIM_HAZIR: CAY-URUN-2026-11-25 — App Store Connect'te byzantion.cay/demlik/semaver (29,99/79,99/199,99 TL) oluşturuldu, kod kimlikleri güncellendi; satın alma denemesi Ücretli Uygulamalar sözleşmesi + banka/vergi (kullanıcı) bekliyor.
 TESLIM_HAZIR: CAY-SOZLESME-2026-11-25 — Ücretli Uygulamalar Sözleşmesi kabul edildi, banka ve vergi formları gönderildi (sözleşme Processing); sandbox denemesi sözleşme Active olunca.
 TESLIM_HAZIR: SBP-2026-11-25 — App Store Small Business Program başvurusu gönderildi (Apple e-postayla dönecek; kabulde komisyon %15).
+TESLIM_HAZIR: CAY-SANDBOX-2026-11-26 — Amcaya çay ısmarla telefonda sandbox ile doğrulandı (semaver: teşekkür ekranı, menü rozeti, Ismarlandı); kayıt ai_review_evidence/CAY-2026-11-25/APP-STORE-CONNECT.md; geri yükleme denenmedi, incelemeye göndermeden önce İngilizce yerelleştirme + inceleme ekran görüntüsü ve AB DSA beyanı bekliyor.
