@@ -2091,3 +2091,4 @@ TESLIM_HAZIR: GECIS-VIDEO-2026-11-26 — geçiş yumuşatma raporu (ai_review_ev
 TESLIM_HAZIR: GECIS-PAKET1-2026-11-26 — çizimsiz geçiş yumuşatma telefonda (YUMUSAK GECIS; ai_review_evidence/GECIS-VIDEO-2026-11-26/sim-paket1-inis.jpg); telefon videosu ve Paket 2 (çizim) kararı bekleniyor.
 - 2026-11-26 Kullanıcı: "arkadaşlara da TestFlight'tan yükle" — 1.0.0 (5) (CFBundleVersion 5, YUMUSAK GECIS) arşivlendi, yüklendi, "Arkadaşlar" grubuna eklendi; Türkçe test notu, otomatik bildirim açık; durum Testing. Xcode hesabı kullanıcı tarafından yeniden girildi. Sonraki yükleme build 6.
 TESLIM_HAZIR: TestFlight 1.0.0 (5) arkadaşlarda — Testing.
+TESLIM_HAZIR: GECIS-ARA-2026-11-26 — Kıvılcım 5 ara kare (itiş, açılma, toplanma, uzanma, çökme) önizleme: ai_review_evidence/GECIS-ARA-2026-11-26/sira.jpg; oyuna bağlanmadı, kullanıcı kabulü bekleniyor.
