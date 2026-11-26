@@ -44,7 +44,8 @@ export function ucusPoz(vy: number, vy0: number) {
 }
 
 /**
- * Uçuş/kenar kol durumu: 0 normal poz, 1 kollar açık denge, 2 süzülme (uzun atışın tepesi).
+ * Uçuş/kenar kol durumu: 0 normal poz, 1 kollar açık denge, 2 süzülme (uzun atışın tepesi),
+ * 3 fırlama (uzun atışın kalkışı), 4 dalış (uzun atışın inişi). UCUS-ARA-KARE (2026-11-26, "Yes, add both").
  * Hem çizim (ucusKol) hem geçiş yumuşatması aynı kuralı kullanır.
  */
 export function kolDurumu(airborne: boolean, idle: boolean, dususVar: boolean, vy: number, vy0: number, birakilan: number, kenar: number) {
@@ -52,7 +53,7 @@ export function kolDurumu(airborne: boolean, idle: boolean, dususVar: boolean, v
   if (dususVar) return 0;
   if (airborne) {
     const r = vy / Math.max(1, vy0);
-    if (birakilan >= 0.4 && r > -0.55 && r < 0.4) return 2;
+    if (birakilan >= 0.4) return r <= -0.55 ? 3 : r < 0.4 ? 2 : 4;
     return r > -0.6 ? 1 : 0;
   }
   return idle && kenar !== 0 ? 1 : 0;
@@ -65,3 +66,5 @@ export const GECIS_ESNE = 0.1;
 export const SUZUL_DALGA = 3.5;
 export const SUZUL_NEFES = 0.03;
 export const SUZUL_HZ = 1.8;
+/** Fırlama/dalış çizimleri eğimi zaten taşıyor: yörünge eğimi bu pozlarda bu oranla uygulanır. */
+export const ARA_KARE_EGIM = 0.35;

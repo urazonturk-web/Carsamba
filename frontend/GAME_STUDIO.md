@@ -2086,3 +2086,4 @@ TESLIM_HAZIR: UCUS-POZ — Kıvılcım "ağır çekim süzülme" pozu önizlemes
 TESLIM_HAZIR: UCUS-POZ — süzülme pozu uzun atışların tepesine bağlandı, telefona kuruldu (SUZULME POZU); kullanıcı videosu bekleniyor.
 TESLIM_HAZIR: UCUS-AKICI — poz geçişlerinde dönme/esneme darbesi ve süzülürken dalgalanma, telefona kuruldu (SUZULME AKICI); ara kareler için Kıvılcım onayı bekleniyor.
 TESLIM_HAZIR: UCUS-ARA-KARE-2026-11-26 — Kıvılcım fırlama + dalış ara kareleri (ai_review_evidence/UCUS-ARA-KARE-2026-11-26/, karsilastirma.jpg); oyuna bağlanmadı, kullanıcı kabulü bekleniyor.
+TESLIM_HAZIR: UCUS-ARA-KARE-2026-11-26 — fırlama + dalış oyuna bağlandı (BUILD_TAG FIRLAMA + DALIS; ai_review_evidence/UCUS-ARA-KARE-2026-11-26/sim-firlama-suzulme-dalis.jpg); telefonda kullanıcı denetimi bekleniyor.

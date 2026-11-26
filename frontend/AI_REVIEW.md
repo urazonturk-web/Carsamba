@@ -3386,3 +3386,13 @@ Kullanıcı kabulü: "Yes, add it".
 - CHANGED: src/game/hareket.ts `kolDurumu` (çizim ve geçiş için tek kural) + sabitler; app/index.tsx oyun döngüsünde kol durumu değişince `kolGecis` darbesi (1→0, sönüm 9/sn): girişte öne, çıkışta geriye 9° dönme, %10 yatay esneme/%6 dikey basılma (ayak noktası etrafında, sarmalayıcıda); süzülme pozunda 1,8 Hz ±3,5° dalgalanma ve ±%3 nefes. Fizik/kamera/çarpışma aynı. BUILD_TAG "SUZULME AKICI".
 - EVIDENCE: simülatör 20 fps kareleri (sim-akici.jpg): süzülme ~0,65 sn, açılarda küçük değişimler görülüyor. Gerçek akıcılık ölçülemedi (simülatör), telefonda görülmedi.
 - OPEN: kod ancak geçişi gizleyebilir; gerçek ara kareler (fırlama → süzülme → iniş hazırlığı) için 2 ek Kıvılcım çizimi gerekir (S1 fırlama, S3 dalış istemleri hazır), kullanıcı onayı bekler.
+
+## UCUS-ARA-KARE — fırlama + dalış uçuş kareleri — 2026-11-26
+TASK: Kullanıcı "Yes, draw two" → Kıvılcım 2 çağrı (her biri 1 görsel); "Yes, add both" → oyuna bağlandı.
+CHANGED: hareket.ts `kolDurumu` uzun atışta (bırakılan ≥ 0,4) r ≤ −0,55 → 3 fırlama, −0,55 < r < 0,4 → 2 süzülme, r ≥ 0,4 → 4 dalış; `ARA_KARE_EGIM` 0,35 (çizimler eğimi taşıyor, yörünge eğimi bu oranla). ChargePoses ReactionLayer k 5/6. index.tsx kolYon dalışa girişte öne; BUILD_TAG "FIRLAMA + DALIS". Fizik/kamera/çarpışma/puan değişmedi.
+EVIDENCE:
+1. Dosya: assets/characters/beden/amca-ucus-firlama.png (1197×1314), amca-ucus-dalis.png (1254×1254); kaynak Codex shared/UCUS-FIRLAMA-preview, UCUS-DALIS-preview; kopyası ai_review_evidence/UCUS-ARA-KARE-2026-11-26/.
+2. Ölçü/pivot: yüz (ten rengi en büyük blob) alanı charge-000'a göre ölçek 1,02 / 1,01 (ölçüm); süzülme ×1,15 olduğundan ikisi ×0,96 kutu (1149×1261, 1204×1204). Pivot: yüz ağırlık merkezi süzülmedeki konumuna (pivot +77, −838) oturtuldu → fırlama (809,1174), dalış (633,1315).
+3. Katman: ReactionLayer içinde, süzülme ile aynı kural (kıyafet görünmüyorken, düşüş yokken); PoseLayer şarj pozlarını ucusKol ≥ 1 iken gizler.
+4. Risk: kıyafetli (yağmur/kış/pijama) sürümler yok → kıyafette eski pozlar. Fırlamada ayak ucu kalkışın ilk karelerinde çatı çizgisinin biraz altına inebilir (görsel). Simülatörde görüldü (sim-firlama-suzulme-dalis.jpg, 15 kare/sn); telefonda kuruldu, kullanıcı videosuyla doğrulanmadı.
+OPEN_ISSUES: telefonda akış ve baş ölçeği sıçraması gözle denetlenecek.

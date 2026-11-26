@@ -336,9 +336,9 @@ function ReactionLayer({ k, px, py, poseCharge, scale, feetCenterOffset, feetHal
     const giysi = 0; // hiçbir kıyafet düşüşü engellemez
     const dusuyor = fallVisible(dusus ? dusus.value : 0, giysi);
     // Başka bir tepki pozu (silkele/oh be) çiziliyorsa kollu poz eklenmez: aynı anda iki gövde yok.
-    // ucusKol: 1 = kollar açık denge pozu (k 2), 2 = uçuş tepesinde süzülme pozu (k 4).
+    // ucusKol: 1 = kollar açık denge pozu (k 2), 2 = süzülme (k 4), 3 = fırlama (k 5), 4 = dalış (k 6).
     const uk = ucusKol ? ucusKol.value : 0;
-    const kolAcik = ((k === 2 && uk === 1) || (k === 4 && uk === 2)) && outfit <= 0.01 && (tk === 0 || tk === 2 || ph !== 0);
+    const kolAcik = ((k === 2 && uk === 1) || (k === 4 && uk === 2) || (k === 5 && uk === 3) || (k === 6 && uk === 4)) && outfit <= 0.01 && (tk === 0 || tk === 2 || ph !== 0);
     const on = ((tk === k && reactionVisible(tk, ph, outfit)) || kolAcik) && !dusuyor;
     const pulse = landPulse ? landPulse.value : 0;
     const sq = 1 - pulse * 0.14;
