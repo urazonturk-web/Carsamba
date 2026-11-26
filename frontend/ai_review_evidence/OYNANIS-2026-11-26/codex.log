@@ -1,0 +1,857 @@
+OpenAI Codex v0.171.0-alpha.13
+--------
+workdir: /Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend
+model: gpt-6-luna
+provider: openai
+approval: never
+sandbox: read-only
+reasoning effort: medium
+reasoning summaries: none
+session id: 01a216b1-4537-77c3-a0ca-425c87afc5c4
+--------
+user
+# Byzantion — Oynanabilirliği nasıl artırırız? (brif, 2026-11-26)
+
+Kullanıcının sorusu: "oyunun oynanılabilitesini arttırmak için neler yapılabilir diğer editörlerle bir değerlendirme yapın ve bana rapor sunun; bunu yaparken en çok oynanan bu tarz oyunların içeriğini de kontrol edin".
+
+## Oyun (bağlam)
+Byzantion: Expo/React Native iPhone oyunu (Android sonra). Tek dokunuşlu "basılı tut-bırak-zıpla": bıyıklı, kırmızı eşofmanlı İstanbullu bir amca, İstanbul çatılarındaki kuleler arasında zıplar (tür olarak WeChat "Jump Jump / 跳一跳", Stick Hero, Mr Jump, Doodle Jump ailesine yakın). Karikatür çizgi, Türkçe arayüz; hedef Türk oyuncu + yurt dışı. TestFlight'ta (birkaç arkadaş), App Store'da değil. Geliştirici tek kişi (kod: Claude Code; görseller bir görsel üretim aracından, her görsel ayrı onayla).
+
+Kod: `/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend` (ana ekran `app/index.tsx`, oyun dosyaları `src/game/`). Okuyabilirsin; DEĞİŞTİRME.
+
+Şu an oyunda olanlar:
+- Basılı tut → şarj, bırak → zıpla. Kule başına +4/+6 puan, seri ateşi, aşırı basınca amca patlar. Fizik/kule üretimi/çarpışma/kamera SABİT (değiştirmek ayrı kullanıcı onayı ister).
+- Güzergâh: 15 kulede bir durak/semt (12 durak: Kadıköy → … → Rumeli Feneri), 3 köprü geçişi; her durakta açılan **kartpostal albümü (12)**; gece durağında pijama anı.
+- **Kedi defteri (12 adlı kedi)**: cumba pencerelerinde 6 görünümde kediler; yanına inince "X ile tanıştın".
+- **Cumba sakinleri**: 4 kadın (yaz + kış/yağmur hâli), her koşuda rastgele dağılım; kargalar konup kalkar.
+- **Gerçek İstanbul**: saat/gün batımı/ay evresi, gerçek hava (yağmur/kar/sis/lodos/poyraz), mevsim (yapraklar, kış cepheleri, mevsime göre İstanbul siluet arka planı); amcanın kışlık/yağmurluk kıyafeti.
+- **Özel günler**: menü manşeti + amcanın başına o güne özel başlık.
+- **Kurukafa**: havada değerse 5 zıplama kuleler %20 büyür/küçülür. **Osuruk gazı**: her zıplamada ses + bulut izi.
+- **Sosyal**: Game Center rekor tablosu, "Meydan oku · 2 dakika" yarış modu, hayalet yarış, günün haritası / harita kodu, paylaşım kartpostalı, oyun sonu lakap.
+- **Destek**: "Amcaya çay ısmarla" (3 kalıcı ürün, yalnız rozet; oyunu kolaylaştırmaz). Reklam yok.
+
+Önceki fikir raporlarında (tekrar önerme, gerekirse "zaten önerildi" de): balkon seyircileri (yapıldı: cumba sakinleri), çatı kedileri + kedi defteri (yapıldı), kişisel kartpostal/lakap (yapıldı), iniş seri ödülü + titreşim + toz, düşüş repertuarı (vapura/çamaşır ipine düşmek), "Hanım arıyor" oyun sonu bildirimi, bıyık barometresi, kayıp terlik, muhtarlık ilan panosu, sahur davulcusu, semte göre ses, saate göre gölgeler, kıyafet/gaz paketi satışları.
+
+Kurallar: Arapça ünlem (maşallah, helal, nazar vb.) önerme. Kazanmak-için-öde önerme. Yeni görsel gerektiren her öneride kaç görsel gerektiğini yaz.
+
+## İstenen
+"Oynanabilirlik" = ilk dakikada anlaşılırlık, el hissi (iniş tatmini), zorluk eğrisi, bir oturumu uzatan şey, ertesi gün geri getiren şey, çeşitlilik/sürpriz, erişilebilirlik.
+Rapor biçimi kendi dosyanda verilir; kesin olmayan rakamları "tahmin" diye işaretle.
+
+
+## Senden istenen (Kıvılcım)
+Kodu okuyabilirsin (değiştirme). (1) Türdeki en çok oynanan oyunlarda (Jump Jump, Stick Hero, Helix Jump, Crossy Road, Doodle Jump, Alto vb.) oynanabilirliği taşıyan mekanikler; (2) Byzantion için öncelikli 8-10 öneri: çözdüğü sorun, İstanbul kimliğiyle somut tasarım, efor (kod / kaç görsel), risk, fizik-kamera-çarpışmaya dokunuyor mu; (3) oyunu 10 üzerinden "oynanış/his" ve "geri gelme isteği" alanlarında puanla; (4) ilk yapılacak 3 iş. Türkçe, başlıklı, en fazla ~1000 kelime. Kaynak verebildiğin yerde URL ver; doğrulanmamış rakamı "tahmin" diye işaretle.
+
+warning: Under-development features enabled: chronicle. Under-development features are incomplete and may behave unpredictably. To suppress this warning, set `suppress_unstable_features_warning = true` in /Users/bekirurazonturk/.codex/config.toml.
+codex
+Önce mevcut oyun akışını ve dosya içindeki ilgili mekanikleri okuyacağım; ardından güncel ve kaynaklı oyun örnekleriyle karşılaştırıp yaklaşık 1000 kelimelik Türkçe raporu ayrı bir dosyada hazırlayacağım. Kodda değişiklik yapmayacağım.
+exec
+/bin/zsh -lc 'rg -n "Byzantion|Carsamba|Jump Jump|gameplay|oynanabilir" /Users/bekirurazonturk/.codex/memories/MEMORY.md' in /Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend
+ succeeded in 0ms:
+116:# Task Group: Carsamba tea support App Store Connect setup
+119:applies_to: cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend; reuse_rule=observed November 25 status; verify current App Store Connect and test state before acting.
+125:- extensions/skysight/resources/2026-11-25T17-50-00-mDMW-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-25T17-50-00-mDMW-10min-memory-summary.md, updated_at=2026-11-25T17:50:00+00:00, application received) [skysight memory]
+126:- extensions/skysight/resources/2026-11-25T17-40-00-uaQF-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-25T17-40-00-uaQF-10min-memory-summary.md, updated_at=2026-11-25T17:40:00+00:00, bank processing) [skysight memory]
+127:- extensions/skysight/resources/2026-11-25T16-50-00-IGez-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-25T16-50-00-IGez-10min-memory-summary.md, updated_at=2026-11-25T16:50:00+00:00, product setup reported) [skysight memory]
+128:- extensions/skysight/resources/2026-11-25T17-10-00-Lnzo-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-25T17-10-00-Lnzo-10min-memory-summary.md, updated_at=2026-11-25T17:10:00+00:00, sensitive form fields) [skysight memory]
+129:- extensions/skysight/resources/2026-11-25T22-10-00-nemC-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-25T22-10-00-nemC-10min-memory-summary.md, updated_at=2026-11-25T22:10:00+00:00, sandbox creation result not observed) [skysight memory]
+144:# Task Group: Carsamba seasonal Istanbul skyline and tea support
+147:applies_to: cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend; reuse_rule=reported November 25 state; verify branch, store configuration and current device build.
+153:- extensions/skysight/resources/2026-11-25T06-00-00-gHaT-6h-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-25T06-00-00-gHaT-6h-memory-summary.md, updated_at=2026-11-25T06:00:00+00:00, simulator checks and skyline push reported) [skysight memory]
+154:- extensions/skysight/resources/2026-11-25T12-30-00-SxTT-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-25T12-30-00-SxTT-10min-memory-summary.md, updated_at=2026-11-25T12:30:00+00:00, phone install reported; gameplay unverified) [skysight memory]
+164:- extensions/skysight/resources/2026-11-25T13-00-00-Uvey-10min-memory-summary.md (cwd=Carsamba game project, rollout_path=extensions/skysight/resources/2026-11-25T13-00-00-Uvey-10min-memory-summary.md, updated_at=2026-11-25T13:00:00+00:00, launch approach chosen) [skysight memory]
+165:- extensions/skysight/resources/2026-11-25T13-10-00-nJVm-10min-memory-summary.md (cwd=Carsamba game project, rollout_path=extensions/skysight/resources/2026-11-25T13-10-00-nJVm-10min-memory-summary.md, updated_at=2026-11-25T13:10:00+00:00, simulator reported; push and phone build pending) [skysight memory]
+178:- Skyline `40d32fc` and snow-filter `ad84442` were reported pushed; latter reportedly installed on phone, but gameplay validation was not observed. Tea card product-name visibility was reportedly fixed in simulator; push and phone build were pending. [Task 1][Task 2] [skysight memory]
+199:# Task Group: Carsamba seasonal facades and neighborhood art
+202:applies_to: cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend; reuse_rule=observed November 24 status and reported tests; verify current assets, branch and device state before work.
+208:- extensions/skysight/resources/2026-11-24T10-00-00-eRNv-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-24T10-00-00-eRNv-10min-memory-summary.md, updated_at=2026-11-24T10:00:00+00:00) [skysight memory]
+209:- extensions/skysight/resources/2026-11-24T09-10-00-NobN-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-24T09-10-00-NobN-10min-memory-summary.md, updated_at=2026-11-24T09:10:00+00:00) [skysight memory]
+210:- extensions/skysight/resources/2026-11-24T08-40-00-aOex-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-24T08-40-00-aOex-10min-memory-summary.md, updated_at=2026-11-24T08:40:00+00:00) [skysight memory]
+211:- extensions/skysight/resources/2026-11-24T08-20-00-zrtr-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-24T08-20-00-zrtr-10min-memory-summary.md, updated_at=2026-11-24T08:20:00+00:00) [skysight memory]
+221:- extensions/skysight/resources/2026-11-24T12-30-00-zzIf-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-24T12-30-00-zzIf-10min-memory-summary.md, updated_at=2026-11-24T12:30:00+00:00, follow-up tests and phone build pending) [skysight memory]
+222:- extensions/skysight/resources/2026-11-24T11-40-00-OSfr-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-24T11-40-00-OSfr-10min-memory-summary.md, updated_at=2026-11-24T11:40:00+00:00, phone video prompted further fixes) [skysight memory]
+223:- extensions/skysight/resources/2026-11-24T11-10-00-ycZO-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-24T11-10-00-ycZO-10min-memory-summary.md, updated_at=2026-11-24T11:10:00+00:00, integration reported) [skysight memory]
+224:- extensions/skysight/resources/2026-11-24T10-20-00-wzpK-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-24T10-20-00-wzpK-10min-memory-summary.md, updated_at=2026-11-24T10:20:00+00:00) [skysight memory]
+225:- extensions/skysight/resources/2026-11-24T10-00-00-eRNv-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-24T10-00-00-eRNv-10min-memory-summary.md, updated_at=2026-11-24T10:00:00+00:00) [skysight memory]
+371:# Task Group: Carsamba landing reactions, crow behavior and restart smoke
+374:applies_to: cwd=Carsamba game project; reuse_rule=observed November 23 status; verify current branch, device build and actual tests.
+380:- extensions/skysight/resources/2026-11-23T11-40-00-roYC-10min-memory-summary.md (cwd=Carsamba game project, rollout_path=extensions/skysight/resources/2026-11-23T11-40-00-roYC-10min-memory-summary.md, updated_at=2026-11-23T11:40:00+00:00, restart smoke fix simulated; deployment pending) [skysight memory]
+381:- extensions/skysight/resources/2026-11-23T11-00-00-ZHDp-10min-memory-summary.md (cwd=Carsamba game project, rollout_path=extensions/skysight/resources/2026-11-23T11-00-00-ZHDp-10min-memory-summary.md, updated_at=2026-11-23T11:00:00+00:00, phone feedback) [skysight memory]
+382:- extensions/skysight/resources/2026-11-23T06-00-00-EkFn-6h-memory-summary.md (cwd=Carsamba game project, rollout_path=extensions/skysight/resources/2026-11-23T06-00-00-EkFn-6h-memory-summary.md, updated_at=2026-11-23T06:00:00+00:00, broader activity arc) [skysight memory]
+386:- Carsamba, amca, landing, düşüş, karga, takılma, restart smoke, 195be17, mahalle sesleri, iPhone
+392:- extensions/skysight/resources/2026-11-23T18-30-00-ATGG-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-23T18-30-00-ATGG-10min-memory-summary.md, updated_at=2026-11-23T18:30:00+00:00, phone installation reported; push unverified) [skysight memory]
+393:- extensions/skysight/resources/2026-11-23T18-20-00-QHzv-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-23T18-20-00-QHzv-10min-memory-summary.md, updated_at=2026-11-23T18:20:00+00:00, combined raincoat and holiday-hat bug) [skysight memory]
+394:- extensions/skysight/resources/2026-11-23T18-10-00-Kkoh-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-23T18-10-00-Kkoh-10min-memory-summary.md, updated_at=2026-11-23T18:10:00+00:00, accessory alignment) [skysight memory]
+395:- extensions/skysight/resources/2026-11-23T18-00-00-FAsM-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-23T18-00-00-FAsM-10min-memory-summary.md, updated_at=2026-11-23T18:00:00+00:00, rain and winter simulation) [skysight memory]
+396:- extensions/skysight/resources/2026-11-23T12-00-00-TxTm-6h-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-23T12-00-00-TxTm-6h-memory-summary.md, updated_at=2026-11-23T12:00:00+00:00, rain poses approved for integration) [skysight memory]
+413:# Task Group: Carsamba game-over screen and Claudex Loop trial
+416:applies_to: cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend; reuse_rule=observed 2026-11-23; inspect checkout, tool installation and phone.
+422:- extensions/skysight/resources/2026-11-23T08-10-00-GLud-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-23T08-10-00-GLud-10min-memory-summary.md, updated_at=2026-11-23T08:10:00+00:00, simulator and phone install reported; phone visual check pending) [skysight memory]
+423:- extensions/skysight/resources/2026-11-23T08-00-00-XtSi-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-23T08-00-00-XtSi-10min-memory-summary.md, updated_at=2026-11-23T08:00:00+00:00, review and coordination) [skysight memory]
+424:- extensions/skysight/resources/2026-11-23T07-50-00-ZYBX-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-23T07-50-00-ZYBX-10min-memory-summary.md, updated_at=2026-11-23T07:50:00+00:00, project-local trial reported) [skysight memory]
+467:# Task Group: Carsamba crow placement and skull timing
+470:applies_to: cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend; reuse_rule=observed November 22–23 status; inspect current checkout and phone before claiming completion.
+476:- extensions/skysight/resources/2026-11-23T07-50-00-ZYBX-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-23T07-50-00-ZYBX-10min-memory-summary.md, updated_at=2026-11-23T07:50:00+00:00, simulator flight reported; phone test pending) [skysight memory]
+477:- extensions/skysight/resources/2026-11-23T07-30-00-OaWV-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-23T07-30-00-OaWV-10min-memory-summary.md, updated_at=2026-11-23T07:30:00+00:00, user feedback) [skysight memory]
+478:- extensions/skysight/resources/2026-11-22T18-40-00-UhJY-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-22T18-40-00-UhJY-10min-memory-summary.md, updated_at=2026-11-22T18:40:00+00:00, video review and accepted crow placement proposal; implementation not shown) [skysight memory]
+479:- extensions/skysight/resources/2026-11-22T18-20-00-SJZE-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-22T18-20-00-SJZE-10min-memory-summary.md, updated_at=2026-11-22T18:20:00+00:00, reported phone install; device test and commit pending) [skysight memory]
+480:- extensions/skysight/resources/2026-11-22T18-00-00-ttSE-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-22T18-00-00-ttSE-10min-memory-summary.md, updated_at=2026-11-22T18:00:00+00:00, user timing request) [skysight memory]
+481:- extensions/skysight/resources/2026-11-22T12-00-00-zHhS-6h-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-22T12-00-00-zHhS-6h-memory-summary.md, updated_at=2026-11-22T12:00:00+00:00, crow poses and phone installation) [skysight memory]
+581:# Task Group: Carsamba window neighbors and dialogue feedback
+584:applies_to: cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend; reuse_rule=observed project discussion on 2026-11-21; verify actual checkout, assets and phone test.
+590:- extensions/skysight/resources/2026-11-21T06-00-00-OGpC-6h-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-21T06-00-00-OGpC-6h-memory-summary.md, updated_at=2026-11-21T06:00:00+00:00, user feedback and editor reports) [skysight memory]
+591:- extensions/skysight/resources/2026-11-21T12-40-00-ByYE-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-21T12-40-00-ByYE-10min-memory-summary.md, updated_at=2026-11-21T12:40:00+00:00, visual request in progress) [skysight memory]
+592:- extensions/skysight/resources/2026-11-21T13-50-00-yLOr-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-21T13-50-00-yLOr-10min-memory-summary.md, updated_at=2026-11-21T13:50:00+00:00, reported scale fix; phone test pending) [skysight memory]
+593:- extensions/skysight/resources/2026-11-21T13-40-00-CCMR-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-21T13-40-00-CCMR-10min-memory-summary.md, updated_at=2026-11-21T13:40:00+00:00, phone recording feedback) [skysight memory]
+603:- extensions/skysight/resources/2026-11-21T20-10-00-NDfx-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-21T20-10-00-NDfx-10min-memory-summary.md, updated_at=2026-11-21T20:10:00+00:00, reported fix; device test pending) [skysight memory]
+607:- game-over freeze, oyun sonu, sıralama, iOS 26, Game Center, ByzantionGameCenterModule.swift, worklet, telefon
+615:- A game-over video showed a stationary 12-point card. An old leaderboard invisibly blocking touches on iOS 26 was a hypothesis, not a confirmed diagnosis; no crash log and no Game Center account in simulator prevented reproduction. A change to `ByzantionGameCenterModule.swift`, typecheck/worklet test and phone installation were reported; opening and closing rankings then replaying on phone remained unverified, and no commit was reported. Verify current checkout and device. [Task 2] [skysight memory]
+678:# Task Group: Carsamba simulator audit and special-day game visuals
+681:applies_to: cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend; reuse_rule=observed 2026-11-20 via project status; verify checkout, remote and physical device before claiming current completion.
+687:- extensions/skysight/resources/2026-11-20T12-00-00-xuot-6h-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-20T12-00-00-xuot-6h-memory-summary.md, updated_at=2026-11-20T12:00:00+00:00, device audit and visual work) [skysight memory]
+688:- extensions/skysight/resources/2026-11-20T14-40-00-pITJ-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-20T14-40-00-pITJ-10min-memory-summary.md, updated_at=2026-11-20T14:40:00+00:00, fix and commit report) [skysight memory]
+698:- extensions/skysight/resources/2026-11-20T17-50-00-vias-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-20T17-50-00-vias-10min-memory-summary.md, updated_at=2026-11-20T17:50:00+00:00, video and phone test) [skysight memory]
+699:- extensions/skysight/resources/2026-11-20T17-30-00-JkkJ-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-20T17-30-00-JkkJ-10min-memory-summary.md, updated_at=2026-11-20T17:30:00+00:00, assets and preview) [skysight memory]
+700:- extensions/skysight/resources/2026-11-20T15-20-00-zBDa-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-20T15-20-00-zBDa-10min-memory-summary.md, updated_at=2026-11-20T15:20:00+00:00, second visual batch) [skysight memory]
+708:- The user asked to compare menu, gameplay and game-over on available simulators, and prioritized fixing late weather data before choosing iPad portrait lock. [Task 1] [skysight memory]
+806:# Task Group: Carsamba fog, rain, wind and two-minute game flow
+809:applies_to: cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend; reuse_rule=observed 2026-11-18 through project status; inspect checkout and test the current physical device before asserting completion.
+815:- extensions/skysight/resources/2026-11-20T05-30-00-SLBL-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-20T05-30-00-SLBL-10min-memory-summary.md, updated_at=2026-11-20T05:30:00+00:00, later session reported commit, clean workspace and no push) [skysight memory]
+817:- extensions/skysight/resources/2026-11-18T20-00-00-NEiv-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-18T20-00-00-NEiv-10min-memory-summary.md, updated_at=2026-11-18T20:00:00+00:00, rain and wind installed; final wind visibility unverified) [skysight memory]
+818:- extensions/skysight/resources/2026-11-18T19-20-00-ZHjH-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-18T19-20-00-ZHjH-10min-memory-summary.md, updated_at=2026-11-18T19:20:00+00:00, fog simulator check and phone install) [skysight memory]
+819:- extensions/skysight/resources/2026-11-18T19-10-00-dQpt-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-18T19-10-00-dQpt-10min-memory-summary.md, updated_at=2026-11-18T19:10:00+00:00, short game and visual ratings requested) [skysight memory]
+840:# Task Group: Carsamba shareable score postcard and push status
+842:scope: Byzantion game-over share card and November 18 GitHub Desktop push.
+843:applies_to: cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend; reuse_rule=observed status is time-specific; verify checkout, current device and remote before relying on it.
+849:- extensions/skysight/resources/2026-11-18T18-50-00-aOGq-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-18T18-50-00-aOGq-10min-memory-summary.md, updated_at=2026-11-18T18:50:00+00:00, simulator and phone install; real share pending) [skysight memory]
+850:- extensions/skysight/resources/2026-11-18T18-40-00-oDPb-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-18T18-40-00-oDPb-10min-memory-summary.md, updated_at=2026-11-18T18:40:00+00:00, sharing implementation) [skysight memory]
+851:- extensions/skysight/resources/2026-11-18T18-00-00-UVtQ-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-18T18-00-00-UVtQ-10min-memory-summary.md, updated_at=2026-11-18T18:00:00+00:00, push reported complete) [skysight memory]
+866:# Task Group: Carsamba rain outfit preview and integration status
+869:applies_to: cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend; reuse_rule=check current checkout and device testing; source generation and later reported integration are separate stages.
+875:- extensions/skysight/resources/2026-11-17T12-00-00-TDcE-6h-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-17T12-00-00-TDcE-6h-memory-summary.md, updated_at=2026-11-17T18:00:00+00:00, later reported integration and commit) [skysight memory]
+889:# Task Group: Byzantion weather, winter effects and startup feedback
+892:applies_to: cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend; reuse_rule=observed through 2026-11-17; verify current checkout, device and commit state.
+898:- extensions/skysight/resources/2026-11-17T09-40-00-XAlL-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-17T09-40-00-XAlL-10min-memory-summary.md, updated_at=2026-11-17T09:40:00+00:00, background inconsistency) [skysight memory]
+899:- extensions/skysight/resources/2026-11-17T09-30-00-oTbJ-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-17T09-30-00-oTbJ-10min-memory-summary.md, updated_at=2026-11-17T09:30:00+00:00, physical test pending) [skysight memory]
+900:- extensions/skysight/resources/2026-11-17T09-10-00-jnCN-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-17T09-10-00-jnCN-10min-memory-summary.md, updated_at=2026-11-17T09:10:00+00:00, snow effects approved) [skysight memory]
+901:- extensions/skysight/resources/2026-11-17T09-00-00-IXTh-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-17T09-00-00-IXTh-10min-memory-summary.md, updated_at=2026-11-17T09:00:00+00:00, clothing integration reported) [skysight memory]
+902:- extensions/skysight/resources/2026-11-17T08-30-00-BPtJ-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-17T08-30-00-BPtJ-10min-memory-summary.md, updated_at=2026-11-17T08:30:00+00:00, WeatherKit verification ongoing) [skysight memory]
+903:- extensions/skysight/resources/2026-11-17T07-30-00-rfJv-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-17T07-30-00-rfJv-10min-memory-summary.md, updated_at=2026-11-17T07:30:00+00:00, implementation status) [skysight memory]
+907:- Byzantion, WeatherKit, istanbul.ts, WeatherLayer.tsx, b01bf04, bere, atkı, kar, seasonal backgrounds, physical phone
+913:- extensions/skysight/resources/2026-11-17T08-20-00-bgVY-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-17T08-20-00-bgVY-10min-memory-summary.md, updated_at=2026-11-17T08:20:00+00:00, splash feedback) [skysight memory]
+914:- extensions/skysight/resources/2026-11-17T07-50-00-oCBP-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-17T07-50-00-oCBP-10min-memory-summary.md, updated_at=2026-11-17T07:50:00+00:00, threshold requested) [skysight memory]
+924:- extensions/skysight/resources/2026-11-17T14-40-00-Ymsy-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-17T14-40-00-Ymsy-10min-memory-summary.md, updated_at=2026-11-17T14:40:00+00:00) [skysight memory]
+925:- extensions/skysight/resources/2026-11-17T14-00-00-lJOT-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-17T14-00-00-lJOT-10min-memory-summary.md, updated_at=2026-11-17T14:00:00+00:00) [skysight memory]
+926:- extensions/skysight/resources/2026-11-17T13-30-00-PnSq-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-17T13-30-00-PnSq-10min-memory-summary.md, updated_at=2026-11-17T13:30:00+00:00) [skysight memory]
+927:- extensions/skysight/resources/2026-11-17T13-00-00-RbrY-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-17T13-00-00-RbrY-10min-memory-summary.md, updated_at=2026-11-17T13:00:00+00:00) [skysight memory]
+935:- For real İstanbul weather, the selected direction was a visual atmosphere layer that does not change gameplay; the user asked to assess seasonal clothes and weather effects on backgrounds and columns. [Task 1] [skysight memory]
+982:# Task Group: Byzantion three-bridge route, postcards and multiplayer testing
+985:applies_to: cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend; reuse_rule=observed activity through 2026-11-16; verify the current checkout, builds and device results before claiming implementation or release.
+991:- extensions/skysight/resources/2026-11-16T06-00-00-wHbS-6h-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-16T06-00-00-wHbS-6h-memory-summary.md, updated_at=2026-11-16T12:00:00+00:00, activity overview) [skysight memory]
+1001:- extensions/skysight/resources/2026-11-16T13-10-00-irCg-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-16T13-10-00-irCg-10min-memory-summary.md, updated_at=2026-11-16T13:10:00+00:00, race duration decision) [skysight memory]
+1002:- extensions/skysight/resources/2026-11-16T12-50-00-JCoi-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-16T12-50-00-JCoi-10min-memory-summary.md, updated_at=2026-11-16T12:50:00+00:00, ghost-race direction) [skysight memory]
+1003:- extensions/skysight/resources/2026-11-16T12-10-00-RHwr-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-16T12-10-00-RHwr-10min-memory-summary.md, updated_at=2026-11-16T12:10:00+00:00, send side observed; receive untested) [skysight memory]
+1004:- extensions/skysight/resources/2026-11-16T12-00-00-BBBX-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-16T12-00-00-BBBX-10min-memory-summary.md, updated_at=2026-11-16T12:00:00+00:00, TestFlight group selection) [skysight memory]
+1014:- extensions/skysight/resources/2026-11-16T12-00-00-ufcu-6h-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-16T12-00-00-ufcu-6h-memory-summary.md, updated_at=2026-11-16T18:00:00+00:00, activity overview) [skysight memory]
+1015:- extensions/skysight/resources/2026-11-16T17-00-00-GzEr-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-16T17-00-00-GzEr-10min-memory-summary.md, updated_at=2026-11-16T17:00:00+00:00, simulator status reported) [skysight memory]
+1016:- extensions/skysight/resources/2026-11-16T20-10-00-avRv-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-16T20-10-00-avRv-10min-memory-summary.md, updated_at=2026-11-16T20:10:00+00:00, earlier simulator status viewed; phone test and commit not observed) [skysight memory]
+1029:- The user wanted a menu before gameplay, a visible sound toggle, and a translucent ghost character instead of only the opponent name. They found menu/end screens insufficiently lively and approved postcard/postmark styling extending to menu and race screens. [Task 3] [skysight memory]
+1155:# Task Group: Byzantion Game Center and one-step difficulty adjustment
+1157:scope: Game Center delivery and difficulty follow-up in the Carsamba game.
+1158:applies_to: cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend; reuse_rule=build and device state are time-sensitive; verify current checkout and TestFlight.
+1164:- extensions/skysight/resources/2026-11-15T13-00-00-QKzx-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-15T13-00-00-QKzx-10min-memory-summary.md, updated_at=2026-11-15T13:00:00+00:00, new difficulty and feature evaluation requested) [skysight memory]
+1165:- extensions/skysight/resources/2026-11-15T13-50-00-jdCy-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-15T13-50-00-jdCy-10min-memory-summary.md, updated_at=2026-11-15T13:50:00+00:00, phone installation reported; real-device play and commit pending) [skysight memory]
+1167:- extensions/skysight/resources/2026-11-15T11-50-00-AHsu-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-15T11-50-00-AHsu-10min-memory-summary.md, updated_at=2026-11-15T11:50:00+00:00, reported phone installation and simulation) [skysight memory]
+1169:- extensions/skysight/resources/2026-11-14T12-00-00-SezP-6h-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-14T12-00-00-SezP-6h-memory-summary.md, updated_at=2026-11-14T12:00:00+00:00, Game Center and difficulty work) [skysight memory]
+1171:- extensions/skysight/resources/2026-11-16T06-50-00-KGPV-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-16T06-50-00-KGPV-10min-memory-summary.md, updated_at=2026-11-16T06:50:00+00:00, phone test reported; analysis requested) [skysight memory]
+1172:- extensions/skysight/resources/2026-11-16T00-00-00-GyXE-6h-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-16T00-00-00-GyXE-6h-memory-summary.md, updated_at=2026-11-16T00:00:00+00:00, easier first 14 towers; release installation reported) [skysight memory]
+1176:- Byzantion, Game Center, 362ba26, TestFlight, Arkadaşlar, 1.0.0 (3), src/game/config.ts, difficulty, typecheck
+1276:# Task Group: Carsamba stops, postcard album and iOS distribution preparation
+1279:applies_to: cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend; reuse_rule=observed product and Git states are time-sensitive and require verification.
+1285:- extensions/skysight/resources/2026-11-12T12-20-00-aXJq-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-12T12-20-00-aXJq-10min-memory-summary.md, updated_at=2026-11-12T12:20:00+00:00, reported push) [skysight memory]
+1291:## Task 2: Byzantion naming and TestFlight follow-up
+1295:- extensions/skysight/resources/2026-11-14T04-20-00-wKMd-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-14T04-20-00-wKMd-10min-memory-summary.md, updated_at=2026-11-14T04:20:00+00:00, external approval and enabled link reported) [skysight memory]
+1297:- extensions/skysight/resources/2026-11-13T09-20-00-RNTz-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-13T09-20-00-RNTz-10min-memory-summary.md, updated_at=2026-11-13T09:20:00+00:00, external review pending) [skysight memory]
+1298:- extensions/skysight/resources/2026-11-13T08-50-00-GVFY-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-13T08-50-00-GVFY-10min-memory-summary.md, updated_at=2026-11-13T08:50:00+00:00, external group status) [skysight memory]
+1299:- extensions/skysight/resources/2026-11-12T12-00-00-lRQt-6h-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-12T12-00-00-lRQt-6h-memory-summary.md, updated_at=2026-11-12T12:00:00+00:00, activity overview) [skysight memory]
+1300:- extensions/skysight/resources/2026-11-12T18-00-00-lixS-10min-memory-summary.md (cwd=/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend, rollout_path=extensions/skysight/resources/2026-11-12T18-00-00-lixS-10min-memory-summary.md, updated_at=2026-11-12T18:00:00+00:00, accidental number corrected) [skysight memory]
+1304:- Byzantion, com.urazonturk.carsamba, TestFlight 1.0.0 (1), 1.0.0 (2), Arkadaşlar, Waiting for Review, 16e9dac, aşırı basma, İstanbul gizemi, 21
+
+exec
+/bin/zsh -lc 'rg --files | head -150' in /Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend
+ succeeded in 0ms:
+CODEX-MESAJI-OZEL-GUN-2-2026-11-20.md
+README.md
+CLAUDE_SHORTPRESS_RESULT.md
+CODEX-MESAJI-OSURUK-2026-11-11.md
+CLAUDE_HANDOFF.md
+CLAUDE_UPPERCHARGE_EXPERIMENT.md
+GAME_STUDIO.md
+CLAUDE_FINGER_TOUCH_RESULT.md
+CLAUDE_REEVAL_13-48-05.md
+CLAUDE_LONGJUMP_RESULT.md
+CODEX-MESAJI-CUMBA-TEYZE-2026-11-21.md
+CODEX-MESAJI-KARTPOSTAL-PILOT-2026-11-16.md
+CODEX-MESAJI-KARTPOSTAL-POZ-2026-11-16.md
+CODEX-MESAJI-ANALIZ-2026-11-11.md
+CODEX-MESAJI-MEVSIM-SILUET-2026-11-25.md
+CODEX-MESAJI-KIS-BASLIK-2026-11-17.md
+CODEX-MESAJI-KAR-CEPHE-2026-11-24.md
+CLAUDE_CHARGE_TIMING_RESULT.md
+CODEX-MESAJI-KARTPOSTAL-PAKET3-2026-11-16.md
+GORSEL-SARTNAME-PIJAMA-2026-11.md
+CODEX-MESAJI-MEVSIM-CEPHE-2026-11-24.md
+CLAUDE_TAKEOFF_RESULT.md
+CODEX-MESAJI-KILIM-DESEN-2026-11-24.md
+CLAUDE_VIDEO_RESULT.md
+AI_REVIEW.md
+CODEX-MESAJI-KURUKAFA-2026-11-16.md
+CODEX-MESAJI-YAGMUR-MONT-7POZ-2026-11-17.md
+app.json
+CODEX-MESAJI-CESIT-SAKIN-2026-11-25.md
+CODEX-MESAJI-AMCA-BEDEN-DILI-2026-11-23.md
+R070B-HAZIRLIK.md
+CODEX-MESAJI-GORSEL-018.md
+package.json
+package-lock.json
+tsconfig.json
+CODEX-MESAJI-PIJAMA-A-2026-11-16.md
+CODEX-MESAJI-AMCA-DUSUS-YAGMUR-2026-11-23.md
+src/theme.ts
+src/components/error-boundary.tsx
+GORSEL-SARTNAME-2026-11.md
+eslint.config.js
+CODEX-MESAJI-KARTPOSTAL-PAKET1-2026-11-16.md
+CODEX-MESAJI-YAGMUR-SAPKA-MONT-2026-11-17.md
+metro.config.js
+scripts/yagmur-mont-hizala.py
+scripts/cephe-cesit.py
+dialog-mizah/entegrasyon-teslimi-2026-09-18.md
+dialog-mizah/taslak-uc-ton-karsilastirma.md
+CODEX-MESAJI-FAZ2-IFADE-2026-11-11.md
+CLAUDE_RESULT.md
+CODEX-MESAJI-TUTARLILIK-2026-11-24.md
+CODEX-MESAJI-OZEL-GUN-KOMSU-KEDI-2026-11-20.md
+scripts/install-guard.sh
+scripts/yagmur-mont-birlestir.py
+scripts/start-expo-prod-test.sh
+scripts/start-expo-interactive.sh
+ai_review_evidence/sim_sequential.cjs
+app/+html.tsx
+app/_layout.tsx
+app/index.tsx
+CODEX-MESAJI-AMCA-DUSUS-2026-11-23.md
+CODEX-MESAJI-KARTPOSTAL-PAKET2-2026-11-16.md
+CODEX-MESAJI-CAY-2026-11-25.md
+HANDOFF.md
+CODEX-MESAJI-MEVSIM-MAHALLE-2026-11-24.md
+CODEX-MESAJI-AMCA-DUSUS-DIGER-2026-11-23.md
+src/query-client.ts
+scripts/sync-shims.sh
+scripts/yagmur-camasir-birlestir.py
+scripts/cmd-guard.js
+scripts/kivilcim-bekle.py
+scripts/mevsim-arkaplan.py
+scripts/kar-cephe-birlestir.py
+scripts/cephe-kilim.py
+scripts/reset-project.js
+ai_review_evidence/sim_render_camera_r044.cjs
+ai_review_evidence/sim_render_camera_r045.cjs
+ai_review_evidence/HIKAYE3-2026-11-12/rapor.html
+ai_review_evidence/HIKAYE3-2026-11-12/editor-anlati.md
+ai_review_evidence/HIKAYE3-2026-11-12/brief.md
+ai_review_evidence/HIKAYE3-2026-11-12/editor-pazar.md
+ai_review_evidence/HIKAYE3-2026-11-12/editor-dunya.md
+ai_review_evidence/HIKAYE3-2026-11-12/editor-kivilcim.md
+scripts/cmd-guard/rules.js
+scripts/cmd-guard/modes.js
+scripts/cmd-guard/matcher.js
+scripts/cmd-guard/vendor/wildcard-match.js
+ai_review_evidence/sim_candidate.cjs
+src/utils/storage/index.web.ts
+src/utils/storage/index.ts
+src/utils/storage/storage-base.ts
+ai_review_evidence/VIDEO-2026-11-21b/t58.5.jpg
+ai_review_evidence/VIDEO-2026-11-21b/t56.jpg
+ai_review_evidence/VIDEO-2026-11-21b/t59.jpg
+ai_review_evidence/VIDEO-2026-11-21b/t70.jpg
+ai_review_evidence/VIDEO-2026-11-21b/ust.jpg
+ai_review_evidence/VIDEO-2026-11-21b/RAPOR.md
+ai_review_evidence/VIDEO-2026-11-21b/sheet1.jpg
+ai_review_evidence/VIDEO-2026-11-21b/kedi-yakin.jpg
+ai_review_evidence/VIDEO-2026-11-21b/sheet2.jpg
+ai_review_evidence/MEVSIM-SILUET-simulator-kar.png
+ai_review_evidence/VIDEO-2026-11-23b/s1.jpg
+ai_review_evidence/VIDEO-2026-11-23b/ucus.jpg
+ai_review_evidence/VIDEO-2026-11-23c/s2.jpg
+ai_review_evidence/VIDEO-2026-11-23c/s1.jpg
+ai_review_evidence/VIDEO-2026-11-23c/ucus2.jpg
+ai_review_evidence/VIDEO-2026-11-23c/ucus1.jpg
+ai_review_evidence/VIDEO-2026-11-23c/ucus.jpg
+ai_review_evidence/VIDEO-2026-11-23c/RAPOR.md
+ai_review_evidence/VIDEO-2026-11-23c/u3.jpg
+assets/fonts/SpaceMono-Regular.ttf
+ai_review_evidence/TUTARLILIK-2026-11-24/DENETIM-LISTESI.md
+ai_review_evidence/TUTARLILIK-2026-11-24/teyze-serin-kucultme.png
+ai_review_evidence/sim_course_variety.cjs
+ai_review_evidence/KARTPOSTAL-2026-11-16/codex_cevap_etkinlik.md
+ai_review_evidence/KARTPOSTAL-2026-11-16/kart-08.jpg
+ai_review_evidence/KARTPOSTAL-2026-11-16/kart-03-kucuk.jpg
+ai_review_evidence/KARTPOSTAL-2026-11-16/kart-09.jpg
+ai_review_evidence/KARTPOSTAL-2026-11-16/paket2-pozlar.jpg
+ai_review_evidence/KARTPOSTAL-2026-11-16/paket3-kartlar.jpg
+ai_review_evidence/KARTPOSTAL-2026-11-16/kart-08-kucuk.jpg
+ai_review_evidence/KARTPOSTAL-2026-11-16/amca-poz-karsilastirma.jpg
+ai_review_evidence/KARTPOSTAL-2026-11-16/kart-11-kucuk.jpg
+ai_review_evidence/KARTPOSTAL-2026-11-16/kart-05-kucuk.jpg
+ai_review_evidence/KARTPOSTAL-2026-11-16/pilot-kart-05-kucuk.jpg
+ai_review_evidence/KARTPOSTAL-2026-11-16/pilot-kart-02-kucuk.jpg
+ai_review_evidence/KARTPOSTAL-2026-11-16/kart-02-kucuk.jpg
+ai_review_evidence/KARTPOSTAL-2026-11-16/kart_birlestir.py
+ai_review_evidence/KARTPOSTAL-2026-11-16/kart-09-kucuk.jpg
+ai_review_evidence/KARTPOSTAL-2026-11-16/tum-12-kart.jpg
+ai_review_evidence/KARTPOSTAL-2026-11-16/kart-04-kucuk.jpg
+ai_review_evidence/KARTPOSTAL-2026-11-16/codex_cevap.md
+ai_review_evidence/KARTPOSTAL-2026-11-16/kart-10-kucuk.jpg
+ai_review_evidence/KARTPOSTAL-2026-11-16/pilot-kart-05.jpg
+ai_review_evidence/KARTPOSTAL-2026-11-16/RAPOR-ETKINLIK.md
+ai_review_evidence/KARTPOSTAL-2026-11-16/codex_soru.md
+ai_review_evidence/KARTPOSTAL-2026-11-16/kart-01-kucuk.jpg
+ai_review_evidence/KARTPOSTAL-2026-11-16/paket2-kartlar.jpg
+ai_review_evidence/KARTPOSTAL-2026-11-16/codex_soru_etkinlik.md
+ai_review_evidence/KARTPOSTAL-2026-11-16/pilot-kart-02.jpg
+ai_review_evidence/KARTPOSTAL-2026-11-16/kart-07-kucuk.jpg
+ai_review_evidence/KARTPOSTAL-2026-11-16/paket3-pozlar.jpg
+ai_review_evidence/KARTPOSTAL-2026-11-16/kart-02.jpg
+ai_review_evidence/KARTPOSTAL-2026-11-16/kart-03.jpg
+ai_review_evidence/KARTPOSTAL-2026-11-16/kart-01.jpg
+ai_review_evidence/KARTPOSTAL-2026-11-16/RAPOR.md
+ai_review_evidence/KARTPOSTAL-2026-11-16/paket1-kartlar.jpg
+ai_review_evidence/KARTPOSTAL-2026-11-16/kart-04.jpg
+ai_review_evidence/KARTPOSTAL-2026-11-16/kart-10.jpg
+ai_review_evidence/KARTPOSTAL-2026-11-16/kart-11.jpg
+
+exec
+/bin/zsh -lc 'rg -n "hold|charge|combo|score|difficulty|tutorial|accessib|haptic|vibration|landing|near|streak|daily|harita" src/game app/index.tsx' in /Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend
+ succeeded in 0ms:
+src/game/yagmur.ts:12:  require("@/assets/characters/yagmur/charge-000-yagmur.png"),
+src/game/yagmur.ts:13:  require("@/assets/characters/yagmur/charge-012-yagmur.png"),
+src/game/yagmur.ts:14:  require("@/assets/characters/yagmur/charge-025-yagmur.png"),
+src/game/yagmur.ts:15:  require("@/assets/characters/yagmur/charge-037-yagmur.png"),
+src/game/yagmur.ts:16:  require("@/assets/characters/yagmur/charge-050-yagmur.png"),
+src/game/yagmur.ts:17:  require("@/assets/characters/yagmur/charge-062-yagmur.png"),
+src/game/yagmur.ts:18:  require("@/assets/characters/yagmur/charge-075-yagmur.png"),
+src/game/yagmur.ts:19:  require("@/assets/characters/yagmur/charge-087-yagmur.png"),
+src/game/yagmur.ts:20:  require("@/assets/characters/yagmur/charge-100-yagmur.png"),
+src/game/config.ts:22:  // Jump force is interpolated between MIN (tap) and MAX (full charge).
+src/game/config.ts:23:  // Vertical speed follows charge; horizontal speed reaches a plateau early.
+src/game/config.ts:24:  // Longer normal holds travel farther because the flight lasts longer.
+src/game/config.ts:25:  minJumpVX: 70, // horizontal launch speed at 0% charge
+src/game/config.ts:26:  maxJumpVX: 400, // horizontal launch speed at 100% charge
+src/game/config.ts:27:  minJumpVY: 220, // upward launch speed at 0% charge (applied as negative)
+src/game/config.ts:29:  maxJumpVY: 1450, // upward launch speed at 100% charge
+src/game/config.ts:30:  chargeResponseCurve: 1, // exponent reshaping the charge fraction before it drives BOTH vx and vy; 1 = linear (unchanged)
+src/game/config.ts:32:  // How long the player must hold to reach full charge. Tuned so ~50% charge
+src/game/config.ts:34:  // power use this same linear charge value.
+src/game/config.ts:61:  // difficultyRamp platforms (gradual difficulty envelope).
+src/game/config.ts:69:  difficultyRamp: 40, // platforms over which difficulty ramps 0 -> 1
+src/game/config.ts:72:  // Width-category weights after warm-up, lerped early -> late by difficulty t
+src/game/config.ts:80:  capHeight: 12, // landing-surface cap thickness
+src/game/config.ts:88:  scorePerLanding: 1, // base points per tower advanced
+src/game/config.ts:89:  scoreMultiTowerBonus: 1, // extra per tower when advancing 2+ in one jump
+src/game/config.ts:90:  scorePerfectBonus: 2,
+src/game/config.ts:120:  // Visible spring: its lower end is the player collision/landing point.
+src/game/config.ts:122:  springMinHeight: 6, // fully charged height
+src/game/config.ts:126:  chargeSquashY: 0.12, // how much the blob compresses vertically at full charge
+src/game/config.ts:127:  chargeStretchX: 0.08, // how much it widens at full charge
+src/game/config.ts:128:  maxChargeShake: 2.8, // px jitter amplitude once near max charge
+src/game/config.ts:130:  landPulseDuration: 0.26, // seconds for the landing compression to recover
+src/game/config.ts:175:  // chargeResponseCurve reshapes the charge fraction fed to BOTH vx and vy
+src/game/config.ts:181:  // Re-measuring 7 reference flights (holds ~0.25-0.56s, not just the
+src/game/config.ts:182:  // original 3) found the hold-time -> power relationship too noisy/
+src/game/config.ts:184:  // "mildly sublinear" trend did not hold up with more data. Separately, a
+src/game/config.ts:188:  // piecewise version (identity below a threshold, reshaped above it) was
+src/game/config.ts:192:  // one worth improving at their expense. Reverting to 1 (linear, i.e. no
+src/game/config.ts:197:  chargeResponseCurve: 1,
+src/game/config.ts:198:  scorePerfectBonus: 0, // reference: center placement does not add points
+src/game/config.ts:203:  //   effectiveCharge across the WHOLE 0-1 charge range, INCLUDING c=1 (full
+src/game/config.ts:204:  //   charge) -- this is not only a mid-range timing-window change. At
+src/game/config.ts:205:  //   plateau=1.15, full-charge horizontal speed drops from 620 to ~539
+src/game/config.ts:206:  //   units (-13%), so MAXIMUM horizontal range is reduced and every charge's
+src/game/config.ts:207:  //   launch angle is steeper than today's near-constant ~70 degrees (vy is
+src/game/config.ts:209:  //   and tilts upward at every charge, not just short taps). Different
+src/game/config.ts:211:  //   chargeResponseCurve exponent on BOTH vx/vy, not a piecewise curve
+src/game/config.ts:214:  //   Simulated (real jump.ts/landing.ts/reference-course.ts, actual spawn
+src/game/config.ts:225:  //   plateau near 2.0, which also breaks the first jump entirely, would
+src/game/config.ts:256:  //    t = min(1, id/difficultyRamp). This ramp already blends toward the
+src/game/config.ts:258:  //    id=20 at difficultyRamp=40) -- this is NOT a "late towers only"
+src/game/config.ts:263:  //    real carried-forward landing positions (not a per-config successful-
+src/game/config.ts:275:  //  - Net effect on a REALISTIC "nearest-reachable" charge per hop (a
+src/game/config.ts:284:  // OYUN_AKISI-001 (2026-09-22, user-authorized difficulty increase): these
+src/game/config.ts:288:  // gameplay difficulty; that dead-config situation is fixed as part of
+src/game/config.ts:302:// physics telemetry (charge %, velocities, platform distance/width, landing
+src/game/config.ts:309:  IDLE: 0, // standing on a platform, ready to charge
+src/game/procedural-course.ts:32:// mulberry32Step directly, since a worklet closure can't hold plain mutable
+src/game/procedural-course.ts:58:  const t = DURAK_SEFER ? stopDifficulty(id) : Math.min(1, id / CONFIG.difficultyRamp); // 0 early -> 1 late
+src/game/procedural-course.ts:63:  // gap distance (grows with difficulty; warm-up = short/medium only)
+app/index.tsx:3:import { LinearGradient } from "expo-linear-gradient";
+app/index.tsx:4:import * as Haptics from "expo-haptics";
+app/index.tsx:52:import { DAILY_KEY, DAILY_MAP, dailySeed, todayKey, todayLabel, type DailyRecord } from "../src/game/daily";
+app/index.tsx:64:import { findFootLanding } from "../src/game/landing";
+app/index.tsx:127:// not duplicated, so the visual cap and the physical landing surface can
+app/index.tsx:134:// below every possible landing cap (rootedTopY max ~80.6) so no landing
+app/index.tsx:175:// -- see AI_REVIEW.md REVIZYON-054). The landing ridge is the existing cap at
+app/index.tsx:227:// jumps; removed (a charge-predicted glow would be an aim assist). Kept off.
+app/index.tsx:246:// tiles never restart at the landing edges.
+app/index.tsx:314:// FAZ2 (2026-11-11): landing feel + character size trial. All visual-only:
+app/index.tsx:315:// physics, collision, camera and the landing point are untouched.
+app/index.tsx:316:const FAZ2_SQUASH = true as boolean; // re-enable GORSEL-017 landing squash (pivot = feet)
+app/index.tsx:317:const FAZ2_DUST = true as boolean; // roof-dust puff on every new-tower landing
+app/index.tsx:321:// the charge + a short-lived cream puff trail behind the hips; both cut on
+app/index.tsx:322:// landing ("pof"). Visual/audio only. 6 pooled puffs, transform+opacity only.
+app/index.tsx:391:// REVIZYON-066 experiment (one variable): expo-linear-gradient's iOS layer
+app/index.tsx:397:// linear gradient looks the same), so their layers never change bounds.
+app/index.tsx:451:// world-anchored near/ground layer below) but the source is now
+app/index.tsx:511:// hero-art near image below, which is finite width) -- kept from GORSEL-015.
+app/index.tsx:542:// Preserve historical scores separately because the scoring rules changed.
+app/index.tsx:578:const BEST_SCORE_KEY = REFERENCE_TRIAL ? "jumpcharge.bestScore.reference.v1" : "jumpcharge.bestScore";
+app/index.tsx:597:// 0-score game over) -- worse than the pre-GORSEL-017 baseline. Flipped
+app/index.tsx:618:// as wide as the sole span landing detection already uses (CONFIG.footSoles
+app/index.tsx:749:  rec: require("@/assets/characters/charge-100-r12-ifade.png"),
+app/index.tsx:750:  mid: require("@/assets/characters/charge-050-r12-ifade.png"),
+app/index.tsx:751:  low: require("@/assets/characters/charge-000-r12.png"),
+app/index.tsx:813:function raceOutcome(c: { race?: string; replyRace?: string; score: number; reply?: number }) {
+app/index.tsx:818:  return r > c.score ? -1 : r === c.score ? 0 : 1;
+app/index.tsx:926:  const [score, setScore] = useState(0);
+app/index.tsx:932:    // against the launch-determining native-timestamp charge on a real
+app/index.tsx:934:    console.info("[jump-measurement]", JSON.stringify({ heldMs: ms, charge: power, visualCharge: lastVisualCharge, pressToFirstFrameMs, vx: launchVX, vy: launchVY, screenWidth: width, fromPlatformId: fromId }));
+app/index.tsx:994:  // on top of the charge area on every single launch, blocking the first
+app/index.tsx:1041:  const [landingLabel, setLandingLabel] = useState("PERFECT!");
+app/index.tsx:1042:  const [landingSub, setLandingSub] = useState("");
+app/index.tsx:1273:    charge: 0, vx: 0, vy: 0, dist: 0, width: 0, offset: 0, fps: 0, p50: 0, p95: 0, dropped: 0,
+app/index.tsx:1275:  const scoreRef = useRef(0);
+app/index.tsx:1283:  const seedRef = useRef(0); // bu koşunun harita tohumu
+app/index.tsx:1306:  const [sheetMode, setSheetMode] = useState<"score" | "race">("score");
+app/index.tsx:1343:  const [mode, setMode] = useState<"free" | "daily">("free");
+app/index.tsx:1344:  const modeRef = useRef<"free" | "daily">("free");
+app/index.tsx:1347:  const dailyRef = useRef<DailyRecord>({ date: "", best: 0, farthest: 0 });
+app/index.tsx:1361:  const charge = useSharedValue(0);
+app/index.tsx:1363:  // touches `charge` itself. Declared here (not next to poseCharge below)
+app/index.tsx:1365:  // of every real charge -- see the 2026-09-22 device-rejection fix note at
+app/index.tsx:1373:  // Diagnostic only (not read by the charge formula below): records the
+app/index.tsx:1448:  // Visual-only, unrelated to score: which platform the character is
+app/index.tsx:1451:  // NEW high-score platform and must not be repurposed for this (see
+app/index.tsx:1455:  // read directly from platform data at landing time -- this, not a bare id
+app/index.tsx:1481:  // Perfect-landing particle burst
+app/index.tsx:1494:      else if (scoreRef.current === 0 && !raceRef.current) skyStep.value = withTiming(Math.max(START_SKY, real), { duration: 1200 });
+app/index.tsx:1596:    if (scoreRef.current === 0) winterWear.value = season === "kis" ? 1 : 0;
+app/index.tsx:1608:    if (scoreRef.current === 0) rainWear.value = rainingNow ? 1 : 0;
+app/index.tsx:1613:    if (!ICSES_ON || menuOpen || gameOver || score !== 0 || raceOn) return;
+app/index.tsx:1615:      if (scoreRef.current !== 0) return;
+app/index.tsx:1620:  }, [menuOpen, gameOver, score, raceOn, showThought]);
+app/index.tsx:1647:    if (KURUKAFA_ON) skullBob.value = withRepeat(withTiming(1, { duration: 1600, easing: Easing.linear }), -1, false);
+app/index.tsx:1687:      showToast(c.race ? `🏁 ${c.from || "Bir arkadaşın"} sana 2 dakikalık meydan okudu: ${c.score}. kule` : `⚔️ ${c.from || "Bir arkadaşın"} sana meydan okudu: ${c.score} puan`);
+app/index.tsx:1710:  // Load persisted best score once.
+app/index.tsx:1727:          if (alive && d && typeof d.date === "string") dailyRef.current = d;
+app/index.tsx:1805:      charge.value = 0;
+app/index.tsx:1927:      towersCrossed * CONFIG.scorePerLanding +
+app/index.tsx:1928:      (towersCrossed > 1 ? towersCrossed * CONFIG.scoreMultiTowerBonus : 0) +
+app/index.tsx:1929:      (perfect ? CONFIG.scorePerfectBonus : 0);
+app/index.tsx:1930:    scoreRef.current += gained;
+app/index.tsx:1931:    setScore(scoreRef.current);
+app/index.tsx:1937:        const line = icSesAfterLanding(rs, ratio, towersCrossed, scoreRef.current, bestRef.current);
+app/index.tsx:2002:      scoreRef.current += OVER_BONUS;
+app/index.tsx:2003:      setScore(scoreRef.current);
+app/index.tsx:2046:      rc.best = Math.max(rc.best, scoreRef.current);
+app/index.tsx:2072:      GameCenter.finishChallenge(id, scoreRef.current, gcNameRef.current);
+app/index.tsx:2084:        if (modeRef.current === "daily") {
+app/index.tsx:2085:          dailyRef.current = { ...dailyRef.current, farthest: lt };
+app/index.tsx:2086:          storage.setItem(DAILY_KEY, JSON.stringify(dailyRef.current));
+app/index.tsx:2094:    if (SFX_ON) playSfx(scoreRef.current > bestRef.current && scoreRef.current > 0 ? "record" : "fall");
+app/index.tsx:2095:    if (SFX_ON) mahalleSes({ tur: "oyunSonu", rekor: scoreRef.current > bestRef.current && scoreRef.current > 0 });
+app/index.tsx:2098:      const sc = scoreRef.current;
+app/index.tsx:2117:        const msg = hanimMessage({ score: sc, newRecord: rec, stops: stopsNow, hour: tr.getUTCHours(), minute: tr.getUTCMinutes(),
+app/index.tsx:2130:    // Free-mode runs only: the daily map is a different course every day.
+app/index.tsx:2131:    if (GAME_CENTER_ON && modeRef.current !== "daily") GameCenter.submitScore(scoreRef.current, LEADERBOARD_ID);
+app/index.tsx:2141:    if (scoreRef.current > bestRef.current) {
+app/index.tsx:2142:      bestRef.current = scoreRef.current;
+app/index.tsx:2143:      setBest(scoreRef.current);
+app/index.tsx:2144:      if (modeRef.current === "daily") {
+app/index.tsx:2145:        dailyRef.current = { ...dailyRef.current, best: scoreRef.current };
+app/index.tsx:2146:        storage.setItem(DAILY_KEY, JSON.stringify(dailyRef.current));
+app/index.tsx:2148:        freeBestRef.current = scoreRef.current;
+app/index.tsx:2149:        storage.setItem(BEST_SCORE_KEY, scoreRef.current);
+app/index.tsx:2211:    scoreRef.current = 0;
+app/index.tsx:2221:    } else if (DAILY_MAP && modeRef.current === "daily") {
+app/index.tsx:2222:      // Gün değiştiyse günlük kayıt sıfırlanır; harita o günün tohumuyla kurulur.
+app/index.tsx:2224:      if (dailyRef.current.date !== key) {
+app/index.tsx:2225:        dailyRef.current = { date: key, best: 0, farthest: 0 };
+app/index.tsx:2231:      initWorld(dailySeed(key));
+app/index.tsx:2288:          gProg.value = withTiming(1, { duration: Math.max(120, Math.min(nk === EV_LAND ? 2500 : 450, nt - t)), easing: Easing.linear });
+app/index.tsx:2328:      rc.best = Math.max(rc.best, scoreRef.current);
+app/index.tsx:2416:    const code = makeCode(seedRef.current, scoreRef.current);
+app/index.tsx:2417:    Share.share({ message: shareText(code, scoreRef.current, gcPlayer?.displayName ?? "") }).catch(() => {});
+app/index.tsx:2437:    const ch: Challenge = { seed: c.seed >>> 0, target: c.score, from: c.from, matchID: c.matchID };
+app/index.tsx:2461:      : await GameCenter.challengePlayer(f.id, seedRef.current, scoreRef.current, gcNameRef.current);
+app/index.tsx:2480:  const switchMode = useCallback((next: "free" | "daily") => {
+app/index.tsx:2483:    if (next === "daily") {
+app/index.tsx:2485:      if (dailyRef.current.date !== key) dailyRef.current = { date: key, best: 0, farthest: 0 };
+app/index.tsx:2486:      bestRef.current = dailyRef.current.best;
+app/index.tsx:2487:      setBest(dailyRef.current.best);
+app/index.tsx:2488:      farthestRef.current = dailyRef.current.farthest;
+app/index.tsx:2489:      recordFlagId.value = dailyRef.current.farthest;
+app/index.tsx:2516:      charge.value = 0;
+app/index.tsx:2522:      if (SFX_ON) runOnJS(playSfx)("charge");
+app/index.tsx:2612:      // Diagnostic snapshot (see CLAUDE_CHARGE_TIMING_RESULT.md): charge.value
+app/index.tsx:2616:      const lastVisualCharge = charge.value;
+app/index.tsx:2626:      charge.value = 0;
+app/index.tsx:2627:      if (SFX_ON) runOnJS(stopSfx)("charge");
+app/index.tsx:2643:          flyT.value = withRepeat(withTiming(1, { duration: 1400, easing: Easing.linear }), -1, false);
+app/index.tsx:2649:      // launch, so the pose is guaranteed to track real charge/idle for the
+app/index.tsx:2676:      if (SFX_ON) runOnJS(stopSfx)("charge");
+app/index.tsx:2677:      charge.value = 0;
+app/index.tsx:2751:    // --- charge ---
+app/index.tsx:2753:    // per-frame delta. This removes drift AND the charge-start boundary
+app/index.tsx:2773:      charge.value = Math.min(1, Math.max(0, heldMs / 1000 / CONFIG.maxChargeDuration));
+app/index.tsx:2782:    if (phase.value === PHASE.CHARGING && charge.value >= 1 && jacketPopped.value === 0) {
+app/index.tsx:2864:          // fair landing
+app/index.tsx:2870:          // Visual-only, unconditional on every successful landing (unlike
+app/index.tsx:2871:          // the score-only lastLandedId gate a few lines below). Anchored to
+app/index.tsx:2872:          // the actual resolved landing x (cx), not the platform's center,
+app/index.tsx:2873:          // so the cloud tracks an off-center landing and wraps the
+app/index.tsx:2880:          // GORSEL-017 (2026-09-23): visual-only landing squash. landPulse
+app/index.tsx:2882:          // (see ChargePoses.tsx) -- py.value/vx/vy, the resolved landing
+app/index.tsx:2889:          // FAZ2 sound: every landing contact says "tak" (also short hops on
+app/index.tsx:2890:          // the same tower, which score nothing and used to be silent).
+app/index.tsx:2993:    // Charge remains immediate; only recovery after landing is softened.
+app/index.tsx:2994:    if (phase.value === PHASE.CHARGING) visualCharge.value = charge.value;
+app/index.tsx:3042:    // that threshold does the target move forward, by exactly enough to
+app/index.tsx:3043:    // hold the player AT the threshold; camX then eases toward that target
+app/index.tsx:3052:    // landing and later catching up to it.
+app/index.tsx:3119:          charge: Math.round(charge.value * 100),
+app/index.tsx:3137:  // landing detection use (py = topY - PH/2 at rest, so feet == topY) -- and
+app/index.tsx:3141:  // Pose driver: the RAW charge.value (decision 2026-09-21, no platform
+app/index.tsx:3142:  // compensation). poseOverride (declared above, near `charge`) >= 0 is a
+app/index.tsx:3143:  // __DEV__-only visual freeze; it never touches `charge`.
+app/index.tsx:3144:  const poseCharge = useDerivedValue(() => (poseOverride.value >= 0 ? poseOverride.value : charge.value));
+app/index.tsx:3151:  // HAYALET YARIŞ: rakibin amcası kendi haritamızda, kule kimliği + kule üstündeki oranla konumlanır.
+app/index.tsx:3188:  // tower's cap only while charging; opacity follows the charge (non-layout).
+app/index.tsx:3315:  // "near" box (see ROOFTOP_BAND_* comment above for why that was the root
+app/index.tsx:3328:  // GORSEL-016 near-image tiles: this crop represents the SAME ground plane
+app/index.tsx:3398:      <LinearGradient
+app/index.tsx:3407:          there is no separate far/near split to draw -- see the panel
+app/index.tsx:3471:      {!POPUP && <LinearGradient pointerEvents="none" colors={roofWx === "kar" ? ["rgba(60,110,190,0.08)", "rgba(255,190,120,0)", "rgba(255,170,100,0)"] : ["rgba(30,120,230,0.10)", "rgba(255,190,120,0)", "rgba(255,170,100,0.10)"]}
+app/index.tsx:3526:        {/* GORSEL-015/016 ground band + near-image tiles: DISABLED as of
+app/index.tsx:3531:            visible in a thin strip near the bottom. Root cause (traced by
+app/index.tsx:3536:            solid brown (groundBandStyle) or the near-image tiles (which
+app/index.tsx:3563:              <LinearGradient
+app/index.tsx:3570:                key={`near-tile-${i}`}
+app/index.tsx:3707:            <LinearGradient colors={["rgba(165,210,235,0)", "rgba(165,210,235,0.13)", "rgba(165,210,235,0)"]}
+app/index.tsx:3714:            <LinearGradient colors={["rgba(190,220,235,0)", "rgba(190,220,235,0.08)", "rgba(190,220,235,0)"]}
+app/index.tsx:3780:            <LinearGradient pointerEvents="none" colors={["rgba(255,236,170,0)", "rgba(255,226,140,0.55)", "rgba(255,248,214,0.95)"]} locations={[0, 0.75, 1]} style={styles.houseGradFill} />
+app/index.tsx:3808:        {/* Perfect-landing particle burst */}
+app/index.tsx:3825:            charge/jump/fall/landing until the 5-pose set exists). Drawn after
+app/index.tsx:3892:          // GORSEL-017 ROLLBACK-01 (2026-09-23): landing squash disabled --
+app/index.tsx:3896:          // the withSequence trigger in the landing-contact block still
+app/index.tsx:3922:          input, see charge-surface) until background/district/character loaded. */}
+app/index.tsx:3931:        testID="charge-surface"
+app/index.tsx:3947:        <LinearGradient pointerEvents="none" colors={["rgba(58,36,24,0)", "rgba(58,36,24,0.38)"]}
+app/index.tsx:3953:          accessibilityRole="button"
+app/index.tsx:3954:          accessibilityLabel={sfxMuted ? "Sesi aç" : "Sesi kapat"}
+app/index.tsx:3966:          accessibilityRole="button"
+app/index.tsx:3967:          accessibilityLabel="Yarıştan çık"
+app/index.tsx:3977:        <Text style={[styles.scoreText, (POPUP || nightHud) && styles.puScoreText]} testID="score-value">
+app/index.tsx:3978:          {score}
+app/index.tsx:3981:          {FAZ1_UI ? (mode === "daily" ? "GÜNÜN REKORU" : "REKOR") : "BEST"} {best}
+app/index.tsx:3985:        {OYUN_SONU_TEST && <Text style={styles.dailyChip}>📅 Günün haritası · 23 Kasım</Text>}
+app/index.tsx:3991:        {DAILY_MAP && mode === "daily" && score > 0 && <Text style={styles.dailyChip}>📅 Günün haritası · {todayLabel()}</Text>}
+app/index.tsx:4008:          harita hemen o moda geçer, oynamak ya da düşmek gerekmez. */}
+app/index.tsx:4009:      {DAILY_MAP && score === 0 && !gameOver && assetsReady && (
+app/index.tsx:4012:          {(["free", "daily"] as const).map((m) => (
+app/index.tsx:4027:      {score === 0 && !gameOver && assetsReady && !raceOn && !menuOpen && !raceResult && runsDone < 3 && (
+app/index.tsx:4034:            <Text style={[styles.hintText, POPUP && styles.puHintText]}>Hold to charge · Release to jump</Text>
+app/index.tsx:4084:          <PerfectPop key={`${score}-${landingLabel}`} styles={styles} label={landingLabel} sub={landingSub} big={FAZ1_UI} />
+app/index.tsx:4095:          <Text style={styles.debugText}>charge {debug.charge}%</Text>
+app/index.tsx:4120:                <Text style={[styles.pcLabel, styles.goSmLabel]}>{DAILY_MAP && mode === "daily" ? `GÜNÜN HARİTASI · ${todayLabel()}` : "SKOR"}</Text>
+app/index.tsx:4121:                <CountUp to={score} style={[styles.pcScore, styles.goScore]} />
+app/index.tsx:4125:                    : `Rekor ${best}${best - score > 0 ? ` · ${best - score} puan kaldı` : best === score && score > 0 ? " · rekora eşitledin" : ""}`}
+app/index.tsx:4128:              <View style={[styles.goInfoPill, score > challenge.target ? styles.challengeWin : styles.challengeLose]} testID="challenge-result">
+app/index.tsx:4130:                  {score > challenge.target ? `⚔️ Geçtin! ${score} > ${challenge.target} 🎉` : score === challenge.target ? `⚔️ Berabere: ${score}` : `⚔️ Hedef ${challenge.target} · ${challenge.target - score} puan eksik`}
+app/index.tsx:4148:                <Text style={styles.friendPillText}>{incoming[0].race ? `🏁 ${incoming[0].from || "Bir arkadaşın"} sana 2 dakikalık meydan okudu: ${incoming[0].score}. kule` : `⚔️ ${incoming[0].from || "Bir arkadaşın"} sana meydan okudu: ${incoming[0].score} puan`}</Text>
+app/index.tsx:4160:                    ? `🏁 ${friendResults[0].replier || "Arkadaşın"} meydan okumanı oynadı: ${friendResults[0].reply ?? 0}. kule (sen ${friendResults[0].score}) — ${raceOutcome(friendResults[0]) < 0 ? "seni geçti!" : raceOutcome(friendResults[0]) === 0 ? "berabere" : "geçemedi 🎉"}`
+app/index.tsx:4161:                    : `⚔️ ${friendResults[0].replier || "Arkadaşın"} senin ${friendResults[0].score} puanını oynadı: ${friendResults[0].reply ?? 0} — ${(friendResults[0].reply ?? 0) > friendResults[0].score ? "seni geçti!" : (friendResults[0].reply ?? 0) === friendResults[0].score ? "berabere" : "geçemedi 🎉"}`}
+app/index.tsx:4184:                  <Text style={styles.playBtnText}>{MEYDAN_ON && challenge ? "Aynı haritada tekrar" : "Bir daha"}</Text>
+app/index.tsx:4199:                    <Pressable testID="challenge-share" style={({ pressed }) => [styles.pcIconBtn, pressed && styles.playBtnPressed]} onPress={YARIS_ON ? startMeydan : () => { setSheetMode("score"); askChallenge(); }}>
+app/index.tsx:4227:                source={goInfo.newRecord ? PC_STICKER.rec : score === 0 || score < best * 0.3 ? PC_STICKER.low : PC_STICKER.mid}
+app/index.tsx:4232:            {goInfo.newRecord && <Postmark delay={countUpMs(score)} styles={styles} small />}
+app/index.tsx:4246:            score={score}
+app/index.tsx:4250:            sticker={goInfo.newRecord ? PC_STICKER.rec : score === 0 || score < best * 0.3 ? PC_STICKER.low : PC_STICKER.mid}
+app/index.tsx:4307:                      <Text style={styles.friendPillText}>{incoming[0].race ? `${incoming[0].from || "Bir arkadaşın"} sana 2 dakikalık meydan okudu: ${incoming[0].score}. kule` : `${incoming[0].from || "Bir arkadaşın"} sana meydan okudu: ${incoming[0].score} puan`}</Text>
+app/index.tsx:4440:            <Text style={styles.albumSub}>{sheetMode === "race" && raceResult ? `2 dakikalık meydan okumanı (${raceResult.me.far}. kule) ve hayaletini gönder` : `${score} puanını ve bu haritayı gönder`}</Text>
+app/index.tsx:4448:                    {f.score != null && <Text style={styles.friendScore}>🏆 En yüksek: {f.score} puan</Text>}
+app/index.tsx:4454:            {sheetMode === "score" && (
+app/index.tsx:4457:                <Text style={styles.goCodeValue} selectable>{makeCode(seedRef.current, score)}</Text>
+app/index.tsx:4463:                    const ok = GameCenter.copyText(makeCode(seedRef.current, score));
+app/index.tsx:4493:              placeholder="KOD-PUAN"
+app/index.tsx:4494:              placeholderTextColor="#b8a17e"
+app/index.tsx:4502:              <Text style={styles.playBtnText}>Aynı haritada başla</Text>
+app/index.tsx:4588:            <Text style={styles.statValue} testID="final-score">
+app/index.tsx:4589:              {score}
+app/index.tsx:4628:          <Pressable accessibilityRole="button" onPress={() => setShowArtTiming(false)}><Text style={styles.artLoadingText}>Kapat</Text></Pressable>
+app/index.tsx:4637:          these charge-percent boxes rendering in the top-right corner on
+app/index.tsx:4703:// (setScore on each landing, setLastJump on each release in dev builds) used
+app/index.tsx:4706:// ~13 mappers per house on the UI thread at takeoff and landing. Props here
+app/index.tsx:4958:              <LinearGradient pointerEvents="none" colors={["rgba(255,240,214,0.10)", "rgba(255,240,214,0)"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.houseGradFill} />
+app/index.tsx:4961:              <LinearGradient pointerEvents="none" colors={["rgba(52,30,18,0)", `rgba(52,30,18,${HOUSE_SHADE_A})`]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.houseGradFill} />
+app/index.tsx:4964:              <LinearGradient pointerEvents="none" colors={["rgba(30,18,10,0.43)", "rgba(30,18,10,0)"]} style={styles.houseGradFill} />
+app/index.tsx:4969:            <LinearGradient pointerEvents="none" colors={["rgba(255,240,214,0.10)", "rgba(255,240,214,0)"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.houseLight} />
+app/index.tsx:4970:            <LinearGradient pointerEvents="none" colors={["rgba(52,30,18,0)", `rgba(52,30,18,${HOUSE_SHADE_A})`]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.houseShade} />
+app/index.tsx:4971:            <LinearGradient pointerEvents="none" colors={["rgba(30,18,10,0.43)", "rgba(30,18,10,0)"]} style={styles.houseEaveShadow} />
+app/index.tsx:5015:                    <LinearGradient colors={["rgba(250,252,255,0.97)", "rgba(244,248,255,0.9)", "rgba(240,246,255,0.35)"]} locations={[0, 0.45, 1]} style={styles.houseGradFill} />
+app/index.tsx:5020:                    <LinearGradient colors={["rgba(255,255,255,0)", "rgba(230,240,255,0.32)", "rgba(255,255,255,0)"]} locations={[0.25, 0.42, 0.6]} style={styles.houseGradFill} />
+app/index.tsx:5076:// (PlatformView, exactly p.x/p.topY/p.width) stays the landing edge; the roof
+app/index.tsx:5138:        <LinearGradient pointerEvents="none" colors={["rgba(40,22,12,0.30)", "rgba(40,22,12,0)"]} style={styles.puEaveShadow} />
+app/index.tsx:5142:        <LinearGradient pointerEvents="none" colors={["#c9a473", "#a57d4f"]} style={styles.houseFill} />
+app/index.tsx:5202:  // LinearGradient, not derived from the sprite's own alpha) that used to sit
+app/index.tsx:5211:  // REVIZYON-031: landing-cap rim (light top edge over a dark under-edge) on
+app/index.tsx:5258:              gone. The landing surface is now one masonry shaft emerging
+app/index.tsx:5355:  // tap while trying to charge a jump could silently freeze the pose -- see
+app/index.tsx:5358:  // where a real charge press lands.
+app/index.tsx:5383:  // any more: the player's landing surface is invisible, and the real
+app/index.tsx:5385:  // ones already painted into the background. towerCenter (perfect-landing
+app/index.tsx:5410:  // what's on screen is a short clean cap at the real landing surface and
+app/index.tsx:5526:  scoreText: {
+app/index.tsx:5593:  dailyChip: { marginTop: 2, fontSize: 12, fontWeight: "800", color: "#2a1b12", opacity: 0.8 },
+src/game/daily.ts:8:export const DAILY_KEY = "carsamba.daily.v1";
+src/game/daily.ts:24:/** Tarih anahtarından 32-bit tohum (FNV-1a). Aynı gün = aynı harita. */
+src/game/daily.ts:25:export function dailySeed(key = todayKey()) {
+src/game/daily.ts:27:  const s = `gunun-haritasi:${key}`;
+src/game/sfx.ts:5:// (press, release, landing, game over) -- nothing per frame.
+src/game/sfx.ts:12:  charge: require("@/assets/sounds/charge.wav"),
+src/game/sfx.ts:43:  charge: 0.35, land: 0.7, multi: 0.6, record: 0.55, fall: 0.45, horn_far: 0.14,
+src/game/sfx.ts:49:// 2026-11-11 phone test (ScreenRecording 14-39-15): ~1 in 4 landing/fall
+src/game/sfx.ts:72:    for (let i = 0; i < (k === "charge" ? 1 : POOL); i++) {
+src/game/sfx.ts:120:// GAZ trial: size follows the released charge (short tap = small "pıt", full
+src/game/sfx.ts:121:// charge = the long one); never the same variant twice in a row.
+src/game/sfx.ts:123:export function playFart(charge: number) {
+src/game/sfx.ts:124:  const group: SfxName[] = charge < 0.35 ? ["fart_s1", "fart_s2"] : charge < 0.85 ? ["fart_m1", "fart_m2"] : ["fart_l1", "fart_l2"];
+src/game/ChargePoses.tsx:25:  // GORSEL-017 (2026-09-23): visual-only landing squash driver. 0 = normal,
+src/game/ChargePoses.tsx:28:  // app/index.tsx's landing-contact block for why this cannot affect
+src/game/ChargePoses.tsx:29:  // physics (py/vx/vy and the resolved landing point are already committed
+src/game/ChargePoses.tsx:88:    // so the compression reads as "sinking into the landing surface"
+src/game/ChargePoses.tsx:155:      testID={`charge-pose-${i}`}
+src/game/amcaSesi.ts:45:  landings: number;
+src/game/amcaSesi.ts:56:  landings: 0, center: 0, edge: 0, multi: 0, maxMulti: 0, perfect: 0, perfectStreak: 0, exploded: false, sinceBubble: 4,
+src/game/amcaSesi.ts:63:  s.landings += 1;
+src/game/amcaSesi.ts:84:export function icSesAfterLanding(s: RunStats, ratio: number, towers: number, score: number, best: number): string | null {
+src/game/amcaSesi.ts:92:  else if (best >= 8 && score === best - 1) line = pick(IC_NEAR_RECORD);
+src/game/amcaSesi.ts:104:  score: number;
+src/game/amcaSesi.ts:122:  const s = c.score;
+src/game/amcaSesi.ts:174:export function lakap(s: RunStats, score: number, stops: number, newRecord: boolean): string | null {
+src/game/amcaSesi.ts:178:  if (score === 0) k = s.exploded ? "gaz" : "kapida";
+src/game/amcaSesi.ts:180:  else if (newRecord && score >= 10) k = "rekor";
+src/game/amcaSesi.ts:182:  else if (s.landings >= 5 && s.perfect >= Math.max(4, s.landings * 0.4)) k = "nisanci";
+src/game/amcaSesi.ts:184:  else if (s.landings >= 5 && s.edge >= s.landings * 0.3) k = "cambaz";
+src/game/amcaSesi.ts:185:  else if (s.landings >= 5 && s.center >= s.landings * 0.6) k = "temkinli";
+src/game/AmbientEvents.tsx:51:    t.value = withTiming(1, { duration: FLIGHT_MS, easing: Easing.linear });
+src/game/mahalle.ts:101:// halı silken teyze) ve günün haritası her oyunda aynı kule kimlikleriyle geldiği için ilk kulelerde hep aynı sakinler
+src/game/WeatherLayer.tsx:4:import { LinearGradient } from "expo-linear-gradient";
+src/game/WeatherLayer.tsx:40:    t.value = withRepeat(withTiming(1, { duration, easing: Easing.linear }), -1, false);
+src/game/WeatherLayer.tsx:98:        <LinearGradient pointerEvents="none" colors={["rgba(62,72,90,0.5)", "rgba(62,72,90,0.36)", "rgba(55,66,90,0.24)", "rgba(55,66,90,0.16)"]}
+src/game/WeatherLayer.tsx:103:        <LinearGradient pointerEvents="none" colors={[TINT[wind], TINT[wind], "rgba(0,0,0,0)"]} locations={[0, 0.45, 0.72]}
+src/game/WeatherLayer.tsx:109:          <LinearGradient colors={["rgba(255,236,170,0.6)", "rgba(255,214,140,0.2)", "rgba(255,214,140,0)"]} locations={[0, 0.35, 0.7]}
+src/game/WeatherLayer.tsx:120:          <LinearGradient pointerEvents="none" colors={FOG_WASH.map((a) => `rgba(${FOG_RGB},${a})`) as any} locations={FOG_WASH_AT as any}
+src/game/WeatherLayer.tsx:140:                <LinearGradient key={`${k}-${i}`} colors={["rgba(255,250,240,0)", `rgba(255,250,240,${g.o})`, "rgba(255,250,240,0)"]} start={{ x: 0, y: 0.5 }} end={{ x: 1, y: 0.5 }}
+src/game/kurukafa.ts:74: *  kurukafanın kulesinden türetilir: aynı haritayı oynayan iki kişi aynı etkiyi alır (meydan okuma). */
+src/game/jump.ts:13:export function jumpVelocity(charge: number, screenWidth = 440) {
+src/game/jump.ts:15:  const c = Math.max(0, Math.min(1, charge));
+src/game/jump.ts:17:  // Both branches read the SAME reshaped charge value. Reshaping charge itself
+src/game/jump.ts:19:  // was at every hold duration; only vx and vy alone would tilt the angle
+src/game/jump.ts:20:  // away from the reference's near-constant ~70 degrees. See CLAUDE_VIDEO_RESULT.md.
+src/game/jump.ts:21:  const effectiveCharge = Math.pow(c, CONFIG.chargeResponseCurve);
+src/game/render-camera.ts:9:  smoothTime: 0.30, // REVIZYON-043: slower horizontal framing on takeoff/landing (X -- UNCHANGED by R044)
+src/game/render-camera.ts:14:  // vertical difference remaining right after a landing is absorbed over a
+src/game/render-camera.ts:20:  // 0.58, paired with maxAccelY/maxSpeedY below so a full-charge apex cannot
+src/game/render-camera.ts:29:  // post-landing settle to a continuous, jerk-limited motion instead of a
+src/game/render-camera.ts:35:  // (charge -> airborne -> landed) never hands stepRenderAxis a stepped
+src/game/render-camera.ts:37:  // değiştirme" fix for both normal and full-charge jumps.
+src/game/render-camera.ts:42:  // correction was deferred to the post-landing stand-phase filter -- see
+src/game/render-camera.ts:45:  // flight target toward the ACTUAL upcoming landing composition (see
+src/game/render-camera.ts:47:  // make the whole correction at once. A long fall (full charge / big drop)
+src/game/render-camera.ts:49:  // landing actually happens -- shrinking the residual the post-landing
+src/game/render-camera.ts:57:  // landing, handing preLandBlend an even BIGGER residual to close and
+src/game/render-camera.ts:65:  // continuous forward reach for long/high-charge flights, tuned/measured in
+src/game/render-camera.ts:71:  // below). vx for charge<=0.65 stays under xLeadVxLo, so short/normal/mid
+src/game/render-camera.ts:73:  // ai_review_evidence/sim_render_camera_x_r046.cjs); only charge roughly
+src/game/render-camera.ts:74:  // >0.7-0.75 and up starts blending in, reaching full effect near full
+src/game/render-camera.ts:75:  // charge -- this is "eşikli sert dal" avoided in favour of a smooth ramp.
+src/game/render-camera.ts:76:  xLeadVxLo: 400, // world units/s (~charge 0.68) -- below this, lead/caps are the R045 base values, unchanged
+src/game/render-camera.ts:77:  xLeadVxHi: 520, // world units/s (~charge 0.96) -- at/above this, full lead/caps below apply
+src/game/render-camera.ts:94:// byte-for-byte), ramping smoothly to 1 at/above xLeadVxHi (near/at full
+src/game/render-camera.ts:95:// charge). Continuous in vx, so there is no discrete "high charge" branch.
+src/game/render-camera.ts:150:  const hi = fMin - loW; // camera must be <= hi so the near edge stays inside
+src/game/AmbientBirds.tsx:10:  return <View pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants"
+src/game/copy.ts:21:export type QuipContext = "record" | "near" | "early" | "any";
+src/game/copy.ts:32:  near: [
+src/game/copy.ts:46:export function quipContext(score: number, prevBest: number): QuipContext {
+src/game/copy.ts:47:  if (score > prevBest && score > 0) return "record";
+src/game/copy.ts:48:  if (score <= 2) return "early";
+src/game/copy.ts:49:  if (prevBest - score >= 1 && prevBest - score <= 3) return "near";
+src/game/panel-course.ts:3:// FIXED, hand-measured sequence of landing spots baked directly into 4
+src/game/panel-course.ts:45:// sequence need charge in [0.08, 0.884], comfortably below the c=1 ceiling)
+src/game/panel-course.ts:51:// For a chimney sitting near the very top of its own panel (P1-A, ~38% down
+src/game/panel-course.ts:52:// the 1671px source) or very near the bottom (P1-C, ~83%), that reveal can
+src/game/panel-course.ts:148:// A +2px (source-pixel) margin sinks the physical landing line a hair into
+src/game/reference-baseline.json:35:    "difficultyRamp": 40,
+src/game/reference-baseline.json:53:    "scorePerLanding": 1,
+src/game/reference-baseline.json:54:    "scoreMultiTowerBonus": 1,
+src/game/reference-baseline.json:55:    "scorePerfectBonus": 2,
+src/game/reference-baseline.json:69:    "chargeSquashY": 0.12,
+src/game/reference-baseline.json:70:    "chargeStretchX": 0.08,
+src/game/meydan.ts:2:// Bir koşunun harita tohumu + skoru kısa bir koda dönüşür; arkadaş kodu girince aynı
+src/game/meydan.ts:3:// haritayı oynar (kule dizisi, kurukafa yerleri ve etkileri tohumdan gelir) ve sonuç karşılaştırılır.
+src/game/meydan.ts:11:export function makeCode(seed: number, score: number) {
+src/game/meydan.ts:12:  return `${(seed >>> 0).toString(36).toUpperCase()}-${Math.max(0, Math.floor(score))}`;
+src/game/meydan.ts:25:export function shareText(code: string, score: number, name: string) {
+src/game/meydan.ts:27:  return `${who}Byzantion'da beni geç! ${score} puan yaptım 💪\nMeydan okuma kodu: ${code}\nOyunu aç → oyun sonunda "🔑 Kod gir" → kodu yaz.`;
+src/game/ShareCard.tsx:18:  score: number;
+src/game/ShareCard.tsx:29:export function shareMessage(score: number, place: string | null, lakap?: string | null) {
+src/game/ShareCard.tsx:32:  return `Byzantion'da amcayla İstanbul çatılarında ${score} puan yaptım${where}!${nick} Sen de dene: ${SHARE_LINK}`;
+src/game/ShareCard.tsx:35:export function ShareSheet({ score, newRecord, place, photo, sticker, stamp, time, lakap, onClose }: ShareCardProps) {
+src/game/ShareCard.tsx:45:      const r = await GameCenter.shareSnapshot(x, y, w, h, shareMessage(score, place, lakap));
+src/game/ShareCard.tsx:72:        <View style={s.scoreRow}>
+src/game/ShareCard.tsx:73:          <Text style={s.score}>{score}</Text>
+src/game/ShareCard.tsx:74:          <Text style={s.scoreUnit}>puan</Text>
+src/game/ShareCard.tsx:115:  scoreRow: { flexDirection: "row", alignItems: "baseline", justifyContent: "center", marginTop: 2 },
+src/game/ShareCard.tsx:116:  score: { fontFamily: TYPE, fontSize: 64, color: "#2a1b12", lineHeight: 72 },
+src/game/ShareCard.tsx:117:  scoreUnit: { fontFamily: TYPE, fontSize: 20, color: "#6e4632", marginLeft: 6 },
+src/game/yaris.ts:2:// Kullanıcı: "aynı haritada birbirlerinin zıplamalarını görerek oynayacakları 3 dakikalık bir oyun;
+src/game/character-pose.ts:1:// GORSEL-008 R12 (accepted; nine poses, supersedes R11 five): charge-driven character pose (VISUAL ONLY).
+src/game/character-pose.ts:2:// Nine measured keyframes at charge 0/12.5/25/.../100 %. All five PNGs share ONE
+src/game/character-pose.ts:5:// charge-r11-olcu-pivot.json = midpoint of the two toe tips, which stay
+src/game/character-pose.ts:14:// two independent idle frames (t=34.5s, t=35.0s), pixel-thresholded
+src/game/character-pose.ts:24:// STANDARD_TABLA_WIDTH (64 world units, the single standardized landing
+src/game/character-pose.ts:36:// pivot, collision box (PW/PH), footSoles, jump/landing math and procedural
+src/game/character-pose.ts:40:// about 0.11 * 0.40 / 0.62 = 7.1% of H, near the measured Spring Ninja 7%.
+src/game/character-pose.ts:56:  { source: require("@/assets/characters/charge-000-r12.png"), w: 516, h: 1103, pivotX: 308, pivotY: 1103 },
+src/game/character-pose.ts:57:  { source: require("@/assets/characters/charge-012-r12.png"), w: 516, h: 1080, pivotX: 311, pivotY: 1080 },
+src/game/character-pose.ts:58:  { source: require("@/assets/characters/charge-025-r12.png"), w: 516, h: 1056, pivotX: 310, pivotY: 1056 },
+src/game/character-pose.ts:59:  { source: require("@/assets/characters/charge-037-r12.png"), w: 516, h: 1031, pivotX: 309, pivotY: 1031 },
+src/game/character-pose.ts:60:  { source: (FAZ2_IFADE ? require("@/assets/characters/charge-050-r12-ifade.png") : require("@/assets/characters/charge-050-r12.png")), w: 516, h: 1005, pivotX: 306, pivotY: 1005 },
+src/game/character-pose.ts:61:  { source: (FAZ2_IFADE ? require("@/assets/characters/charge-062-r12-ifade.png") : require("@/assets/characters/charge-062-r12.png")), w: 516, h: 979, pivotX: 302, pivotY: 979 },
+src/game/character-pose.ts:62:  { source: (FAZ2_IFADE ? require("@/assets/characters/charge-075-r12-ifade.png") : require("@/assets/characters/charge-075-r12.png")), w: 516, h: 951, pivotX: 298, pivotY: 951 },
+src/game/character-pose.ts:63:  { source: (FAZ2_IFADE ? require("@/assets/characters/charge-087-r12-ifade.png") : require("@/assets/characters/charge-087-r12.png")), w: 516, h: 922, pivotX: 293, pivotY: 922 },
+src/game/character-pose.ts:64:  { source: (FAZ2_IFADE ? require("@/assets/characters/charge-100-r12-ifade.png") : require("@/assets/characters/charge-100-r12.png")), w: 516, h: 892, pivotX: 288, pivotY: 892 },
+src/game/character-pose.ts:68: * R12: nine keyframes 12.5 % apart. Exactly ONE pose is visible at any charge
+src/game/character-pose.ts:69: * (nearest keyframe): a hard switch, so two full-body silhouettes are never
+src/game/character-pose.ts:72: * few px; 12.5 % of charge lasts ~3.4 frames at 60 Hz, so the crouch reads as
+src/game/character-pose.ts:82:// Ölçek charge-000 ile aynı; pivotX = ölçülen ayak ortası + 86 (charge-000: 222 → 308 sabit çapa), pivotY = ayak tabanı.
+src/game/character-pose.ts:100:// DÜŞÜŞ (2026-11-23, plan AMCA-DUSUS): düşüş kesinleşince iki karelik "eyvah" çırpınması. 1100×1103, ölçek charge-000 ile
+src/game/character-pose.ts:101:// aynı; pivot baş hizasından ölçüldü (charge-000 baş ağırlık merkezi pivotun 45 px solunda, tepe y=1; burada baş x≈544, tepe y≈6).
+src/game/ColumnSmoke.tsx:40:// face and the landing/contact edge. Purely cosmetic constants; change
+src/game/ColumnSmoke.tsx:53:// platform surface, nowhere near the character. The original +10/+12 values
+src/game/ColumnSmoke.tsx:56:// below the face and clearly above the landing/contact edge, not below it.
+src/game/ColumnSmoke.tsx:148:  // Anchored to a fixed world-space point captured once at landing (see
+src/game/ColumnSmoke.tsx:238:    <View pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={{ position: "absolute", top: 0, left: 0 }}>
+src/game/ColumnSmoke.tsx:250: * the face and of the column's landing/contact edge; does not intercept
+src/game/ColumnSmoke.tsx:256:    <View pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={{ position: "absolute", top: 0, left: 0 }}>
+
+web search: 
+web search: official Google Play Stick Hero game description gameplay ...
+codex
+**Not:** Çalışma alanı bu oturumda salt okunur; bu nedenle raporu dosyaya kaydedemiyorum. Aşağıdaki metin dosyaya aktarılmaya hazır. Kodu yalnızca okudum; fizik, kamera ve çarpışmayı değiştirecek önerileri özellikle ayırdım. “Diğer editörlerle” bağımsız değerlendirme yaptığımı söyleyemem; bu rapor editoryal ürün değerlendirmesidir.
+
+# Byzantion — Oynanabilirliği artırma raporu
+*26 Kasım 2026*
+
+## Türde oynanışı taşıyan mekanikler
+
+- **Stick Hero / Jump Jump:** Tek hareketle hemen başlama, basılı tutma süresini mesafeye dönüştürme ve dar hedefe inişin risk-ödül gerilimi. Kontrolün öğrenilmesi kolay; ustalaşması zaman alıyor. [Stick Hero](https://play.google.com/store/apps/details?id=com.ketchapp.stickhero)
+- **Helix Jump:** Hareket hâlindeki tehlikeyi anında okunur kılan görsel kontrast, kısa denemeler ve başarısızlıktan hemen yeniden başlama. [Voodoo: Helix Jump](https://voodoo.io/games/helix-jump)
+- **Crossy Road:** Basit çekirdek döngünün üstüne günlük meydan okuma, skor tablosu, çok sayıda karakter ve paylaşılabilir başarı koyuyor. [App Store: Crossy Road](https://apps.apple.com/us/app/crossy-road/id924373886)
+- **Doodle Jump:** Yüksek skor peşinde koşmayı güçlendirme nesneleri, engeller ve dönemsel içerikle tazeliyor. [App Store: Doodle Jump](https://apps.apple.com/us/app/doodle-jump/id307727765)
+- **Alto:** Akıcı hareket hissi, sakin sunum ve görsel çeşitliliği öne çıkarıyor. Byzantion için çıkarım: yeni içerik, ana dokunma-zıplama döngüsünün ritmini boğmamalı.
+
+Bu örnekler Byzantion’a bire bir kopyalanacak reçeteler değil; kısa öğrenme süresi, belirgin geri bildirim ve oturumlar arasında geri dönüş sebebi için karşılaştırma noktalarıdır.
+
+## Mevcut durum ve puan
+
+Kodda şarj ve iniş geri bildirimi (sıkışma animasyonu, çatı tozu), seri/çok kule puanları, günlük harita, meydan okuma ve hayalet yarış altyapısı görünüyor. Duraklar, kartpostallar ve kedi defteri uzun vadeli koleksiyon hedefi sağlıyor. Dolayısıyla ana fırsat daha çok içerik eklemekten önce **ilk dakikayı anlaşılır kılmak**, inişin tatminini görünür/duyulur yapmak ve mevcut günlük/rekabet sistemlerini tekrar oynama nedenine dönüştürmek.
+
+- **Oynanış / his: 7/10.** Basit tek parmaklı fikir, İstanbul atmosferi ve iniş efektleri güçlü temel. Gerçek cihazda yeni oyuncunun ilk 5–10 zıplamasını görmeden kontrolün ne kadar sezgisel ve inişin ne kadar tatmin edici olduğunu doğrulayamam.
+- **Geri gelme isteği: 7/10.** Günlük harita, koleksiyon, rekor ve meydan okuma mevcut. Düzenli mini hedef/ödül döngüsünün oyuncuya ne zaman ve neden dönmesini söylediği daha belirgin olabilir.
+
+## Öncelikli öneriler
+
+Efor düzeyi tahminidir; görsel sayısı **yeni üretilecek görsel** adedidir. Kod eforu düşük: birkaç saat–1 gün; orta: 2–5 gün; yüksek: 1+ hafta tahmini. Mevcut sanat varlıklarının yeniden kullanılması varsayılmıştır.
+
+| Öncelik ve öneri | Çözdüğü sorun, İstanbul’a özgü tasarım | Efor / yeni görsel | Fizik, kamera, çarpışma |
+|---|---|---|---|
+| **1. İlk koşuda 3 adımlı öğretici** | Ekran üstü kısa yönlendirme: “Basılı tut”, “Bırak”, “Daha uzun tut = daha uzağa”. İlk kulelerde güvenli, anlaşılır ritim kurar; “amca” diliyle kısa ve mizahi olabilir. | Düşük / 0 | Hayır |
+| **2. İniş geri bildirimini ses ve ayarla tamamla** | Mevcut toz/sıkışmaya inişte kısa, katmanlı ses ve ayrı kapatılabilen titreşim ekle; isabetli inişe farklı, abartısız bir çatı sesi. Erişilebilirlik için sessiz/titreşimsiz seçenek. | Düşük / 0 | Hayır |
+| **3. Günlük haritaya tek net hedef** | Her gün bir görev: ör. “Üç durakta seri yap” veya “kediyle tanış”. Sonuçta ilerleme ve tamamlandı göstergesi; mevcut harita ve albümle bağ kurar. | Orta / 0 (arayüz/metin) | Hayır |
+| **4. Kısa yeniden başlama ve son koşu özeti** | Oyun sonrasında tek dokunuşla yeniden dene; özet “en iyi seri”, “en yakın kule”, “bugünkü hedef” gibi kişisel gelişimi gösterir. Ölüm anındaki hayal kırıklığını yeni denemeye çevirir. | Düşük / 0 | Hayır |
+| **5. Görsel/işitsel erişilebilirlik ayarları** | Titreşim, ses, ekran sarsıntısı ve yüksek kontrast seçenekleri; hızlı şarj göstergesini renk dışında şekil/dolulukla da anlat. Karanlık/gece temalarında hedef okunurluğunu koru. | Orta / 0 | Hayır |
+| **6. Durak başına küçük sürpriz olayı** | Mevcut semtlerde vapur düdüğü, martı geçişi ya da uzakta çay tepsisi gibi kısa arka plan anları; oyuncunun karar zamanlamasını örtmesin. Tekrara karşı semt kimliği verir. | Orta / 6–10 (olay başına tekil varlıklar; mevcut varlıkla yapılırsa 0) | Hayır |
+| **7. Ustalık hedefleri ve kişisel rekor kırılımı** | “3 kusursuz iniş”, “iki kuleyi tek sıçrayışta geç” gibi isteğe bağlı hedefler; oyuncuya yalnızca toplam skor dışında gelişim ölçüsü verir. Puan/ödül dengesi sömürüsüz ve kozmetik/defter odaklı kalmalı. | Orta / 0 | Muhtemelen hayır; skor mantığı etkilenebilir |
+| **8. Hayalet yarışını görünür kıl** | Rakibin hayaleti ve “şu an önde/geride” bilgisi, oyuncuya aynı haritada anlamlı rekabet verir. Ekranı kalabalıklaştırmadan okunmalı; ilk etapta arkadaş meydan okumasına odaklanabilir. | Orta / 0 yeni; mevcut hayalet görünümü yetersizse 1 | Hayır |
+| **9. Kısa oturum seçeneği** | “2 dakika meydan oku” zaten var; menüde amacı ve bitiş koşulunu tek cümleyle açıkla. Üç turluk/tek duraklık hızlı mod, uzun koşuya vakti olmayanlara seçenek sunar. | Orta / 0 | Evet, mod kuralı/oturum akışı; çekirdek fizik değil |
+
+**Risk notu:** 6. öneride yeni görseller, tek geliştirici için üretim/entegrasyon ve tutarlılık yükü yaratır. Önce mevcut arka planla prototiplenebilir. 9. öneri yeni mod olduğu için menü ve skor akışı ek yük getirir. Hiçbir öneri fizik, kamera veya çarpışma değişikliği gerektirmiyor; 7 ve 9’da skor/mod kuralları değişir ve ayrı tasarım kararı ister.
+
+## İlk yapılacak 3 iş
+
+1. İlk koşu öğreticisini mevcut oyun akışına ekle; oyuncunun basılı tutma ve bırakma davranışını ilk dakikada sınasın.
+2. İniş sesi ve titreşimi cihazda değerlendir; ayrı ayar ekleyerek sessiz/titreşimsiz oyunu mümkün kıl.
+3. Günlük haritaya tek anlaşılır hedef ve tamamlanma göstergesi bağla; mevcut sistemleri kullanarak geri dönüş sebebini görünür yap.
+
+**Ölçüm önerisi:** TestFlight’taki yeni oyuncularla, ilk 60 saniyede öğreticisiz/öğreticili kontrol anlayışını; ilk oturumda tekrar deneme oranını; ertesi gün açılışını kaydedin. Katılımcı sayısı küçükse sonuçları yön gösterici kabul edin, kesin ürün metriği gibi sunmayın.
+tokens used
+49.330
+**Not:** Çalışma alanı bu oturumda salt okunur; bu nedenle raporu dosyaya kaydedemiyorum. Aşağıdaki metin dosyaya aktarılmaya hazır. Kodu yalnızca okudum; fizik, kamera ve çarpışmayı değiştirecek önerileri özellikle ayırdım. “Diğer editörlerle” bağımsız değerlendirme yaptığımı söyleyemem; bu rapor editoryal ürün değerlendirmesidir.
+
+# Byzantion — Oynanabilirliği artırma raporu
+*26 Kasım 2026*
+
+## Türde oynanışı taşıyan mekanikler
+
+- **Stick Hero / Jump Jump:** Tek hareketle hemen başlama, basılı tutma süresini mesafeye dönüştürme ve dar hedefe inişin risk-ödül gerilimi. Kontrolün öğrenilmesi kolay; ustalaşması zaman alıyor. [Stick Hero](https://play.google.com/store/apps/details?id=com.ketchapp.stickhero)
+- **Helix Jump:** Hareket hâlindeki tehlikeyi anında okunur kılan görsel kontrast, kısa denemeler ve başarısızlıktan hemen yeniden başlama. [Voodoo: Helix Jump](https://voodoo.io/games/helix-jump)
+- **Crossy Road:** Basit çekirdek döngünün üstüne günlük meydan okuma, skor tablosu, çok sayıda karakter ve paylaşılabilir başarı koyuyor. [App Store: Crossy Road](https://apps.apple.com/us/app/crossy-road/id924373886)
+- **Doodle Jump:** Yüksek skor peşinde koşmayı güçlendirme nesneleri, engeller ve dönemsel içerikle tazeliyor. [App Store: Doodle Jump](https://apps.apple.com/us/app/doodle-jump/id307727765)
+- **Alto:** Akıcı hareket hissi, sakin sunum ve görsel çeşitliliği öne çıkarıyor. Byzantion için çıkarım: yeni içerik, ana dokunma-zıplama döngüsünün ritmini boğmamalı.
+
+Bu örnekler Byzantion’a bire bir kopyalanacak reçeteler değil; kısa öğrenme süresi, belirgin geri bildirim ve oturumlar arasında geri dönüş sebebi için karşılaştırma noktalarıdır.
+
+## Mevcut durum ve puan
+
+Kodda şarj ve iniş geri bildirimi (sıkışma animasyonu, çatı tozu), seri/çok kule puanları, günlük harita, meydan okuma ve hayalet yarış altyapısı görünüyor. Duraklar, kartpostallar ve kedi defteri uzun vadeli koleksiyon hedefi sağlıyor. Dolayısıyla ana fırsat daha çok içerik eklemekten önce **ilk dakikayı anlaşılır kılmak**, inişin tatminini görünür/duyulur yapmak ve mevcut günlük/rekabet sistemlerini tekrar oynama nedenine dönüştürmek.
+
+- **Oynanış / his: 7/10.** Basit tek parmaklı fikir, İstanbul atmosferi ve iniş efektleri güçlü temel. Gerçek cihazda yeni oyuncunun ilk 5–10 zıplamasını görmeden kontrolün ne kadar sezgisel ve inişin ne kadar tatmin edici olduğunu doğrulayamam.
+- **Geri gelme isteği: 7/10.** Günlük harita, koleksiyon, rekor ve meydan okuma mevcut. Düzenli mini hedef/ödül döngüsünün oyuncuya ne zaman ve neden dönmesini söylediği daha belirgin olabilir.
+
+## Öncelikli öneriler
+
+Efor düzeyi tahminidir; görsel sayısı **yeni üretilecek görsel** adedidir. Kod eforu düşük: birkaç saat–1 gün; orta: 2–5 gün; yüksek: 1+ hafta tahmini. Mevcut sanat varlıklarının yeniden kullanılması varsayılmıştır.
+
+| Öncelik ve öneri | Çözdüğü sorun, İstanbul’a özgü tasarım | Efor / yeni görsel | Fizik, kamera, çarpışma |
+|---|---|---|---|
+| **1. İlk koşuda 3 adımlı öğretici** | Ekran üstü kısa yönlendirme: “Basılı tut”, “Bırak”, “Daha uzun tut = daha uzağa”. İlk kulelerde güvenli, anlaşılır ritim kurar; “amca” diliyle kısa ve mizahi olabilir. | Düşük / 0 | Hayır |
+| **2. İniş geri bildirimini ses ve ayarla tamamla** | Mevcut toz/sıkışmaya inişte kısa, katmanlı ses ve ayrı kapatılabilen titreşim ekle; isabetli inişe farklı, abartısız bir çatı sesi. Erişilebilirlik için sessiz/titreşimsiz seçenek. | Düşük / 0 | Hayır |
+| **3. Günlük haritaya tek net hedef** | Her gün bir görev: ör. “Üç durakta seri yap” veya “kediyle tanış”. Sonuçta ilerleme ve tamamlandı göstergesi; mevcut harita ve albümle bağ kurar. | Orta / 0 (arayüz/metin) | Hayır |
+| **4. Kısa yeniden başlama ve son koşu özeti** | Oyun sonrasında tek dokunuşla yeniden dene; özet “en iyi seri”, “en yakın kule”, “bugünkü hedef” gibi kişisel gelişimi gösterir. Ölüm anındaki hayal kırıklığını yeni denemeye çevirir. | Düşük / 0 | Hayır |
+| **5. Görsel/işitsel erişilebilirlik ayarları** | Titreşim, ses, ekran sarsıntısı ve yüksek kontrast seçenekleri; hızlı şarj göstergesini renk dışında şekil/dolulukla da anlat. Karanlık/gece temalarında hedef okunurluğunu koru. | Orta / 0 | Hayır |
+| **6. Durak başına küçük sürpriz olayı** | Mevcut semtlerde vapur düdüğü, martı geçişi ya da uzakta çay tepsisi gibi kısa arka plan anları; oyuncunun karar zamanlamasını örtmesin. Tekrara karşı semt kimliği verir. | Orta / 6–10 (olay başına tekil varlıklar; mevcut varlıkla yapılırsa 0) | Hayır |
+| **7. Ustalık hedefleri ve kişisel rekor kırılımı** | “3 kusursuz iniş”, “iki kuleyi tek sıçrayışta geç” gibi isteğe bağlı hedefler; oyuncuya yalnızca toplam skor dışında gelişim ölçüsü verir. Puan/ödül dengesi sömürüsüz ve kozmetik/defter odaklı kalmalı. | Orta / 0 | Muhtemelen hayır; skor mantığı etkilenebilir |
+| **8. Hayalet yarışını görünür kıl** | Rakibin hayaleti ve “şu an önde/geride” bilgisi, oyuncuya aynı haritada anlamlı rekabet verir. Ekranı kalabalıklaştırmadan okunmalı; ilk etapta arkadaş meydan okumasına odaklanabilir. | Orta / 0 yeni; mevcut hayalet görünümü yetersizse 1 | Hayır |
+| **9. Kısa oturum seçeneği** | “2 dakika meydan oku” zaten var; menüde amacı ve bitiş koşulunu tek cümleyle açıkla. Üç turluk/tek duraklık hızlı mod, uzun koşuya vakti olmayanlara seçenek sunar. | Orta / 0 | Evet, mod kuralı/oturum akışı; çekirdek fizik değil |
+
+**Risk notu:** 6. öneride yeni görseller, tek geliştirici için üretim/entegrasyon ve tutarlılık yükü yaratır. Önce mevcut arka planla prototiplenebilir. 9. öneri yeni mod olduğu için menü ve skor akışı ek yük getirir. Hiçbir öneri fizik, kamera veya çarpışma değişikliği gerektirmiyor; 7 ve 9’da skor/mod kuralları değişir ve ayrı tasarım kararı ister.
+
+## İlk yapılacak 3 iş
+
+1. İlk koşu öğreticisini mevcut oyun akışına ekle; oyuncunun basılı tutma ve bırakma davranışını ilk dakikada sınasın.
+2. İniş sesi ve titreşimi cihazda değerlendir; ayrı ayar ekleyerek sessiz/titreşimsiz oyunu mümkün kıl.
+3. Günlük haritaya tek anlaşılır hedef ve tamamlanma göstergesi bağla; mevcut sistemleri kullanarak geri dönüş sebebini görünür yap.
+
+**Ölçüm önerisi:** TestFlight’taki yeni oyuncularla, ilk 60 saniyede öğreticisiz/öğreticili kontrol anlayışını; ilk oturumda tekrar deneme oranını; ertesi gün açılışını kaydedin. Katılımcı sayısı küçükse sonuçları yön gösterici kabul edin, kesin ürün metriği gibi sunmayın.
