@@ -3301,3 +3301,17 @@ Kullanıcı: "Yes, build A" (rapor ai_review_evidence/HAREKET-2026-11-26/RAPOR.m
 - Simülatör (iPhone 17, Release): kayıt karelerinde yükselişte öne eğilme, tepede ve inişte dizler bükük poz görüldü; iniş yerleri doğru, Kurukafa ve oyun sonu çalışıyor. Simülatörde dokunma süreleri gerçek cihazdan farklı (1,1 sn basış patladı), kenar sallanması/kabarma simülatörde yakalanmadı.
 ### OPEN_ISSUES
 - Telefonda görülmedi; kenar sallanması, seri tepkisi ve rekor kutlaması cihaz videosunda denetlenmeli. Şemsiyeli yağmurda performans ölçülmedi.
+
+## DURAK OYUNU — Harem Bagaj İstifi (prototip) — 2026-11-26
+### TASK
+Kullanıcı: "Harem luggage puzzle" (rapor ai_review_evidence/DURAK-OYUN-2026-11-26/RAPOR.md). İlk durağa (Harem, 15. kule) koşu içinde ilk varışta ana oyun durur, mola kartı açılır (Oyna / Geç).
+### CHANGED
+- src/game/BagajIstifi.tsx (yeni): 6×4 bagaj gözü; parçalar ızgarayı tam dolduracak şekilde rastgele üretilir (çözüm kesin var), tepside karışık ve rastgele döndürülmüş gelir; sürükle = yerleştir (hücreye oturur, sığmazsa tepsiye döner), dokun = döndür; 45 sn; "Bagaj tamam!" / "Otobüs kalktı!" sonu; ödül yok, ceza yok. Eşyalar kodla kutu + emoji (görsel yok; Kıvılcım ancak kabulden sonra). Şablon başına en fazla 2 parça, tek tavuk kafesi.
+- app/index.tsx: `bagaj` durumu; onLanding'de Harem'e ilk varışta (yarış/meydan okuma değilken) `running = 0` (şarj sürüyorsa iptal) ve kart açılır; bitince `running = 1`. Katman en üstte (zIndex 9999). Restart'ta sıfırlanır. BUILD_TAG "HAREM BAGAJ ISTIFI".
+- Fizik, kamera, çarpışma, puan, kule üretimi DEĞİŞMEDİ (yalnız oyun döngüsü mola süresince durur).
+### EVIDENCE
+- tsc: yalnız önceden var olan 4 hata (src/theme.ts).
+- Simülatör (geçici BAGAJ_TEST=true, ilk inişte açılır): kart en üst katmanda; sürükle-bırak doğru hücreye oturdu (9 parçanın 5'i elle doğru yerleştirildi); "Geç" → oyun sürdü; süre bitti → "Otobüs kalktı!" → "Yola devam" → oyun sürdü. Teslimde BAGAJ_TEST=false.
+### OPEN_ISSUES
+- "Bagaj tamam!" (kazanma) sonu simülatörde görülmedi (süre yetmedi); kod yolu aynı.
+- Telefonda Harem'e varışla denenmedi. Android doğrulanmadı.

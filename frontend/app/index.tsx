@@ -60,6 +60,7 @@ import { CEPHE_HUCRE, CEPHE_DONEM_PX, CEPHE_BASLANGIC_PX } from "../src/game/cep
 import { MAHALLE_ON, MAHALLE_SPEECH_ON, CUMBA_SOURCE, CUMBA_KEDI_SOURCE, CUMBA_ASPECT, CUMBA_TEYZE_SOURCE, CUMBA_TEYZE_BAKIS_SOURCE, CUMBA_TEYZE_ASPECT, cumbaBox, MAHALLE_BOX, TEYZE_ASPECT, KEDI_ASPECT, KEDI_UYUYAN_FOOT, KEDI_DIK_FOOT, AMCA_ASPECT, COCUK_ASPECT, KEDI_GERINEN_ASPECT, KEDI_GRI_ASPECT, TEYZE_SOURCE, KEDI_SOURCE, AMCA_SOURCE, COCUK_SOURCE, KEDI_GERINEN_SOURCE, KEDI_GRI_SOURCE, KEDI_ADLARI, sakin, teyzeBox, kediBox, kediAdi, kediGri, kediGriNo, pencereAspect, pencereLafi, kediLafi, KEDI_DEFTER_KEY, mahalleKaynak, kediGorunum, kediGorunumNo, kadinNo, KADIN_KAYNAK, KEDI_YENI, KEDI_YENI_ASPECT, SAKIN_TOHUM } from "../src/game/mahalle";
 import { OZEL_GUN_ON, OZEL_GUN_TEST_TAP, OZEL_GUNLER, OZEL_GUN_TEST_ORDER, todaysEvent } from "../src/game/ozelGun";
 import { HAREKET_ON, ucusEgim, ucusPoz, EGIM_HIZ, ESNE_BOY, ESNE_EN, SALLAN_DERECE, KABAR_ORAN, OHBE_MAX } from "../src/game/hareket";
+import BagajIstifi, { BAGAJ_ON, BAGAJ_TEST, BAGAJ_DURAK } from "../src/game/BagajIstifi";
 import { IPUCU_ON, IPUCU_MAX, IPUCU_KEY, IPUCU_METIN, HIZLI_TEKRAR_MS } from "../src/game/ipucu";
 import { HANIM_ON, ICSES_ON, LAKAP_ON, newRunStats, noteLanding, icSesAfterLanding, icSesIdle, hanimMessage, lakap } from "../src/game/amcaSesi";
 import { jumpVelocity, advanceFlight } from "../src/game/jump";
@@ -387,7 +388,7 @@ const AnimatedImage = Animated.createAnimatedComponent(Image);
 const BG_SCROLL_TEST = true as boolean;
 const BG_SCROLL_RATIO = 0.45;
 const BG_SCROLL_TILES = 4;
-const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "HAREKET PAKET A") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
+const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "HAREM BAGAJ ISTIFI") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
 const DIAG_MAX_EXAMPLES = 6;
 const HOUSE_AB_FROZEN = false as boolean;
 // REVIZYON-066 experiment (one variable): expo-linear-gradient's iOS layer
@@ -968,6 +969,9 @@ export default function Game() {
     });
   }, []);
   const [gameOver, setGameOver] = useState(false);
+  // DURAK OYUNU (Harem Bagaj İstifi): açıkken ana oyun durur (running = 0).
+  const [bagaj, setBagaj] = useState(false);
+  const bagajRef = useRef(false); // bu koşuda açıldı mı
   // AÇILIŞ MENÜSÜ (2026-11-16): kullanıcı "oyunun ilk açılışında bir menü olmalı, hemen oyun açılıyor".
   const [menuOpen, setMenuOpen] = useState(MENU_ON);
   // GERÇEK İSTANBUL (2026-11-17): hava, saat, ay, pil.
@@ -1944,6 +1948,19 @@ export default function Game() {
         skyStep.value = withTiming(Math.max(skyStepForStops(after), realSkyRef.current), { duration: 900 });
       }
     }
+    if (BAGAJ_ON && !bagajRef.current && !raceRef.current && !challengeRef.current) {
+      const durak = DURAK_SEFER ? stopsPassed(landedId) : 0;
+      const varis = DURAK_SEFER && stopsPassed(landedId - towersCrossed) < BAGAJ_DURAK && durak >= BAGAJ_DURAK;
+      if (BAGAJ_TEST || varis) {
+        bagajRef.current = true;
+        runOnUI(() => {
+          "worklet";
+          running.value = 0;
+          if (phase.value === PHASE.CHARGING) { phase.value = PHASE.IDLE; charge.value = 0; }
+        })();
+        setTimeout(() => setBagaj(true), 450);
+      }
+    }
     const gained =
       towersCrossed * CONFIG.scorePerLanding +
       (towersCrossed > 1 ? towersCrossed * CONFIG.scoreMultiTowerBonus : 0) +
@@ -2221,6 +2238,8 @@ export default function Game() {
     }
     lastTowerRef.current = TEST_START_TOWER;
     runStatsRef.current = newRunStats();
+    bagajRef.current = false;
+    setBagaj(false);
     sonPatladiRef.current = false;
     setThought(null);
     setSpeech(null);
@@ -4781,6 +4800,18 @@ export default function Game() {
             </Pressable>
           ))}
         </View>
+      )}
+      {/* DURAK OYUNU en üst katmanda: skor, ses düğmesi ve yapraklar örtülür. */}
+      {BAGAJ_ON && bagaj && (
+        <BagajIstifi
+          onBitti={() => {
+            setBagaj(false);
+            runOnUI(() => {
+              "worklet";
+              running.value = 1;
+            })();
+          }}
+        />
       )}
 
     </View>
