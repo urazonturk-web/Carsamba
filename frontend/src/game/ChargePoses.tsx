@@ -335,7 +335,8 @@ function ReactionLayer({ k, px, py, poseCharge, scale, feetCenterOffset, feetHal
       umbrella ? umbrella.value : 0, snow ? snow.value : 0, eventHat ? 1 : 0);
     const giysi = 0; // hiçbir kıyafet düşüşü engellemez
     const dusuyor = fallVisible(dusus ? dusus.value : 0, giysi);
-    const kolAcik = k === 2 && !!ucusKol && ucusKol.value === 1 && outfit <= 0.01;
+    // Başka bir tepki pozu (silkele/oh be) çiziliyorsa kollu poz eklenmez: aynı anda iki gövde yok.
+    const kolAcik = k === 2 && !!ucusKol && ucusKol.value === 1 && outfit <= 0.01 && (tk === 0 || tk === 2 || ph !== 0);
     const on = ((tk === k && reactionVisible(tk, ph, outfit)) || kolAcik) && !dusuyor;
     const pulse = landPulse ? landPulse.value : 0;
     const sq = 1 - pulse * 0.14;

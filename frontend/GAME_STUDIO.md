@@ -2081,3 +2081,4 @@ TESLIM_HAZIR: VIDEO-1412 — gaz kalıntısı, bulmaca görünümü/ortalama, u�
 TESLIM_HAZIR: OYUNICI-OLAY-2026-11-26 — bulmaca kapatıldı (telefonda KOL ACIK, BULMACA KAPALI); oyun içi durak olayları raporu (martı baskını vb.) ai_review_evidence/OYUNICI-OLAY-2026-11-26/RAPOR.md; ilk olay seçimi kullanıcı kararı bekliyor.
 TESLIM_HAZIR: YARATICI-OLAY-2026-11-26 — çıpasız yaratıcı tur (3 bakış açısı + Kıvılcım ≈38 fikir, eleştirmen puanlaması) ai_review_evidence/YARATICI-OLAY-2026-11-26/RAPOR.md; ilk yapılacak (Kızaran yüz fener) kullanıcı kararı bekliyor.
 TESLIM_HAZIR: FENER — Kızaran yüz fener prototipi (sis + şarjla büyüyen ışık, kule 17–22), telefona kuruldu (KIZARAN YUZ FENER); kullanıcı denemesi bekleniyor.
+TESLIM_HAZIR: KENAR-DURUSU — kenarda dururken kollar açık + sürekli sallanma, telefona kuruldu (FENER + KENAR DURUSU); uçuş pozları için Kıvılcım onayı bekleniyor.

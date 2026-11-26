@@ -3350,3 +3350,18 @@ Kullanıcı: "Yes, build it" (ai_review_evidence/YARATICI-OLAY-2026-11-26/RAPOR.
 ### OPEN_ISSUES
 - Telefonda 17–22. kulelerde görülmedi; takılmaya etkisi ölçülmedi (tek büyük görsel katmanı, opaklık 0 iken çizilmez).
 - Işık aralığı (0,45–1,8) ve sisli bölüm uzunluğu oyun hissine göre ayar ister. Zorluk fiilen artar: hafif kural etkisi (eleştirmen notu).
+
+## 15:16 videosu — kenar duruşu — 2026-11-26
+### TASK
+Kullanıcı: "fena olmamış (fener). ama havada süzülürken daha farklı görseller olsa daha güzel olur … kolonun çok kenarına inmeme rağmen duruşu aynı kaldı videoyu dikkatli bir şekilde analiz et".
+### EVIDENCE (video, 10 fps kırpma)
+- Gözlem 20,0–21,6 sn ve 41,0–42,6 sn: amca kulenin sol (arka) kenarına iniyor; kollar açık denge pozu ~0,9 sn görünüyor, sonra normal duruş pozuna dönüp tam kenarda dimdik duruyor (yere sağlam basıyormuş gibi). Kullanıcının "duruşu aynı kaldı" dediği an bu.
+- Neden (kod): tepki pozu 900 ms sonra kapanıyor (tepki withDelay); kenar sallanması 600 ms'lik tek sefer; kenar eşiği %12/%88.
+- Fener: 34. puan civarı sisli bölüm görüldü, kullanıcı "fena olmamış".
+### CHANGED
+- app/index.tsx: `kenar` (-1/0/+1) iniş anında görünen (Kurukafa ölçekli) kule kenarına göre, eşik %15/%85; IDLE'da kenarda durdukça sürekli sallanma (4,5° ± 3°, ~0,7 Hz, ayak noktası etrafında) ve kollar açık denge pozu (ucusKol IDLE+kenar). Şarja başlayınca söner. BUILD_TAG "FENER + KENAR DURUSU".
+- src/game/ChargePoses.tsx: başka tepki pozu (silkele/oh be) çizilirken kollu poz eklenmez (iki gövde yok).
+- Fizik/kamera/çarpışma/puan değişmedi.
+### OPEN_ISSUES
+- Telefonda ve simülatörde kenar inişi görülmedi (simülatörde kenara indirmek denetlenemiyor). Kıyafetliyken kollu poz yok (yalnız sallanma).
+- "Havada daha farklı görseller": yeni poz çizimi gerekir (Kıvılcım; DURAK-OYUN-2026-11-26 S1–S5 istemleri hazır), kullanıcı onayı bekliyor.

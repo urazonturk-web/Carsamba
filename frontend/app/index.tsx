@@ -389,7 +389,7 @@ const AnimatedImage = Animated.createAnimatedComponent(Image);
 const BG_SCROLL_TEST = true as boolean;
 const BG_SCROLL_RATIO = 0.45;
 const BG_SCROLL_TILES = 4;
-const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "KIZARAN YUZ FENER") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
+const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "FENER + KENAR DURUSU") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
 const DIAG_MAX_EXAMPLES = 6;
 const HOUSE_AB_FROZEN = false as boolean;
 // REVIZYON-066 experiment (one variable): expo-linear-gradient's iOS layer
@@ -1408,6 +1408,10 @@ export default function Game() {
   const kabar = useSharedValue(0);
   // KIZARAN YÜZ FENER: sis görünürlüğü (0..1) ve ışık ölçeği. Yalnız çizim.
   const fenerOp = useSharedValue(0);
+  // KENAR DURUŞU (15:16 videosu: "kolonun çok kenarına inmeme rağmen duruşu aynı kaldı"): kenarda durdukça
+  // kollar açık denge pozu + sürekli hafif sallanma. -1 arka kenar, +1 ön kenar, 0 yok. Yalnız çizim.
+  const kenar = useSharedValue(0);
+  const kenarSal = useSharedValue(0);
   const fenerS = useSharedValue(FENER_MIN);
   const camX = useSharedValue(0);
   // Render Y is fixed at the spawn composition for the entire life.
@@ -2271,6 +2275,7 @@ export default function Game() {
     if (HAREKET_ON) {
       cancelAnimation(sallan); sallan.value = 0; cancelAnimation(kabar); kabar.value = 0;
       cancelAnimation(ucusEsne); ucusEsne.value = 0; ucusAci.value = 0;
+      kenar.value = 0; kenarSal.value = 0;
       kusursuzSeriRef.current = 0; ohbeSayRef.current = 0; rekorKutlandiRef.current = false;
     }
     dusus.value = 0;
@@ -2854,6 +2859,14 @@ export default function Game() {
       const hedef = phase.value === PHASE.AIRBORNE && dusus.value === 0 ? ucusEgim(vy.value, ucusV0.value, releasedCharge.value) : 0;
       ucusAci.value += (hedef - ucusAci.value) * Math.min(1, dt * EGIM_HIZ);
     }
+    if (HAREKET_ON) {
+      // Kenarda dururken (IDLE) sürekli sallanma; şarj/uçuşta söner.
+      const sabit = phase.value === PHASE.IDLE && kenar.value !== 0 && dusus.value === 0;
+      const zaman = frame.timestamp / 1000;
+      const hedefK = sabit ? kenar.value * (4.5 + 3 * Math.sin(zaman * 4.2)) : 0;
+      kenarSal.value += (hedefK - kenarSal.value) * Math.min(1, dt * 10);
+      if (phase.value === PHASE.AIRBORNE) kenar.value = 0;
+    }
     if (FENER_ON) {
       const sis = fenerAktif(lastLandedId.value) ? 1 : 0;
       fenerOp.value += (sis - fenerOp.value) * Math.min(1, dt * 2.5);
@@ -2978,6 +2991,12 @@ export default function Game() {
         if (contact) {
           const p = list[contact.index];
           const cx = contact.x;
+          if (HAREKET_ON) {
+            // Görünen kenar (Kurukafa ölçekli liste dahil): ayak bu kulede %15'ten az pay bıraktıysa kenarda.
+            const lp = landList[contact.index];
+            const r = (cx - lp.x) / Math.max(1, lp.width);
+            kenar.value = r <= 0.15 ? -1 : r >= 0.85 ? 1 : 0;
+          }
           px.value = cx;
           // fair landing
           py.value = p.topY - PH / 2;
@@ -3282,7 +3301,9 @@ export default function Game() {
   });
   // HAREKET: kalkışın ilk anından sonra uçuşta kollar açık (mevcut denge çizimi).
   const ucusKol = useDerivedValue(() =>
-    HAREKET_ON && phase.value === PHASE.AIRBORNE && dusus.value === 0 && vy.value / Math.max(1, ucusV0.value) > -0.6 ? 1 : 0);
+    HAREKET_ON && dusus.value === 0 && (
+      (phase.value === PHASE.AIRBORNE && vy.value / Math.max(1, ucusV0.value) > -0.6) ||
+      (phase.value === PHASE.IDLE && kenar.value !== 0)) ? 1 : 0); // uçuşta ve kenarda dururken kollar açık
   // Soluk amca: tek görsel (duruş pozu), kutusu açık boyutlu (sıfır boyutlu kapsayıcıda görünmüyordu).
   const GHOST_POSE = CHARGE_POSES[0];
   const GHOST_SCALE = SPRITE_SCALE * GLOBAL_VISUAL_SCALE * CHAR_SIZE_TRIAL;
@@ -3376,7 +3397,7 @@ export default function Game() {
     const fy = py.value + PH / 2;
     const e = ucusEsne.value;
     const kb = kabar.value;
-    const aci = (dusus.value > 0 ? 0 : ucusAci.value) + sallan.value;
+    const aci = (dusus.value > 0 ? 0 : ucusAci.value) + sallan.value + kenarSal.value;
     return {
       opacity: charOp.value,
       transform: [
