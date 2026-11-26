@@ -1,0 +1,130 @@
+OpenAI Codex v0.171.0-alpha.13.2
+--------
+workdir: /Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend
+model: gpt-6-luna
+provider: openai
+approval: never
+sandbox: read-only
+reasoning effort: medium
+reasoning summaries: none
+session id: 01a21775-db44-7301-97aa-fc05ce929f05
+--------
+user
+# DURAK-OYUN-2026-11-26 — (1) sinematik zıplama/iniş pozları, (2) durakta açılan "oyun içinde oyun"
+
+## Kullanıcının sözleri (kelimesi kelimesine)
+1. "1 nolu önerin için konuşuyorum yeniden çizimler yapılsın mesela matrix filmindeki atlama sahneleri gibi ya da hulkun atlaması gibi vb benzer işlerden yola çıkarak atlama ve iniş sahnelerimiz geliştirelim."
+2. "2 nolu önerin beni hiç tatmin etmedi dümdüz bir zıplama oyunundan çıkarmak istiyorum mesela oyun içinde oyun açılsın gibi. belirli bir durağa vardıktan sonra mesela bir bulmaca açılsın önüne ya da bir harita vb şeyler olabilir. kartpostal falan filan bunlar boş işler"
+
+→ Kullanıcı koleksiyon/kartpostal/toplama tarzı "meta" fikirleri İSTEMİYOR. İstediği: oyunun türünü genişleten, durakta açılan **gerçek oynanış** (mini oyun, bulmaca, harita ile ilgili bir şey).
+
+## Bağlam
+- Oyun: Byzantion, Expo/React Native iPhone. Eşofmanlı bıyıklı İstanbul amcası basılı tut-bırak ile gazla zıplayıp kule çatılarına iner. Kadıköy'den Rumeli Feneri'ne 12 durak (her 15 kulede bir: Harem, Üsküdar·Kız Kulesi, Kuzguncuk, Beylerbeyi, Ortaköy, Arnavutköy, Bebek, Rumeli Hisarı, Kanlıca, Beykoz, Anadolu Kavağı, Rumeli Feneri), 3 köprü. Düşünce baştan. Ton: sıcak mahalle mizahı, Arapça ünlem yok.
+- Mevcut çizimler ve uçuş analizi: ../HAREKET-2026-11-26/ ve ../AMAC-2026-11-26/ (RAPOR.md + editör raporları + kareler/). Uçuşta amca dik, kollar yanda ("kazık"). Bugün eklenen Paket A: eğilme ±12°, kalkış esnemesi, hıza göre iniş çökmesi, kenar sallanması.
+- Teknik: pozlar tek parça PNG; uçuşta poz seçimi kodla (`src/game/hareket.ts`, `ChargePoses.tsx`), dönme/ölçek ayak noktası etrafında; kıyafet katmanları (pijama/kış/yağmur/şemsiye/özel şapka) bindirme. Fizik, kamera, çarpışma DEĞİŞMEZ; yalnız görsel.
+- Yeni görseller Kıvılcım (görsel üretici) ile; **her çağrı ayrı kullanıcı onayı**, kabul edilmeden oyuna bağlanmaz.
+
+## Telif / özgünlük kuralı
+Matrix, Hulk vb. yalnız **hareket dili ilhamı** (ağır çekim, süper kahraman inişi, yere çarpınca çatlak/toz şoku, havada yavaşlama, rüzgârda savrulan ceket). Film karakterlerinin görünüşü, kostümü, logosu, sahnesi KOPYALANMAZ; amcanın kendi kişiliğine uyarlanır (eşofman, terlik, kasket, bıyık, gaz). Prompt'larda film/karakter adı geçmemeli.
+
+## (1) için istenen — animasyon/görsel editörü
+- Sinematik hareket dilinden amcaya uyarlanmış **kalkış → uçuş → tepe → iniş** dizisi: hangi pozlar (en fazla 5-6), her biri için Kıvılcım'a verilebilecek ayrıntılı betimleme (kol/bacak açıları, gövde eğimi, yüz, bıyık, ceket, gaz), tuval/pivot kuralı (mevcut: 516 veya 1100 genişlik, 1103 yükseklik, ayak noktası), hangi uçuş evresinde ve hangi koşulda (uzun atış, çoklu kule, kusursuz iniş, patlama) gösterileceği.
+- Pozla birlikte kodla eklenebilecek **sinematik efektler**: kısa ağır çekim anı (zaman ölçeği yalnız görsel mi yoksa fizik dt'si mi — fizik değişmez kuralını göz önünde tut, öneri fiziğe dokunuyorsa açıkça yaz), "süper iniş" çatı tozu/çatlak şok dalgası, ekran sarsıntısı (kamera değişmez kuralı!), hız çizgileri, gölge izi (afterimage), kamera dışı vinyet. Her birinin kural sınırına uyup uymadığını belirt.
+- Kıyafet sürümlerini ve toplam görsel sayısını say; önce hangi 1-2 pozla denensin.
+
+## (2) için istenen — oyun tasarımcıları
+Durakta (ya da belirli duraklarda) açılan **oyun içinde oyun**. En az 8 somut fikir. Her biri için:
+- Nasıl oynanır (dokunma/kaydırma/sürükleme; zıplama dışı kontrol serbest çünkü ayrı ekran), süresi (önerilen 20-60 sn), zorluk eğrisi.
+- İstanbul/Boğaz/o semtle bağı (ör. Kız Kulesi'nde fener ışığıyla vapur yönlendirme, Rumeli Hisarı'nda surlar, Kanlıca'da yoğurt, Bebek'te kürek, köprüde trafik, vapur iskelesi, balık tutma, tavla, çay ocağı sıra, simit fırlatma, harita/yön bulma bulmacası, eski İstanbul haritası parçaları…).
+- Ana oyuna dönüşte ne kazandırır (ör. bir sonraki bölüm için yardım: bir kez düşüşte kurtarma, durak başlangıcından devam hakkı — kayıt noktası şu an yok; bunlar kurala dokunur mu açıkça yaz), puan ilişkisi (puan kuralı değişikliği ayrı onay ister).
+- Gerekli yeni görsel sayısı, uygulama büyüklüğü (S/M/L), riskler (akışı kesmesi, ilk oyunda sıkıcılık, tekrar edilebilirlik).
+- Ayrıca **harita** fikri: ana oyunun üstüne bir Boğaz haritası katmanı (rota seçimi, dallanan güzergâh, gizli duraklar) olabilir mi?
+- Benzer başarılı örnekler: "oyun içinde oyun" / mini oyunlu mobil oyunlar (WarioWare, Mario Party mini oyunları, Gardenscapes/Homescapes'in ana oyun + meta, Royal Match, Township, Subway Surfers etkinlikleri, Alto's Odyssey, "Monument Valley", "Florence", "Pokémon GO", "Hitman GO" vb.) — kaynak göster (web araması serbest).
+- En iyi 3'ü seç; ilk yapılacak olanı gerekçelendir (en az görselle en büyük "tür değişimi" hissi).
+
+Raporlar bu klasöre `editor-<rol>.md` olarak, Türkçe, ~1-1,5 sayfa, madde madde. Oyun kodunu DEĞİŞTİRMEYİN.
+
+
+## Kıvılcım için not
+Bu çağrıda görsel ÜRETMİYORSUN, dosya yazmıyorsun; yalnız metinle görüş ver. Rolün: görsel tasarım ve karakter dili. (1) Amcanın sinematik kalkış/uçuş/iniş pozlarını sen çizecek olsan nasıl çizerdin (her poz için kısa betimleme, film/karakter adı kullanmadan). (2) Durakta açılan mini oyun/bulmaca/harita fikirleri: görsel olarak en çekici ve İstanbul semtlerine özgü olanlar; her birinin kaç görsel istediği. Türkçe, ~1 sayfa.
+
+warning: Under-development features enabled: chronicle. Under-development features are incomplete and may behave unpredictably. To suppress this warning, set `suppress_unstable_features_warning = true` in /Users/bekirurazonturk/.codex/config.toml.
+codex
+Bu tur için **editör raporu yazmam mı**, yoksa yalnızca görüşü burada paylaşmam mı isteniyor? Talimatta hem `editor-<rol>.md` raporu isteniyor hem de Kıvılcım notunda “dosya yazmıyorsun” deniyor. Dosyalara erişimim ayrıca salt okunur olduğundan raporu klasöre kaydedemem; aşağıda istenen görsel tasarım görüşünü metin olarak veriyorum.
+
+## (1) Amcanın sinematik hareket pozları
+
+Pozlar mevcut tek parça PNG’ye, **516 veya 1100 × 1103** tuvale ve değişmeyen ayak pivotuna göre çizilmeli. Film karakterlerinin görünüşünü ya da kostümünü almadan; eşofmanlı, terlikli, bıyıklı amcanın kendi mizahını koruyarak:
+
+1. **Yüklenme:** Dizler belirgin bükülü, gövde öne eğik, kollar geride. Yüzde “hazır mıyız?” kararlılığı; ceket ve bıyık hafif geriye çekilmiş. Şarjın son anında kullanılır.
+2. **Güçlü kalkış:** Bir diz yukarıda, diğer bacak aşağı uzanırken kollar denge için açılır. Gövde çapraz yükselir; eşofman ceketi ve gaz izi aşağı geriye savrulur. Güçlü/uzun atışta gösterilir.
+3. **Havada süzülme:** Gövde hafif öne yatık, dizler gevşek, kollar asimetrik açık. Amca aşağıya temkinli bakar; ceket ucu rüzgârda dalgalanır, gaz izi seyrekleşir. Normal uçuşta kullanılabilir.
+4. **Uçuş tepesi:** Bacaklar kısa süre toplanır, kollar yana açılır; yüzünde bir anlık şaşkınlık ve bıyık yukarı kalkmış görünür. En yüksek noktada kısa bir vurgu pozu olur.
+5. **Dengeli iniş:** Ayaklar çatıya yaklaşırken dizler bükülür, gövde öne alınır, kollar iki yana açılır. Kusursuz inişte daha kontrollü, hızlı inişte daha derin çömelme kullanılabilir.
+6. **Ağır iniş:** Ayaklar yere basar, dizler derin kırılır; bir el denge için öne uzanır. Yüzde “oh be” ifadesi; ceket ve gaz basış yönünün tersine savrulur. Yalnız sert iniş/iniş etkisi için.
+
+**Önce deneme:** 2 pozla başlayın: **güçlü kalkış** ve **dengeli iniş**. Uçuşun enerjisini ve iniş okunurluğunu az sayıda yeni çizimle sınarlar. Ağır iniş daha sonra eklenebilir.
+
+**Efekt sınırları:** Hız çizgileri, kısa süreli gölge izi ve karakter çevresinde hafif vinyet görsel katman olarak kalırsa fizik/kamera kuralına uyar. Çatı tozu ve görsel çatlak şoku da çarpışma sonucunu değiştirmeyen kozmetik efekt olabilir. Ekran sarsıntısı kamera değişikliğidir; mevcut “kamera değişmez” kuralıyla uyumlu değil. Ağır çekimi yalnız animasyon/efekt zamanlamasına uygulamak mümkün; fizik `dt` değerini yavaşlatmak fizik davranışını değiştirir ve bu kurala uymaz.
+
+Tek bir temel karakter çiziminin kıyafet katmanlarıyla çoğaltılması durumunda, **her poz için pijama, kış, yağmur, şemsiye ve özel şapka olmak üzere 5 sürüm** gerekir. Altı pozluk tam set **30 poz-kıyafet bileşimi** eder; iki pozluk ilk deneme **10 bileşim**. Katmanların mevcut görsel sistemle uyumlu olup olmadığı çizim öncesi teyit edilmeli.
+
+## (2) Durakta açılan oynanış fikirleri
+
+Aşağıdaki görsel sayıları yaklaşık yeni sahne/öğe sayısıdır; mevcut varlıkların yeniden kullanımı bu sayıyı düşürebilir. Puanı değiştiren ödüller ve ana oyuna düşüş kurtarma ya da kayıt noktası eklemek **oyun kuralı değişikliğidir**, ayrıca onay gerektirir.
+
+| Fikir | Oynanış ve süre | Semt bağı, ana oyuna katkı | Görsel / kapsam / risk |
+|---|---|---|---|
+| **Kız Kulesi feneri** | Fener ışığını sürükleyerek vapurları güvenli kanala yönlendir; 30–45 sn, gemi sayısı ve akıntı artar. | Kız Kulesi; kozmetik yıldız veya yeni bölüm için yardım. | 2–4 görsel, S. Fazla öğretici olursa kolaylaşır. |
+| **Rumeli Hisarı sur bulmacası** | Taş parçalarını sürükleyip doğru sur hattını tamamla; 30–60 sn, daha az ipucuyla zorlaşır. | Hisar; tamamlayınca sonraki uçuş için tek seferlik görsel rota ipucu. | 4–8 görsel, M. Bulmaca temposu ana oyundan farklı olabilir. |
+| **Kanlıca yoğurt tepsisi** | Telefonu değil, parmağı kaydırarak tepsileri düşürmeden sırala; 20–40 sn, tepsi hızı artar. | Kanlıca; başarı puanı veya kozmetik sunum. | 2–3 görsel, S. Tekrarında çabuk ezberlenebilir. |
+| **Bebek kürek yarışı** | İki parmakla dönüşümlü dokunup kayık ritmini tuttur; 30–45 sn, engeller sıklaşır. | Bebek kıyısı; sonraki durakta başlangıç kolaylığı gibi kural değişikliği ödülü olabilir. | 3–5 görsel, M. Kontrol erişilebilirliği dikkat ister. |
+| **Boğaz köprüsü trafik akışı** | Şeritlere dokunup araçları çarpıştırmadan sıraya koy; 30–60 sn, araç yoğunluğu yükselir. | Köprü; yalnız mini oyunda skor/başarı. | 3–6 görsel, M. Ana oyundan kopuş hissi yaratabilir. |
+| **Vapur iskelesi çay sırası** | Siparişleri doğru yolcuya sürükle; 30–45 sn, eşzamanlı sipariş sayısı artar. | İskele ve mahalle mizahı; kozmetik çay tepsisi/animasyonu. | 4–7 görsel, M. Hızlı eşleştirme yorucu olabilir. |
+| **Simit atışı** | Simidi rüzgârı hesaba katarak sürükleyip martı yerine doğru hedefe bırak; 20–30 sn, rüzgâr yönü değişir. | Boğaz martıları; mini oyun skoru. | 2–4 görsel, S. Zıplama oyununa fazla yakın hissettirebilir. |
+| **Tavla: tek hamle bulmacası** | Taşları dokunup sürükleyerek verilen pozisyondaki en iyi hamleyi bul; 30–60 sn, daha az ipucu. | Mahalle kahvesi/çay ocağı; bağımsız başarı ve tekrar oynama. | 2–5 görsel, S–M. Tavla bilmeyenler için kural açıklaması gerekir. |
+| **Boğaz haritası yön bulma** | Haritayı kaydırıp doğru iskele/rota seç; süreli 30–45 sn bulmaca. | Durakların gerçek coğrafyası; dallanan rota veya gizli durak açabilir. | 1–3 harita görseli, M–L. Rota seçimi seviye sırası ve ilerleme kurallarını değiştirir. |
+
+**En iyi üç aday:** Kız Kulesi feneri, Boğaz haritası yön bulma ve Rumeli Hisarı sur bulmacası. İlk prototip için **Kız Kulesi feneri** en uygun görünüyor: tek sahne üzerinde sürükleme ile oynanışı belirgin biçimde değiştiriyor, İstanbul’a özgü ve az görselle prototiplenebilir. Harita fikri en büyük tür ve rota değişimini sağlar; ancak dallanma/gizli duraklar seviye yapısını etkileyebileceğinden kapsamı daha büyük.
+
+**Örneklerden çıkarım:** WarioWare ve Mario Party kısa, ayrı kurallı mini oyunlarla tempo değişimini; Alto’s Odyssey ve Monument Valley ise güçlü görsel/yer hissini gösteren karşılaştırma noktalarıdır. Bu, önerilerin tasarım değerlendirmesidir; örnek oyunlara dair canlı kaynak taraması yapmadım.
+tokens used
+13.053
+Bu tur için **editör raporu yazmam mı**, yoksa yalnızca görüşü burada paylaşmam mı isteniyor? Talimatta hem `editor-<rol>.md` raporu isteniyor hem de Kıvılcım notunda “dosya yazmıyorsun” deniyor. Dosyalara erişimim ayrıca salt okunur olduğundan raporu klasöre kaydedemem; aşağıda istenen görsel tasarım görüşünü metin olarak veriyorum.
+
+## (1) Amcanın sinematik hareket pozları
+
+Pozlar mevcut tek parça PNG’ye, **516 veya 1100 × 1103** tuvale ve değişmeyen ayak pivotuna göre çizilmeli. Film karakterlerinin görünüşünü ya da kostümünü almadan; eşofmanlı, terlikli, bıyıklı amcanın kendi mizahını koruyarak:
+
+1. **Yüklenme:** Dizler belirgin bükülü, gövde öne eğik, kollar geride. Yüzde “hazır mıyız?” kararlılığı; ceket ve bıyık hafif geriye çekilmiş. Şarjın son anında kullanılır.
+2. **Güçlü kalkış:** Bir diz yukarıda, diğer bacak aşağı uzanırken kollar denge için açılır. Gövde çapraz yükselir; eşofman ceketi ve gaz izi aşağı geriye savrulur. Güçlü/uzun atışta gösterilir.
+3. **Havada süzülme:** Gövde hafif öne yatık, dizler gevşek, kollar asimetrik açık. Amca aşağıya temkinli bakar; ceket ucu rüzgârda dalgalanır, gaz izi seyrekleşir. Normal uçuşta kullanılabilir.
+4. **Uçuş tepesi:** Bacaklar kısa süre toplanır, kollar yana açılır; yüzünde bir anlık şaşkınlık ve bıyık yukarı kalkmış görünür. En yüksek noktada kısa bir vurgu pozu olur.
+5. **Dengeli iniş:** Ayaklar çatıya yaklaşırken dizler bükülür, gövde öne alınır, kollar iki yana açılır. Kusursuz inişte daha kontrollü, hızlı inişte daha derin çömelme kullanılabilir.
+6. **Ağır iniş:** Ayaklar yere basar, dizler derin kırılır; bir el denge için öne uzanır. Yüzde “oh be” ifadesi; ceket ve gaz basış yönünün tersine savrulur. Yalnız sert iniş/iniş etkisi için.
+
+**Önce deneme:** 2 pozla başlayın: **güçlü kalkış** ve **dengeli iniş**. Uçuşun enerjisini ve iniş okunurluğunu az sayıda yeni çizimle sınarlar. Ağır iniş daha sonra eklenebilir.
+
+**Efekt sınırları:** Hız çizgileri, kısa süreli gölge izi ve karakter çevresinde hafif vinyet görsel katman olarak kalırsa fizik/kamera kuralına uyar. Çatı tozu ve görsel çatlak şoku da çarpışma sonucunu değiştirmeyen kozmetik efekt olabilir. Ekran sarsıntısı kamera değişikliğidir; mevcut “kamera değişmez” kuralıyla uyumlu değil. Ağır çekimi yalnız animasyon/efekt zamanlamasına uygulamak mümkün; fizik `dt` değerini yavaşlatmak fizik davranışını değiştirir ve bu kurala uymaz.
+
+Tek bir temel karakter çiziminin kıyafet katmanlarıyla çoğaltılması durumunda, **her poz için pijama, kış, yağmur, şemsiye ve özel şapka olmak üzere 5 sürüm** gerekir. Altı pozluk tam set **30 poz-kıyafet bileşimi** eder; iki pozluk ilk deneme **10 bileşim**. Katmanların mevcut görsel sistemle uyumlu olup olmadığı çizim öncesi teyit edilmeli.
+
+## (2) Durakta açılan oynanış fikirleri
+
+Aşağıdaki görsel sayıları yaklaşık yeni sahne/öğe sayısıdır; mevcut varlıkların yeniden kullanımı bu sayıyı düşürebilir. Puanı değiştiren ödüller ve ana oyuna düşüş kurtarma ya da kayıt noktası eklemek **oyun kuralı değişikliğidir**, ayrıca onay gerektirir.
+
+| Fikir | Oynanış ve süre | Semt bağı, ana oyuna katkı | Görsel / kapsam / risk |
+|---|---|---|---|
+| **Kız Kulesi feneri** | Fener ışığını sürükleyerek vapurları güvenli kanala yönlendir; 30–45 sn, gemi sayısı ve akıntı artar. | Kız Kulesi; kozmetik yıldız veya yeni bölüm için yardım. | 2–4 görsel, S. Fazla öğretici olursa kolaylaşır. |
+| **Rumeli Hisarı sur bulmacası** | Taş parçalarını sürükleyip doğru sur hattını tamamla; 30–60 sn, daha az ipucuyla zorlaşır. | Hisar; tamamlayınca sonraki uçuş için tek seferlik görsel rota ipucu. | 4–8 görsel, M. Bulmaca temposu ana oyundan farklı olabilir. |
+| **Kanlıca yoğurt tepsisi** | Telefonu değil, parmağı kaydırarak tepsileri düşürmeden sırala; 20–40 sn, tepsi hızı artar. | Kanlıca; başarı puanı veya kozmetik sunum. | 2–3 görsel, S. Tekrarında çabuk ezberlenebilir. |
+| **Bebek kürek yarışı** | İki parmakla dönüşümlü dokunup kayık ritmini tuttur; 30–45 sn, engeller sıklaşır. | Bebek kıyısı; sonraki durakta başlangıç kolaylığı gibi kural değişikliği ödülü olabilir. | 3–5 görsel, M. Kontrol erişilebilirliği dikkat ister. |
+| **Boğaz köprüsü trafik akışı** | Şeritlere dokunup araçları çarpıştırmadan sıraya koy; 30–60 sn, araç yoğunluğu yükselir. | Köprü; yalnız mini oyunda skor/başarı. | 3–6 görsel, M. Ana oyundan kopuş hissi yaratabilir. |
+| **Vapur iskelesi çay sırası** | Siparişleri doğru yolcuya sürükle; 30–45 sn, eşzamanlı sipariş sayısı artar. | İskele ve mahalle mizahı; kozmetik çay tepsisi/animasyonu. | 4–7 görsel, M. Hızlı eşleştirme yorucu olabilir. |
+| **Simit atışı** | Simidi rüzgârı hesaba katarak sürükleyip martı yerine doğru hedefe bırak; 20–30 sn, rüzgâr yönü değişir. | Boğaz martıları; mini oyun skoru. | 2–4 görsel, S. Zıplama oyununa fazla yakın hissettirebilir. |
+| **Tavla: tek hamle bulmacası** | Taşları dokunup sürükleyerek verilen pozisyondaki en iyi hamleyi bul; 30–60 sn, daha az ipucu. | Mahalle kahvesi/çay ocağı; bağımsız başarı ve tekrar oynama. | 2–5 görsel, S–M. Tavla bilmeyenler için kural açıklaması gerekir. |
+| **Boğaz haritası yön bulma** | Haritayı kaydırıp doğru iskele/rota seç; süreli 30–45 sn bulmaca. | Durakların gerçek coğrafyası; dallanan rota veya gizli durak açabilir. | 1–3 harita görseli, M–L. Rota seçimi seviye sırası ve ilerleme kurallarını değiştirir. |
+
+**En iyi üç aday:** Kız Kulesi feneri, Boğaz haritası yön bulma ve Rumeli Hisarı sur bulmacası. İlk prototip için **Kız Kulesi feneri** en uygun görünüyor: tek sahne üzerinde sürükleme ile oynanışı belirgin biçimde değiştiriyor, İstanbul’a özgü ve az görselle prototiplenebilir. Harita fikri en büyük tür ve rota değişimini sağlar; ancak dallanma/gizli duraklar seviye yapısını etkileyebileceğinden kapsamı daha büyük.
+
+**Örneklerden çıkarım:** WarioWare ve Mario Party kısa, ayrı kurallı mini oyunlarla tempo değişimini; Alto’s Odyssey ve Monument Valley ise güçlü görsel/yer hissini gösteren karşılaştırma noktalarıdır. Bu, önerilerin tasarım değerlendirmesidir; örnek oyunlara dair canlı kaynak taraması yapmadım.
