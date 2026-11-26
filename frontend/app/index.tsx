@@ -59,6 +59,7 @@ import { KARGA_ON, KARGA_TUNEMIS, KARGA_BAKIS, KARGA_YEM, KARGA_HAVALANMA, KARGA
 import { CEPHE_HUCRE, CEPHE_DONEM_PX, CEPHE_BASLANGIC_PX } from "../src/game/cepheCesit";
 import { MAHALLE_ON, MAHALLE_SPEECH_ON, CUMBA_SOURCE, CUMBA_KEDI_SOURCE, CUMBA_ASPECT, CUMBA_TEYZE_SOURCE, CUMBA_TEYZE_BAKIS_SOURCE, CUMBA_TEYZE_ASPECT, cumbaBox, MAHALLE_BOX, TEYZE_ASPECT, KEDI_ASPECT, KEDI_UYUYAN_FOOT, KEDI_DIK_FOOT, AMCA_ASPECT, COCUK_ASPECT, KEDI_GERINEN_ASPECT, KEDI_GRI_ASPECT, TEYZE_SOURCE, KEDI_SOURCE, AMCA_SOURCE, COCUK_SOURCE, KEDI_GERINEN_SOURCE, KEDI_GRI_SOURCE, KEDI_ADLARI, sakin, teyzeBox, kediBox, kediAdi, kediGri, kediGriNo, pencereAspect, pencereLafi, kediLafi, KEDI_DEFTER_KEY, mahalleKaynak, kediGorunum, kediGorunumNo, kadinNo, KADIN_KAYNAK, KEDI_YENI, KEDI_YENI_ASPECT, SAKIN_TOHUM } from "../src/game/mahalle";
 import { OZEL_GUN_ON, OZEL_GUN_TEST_TAP, OZEL_GUNLER, OZEL_GUN_TEST_ORDER, todaysEvent } from "../src/game/ozelGun";
+import { IPUCU_ON, IPUCU_MAX, IPUCU_KEY, IPUCU_METIN, HIZLI_TEKRAR_MS } from "../src/game/ipucu";
 import { HANIM_ON, ICSES_ON, LAKAP_ON, newRunStats, noteLanding, icSesAfterLanding, icSesIdle, hanimMessage, lakap } from "../src/game/amcaSesi";
 import { jumpVelocity, advanceFlight } from "../src/game/jump";
 import { findFootLanding } from "../src/game/landing";
@@ -385,7 +386,7 @@ const AnimatedImage = Animated.createAnimatedComponent(Image);
 const BG_SCROLL_TEST = true as boolean;
 const BG_SCROLL_RATIO = 0.45;
 const BG_SCROLL_TILES = 4;
-const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "CAY URUN") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
+const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "OYNANIS PAKET 1") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
 const DIAG_MAX_EXAMPLES = 6;
 const HOUSE_AB_FROZEN = false as boolean;
 // REVIZYON-066 experiment (one variable): expo-linear-gradient's iOS layer
@@ -1038,10 +1039,16 @@ export default function Game() {
   }, [assetsReady]);
 
   const [perfectVisible, setPerfectVisible] = useState(false);
-  const [landingLabel, setLandingLabel] = useState("PERFECT!");
+  const [landingLabel, setLandingLabel] = useState("Tam isabet!");
   const [landingSub, setLandingSub] = useState("");
   const [quip, setQuip] = useState(GAME_OVER_LINE);
   const [goInfo, setGoInfo] = useState({ prevBest: 0, newRecord: false });
+  // OYNANIS-2026-11-26 ilk paket: hataya göre ipucu (ilk IPUCU_MAX oyun sonunda) + hızlı yeniden başlama.
+  const [ipucu, setIpucu] = useState<string | null>(null);
+  const ipucuSayRef = useRef(0);
+  const goAtRef = useRef(0);
+  const sonPatladiRef = useRef(false);
+  useEffect(() => { storage.getItem<number>(IPUCU_KEY, 0).then((n) => { ipucuSayRef.current = Number(n) || 0; }); }, []);
   // AMCANIN SESİ + LAKAP (2026-11-20)
   const runStatsRef = useRef(newRunStats());
   const [thought, setThought] = useState<{ k: number; text: string } | null>(null);
@@ -1874,6 +1881,7 @@ export default function Game() {
   // JS callbacks triggered from the worklet (rare, event-based).
   // ------------------------------------------------------------------------
   const onLanding = useCallback((perfect: number, towersCrossed: number, landedId: number, ratio = 0.5) => {
+    sonPatladiRef.current = false; // ipucu: yalnız son zıplamanın patlaması sayılır
     const rcL = raceRef.current;
     if (YARIS_ON && rcL && !rcL.ended) pushEvent(rcL.log, raceElapsed(rcL), EV_LAND, landedId, ratio);
     if (DURAK_SEFER) {
@@ -1988,7 +1996,7 @@ export default function Game() {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
     }
     if (REFERENCE_TRIAL ? towersCrossed > 1 : perfect) {
-      setLandingLabel(REFERENCE_TRIAL ? `+${gained}` : "PERFECT!");
+      setLandingLabel(REFERENCE_TRIAL ? `+${gained}` : "Tam isabet!");
       setLandingSub(FAZ1_UI && REFERENCE_TRIAL ? multiJumpShout(towersCrossed) : "");
       setPerfectVisible(true);
       if (perfectTimer.current) clearTimeout(perfectTimer.current);
@@ -2006,6 +2014,7 @@ export default function Game() {
       if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy).catch(() => {});
     } else {
       runStatsRef.current.exploded = true;
+      sonPatladiRef.current = true;
       setLandingLabel(SPLAT_ON ? "PATLADI!" : "Dayanamadı!");
       setLandingSub(SPLAT_ON ? "💩" : "💨");
       if (Platform.OS !== "web") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => {});
@@ -2111,6 +2120,15 @@ export default function Game() {
       setLakapText(LAKAP_ON ? lakap(runStatsRef.current, sc, stopsNow, rec) : null);
       setRunsDone((n) => n + 1);
       setThought(null);
+      if (IPUCU_ON && !challengeRef.current && ipucuSayRef.current < IPUCU_MAX) {
+        const lt = lastTowerRef.current;
+        const nx = platforms.value.find((q: any) => q.id === lt + 1);
+        const x = px.value;
+        const tur = sonPatladiRef.current ? "patladi" : nx ? (x < nx.x + nx.width / 2 ? "kisa" : "uzun") : null;
+        const t = tur ? IPUCU_METIN[tur] : null;
+        setIpucu(t);
+        if (t) { ipucuSayRef.current += 1; storage.setItem(IPUCU_KEY, ipucuSayRef.current); }
+      } else setIpucu(null);
       if (HANIM_ON && !raceRef.current && !challengeRef.current) {
         const tr = new Date(Date.now() + 3 * 3600 * 1000);
         const w = weatherRef.current;
@@ -2126,6 +2144,7 @@ export default function Game() {
         }
       }
     }
+    goAtRef.current = Date.now();
     setGameOver(true);
     // Free-mode runs only: the daily map is a different course every day.
     if (GAME_CENTER_ON && modeRef.current !== "daily") GameCenter.submitScore(scoreRef.current, LEADERBOARD_ID);
@@ -2166,6 +2185,7 @@ export default function Game() {
     }
     lastTowerRef.current = TEST_START_TOWER;
     runStatsRef.current = newRunStats();
+    sonPatladiRef.current = false;
     setThought(null);
     setSpeech(null);
     catWoken.value = -1;
@@ -4106,8 +4126,9 @@ export default function Game() {
 
       {/* Game Over — KARTPOSTAL (2026-11-16) */}
       {gameOver && FAZ1_UI && (
-        <View style={[styles.overlay, styles.goOverlay, { paddingTop: insets.top + 70 }]} testID="game-over-overlay">
-          <Animated.View entering={FadeInDown.duration(380)} style={[styles.pcWrap, styles.goWrap, { maxHeight: Math.min(H - (insets.top + 70) - insets.bottom - 86, 0.6 * H) }]}
+        <Pressable style={[styles.overlay, styles.goOverlay, { paddingTop: insets.top + 70 }]} testID="game-over-overlay"
+          onPress={() => { if (Date.now() - goAtRef.current >= HIZLI_TEKRAR_MS) restart(); }}>
+          <Animated.View entering={FadeInDown.duration(250)} onStartShouldSetResponder={() => true} style={[styles.pcWrap, styles.goWrap, { maxHeight: Math.min(H - (insets.top + 70) - insets.bottom - 86, 0.6 * H) }]}
             onLayout={(e) => { const l = e.nativeEvent.layout; setGoCardBottom(l.y + l.height); }}>
             <View style={[styles.pcTilt, styles.goShrink]}>
             <View style={[styles.pcCard, styles.goShrink]}>
@@ -4135,6 +4156,25 @@ export default function Game() {
                 <Text style={[styles.pcHand, styles.goSmHand]} numberOfLines={1} adjustsFontSizeToFit>
                   📍 {runEnd.stops > 0 ? `${stopName(runEnd.stops)} · ` : ""}{nextStopLine(runEnd.lastTower)}
                 </Text>
+                {(() => {
+                  // OYNANIS-2026-11-26: sıradaki durağa ilerleme çubuğu + o durağın kartpostalı (açılmadıysa bulanık).
+                  const k = stopsPassed(runEnd.lastTower) + 1;
+                  const bas = k === 1 ? 0 : stopTowerId(k - 1);
+                  const ilerleme = Math.max(0, Math.min(1, (runEnd.lastTower - bas) / Math.max(1, stopTowerId(k) - bas)));
+                  const kart = POSTCARDS_ON ? POSTCARDS.find((c) => c.stop === k) : undefined;
+                  const acik = !!kart && unlocked.includes(k);
+                  return (
+                    <View style={styles.goNextRow} testID="next-stop-progress">
+                      {kart && (
+                        <View style={styles.goNextCard}>
+                          <CachedImage source={kart.source} style={{ position: "absolute", left: 0, top: 0, right: 0, bottom: 0 }} contentFit="cover" blurRadius={acik ? 0 : 12} transition={0} />
+                          {!acik && <Text style={styles.goNextQ}>?</Text>}
+                        </View>
+                      )}
+                      <View style={styles.goNextBar}><View style={[styles.goNextFill, { width: `${Math.round(ilerleme * 100)}%` }]} /></View>
+                    </View>
+                  );
+                })()}
                 {LAKAP_ON && lakapText && (
                   <Text style={[styles.lakapLine, styles.goSmLakap]} numberOfLines={1} adjustsFontSizeToFit testID="lakap-line">🏷️ Lakabın: {lakapText}</Text>
                 )}
@@ -4174,6 +4214,9 @@ export default function Game() {
                     <Text style={[styles.goLink, { marginTop: 0, color: "#b5482c" }]}>Keyfin yerinde mi? Amcaya bir çay ısmarla</Text>
                     <Pressable onPress={() => setCayOneri(false)} hitSlop={10} testID="cay-oneri-kapat"><Ico name="xmark" size={12} color="#9a7a66" /></Pressable>
                   </Pressable>
+                )}
+                {IPUCU_ON && ipucu && !(MEYDAN_ON && challenge) && (
+                  <Text style={styles.goIpucu} testID="ipucu-line">💡 {ipucu}</Text>
                 )}
                 <Pressable
                   testID="play-again-button"
@@ -4232,7 +4275,7 @@ export default function Game() {
             {goInfo.newRecord && <Postmark delay={countUpMs(score)} styles={styles} small />}
             </View>
           </Animated.View>
-        </View>
+        </Pressable>
       )}
 
       {/* PAYLAŞIM KARTPOSTALI (2026-11-18): oyun sonu kartının üstünde, ekranın tamamı */}
@@ -5727,6 +5770,12 @@ const useStyles = makeStyles((colors) => ({
   toastText: { backgroundColor: "rgba(30,20,60,0.92)", color: "#fff", fontSize: 15, fontWeight: "800", paddingHorizontal: 14, paddingVertical: 8, borderRadius: 14, overflow: "hidden", textAlign: "center" },
   goInfoPill: { width: "100%", marginTop: 10, borderRadius: 12, paddingVertical: 7, paddingHorizontal: 10, alignItems: "center", backgroundColor: "rgba(192,71,43,0.08)" },
   goInfoMain: { fontSize: 14, fontWeight: "800", color: "#2a1b12", textAlign: "center" },
+  goNextRow: { flexDirection: "row", alignItems: "center", gap: 8, marginTop: 6, alignSelf: "stretch", paddingHorizontal: 6 },
+  goNextCard: { width: 46, height: 32, borderRadius: 3, overflow: "hidden", backgroundColor: "#d8c9a8", alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: "#fff" },
+  goNextQ: { fontSize: 16, fontWeight: "800", color: "#fff", textShadowColor: "rgba(0,0,0,0.5)", textShadowRadius: 3 },
+  goNextBar: { flex: 1, height: 8, borderRadius: 4, backgroundColor: "rgba(31,78,121,0.15)", overflow: "hidden" },
+  goNextFill: { height: 8, borderRadius: 4, backgroundColor: "#c0472b" },
+  goIpucu: { marginTop: 6, marginBottom: 2, fontSize: 14, fontWeight: "700", color: "#1f4e79", textAlign: "center", paddingHorizontal: 8 },
   goInfoNew: { marginTop: 3, fontSize: 13, fontWeight: "700", color: "#9a5a1e", textAlign: "center" },
   goLink: { marginTop: 8, fontSize: 14, fontWeight: "800", color: "#c0472b", textAlign: "center" },
   goIconRow: { flexDirection: "row", justifyContent: "space-between", width: "100%", marginTop: 14 },

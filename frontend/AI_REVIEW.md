@@ -3222,3 +3222,22 @@ TASK: Kullanıcı: "computer use ile sen yap" (sözleşme/banka/vergi).
 CHANGED (yerleşik tarayıcı; kullanıcı oturumu): tüzel kişi adresi Apple standardıyla onaylandı (kullanıcı onayı); Ücretli Uygulamalar Sözleşmesi özetlendi ve kullanıcının "Evet, kabul et" onayıyla kabul edildi; banka formunda hesap sahibi bilgileri ve şube kodu (0062 01163 055) Claude, IBAN/hesap no/onay/2FA kullanıcı; ABD vergi anketi Claude ("hayır/hayır"); W-8BEN'de 9. satır Claude, TC/doğum tarihi/imza kullanıcı; yabancı statü beyanında unvan Claude, onay/gönder kullanıcı.
 EVIDENCE: Business sayfası: Paid Apps "Processing", banka "Processing", W-8BEN ve yabancı statü "Active".
 OPEN_ISSUES: Sözleşme Active olunca sandbox test hesabı (yeni e-posta gerekir; hesap açma kullanıcı onayı ister) ile telefonda satın alma/teşekkür/geri yükleme denenecek. DSA tacir beyanı ve Küçük İşletme Programı başvurusu bekliyor. Site adı adrese eklenemedi.
+
+## OYNANIS-PAKET-1 — ilk oynanabilirlik paketi (2026-11-26)
+### TASK
+Kullanıcı: "İlk paketi yap" (OYNANIS-2026-11-26/RAPOR.md §6.1). Fizik, kamera, kule üretimi, çarpışma ve puan kuralı değişmedi.
+### CHANGED
+- `src/game/ipucu.ts` (yeni): IPUCU_ON, IPUCU_MAX=5, IPUCU_KEY, metinler, HIZLI_TEKRAR_MS=400.
+- `app/index.tsx`:
+  - Oyun sonunda hataya göre ipucu (ilk 5 oyun sonunda, meydan okumada yok). Sınıflama yalnız OKUR: son zıplama "dayanamadı" ise (yeni `sonPatladiRef`, her inişte sıfırlanır) "patladi"; değilse ölüm anındaki `px` sonraki kulenin (`lastTower+1`) ortasından önceyse "kisa", sonraysa "uzun".
+  - "PERFECT!" iki dizesi "Tam isabet!" oldu. Not: `REFERENCE_TRIAL=true` iken bu etiket oyuncuya hiç gösterilmiyordu (çoklu kule için "+N" gösteriliyor); editörlerin "PERFECT! görünüyor" tespiti bu yüzden yalnız kodda geçerliydi.
+  - Oyun sonu kartında "X'e N kule kaldı" satırının altına ilerleme çubuğu + sıradaki durağın kartpostalı (açılmadıysa bulanık + "?", expo-image blurRadius 12).
+  - Hızlı yeniden başlama: kart dışındaki boş yere dokunmak, kart açıldıktan 400 ms sonra "Bir daha" sayılır (dış kap Pressable, kart `onStartShouldSetResponder` ile dokunuşu kendinde tutar). Kart giriş animasyonu 380 → 250 ms. Oyun yüzeyinin dokunma alıcısı `!gameOver` koşullu olduğu için şarj başlamaz.
+  - BUILD_TAG "OYNANIS PAKET 1".
+### EVIDENCE
+- `npx tsc --noEmit`: app/index.tsx için hata yok.
+- Simülatör (iPhone 17, Release): uzun basış → "Amca uçtu gitti!"; ilk derlemede koşu boyu `exploded` bayrağı yüzünden kısa düşüşe "Fazla bastın" çıktı → `sonPatladiRef` ile düzeltildi. Kulenin duvarına çarpıp düşüşte ipucu çıkmadı → sınıflama kulenin ortasına göre yapıldı (son derleme simülatörde ayrıca denenmedi). Boş yere dokunma yeniden başlattı; karta dokunma başlatmadı. İlerleme çubuğu ve bulanık kartpostal görüldü.
+- Telefon: Release kurulumu ve `strings main.jsbundle | grep OYNANIS PAKET 1` — sonuç aşağıdaki satırda.
+### OPEN_ISSUES
+- Cihazda his/okunurluk kullanıcı videosuyla doğrulanmadı. İpucu sayacı cihazda kalıcı (5 kez sonra çıkmaz).
+- Telefon (2026-11-26): Release derlendi, `strings main.jsbundle | grep -c OYNANIS PAKET 1` = 1, devicectl "App installed".
