@@ -3459,3 +3459,8 @@ OPEN_ISSUES: Aynı nedenle index.tsx'teki iniş çömelme derinliği (`releasedC
 TASK: kullanıcı "Evet, düzelt" (önceki bölümdeki OPEN_ISSUES).
 CHANGED: index.tsx iniş: `cok` artık sonAtis'e bakıyor (sonAtis < 0,25 → 0,25; sert > 1 → 0,5; değilse 0,375). Önceden releasedCharge burada 0 olduğu için her inişte 0,25 seçiliyordu. Orta/uzun atışta 6. kare (inisCok > 0,12) tahminen ~120 ms görünür (önce ~70 ms). BUILD_TAG "TEK SAYFA 6 KARE + DERIN INIS". Fizik/kamera/puan değişmedi (inisCok yalnız çizim).
 EVIDENCE: Simülasyon gözlemi sim3-inis.jpg: düz inişte uzanma → çömelme karesi (2 kare @20 fps) → doğrulma. Telefona kuruldu (strings eşleşti). Telefonda video çekilmedi.
+
+## TESTFLIGHT-6 — arkadaşlara yayın — 2026-11-27
+TASK: kullanıcı "arkadaşlara da TestFlight'tan yükle".
+CHANGED: ios/ (gitignore) CURRENT_PROJECT_VERSION ve CFBundleVersion 6. Arşiv ~/Library/Developer/Xcode/Archives/byzantion-6.xcarchive (main.jsbundle'da "DERIN INIS" var), exportArchive ile yüklendi ("Uploaded frontend"; hermesvm dSYM uyarısı, zararsız). App Store Connect: Arkadaşlar grubuna build 6 eklendi, durum Testing, testçilere otomatik bildirim açık.
+EVIDENCE: Gözlem (App Store Connect, 10:2x): grup "5 Builds", 1.0.0 (6) Testing. Testçi listesi: 6 anonim arkadaş, hepsinde build 5 kurulu, oturumlar 122/92/58/43/10/1, çökme yok.
