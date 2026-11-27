@@ -1,6 +1,6 @@
 # Byzantion — "Merak" Raporu: zıplamayı bozmadan başka bir yere/zamana geçmek (2026-11-27)
 
-**Ekip:** Kıvılcım (yaratıcı yönetmen) + dört Claude editörü: oyun tasarımı, anlatı ve dünya, teknik, oyuncu ve paylaşım. Her biri brief'i (`brief.md`) bağımsız okudu, depoyu inceledi, en az 8 fikir yazdı. Toplam ~45 fikir; ayrıntılar editör dosyalarında. Kod değişmedi, görsel üretilmedi.
+**Ekip:** Kıvılcım (yaratıcı yönetmen) + dört Claude editörü: oyun tasarımı, anlatı ve dünya, teknik, oyuncu ve paylaşım. **Ek (aynı gün):** Codex editörleri Arda (bağımsız inceleme: karakter, ses, haklar, pazarlama) ve Ada (editoryal kalite ve kanıt disiplini) — bkz. bölüm 7. Her biri brief'i (`brief.md`) bağımsız okudu, depoyu inceledi, en az 8 fikir yazdı. Toplam ~45 fikir; ayrıntılar editör dosyalarında. Kod değişmedi, görsel üretilmedi.
 
 ## 0. En önemli sonuç: beş editör aynı yere vardı
 Kimse birbirinin cevabını görmeden, beşi de 1 numara olarak **aynı fikrin bir sürümünü** seçti:
@@ -95,5 +95,25 @@ Her parantez sahnenin sonunda amcanın cebinde bir kartpostal belirir. Ön yüzd
 - Dini mekânlar, ezan, siyasi ya da futbol göndermeleri.
 - Başka oyunların tanınır mekanikleri ya da adları.
 
+## 7. Arda ve Ada'nın görüşü (Codex; konuşmaları çatallanarak soruldu)
+Önce brief'ten bağımsız fikir yazdılar, sonra bu raporu eleştirdiler.
+
+| | Arda | Ada |
+|---|---|---|
+| Kendi 1 numarası | Kayıp Sefer (aynı fikir) | **Yansımadaki öteki İstanbul**: Boğaz'daki yansıma önce birkaç kez yanlış şehri gösterir, ipuçları birikir, sonra geçiş olur |
+| Karar | **PASS**: dar kapsamlı ilk deneme | **HOLD**: fikir iyi, deneme tarifi düzeltilmeli |
+| Yeni fikirler | Vapurun cevabı (zıplama ritmine özgün düdükle cevap), katlanan kartpostal şehri, Boğaz'ın altındaki şehir | Vapur camındaki yanlış durak, çatılarda biriken izler, şehirden gelen ses cevabı |
+
+**İkisinin ortak uyarıları (rapora işlenmesi gereken düzeltmeler):**
+1. **İlk koşudaki yakalanamaz jeton** merak kadar "göstermelik ödül / haksızlık" hissi de verebilir → ilk denemede çıkarılsın; jeton belli bir koşuda, erişilebilir yükseklikte olsun.
+2. **Kurukafayı sarıya boyamak** anlam karıştırır (kurukafa zaten iniş yüzeyini değiştiriyor) → ayrı, açıkça geçici bir işaret kullanılsın.
+3. **R. hikâyesi** ilk deneme için fazla büyük taahhüt; ayrıca "hiç anlatılmaz" ile kartpostal açıklaması çelişiyor → önce yalnız geçiş hissi sınansın, anlatı sonra tek tutarlı yaklaşımla kurulsun.
+4. **"1926" ve Alt Akıntı** gerçeklik iddiası gibi okunmasın → dönem ayrıntıları kontrol edilsin ya da açıkça kurgu olduğu hissettirilsin.
+5. **"Beş editör aynı fikri seçti" kanıt değil** (Ada): brief'te ışınlanma örneği vardı, yönlendirme oldu. Asıl kanıt oyuncu testi: geçişi anladı mı, sonraki zıplaması bozuldu mu, erken çıktı mı.
+6. **Kanıt disiplini** (Ada): yalnız kule dizisi değil; puan, durak, kurukafa rastgeleliği, jeton toplanma/kaçırılma ve yeniden başlatma da özellik açık/kapalı karşılaştırılsın; kare hızı gerçek iPhone'da ölçülsün.
+7. **Haklar** (Arda): vapur düdüğü ve görseller özgün ya da hakkı net olsun; tanınır film/oyun sesi yok.
+
+**Güncellenmiş ilk deneme (Arda ve Ada'nın düzeltmeleriyle):** tek sahne "Eski Boğaz"; jeton belli bir koşuda, erişilebilir yükseklikte, ayrı geçici işaretle; yakalanamaz parıltı, rastgele dağıtım, R. kartları ve yeni görsel yok; kanıt: aynı tohumla açık/kapalı karşılaştırma (dizi, puan, durak, kurukafa, yeniden başlatma) + telefonda kare hızı + bir arkadaşa "ne oldu sence?" sorusu.
+
 ## Dosyalar
-`brief.md` · `kivilcim-gorusu.md` · `editor-oyun.md` · `editor-anlati.md` · `editor-teknik.md` · `editor-oyuncu.md`
+`brief.md` · `kivilcim-gorusu.md` · `editor-oyun.md` · `editor-anlati.md` · `editor-teknik.md` · `editor-oyuncu.md` · `arda-gorusu.md` · `ada-gorusu.md`
