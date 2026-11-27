@@ -11,9 +11,9 @@ export const MARTI_ON = true as boolean;
 /** Gri kutu: her koşuda bu kuleden sonraki boşlukta simit (gerçek sürümde ilk koşu garantili, sonra seyrek). */
 export const MARTI_TETIK_ID = 1;
 /** Simit, prev→next yayının tepesinin bu kadar üstünde (dünya birimi; alçak = kolay). */
-export const SIMIT_LIFT = 60;
-export const SIMIT_SIZE = 70;
-export const SIMIT_HIT_R = 0.5;
+export const SIMIT_LIFT = 0; // video 13-17: "alması zor" → yayın tam üstünde
+export const SIMIT_SIZE = 96;
+export const SIMIT_HIT_R = 0.8; // dokunma yarıçapı ~77 birim (cömert)
 /** Martının taşıma süresi (ms) ve yay yüksekliği (dünya birimi). */
 export const TASIMA_MS = 1500;
 export const TASIMA_YAY = 260;

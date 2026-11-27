@@ -3491,3 +3491,11 @@ EVIDENCE:
 - Simülatör gözlemi: sim-marti-kapti.jpg — simit, martı kapma, kulelerin üstünden uçuş, gemiye iniş; konteynere iniş ve puan; denizde düşüşte cezasız dönüş (iki kez). Hareketli kayığa iniş simülatörde gözle görülmedi.
 - Telefona kuruldu (strings main.jsbundle "MARTI KAPTI (GRI KUTU)" = 1). Telefonda denenmedi.
 OPEN_ISSUES: Simit alınınca önceden üretilmiş kuleler atlanır; sonraki kule dizisi simitsiz koşudan farklıdır (yalnız normal koşuda; yarış/meydan okumada simit yok). Karga/kedi/komşu gibi kule süsleri deniz yüzeylerine denk gelebilir. Gövde düz koyu blok (gri kutu). Taşınırken amca duruş pozunda.
+
+## MARTI-v2 — 13:17 telefon videosu denetimi ve düzeltmeler — 2026-11-27
+TASK: kullanıcı "olmamış sanki. alması da zor ve bir kere aldım martı kapmadı".
+EVIDENCE (gözlem): gecis1.jpg (5,4–6,6 sn): amcanın bacakları simidin üstünden geçiyor, martı gelmiyor. gemi.jpg (20,5–28,5 sn): ikinci koşuda taşınma çalışıyor ama gövdenin içinde bir ev ve görünmeyen konteynerler; amca gövdenin önünden aşağı düşüyor.
+TEŞHİS (kod): (1) yakalama koşulu bolumSigar(idCounter) — bölüm 15. (durak) kulesine denk geliyorsa simit dokunulsa bile reddediliyordu (1. kule tetiğiyle idCounter ~8 → 8..15). (2) slotPlatform id%14 yuvası: 7 deniz yüzeyi eski kulelerle aynı yuvaya düşüyor, ilk bulunan (eski kule) çiziliyordu. (3) gövde ve kutular karakterden önce çiziliyordu.
+CHANGED: (1) durak çakışmasında önce ana üreticiyle (makeNextPlatform) kule eklenir, bölüm ardından başlar (o koşuda durak kulesinin üstünden uçulur). (2) slotPlatform deniz yüzeylerini atlar; DenizSlot kendi 7'li havuzu (id − denizIlk). (3) gövde + deniz kutuları karakterden sonra (önde) çizilir. (4) SIMIT_SIZE 70→96, SIMIT_HIT_R 0,5→0,8, SIMIT_LIFT 60→0. BUILD_TAG "MARTI KAPTI v2". Telefona kuruldu.
+Simülatör gözlemi: yakalama, taşınma, konteynerler görünür, denizde düşüş kurtarma çalıştı; kayığa iniş yine gözle görülmedi (iki denemede konteynerlerde düştüm).
+OPEN_ISSUES: genel his ("olmamış") henüz konuşulmadı; konteyner arası zıplamalar simülatörde benim için zor geçti (kanıt betiği ulaşılabilirliği doğruluyor, zorluk ayrı soru).

@@ -394,7 +394,7 @@ const AnimatedImage = Animated.createAnimatedComponent(Image);
 const BG_SCROLL_TEST = true as boolean;
 const BG_SCROLL_RATIO = 0.45;
 const BG_SCROLL_TILES = 4;
-const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "MARTI KAPTI (GRI KUTU)") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
+const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "MARTI KAPTI v2") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
 const DIAG_MAX_EXAMPLES = 6;
 const HOUSE_AB_FROZEN = false as boolean;
 // REVIZYON-066 experiment (one variable): expo-linear-gradient's iOS layer
@@ -735,6 +735,7 @@ const FART_BOX = FART_CHAR_H * 0.45;
 const MARTI_SOURCE = require("@/assets/environment/ambient/marti.png");
 const POOL = 14; // fixed pool of platform views (only ~5 are visible at once)
 const POOL_IDX = Array.from({ length: POOL }, (_, i) => i);
+const BOLUM_IDX = Array.from({ length: BOLUM_N }, (_, i) => i);
 // REVIZYON-060: a pool slot shows the platform whose id % POOL equals the
 // slot, NOT the platform at that array index. Array-index slots re-targeted
 // every slot (all their layout props) whenever cleanup sliced the list -- a
@@ -744,7 +745,8 @@ const POOL_IDX = Array.from({ length: POOL }, (_, i) => i);
 function slotPlatform(list: any[], slot: number) {
   "worklet";
   for (let i = 0; i < list.length; i++) {
-    if (list[i].id % POOL === slot) return list[i];
+    // MARTI KAPTI: deniz yüzeyleri kendi havuzunda (DenizSlot) çizilir; kule yuvalarını işgal etmez.
+    if (list[i].id % POOL === slot && !list[i].deniz) return list[i];
   }
   return undefined;
 }
@@ -3126,11 +3128,20 @@ export default function Game() {
       if (MARTI_ON && simitVis.value === 1) {
         const feetY = py.value + PH / 2;
         const bodyCx = px.value + SOLE_CENTER_OFFSET;
-        const last = list[list.length - 1];
-        if (last && bolumSigar(idCounter.value) && skullTouches(simitX.value, simitY.value, SIMIT_SIZE * SIMIT_HIT_R, bodyCx - CHAR_BODY_HALF_W, feetY - FART_CHAR_H, bodyCx + CHAR_BODY_HALF_W, feetY)) {
+        let last = list[list.length - 1];
+        if (last && skullTouches(simitX.value, simitY.value, SIMIT_SIZE * SIMIT_HIT_R, bodyCx - CHAR_BODY_HALF_W, feetY - FART_CHAR_H, bodyCx + CHAR_BODY_HALF_W, feetY)) {
+          // Video 13-17: bölüm durak kulesine denk gelince simit sessizce reddediliyordu. Artık önce ana üreticiyle
+          // kule eklenir (durak kulesi dahil), bölüm durağın ardından başlar.
+          const ek: any[] = [];
+          while (!bolumSigar(idCounter.value)) {
+            const n = makeNextPlatform(last, idCounter.value);
+            idCounter.value += 1;
+            ek.push(n);
+            last = n;
+          }
           const seg = denizBolumu(last, idCounter.value, runSeed.value, W);
           idCounter.value += BOLUM_N;
-          platforms.value = list.concat(seg);
+          platforms.value = list.concat(ek, seg);
           denizIlk.value = seg[0].id;
           denizSon.value = seg[seg.length - 1].id;
           let gx1 = seg[0].x;
@@ -4216,12 +4227,7 @@ export default function Game() {
             effectK={KURUKAFA_ON ? effectK : undefined}
           />
         ))}
-        {MARTI_ON && (
-          <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, height: 900, backgroundColor: "#2b3a4a", borderTopWidth: 10, borderTopColor: "#9b2d22" }, govdeStyle]}>
-            <View style={{ position: "absolute", left: 0, right: 0, top: 70, height: 8, backgroundColor: "#e8e2d0" }} />
-          </Animated.View>
-        )}
-        {MARTI_ON && POOL_IDX.map((i) => <DenizSlot key={`deniz-${i}`} index={i} platforms={platforms} denizT={denizT} govdeY={govdeY} />)}
+        
         {HEDEF_PARILTI && (
           <Animated.View style={[styles.targetGlow, targetGlowStyle]}>
             <LinearGradient pointerEvents="none" colors={["rgba(255,236,170,0)", "rgba(255,226,140,0.55)", "rgba(255,248,214,0.95)"]} locations={[0, 0.75, 1]} style={styles.houseGradFill} />
@@ -4291,6 +4297,12 @@ export default function Game() {
             <Image source={MARTI_SOURCE} resizeMode="stretch" fadeDuration={0} style={{ width: "100%", height: "100%" }} />
           </Animated.View>
         )}
+        {MARTI_ON && (
+          <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, height: 900, backgroundColor: "#2b3a4a", borderTopWidth: 10, borderTopColor: "#9b2d22" }, govdeStyle]}>
+            <View style={{ position: "absolute", left: 0, right: 0, top: 70, height: 8, backgroundColor: "#e8e2d0" }} />
+          </Animated.View>
+        )}
+        {MARTI_ON && BOLUM_IDX.map((i) => <DenizSlot key={`deniz-${i}`} index={i} platforms={platforms} denizT={denizT} govdeY={govdeY} denizIlk={denizIlk} />)}
         {KURUKAFA_ON && (
           <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, width: SKULL_SIZE, height: SKULL_SIZE }, skullStyle]}>
             <Image source={SKULL_SOURCE} resizeMode="stretch" fadeDuration={0} style={{ width: "100%", height: "100%" }} />
@@ -5660,9 +5672,11 @@ const PopupHouseView = memo(function PopupHouseView({ index, platforms, styles }
 
 // MARTI KAPTI (gri kutu): deniz bölümü yüzeyleri. 1 konteyner istifi (güverteye kadar), 2 sallanan kayık, 3 iskele.
 const KONTEYNER_RENK = ["#c0392b", "#2e6da4", "#2f8f5b", "#d08a26"];
-const DenizSlot = memo(function DenizSlot({ index, platforms, denizT, govdeY }: any) {
+const DenizSlot = memo(function DenizSlot({ index, platforms, denizT, govdeY, denizIlk }: any) {
   const st = useAnimatedStyle(() => {
-    const p = slotPlatform(platforms.value, index);
+    const list = platforms.value;
+    let p: any = null;
+    for (let i = 0; i < list.length; i++) if (list[i].deniz && list[i].id - denizIlk.value === index) { p = list[i]; break; }
     if (!p || !p.deniz) return { opacity: 0, transform: [{ translateX: -99999 }, { translateY: -99999 }] };
     const x = denizX(p, denizT.value);
     const h = p.deniz === 1 ? Math.max(40, govdeY.value - p.topY + 12) : p.deniz === 2 ? 46 : 520;
