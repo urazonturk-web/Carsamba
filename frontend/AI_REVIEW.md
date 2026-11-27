@@ -3474,3 +3474,8 @@ OPEN_ISSUES: (a) devir eşiğini yükseltmek (ör. inisCok ≤ 0,3 → charge-02
 TASK: kullanıcı "Evet, yumuşat" (VIDEO-1038 OPEN_ISSUES a).
 CHANGED: index.tsx kd 16 koşulu inisCok > 0,12 → > 0,25. Devirde şarj dizisi charge-025'ten (round(0,25·8)=2) başlar, sonra 012 → 000. Sayfa çömelmesi tahminen ~65 ms (c 0,375) / ~85 ms (c 0,5) görünür. sonAtis 0,20–0,25 arası atışlarda (c = 0,25) sayfa çömelmesi artık hiç gösterilmez. BUILD_TAG "TEK SAYFA 6 KARE + YUMUSAK DOGRULMA". Fizik değişmedi.
 EVIDENCE: Simülasyon gözlemi sim-dogrulma2.jpg: derin çömelme (2 kare) → dizler kırık şarj çizimi (1 kare) → dik. Simülatör kaydı değişken kare hızlı; telefonda video çekilmedi. Telefona kuruldu (strings eşleşti).
+
+## TESTFLIGHT-7 + MERAK raporu — 2026-11-27
+TASK: kullanıcı "arkadaşlara da TestFlight'tan yükle" (build 7) ve "merak uyandıracak bir şey … editörlerle değerlendirip rapor sunun".
+CHANGED: ios/ (gitignore) build 7; arşiv byzantion-7.xcarchive ("YUMUSAK DOGRULMA" main.jsbundle'da), yüklendi; Arkadaşlar grubunda 1.0.0 (7) Testing. Rapor: ai_review_evidence/MERAK-2026-11-27/ (brief, Kıvılcım + 4 editör görüşü, RAPOR.md). Oyun kodu değişmedi.
+OPEN_ISSUES: Kullanıcının andığı "Arda" ve "Ada" adlı editörler projede bulunamadı; her zamanki ekip kullanıldı.

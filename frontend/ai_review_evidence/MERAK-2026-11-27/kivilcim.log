@@ -1,0 +1,1107 @@
+OpenAI Codex v0.171.0-alpha.13.2
+--------
+workdir: /Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend
+model: gpt-6-luna
+provider: openai
+approval: never
+sandbox: read-only
+reasoning effort: medium
+reasoning summaries: none
+session id: 01a21c17-2505-74e2-ab57-475a3eddd337
+--------
+user
+# MERAK-2026-11-27 — "Zıplamayı bozmadan farklı hissettirecek, merak uyandıracak bir şey" (brief)
+
+## Kullanıcının isteği (aynen)
+"oyunumuza bir hikaye kattık sahil şeridi boyunca zıplayarak giden bir amcamız var. zıplama mekaniğini bozmadan farklı hissettirecek bir şeyler yapmalıyız. mesela havada aldığı kuru kafa gibi başka bir nesne alınca bir yere ışınlanabilir farklı bir yerde zıplamaya devam edebilir gibi insanlara merak uyandıracak bir şey bulmalıyız. bu konuyu … editörlerle beraber değerlendirip bana bir rapor sunun. sınırlarınızı zorlayın"
+
+## Oyun (Byzantion, iPhone, Expo/React Native + Reanimated)
+- Tek dokunuş: basılı tut (şarj) → bırak → amca (bordo eşofmanlı, bıyıklı, büyük kafalı karikatür İstanbul amcası) kuleden kuleye zıplar. Kule = eski İstanbul evleri/çatılar; arka planda Boğaz, vapurlar.
+- Güzergâh: Kadıköy'den başlayıp Boğaz boyunca kuzeye; her 15 kulede bir durak (Harem, Üsküdar·Kız Kulesi, Kuzguncuk, Beylerbeyi, Ortaköy, Arnavutköy, Bebek, Rumeli Hisarı, Kanlıca, Beykoz, Anadolu Kavağı, Rumeli Feneri); üç köprüde yaka değişir; son: "Karadeniz'e ulaştın!", sonrası "Gece seferi N". Düşünce baştan. (src/game/stops.ts)
+- Mevcut özel nesne: KURUKAFA (src/game/kurukafa.ts) — 4. kuleden sonra rastgele, iki kule arası zıplama yayının tepesinde havada durur; değince 50/50 kulelerin iniş yüzeyi 3–8 iniş boyunca %10–30 büyür/küçülür. Kule dizisi değişmez (ayrı karma).
+- Diğer var olanlar: gerçek İstanbul havası (yağmur, kar, lodos, sis), gece/gündüz, şemsiye (yağmurda düşerken açılır), pijama/gece külahı, kış kıyafeti, kargalar/kediler/martılar, teyze/komşu diyalog balonları, "çay ısmarla" ve kartpostal paylaşımı, günün haritası (daily.ts), meydan/yarış (meydan.ts, yaris.ts), fener (sisli bölümde yüz ışığı), gaz (osuruk) deneme.
+- Geçmiş fikir raporları (tekrar etmemek için oku): ai_review_evidence/YARATICI-FIKIR-2026-11-17/RAPOR.md, FIKIR-PUAN-2026-11-20/RAPOR.md, FIKIR-GELIR-2026-11-18/RAPOR.md, HIKAYE4-2026-11-12/.
+
+## Değişmez çekirdek (aşılırsa ayrı onay gerekir)
+- Zıplama fiziği (config.ts, jump.ts, landing.ts), şarj → zıplama → iniş matematiği, çarpışma/footSoles, kamera, prosedürel kule üretimi (procedural-course.ts), puan kuralı. "Zıplama mekaniğini bozmadan" = bunlar aynı kalır; yeni şeyler bunların ÜSTÜNE oturmalı (görsel bağlam, sahne, kural katmanı, nesne).
+- İçerik: Arapça ünlem (maşallah, helal, nazar vb.) yok, dini motif yok. Film/marka/karakter adı yok. Başka bir oyunun birebir kopyası yok.
+- Yeni görseller Kıvılcım (görsel üretici) ile, her çağrı ayrı onayla; tek kişilik küçük ekip — maliyeti gerçekçi düşün.
+
+## İstenen
+"Sınırlarınızı zorlayın": güvenli küçük fikirler değil, oyuncuyu "bu ne? orası neresi?" dedirtecek, merak ve paylaşma isteği uyandıracak fikirler. Işınlanma fikrini ciddiye al ama ona hapsolma. Her fikir için: ne olur (oyuncu gözünden 2–3 cümle), neden merak uyandırır, zıplamayı nasıl bozmaz, kabaca maliyet (kod/görsel), en büyük risk. Sonunda kendi 1 numaran ve neden.
+
+## Kıvılcım'a not
+Sen bu ekibin "yaratıcı yönetmen" editörüsün. Bu bir METİN görüşü; görsel ÜRETME, dosya yazma, kod değiştirme. Depoyu okuyabilirsin (src/game/, ai_review_evidence/). En az 8 fikir; en az 3'ü gerçekten cüretkâr olsun. Türkçe yaz. Sonunda: 1 numaran + ilk sürüm için en küçük deneme hâli.
+
+warning: Under-development features enabled: chronicle. Under-development features are incomplete and may behave unpredictably. To suppress this warning, set `suppress_unstable_features_warning = true` in /Users/bekirurazonturk/.codex/config.toml.
+codex
+İstenen kapsamı metin incelemesi olarak tutacağım: önce depo içindeki ilgili oyun sınırlarını ve geçmiş fikir raporlarını okuyup, sonra tekrar etmeyen en az sekiz öneriyi maliyet ve riskleriyle raporlayacağım. Dosya veya kod değiştirmeyeceğim.
+exec
+/bin/zsh -lc 'rg -n "responsesapi|Byzantion|YARATICI-FIKIR|FIKIR-PUAN|FIKIR-GELIR|HIKAYE4" /Users/bekirurazonturk/.codex/memories/MEMORY.md' in /Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend
+ succeeded in 0ms:
+27:- Byzantion, TestFlight, 1.0.0 (5), Arkadaşlar, Testing, App Store Connect, new frames
+38:- App Store Connect showed Byzantion `1.0.0 (5)` as Testing in the six-person Arkadaşlar group. The later five frames were not in build 5; no later tester build is evidenced. Verify distribution separately from local integration. [Task 2] [skysight memory]
+701:- game-over freeze, oyun sonu, sıralama, iOS 26, Game Center, ByzantionGameCenterModule.swift, worklet, telefon
+709:- A game-over video showed a stationary 12-point card. An old leaderboard invisibly blocking touches on iOS 26 was a hypothesis, not a confirmed diagnosis; no crash log and no Game Center account in simulator prevented reproduction. A change to `ByzantionGameCenterModule.swift`, typecheck/worklet test and phone installation were reported; opening and closing rankings then replaying on phone remained unverified, and no commit was reported. Verify current checkout and device. [Task 2] [skysight memory]
+934:scope: Byzantion game-over share card and November 18 GitHub Desktop push.
+981:# Task Group: Byzantion weather, winter effects and startup feedback
+999:- Byzantion, WeatherKit, istanbul.ts, WeatherLayer.tsx, b01bf04, bere, atkı, kar, seasonal backgrounds, physical phone
+1074:# Task Group: Byzantion three-bridge route, postcards and multiplayer testing
+1247:# Task Group: Byzantion Game Center and one-step difficulty adjustment
+1268:- Byzantion, Game Center, 362ba26, TestFlight, Arkadaşlar, 1.0.0 (3), src/game/config.ts, difficulty, typecheck
+1372:## Task 1: Byzantion naming and TestFlight follow-up
+1383:- Byzantion, com.urazonturk.carsamba, TestFlight 1.0.0 (1), 1.0.0 (2), Arkadaşlar, Waiting for Review, 16e9dac, aşırı basma, İstanbul gizemi
+
+exec
+/bin/zsh -lc "pwd && rg --files src/game ai_review_evidence | rg '(config\\.ts|jump\\.ts|landing\\.ts|kurukafa\\.ts|procedural-course\\.ts|stops\\.ts|daily\\.ts|meydan\\.ts|yaris\\.ts|YARATICI-FIKIR-2026-11-17/RAPOR\\.md|FIKIR-PUAN-2026-11-20/RAPOR\\.md|FIKIR-GELIR-2026-11-18/RAPOR\\.md|HIKAYE4-2026-11-12)'" in /Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend
+ succeeded in 0ms:
+/Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend
+src/game/config.ts
+src/game/procedural-course.ts
+src/game/landing.ts
+src/game/stops.ts
+src/game/jump.ts
+src/game/yaris.ts
+src/game/meydan.ts
+src/game/daily.ts
+src/game/kurukafa.ts
+ai_review_evidence/FIKIR-PUAN-2026-11-20/RAPOR.md
+ai_review_evidence/HIKAYE4-2026-11-12/rapor.html
+ai_review_evidence/HIKAYE4-2026-11-12/editor-anlati.md
+ai_review_evidence/HIKAYE4-2026-11-12/brief.md
+ai_review_evidence/HIKAYE4-2026-11-12/editor-pazar.md
+ai_review_evidence/HIKAYE4-2026-11-12/editor-dunya.md
+ai_review_evidence/HIKAYE4-2026-11-12/editor-kivilcim.md
+ai_review_evidence/FIKIR-GELIR-2026-11-18/RAPOR.md
+ai_review_evidence/YARATICI-FIKIR-2026-11-17/RAPOR.md
+
+exec
+/bin/zsh -lc 'cat src/game/kurukafa.ts && cat src/game/stops.ts && cat src/game/daily.ts && cat src/game/meydan.ts && cat src/game/yaris.ts' in /Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend
+ succeeded in 0ms:
+// KURUKAFA (2026-11-16, kullanıcı: "şimdi kurukafaya da başlayalım"; kararlar: %20,
+// 5 zıplama, görsel Kıvılcım). İlk duraktan sonra arada bir, iki kule arasındaki
+// normal zıplama yayının tepesinde havada bir kurukafa durur. Amca uçarken değerse
+// 50/50: kulelerin iniş yüzeyi 5 zıplama boyunca %20 büyür ya da %20 küçülür.
+// Kule dizisi değişmez: yerleşim ayrı bir karma (hash) ile, tohumun RNG akışına
+// dokunmadan seçilir. Fizik formülleri aynı; yalnız iniş testinde etkin genişlik.
+// Rapor: ai_review_evidence/KURUKAFA-ONLINE-2026-11-15/RAPOR.md
+
+import { jumpVelocity, flightGravity } from "./jump";
+import { isStopTower } from "./stops";
+
+// Görsel: Kıvılcım (1 çağrı), kullanıcı kabulü 2026-11-16 ("Evet, kabul"; gece külahlı hâli).
+export const KURUKAFA_ON = true as boolean;
+export const SKULL_SOURCE = require("@/assets/environment/kurukafa/kurukafa.png");
+
+// 2026-11-16 kullanıcı: "random olsun" -> çıkış yeri, yükseklik, etki oranı ve süre rastgele.
+export const SKULL_SCALE_MIN = 0.1; // etki oranı %10..%30 arası rastgele (büyüme ya da küçülme)
+export const SKULL_SCALE_MAX = 0.3;
+export const SKULL_JUMPS_MIN = 3; // etki 3..8 iniş arası rastgele
+export const SKULL_JUMPS_MAX = 8;
+// 2026-11-22 kullanıcı: "12. kuleden sonra değil random olsun; bir kurukafanın süresi bitmeden diğeri çıkmasın"
+// -> 4. kuleden itibaren rastgele; etki sürerken yeni kurukafa gösterilmez (app/index.tsx, effectLeft kapısı).
+export const SKULL_MIN_ID = 4;
+export const SKULL_CHANCE = 0.2; // her boşlukta olasılık; ardışık engeli ile ~12-13 kulede bir
+export const SKULL_MIN_GAP = 4; // kullanıcı: "peş peşe de çıkmasın" -> iki kurukafa arası en az 4 kule
+export const SKULL_LIFT_MIN = 180; // doğal yay tepesinin üstünde rastgele yükseklik: alçak = kolay,
+export const SKULL_LIFT_MAX = 330; // yüksek = uzun basış ister
+// Kullanıcı (video 12-42-57): "değince alması lazım" -> toplama, kurukafa dairesi ile
+// amcanın çizilen gövdesi (dikdörtgen) değince olur; eskiden merkeze 34 birim gerekiyordu.
+export const SKULL_HIT_R = 0.42; // kurukafa çizim boyunun bu oranı kadar yarıçap
+export const SKULL_SIZE = 110; // çizim boyu (dünya birimi; kamera 0,4 ile ekranda ~44 nokta)
+
+export function skullHash(seed: number, id: number) {
+  "worklet";
+  let h = Math.imul((seed ^ 0x9e3779b9) | 0, 0x85ebca6b) ^ Math.imul(id + 0x632be5ab, 0xc2b2ae35);
+  h ^= h >>> 15;
+  h = Math.imul(h, 0x2c1b3c6d);
+  h ^= h >>> 12;
+  h = Math.imul(h, 0x297a2d39);
+  h ^= h >>> 15;
+  return (h >>> 0) / 4294967296;
+}
+
+function baseSkull(seed: number, id: number) {
+  "worklet";
+  return id >= SKULL_MIN_ID && !isStopTower(id) && !isStopTower(id + 1) && skullHash(seed, id) < SKULL_CHANCE;
+}
+
+/** id kulesinden sonraki boşlukta kurukafa var mı? Rastgele, ama önceki SKULL_MIN_GAP boşlukta yoksa. */
+export function skullAfter(seed: number, id: number) {
+  "worklet";
+  if (!baseSkull(seed, id)) return false;
+  for (let j = id - SKULL_MIN_GAP; j < id; j++) if (baseSkull(seed, j)) return false;
+  return true;
+}
+
+/** Kurukafa dairesi amcanın gövde dikdörtgenine değiyor mu? */
+export function skullTouches(sx: number, sy: number, r: number, left: number, top: number, right: number, bottom: number) {
+  "worklet";
+  const cx = Math.max(left, Math.min(sx, right));
+  const cy = Math.max(top, Math.min(sy, bottom));
+  const dx = sx - cx;
+  const dy = sy - cy;
+  return dx * dx + dy * dy <= r * r;
+}
+
+/** Bu kurukafanın yay tepesinin ne kadar üstünde duracağı (rastgele, tohumla sabit). */
+export function skullLift(seed: number, id: number) {
+  "worklet";
+  return SKULL_LIFT_MIN + skullHash(seed ^ 0x5bd1e995, id) * (SKULL_LIFT_MAX - SKULL_LIFT_MIN);
+}
+
+/** Alındığı an: çarpan (×0,7..0,9 ya da ×1,1..1,3) ve süre (3..8 iniş). Haritanın tohumu ve
+ *  kurukafanın kulesinden türetilir: aynı haritayı oynayan iki kişi aynı etkiyi alır (meydan okuma). */
+export function rollSkullEffect(seed: number, id: number) {
+  "worklet";
+  const mag = SKULL_SCALE_MIN + skullHash(seed ^ 0x27d4eb2f, id) * (SKULL_SCALE_MAX - SKULL_SCALE_MIN);
+  const k = skullHash(seed ^ 0x165667b1, id) < 0.5 ? 1 + mag : 1 - mag;
+  const jumps = SKULL_JUMPS_MIN + Math.floor(skullHash(seed ^ 0x3c6ef372, id) * (SKULL_JUMPS_MAX - SKULL_JUMPS_MIN + 1));
+  return { k, jumps };
+}
+
+type P = { x: number; topY: number; width: number };
+
+/** prev kulesinin ortasından next kulesinin ortasına inen zıplamanın yay tepesi (+lift). */
+export function skullPoint(prev: P, next: P, halfH: number, screenWidth: number, lift: number) {
+  "worklet";
+  const g = flightGravity(screenWidth);
+  const x0 = prev.x + prev.width / 2;
+  const targetDx = next.x + next.width / 2 - x0;
+  const dy = next.topY - prev.topY;
+  let lo = 0;
+  let hi = 1;
+  for (let k = 0; k < 24; k++) {
+    const c = (lo + hi) / 2;
+    const v = jumpVelocity(c, screenWidth);
+    const disc = v.vy * v.vy + 2 * g * dy;
+    const t = (-v.vy + Math.sqrt(Math.max(0, disc))) / g;
+    if (v.vx * t < targetDx) lo = c;
+    else hi = c;
+  }
+  const v = jumpVelocity((lo + hi) / 2, screenWidth);
+  const ta = -v.vy / g;
+  return { x: x0 + v.vx * ta, y: prev.topY - halfH + v.vy * ta + 0.5 * g * ta * ta - lift };
+}
+
+/** Etkin iniş genişliği: kule ortası sabit, genişlik × k. */
+export function scaledPlatforms<T extends P>(list: readonly T[], k: number): T[] {
+  "worklet";
+  const out: T[] = [];
+  for (let i = 0; i < list.length; i++) {
+    const p = list[i];
+    out.push({ ...p, x: p.x + (p.width * (1 - k)) / 2, width: p.width * k });
+  }
+  return out;
+}
+// DURAK SEFERİ (2026-11-12, kullanıcı: "Evet, başla"; YAPI-2026-11-12 raporu).
+// Sonsuz koşunun içine duraklar: her 15 kulede bir (15, 30, 45, 60…).
+// 4. durak iskele ("vapura yetiştin"); sonrası "Gece seferi N" olarak sürer.
+// Kayıt noktası yok: düşünce baştan başlanır. Durak puan vermez (ilk deneme).
+// Zorluk her durakta bir basamak artar (procedural-course.ts); fizik değişmez.
+// Kule kimliği (platform id) üzerinden çalışır, skor üzerinden değil.
+
+export const DURAK_SEFER = true as boolean;
+
+// 2026-11-12 kullanıcı (video 12-23-01): "baştan 15. kolona vardığında durak yazsa daha
+// tutarlı olur" -> ilk durak da 15. kulede; duraklar 15, 30, 45, 60 (iskele), 75…
+export const FIRST_STOP = 15;
+export const STOP_EVERY = 15;
+
+// GÜZERGÂH 2026-11-16 (kullanıcı: "Evet, geçir"; ai_review_evidence/GUZERGAH-2026-11-16/RAPOR.md):
+// Kadıköy'den Boğaz boyunca kuzeye, üç köprüyle Karadeniz'e. Önceki duraklar:
+// Karaköy, Galata, Sirkeci, Eminönü İskelesi (PIER_STOP 4 = iskele + zorluk tavanı).
+export const START_NAME = "Kadıköy";
+export const STOP_NAMES = [
+  "Harem", "Üsküdar · Kız Kulesi", "Kuzguncuk", "Beylerbeyi",
+  "Ortaköy", "Arnavutköy", "Bebek", "Rumeli Hisarı",
+  "Kanlıca", "Beykoz", "Anadolu Kavağı", "Rumeli Feneri",
+] as const;
+// Sonuç kartındaki "…'e N kule kaldı" için yönelme hâlleri (ünlü uyumu elle).
+const STOP_DATIVE = [
+  "Harem'e", "Üsküdar'a", "Kuzguncuk'a", "Beylerbeyi'ne",
+  "Ortaköy'e", "Arnavutköy'e", "Bebek'e", "Rumeli Hisarı'na",
+  "Kanlıca'ya", "Beykoz'a", "Anadolu Kavağı'na", "Rumeli Feneri'ne",
+] as const;
+/** Son durak (büyük final: "Karadeniz'e ulaştın!"); sonrası "Gece seferi N". */
+export const FINAL_STOP = STOP_NAMES.length;
+/** Zorluk tavanı: önceki gibi 4. durakta (isimlerden bağımsız; zorluk değişmez). */
+export const DIFFICULTY_CAP_STOP = 4;
+
+/** Köprüler: `foot` durağından sonraki kuleler köprü üstü sayılır, `to` durağında karşı yakadasın. */
+export const BRIDGES = [
+  { foot: 4, to: 5, name: "Boğaziçi Köprüsü", from: "Anadolu", side: "Avrupa", arrive: "Avrupa yakasına geçtin!" },
+  { foot: 8, to: 9, name: "Fatih Sultan Mehmet Köprüsü", from: "Avrupa", side: "Anadolu", arrive: "Anadolu yakasına döndün!" },
+  { foot: 11, to: 12, name: "Yavuz Sultan Selim Köprüsü", from: "Anadolu", side: "Avrupa", arrive: "Karadeniz'e ulaştın!" },
+] as const;
+
+/** Bu kule bir köprünün üstünde mi? (ayak ile varış durağı arasındaki kuleler) */
+export function bridgeAt(towerId: number) {
+  for (const b of BRIDGES) {
+    const a = stopTowerId(b.foot), z = stopTowerId(b.to);
+    if (towerId > a && towerId < z) return { bridge: b, progress: (towerId - a) / (z - a) };
+  }
+  return null;
+}
+export function bridgeFromFoot(k: number) {
+  return BRIDGES.find((b) => b.foot === k) ?? null;
+}
+export function bridgeArrivingAt(k: number) {
+  return BRIDGES.find((b) => b.to === k) ?? null;
+}
+
+/** Gecenin başladığı durak (skyStepForStops 4): pijama anı burada (Ortaköy). */
+export const NIGHT_STOP = 5;
+
+/** Gökyüzü adımı (0 sabah … 4 gece). 2026-11-16 kullanıcı: "gün batımını daha erkene alalım":
+ *  0-1 sabah, 2 öğle, 3 ikindi, 4 (Beylerbeyi + Boğaziçi Köprüsü) gün batımı, 5 Ortaköy'den itibaren gece.
+ *  (önceki: 1-4 sabah, 5-8 öğle, 9-10 ikindi, 11 gün batımı, 12+ gece) */
+export function skyStepForStops(k: number) {
+  if (k <= 1) return 0;
+  if (k <= 4) return k - 1;
+  return 4;
+}
+
+/** k. durağın (1'den başlar) kule kimliği. */
+export function stopTowerId(k: number) {
+  "worklet";
+  return FIRST_STOP + (k - 1) * STOP_EVERY;
+}
+
+/** Bu kuleye kadar (dahil) geçilen durak sayısı. */
+export function stopsPassed(id: number) {
+  "worklet";
+  if (id < FIRST_STOP) return 0;
+  return 1 + Math.floor((id - FIRST_STOP) / STOP_EVERY);
+}
+
+export function isStopTower(id: number) {
+  "worklet";
+  return id >= FIRST_STOP && (id - FIRST_STOP) % STOP_EVERY === 0;
+}
+
+/** Zorluk basamağı 0..1: durak başına bir basamak, iskelede tavan. */
+export function stopDifficulty(id: number) {
+  "worklet";
+  return Math.min(1, stopsPassed(id) / DIFFICULTY_CAP_STOP);
+}
+
+export function stopName(k: number) {
+  if (k <= 0) return "";
+  if (k <= STOP_NAMES.length) return STOP_NAMES[k - 1];
+  return `Gece seferi ${k - FINAL_STOP}`;
+}
+
+/** Paylaşım kartpostalı için: "Üsküdar'a kadar geldim" (k = geçilen durak sayısı). */
+export function reachedLine(k: number) {
+  if (k <= 0) return null;
+  if (k <= STOP_DATIVE.length) return `${STOP_DATIVE[k - 1]} kadar geldim`;
+  return `Rumeli Feneri'ni geçtim, gece seferindeyim`;
+}
+
+/** Sonuç kartı için: "Galata'ya 4 kule kaldı" satırı. */
+export function nextStopLine(lastTowerId: number) {
+  const k = stopsPassed(lastTowerId) + 1;
+  const left = stopTowerId(k) - lastTowerId;
+  if (k <= STOP_DATIVE.length) return `${STOP_DATIVE[k - 1]} ${left} kule kaldı`;
+  return `Sonraki gece durağına ${left} kule kaldı`;
+}
+// GÜNÜN HARİTASI (2026-11-12, YAPI-2026-11-12 raporunun 2. denemesi).
+// Telefonun yerel tarihinden sabit bir tohum: o gün herkes aynı çatıları oynar.
+// Sunucu ve hesap yok; günlük rekor ve günlük en uzak kule yalnız cihazda.
+
+// 2026-11-12 kullanıcı: "günlük mod işini pek beğenmedim, bu oyun tekrara düşmemeli" -> kapalı.
+// Kod duruyor; açılırsa sekme ve kart düğmesi geri gelir.
+export const DAILY_MAP = false as boolean;
+export const DAILY_KEY = "carsamba.daily.v1";
+
+export type DailyRecord = { date: string; best: number; farthest: number };
+
+const AYLAR = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
+
+export function todayKey(d = new Date()) {
+  const m = `${d.getMonth() + 1}`.padStart(2, "0");
+  const day = `${d.getDate()}`.padStart(2, "0");
+  return `${d.getFullYear()}-${m}-${day}`;
+}
+
+export function todayLabel(d = new Date()) {
+  return `${d.getDate()} ${AYLAR[d.getMonth()]}`;
+}
+
+/** Tarih anahtarından 32-bit tohum (FNV-1a). Aynı gün = aynı harita. */
+export function dailySeed(key = todayKey()) {
+  let h = 0x811c9dc5;
+  const s = `gunun-haritasi:${key}`;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return h >>> 0;
+}
+// MEYDAN OKUMA (2026-11-16, kullanıcı: "2 kişi oynayabilmek", seçim "İkisi de": önce meydan okuma).
+// Bir koşunun harita tohumu + skoru kısa bir koda dönüşür; arkadaş kodu girince aynı
+// haritayı oynar (kule dizisi, kurukafa yerleri ve etkileri tohumdan gelir) ve sonuç karşılaştırılır.
+// Sunucu yok; kod mesajla paylaşılır. Not: kule dizisi telefon genişliğinden çok az etkilenebilir.
+
+export const MEYDAN_ON = true as boolean;
+
+export type Challenge = { seed: number; target: number; from: string; matchID?: string };
+
+/** Tohum (32 bit) -> 7 karakter base36, büyük harf; skor ondalık. Örn. "1K9Z0QX-37". */
+export function makeCode(seed: number, score: number) {
+  return `${(seed >>> 0).toString(36).toUpperCase()}-${Math.max(0, Math.floor(score))}`;
+}
+
+/** Kullanıcının yazdığı kodu çöz; boşluk ve küçük harf serbest. Geçersizse null. */
+export function parseCode(raw: string): { seed: number; target: number } | null {
+  const t = raw.trim().toUpperCase().replace(/\s+/g, "").replace(/[–—_]/g, "-");
+  const m = t.match(/([0-9A-Z]{1,7})-(\d{1,5})/);
+  if (!m) return null;
+  const seed = parseInt(m[1], 36);
+  if (!Number.isFinite(seed) || seed < 0 || seed > 0xffffffff) return null;
+  return { seed: seed >>> 0, target: parseInt(m[2], 10) };
+}
+
+export function shareText(code: string, score: number, name: string) {
+  const who = name ? `${name} diyor ki: ` : "";
+  return `${who}Byzantion'da beni geç! ${score} puan yaptım 💪\nMeydan okuma kodu: ${code}\nOyunu aç → oyun sonunda "🔑 Kod gir" → kodu yaz.`;
+}
+// HAYALET YARIŞ (2026-11-16)
+// Kullanıcı: "aynı haritada birbirlerinin zıplamalarını görerek oynayacakları 3 dakikalık bir oyun;
+// yanan tekrar baştan başlıyor; en sonunda kim ne kadar puan yapmış ve en uzağa gitmişse".
+// Karar: önce asenkron hayalet yarış. Kazanan = tek koşuda en uzak kule; eşitlikte en iyi koşu puanı.
+// Rakibin zıplamaları kule kimliği + kule üstündeki oranla kaydedilir (ekran genişliği farkı yüzünden
+// mutlak x gönderilmez; bkz. ai_review_evidence/ONLINE-YARIS-2026-11-16/RAPOR.md).
+
+export const YARIS_ON = true;
+export const RACE_MS = 120_000; // kullanıcı: "3 dakika çok uzun" -> 2 dk
+export const RESPAWN_MS = 700;
+
+// Olay türleri
+export const EV_LAUNCH = 0;
+export const EV_LAND = 1;
+export const EV_FALL = 2;
+export const EV_RESPAWN = 3;
+
+/** Düz dizi: [t, tür, kule, oran*1000] tekrarları. t = yarış başından ms. */
+export type RaceLog = number[];
+
+export type RaceSummary = { far: number; best: number; runs: number };
+export type RaceData = RaceSummary & { v: 1; log: RaceLog };
+
+export function pushEvent(log: RaceLog, t: number, kind: number, tower = 0, ratio = 0) {
+  log.push(Math.max(0, Math.round(t)), kind, tower | 0, Math.round(Math.max(-1, Math.min(2, ratio)) * 1000));
+}
+
+export function encodeRace(d: RaceSummary, log: RaceLog): string {
+  const data: RaceData = { v: 1, far: d.far, best: d.best, runs: d.runs, log };
+  return JSON.stringify(data);
+}
+
+export function decodeRace(raw?: string | null): RaceData | null {
+  if (!raw) return null;
+  try {
+    const d = JSON.parse(raw);
+    if (!d || d.v !== 1 || !Array.isArray(d.log)) return null;
+    return { v: 1, far: d.far | 0, best: d.best | 0, runs: d.runs | 0, log: d.log.map((n: any) => +n || 0) };
+  } catch {
+    return null;
+  }
+}
+
+/** 1 = a kazandı, -1 = b kazandı, 0 = berabere. */
+export function compareRace(a: RaceSummary, b: RaceSummary): number {
+  if (a.far !== b.far) return a.far > b.far ? 1 : -1;
+  if (a.best !== b.best) return a.best > b.best ? 1 : -1;
+  return 0;
+}
+
+export function clockText(ms: number): string {
+  const s = Math.max(0, Math.ceil(ms / 1000));
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+}
+
+exec
+/bin/zsh -lc 'cat ai_review_evidence/YARATICI-FIKIR-2026-11-17/RAPOR.md && cat ai_review_evidence/FIKIR-PUAN-2026-11-20/RAPOR.md && cat ai_review_evidence/FIKIR-GELIR-2026-11-18/RAPOR.md && cat ai_review_evidence/HIKAYE4-2026-11-12/brief.md && cat ai_review_evidence/HIKAYE4-2026-11-12/editor-kivilcim.md' in /Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend
+ succeeded in 0ms:
+# Byzantion — Yaratıcı Fikirler Raporu (2026-11-17)
+
+Kullanıcı: "hava o gün İstanbul'da nasıl ise bizim oyunda da gerçek zamanlı olsun … yaratıcı fikirler istiyorum, diğer editörlerle".
+Danışılan: Codex (`codex-gorusu.md`) ve ikinci bir Claude editörü (aşağıda özetlendi). Brif: `brief.md`.
+
+## 1. Gerçek zamanlı İstanbul havası — ortak karar: EVET, yalnız görünüş
+
+İki editör de aynı yerde birleşti: hava **dekor ve atmosfer** olsun, zıplamayı/kamerayı/çatıları değiştirmesin.
+
+| Hava | Oyunda nasıl görünür |
+|---|---|
+| Yağmur | ince çapraz çizgiler, çatılarda ıslak parlama |
+| Lodos | ılık turuncu ton, bulutlar hızlı akar, çamaşırlar uçuşur, amcanın bıyığı titrer, Boğaz köpüklü |
+| Poyraz | soğuk mavi ton, bulutlar ters yönde akar |
+| Sis | uzak siluet (köprü, karşı yaka) silinir, yakın kuleler hep net; arada sis düdüğü |
+| Kar | yavaş taneler, çatı kenarlarında beyaz şerit |
+| Gün batımı / gece | gerçek doğuş-batış saatine göre (gece zaten var, saate bağlanır) |
+
+**Oyuncu nasıl fark eder:** menü kartpostalında damga — "17 Kasım · Lodos · 14°" — ve ilk koşuda tek satır: "Bugün İstanbul'da lodos var, çamaşırları topla!"
+
+**Riskler ve çözümler**
+- Okunurluk: efekt yalnız arka katmanlara; sıradaki kule asla örtülmez.
+- Kasımın gri havası sıkıcı olmasın: gri gün "çay günü" sıcaklığında çizilir.
+- Çevrimdışı: son veri telefonda saklanır; yoksa / 6 saatten eskiyse "açık hava + gerçek saat".
+- Pil/FPS: parçacık sayısına sınır.
+- Rüzgârın zıplamayı etkilemesi: yalnız ayrı, isteğe bağlı bir "Lodos Modu" olabilir; Günün Haritası ve hayalet yarışta ASLA (aynı harita farklı oyun olur, sıralama bozulur).
+
+**Veri kaynağı (önemli):** Claude editörünün uyarısı doğru — Open-Meteo'nun ücretsiz katmanı ticari olmayan kullanım içindir. App Store oyunu için daha uygun seçenek **Apple WeatherKit**: Apple geliştirici hesabına dahil (ayda 500 bin çağrıya kadar ücretsiz), ticari kullanıma açık, konum izni istemez (sabit İstanbul koordinatı). Gereken: Apple Developer hesabında WeatherKit yetkisini açmak (hesap işlemi — kullanıcı onayı gerekir) ve ekranda küçük "Apple Hava Durumu" atfı.
+
+## 2. Yaratıcı fikirler (iki editörden, birleştirilmiş)
+
+| # | Fikir | His | Yapım | Efor |
+|---|---|---|---|---|
+| 1 | **Günün İstanbul'u** — gerçek saate göre şafak → gün → gün batımı → gece | Şehirle aynı anda yaşıyor | Kod | Orta |
+| 2 | **Ay evresi ve yakamoz** — gece ayın şekli gerçek; dolunayda Boğaz'da gümüş ışık yolu + "Yakamoz" kartpostalı | Gece oynamak için sebep | Kod (internetsiz hesap) | Küçük |
+| 3 | **Pil = amcanın şarjı** — telefonun pili %15 altındaysa amca esner: "Senin şarjın da bitiyor, benim de"; şarjdaysa yanında çay | "Oyun beni görüyor" şaşkınlığı, paylaşılır | Kod (izin istemez) | Küçük |
+| 4 | **Lodosta vapurlar iptal** — rüzgâr eşiğinde vapurlar kaybolur, iskelede "Seferler iptal" | İstanbullunun tanıdık anı | Kod + 1 tabela görseli | Küçük |
+| 5 | **Kar tatili** — İstanbul'da gerçekten kar varsa menüde "Okullar tatil!" manşeti, kardan adam, özel kartpostal | Herkesin aynı gün konuştuğu olay | Kod + 2-3 görsel | Orta |
+| 6 | **Gece yarısı amcası** — saat 02:00-05:00 arası amca pijamalı/uykulu: "Bu saatte ne işin var evladım?"; sabah ilk koşuda simit-çay kartı | Oyuncunun gününe dokunur | Kod (pijama görseli zaten var) | Küçük |
+| 7 | **İstanbul takvimi** — nisanda erguvan/lâle, sonbaharda Galata'da lüfer oltaları, kışın kestane dumanı, Hıdrellez'de dilek ağacı kartpostalı | Oyun yaşıyor, geri dönmeye değer | Kod + mevsim başına 1 görsel | Orta |
+| 8 | **Martı vergisi** — martı amcanın simidini kapar, amca yumruk sallar; ertesi gün kartpostalda martı simitle görünür | Günler arası süren küçük hikâye | Kod + 1 görsel | Küçük |
+| 9 | **Teyzenin sepeti** — balkondan iple sepet sarkar, amca simit kapar; kaçırırsan "Ayıp ettin!" | Mahalle sıcaklığı | 1-2 görsel + kod | Orta |
+| 10 | **Amcanın çay molası** — uzun seride amca bir çatıda çayını üfler, dokununca devam | Karaktere nefes | Kod + yeni poz görseli | Orta |
+
+**Bilerek dışarıda bırakılanlar:** maç günleri (takım kavgası), ezan/sahur davulu (dini hassasiyet), gerçek vapur saatleri (güvenilir ücretsiz kaynak yok, gömülü tarife eskir).
+
+## 3. Önerilen sıra (iki editörün ortak sıralaması)
+
+1. **Gerçek saat + gün doğumu/batımı + ay evresi (yakamoz dahil).** İnternet gerektirmez, risksiz; hava katmanının altyapısı da budur. Tamamen kodla.
+2. **Gerçek hava katmanı (yağmur, sis, lodos, sonra kar) + "Bugün İstanbul'da lodos var" damgası.** Asıl istek. Lodosta vapur iptali aynı veriyle neredeyse bedava gelir. WeatherKit için hesap onayı gerekir; onay gelene kadar kod hazırlanıp sahte veriyle simülatörde denenebilir.
+3. **Pil = amcanın şarjı.** En ucuz, en şaşırtıcı fikir; oyunun "şarj" mekaniğiyle kelime oyunu. Görsel gerektirmez.
+
+Değişmeyenler: fizik, kamera, çatı silueti; yeni görseller kullanıcı onayı olmadan oyuna bağlanmaz.
+# Byzantion — Yeni Fikirler ve Bugünkü Puan (2026-11-20)
+
+Kullanıcı: "oyunumuza başka neler ekleyebiliriz? diğer editörlerden de yaratıcı fikirler bekliyorum ayrıca şu haliyle oyunu puanlasınlar"
+Danışılan: Codex (`codex-gorusu.md`) ve ikinci bir Claude editörü (`claude-editor-gorusu.md`). Brif: `brief.md`; 6 ekran görüntüsü (yağmur, lodos, kar, gece menü, meydan okuma, paylaşım kartı). Eski raporlardaki fikirler tekrar edilmesin diye brife yazıldı. Kod değişmedi.
+
+## 1. Puanlar
+
+| Alan | Codex | Claude editörü |
+|---|---|---|
+| Görsel | 8,5 | 8 |
+| Oynanış / his | 7 | 6,5 |
+| Özgünlük / kimlik | 9 | 8,5 |
+| Eğlence / mizah | 8 | 6,5 |
+| Geri gelme isteği | 7 | 6 |
+| Paylaşılabilirlik | 8,5 | 7,5 |
+| App Store'a hazırlık | 6,5 | 5,5 |
+| **Genel** | **8 / 10** | **7 / 10** |
+
+İkisinin ortak görüşü: kimlik ve görsel türün (Stick Hero, Mr Jump, Doodle Jump) üstünde; zayıf halka **iniş anının tatmini** ve **uzun vadede geri getiren ikinci bir hedef**. Claude editörü: "Stick Hero'dan daha çok dünya, daha az tek dokunuş tatmini."
+
+## 2. İki editörün de bulduğu fikirler (en güçlü sinyal)
+
+| Fikir | Codex | Claude editörü |
+|---|---|---|
+| **Mahalle pencereleri / balkon seyircileri** — pencereden halı silkeleyen teyze, "Oğlum in oradan!" diyen komşu, alkışlayan çocuk; Claude: tepki inişe bağlı (ortaya inersen alkış, kenara "Aaa!") | En iyi 3 (1.) | Fikir 2 |
+| **Çatı kedileri** — çatıda uyuyan kedi, amca inince gerinir; Claude: adlı kediler, "Kedi defteri" koleksiyonu | Fikir | En iyi 3 (2.) |
+| **Kişisel kartpostal** — Codex: koşu tarzına göre lakap damgası ("Galata'da temkinli"); Claude: durak selfiesi, kart o koşunun karesinden | En iyi 3 (2.) | Fikir 7 |
+| **Amcanın sesi** — Codex: tek satır iç ses balonu; Claude: "Hanım arıyor" oyun sonu bildirimi ("Ekmek nerde? 23 kule mi zıpladın?!") | En iyi 3 (3.) | Fikir 5 |
+
+## 3. Tek editörden gelen öne çıkanlar
+
+**Claude editörü:**
+- **Maşallah serisi + nazar boncuğu** (en iyi 3'ün 1.'si) — kusursuz inişler art arda gelince "Maşallah!" → "Helal!" → "Vay be!"; 10'luk seride göğüste nazar boncuğu, seri bozulunca "çat" diye çatlar. İngilizce "PERFECT!" yazısının yerine geçer. Neredeyse tamamen kod, en ucuz.
+- **Düşüş repertuarı** (en iyi 3'ün 3.'sü) — düşünce her seferinde başka son: vapur güvertesine düşüp götürülmek, çamaşır ipine takılmak, simit tablasına oturmak; görülen sonlar koleksiyon. Pahalı (her son görsel); 2-3 sonla başlanmalı, 1 saniyeyi geçmemeli.
+- Bıyık barometresi (bıyık lodosta savrulur, poyrazda diken diken), kayıp terlik, hayalete laf bırak (hazır listeden), muhtarlık ilan panosu (sıralama), sahur davulcusu (gece 02-04).
+
+**Codex:** Boğaz'ın ses haritası (semte göre ses), yanlış vapur anonsu, cepten çıkan eşyalar (vapur bileti, mandal), saate göre kule/minare gölgeleri, birleşik posta damgası.
+
+## 4. Puanı artırmak için (iki editörün ortak listesi)
+1. **İniş hissini cilalamak** — seri ödülü (Maşallah/nazar), titreşim, küçük toz bulutu, seriyle yükselen ses. Her iki editör de oynanış puanını buna bağlıyor. *(Not: fizik/kamera değişmez; yalnız efekt ve ses.)*
+2. **Mağaza öncesi temizlik** — "PERFECT!" Türkçeleşsin, buton adları tutarlı olsun, gece ayına doku/hale, lodos çizgileri telefonda kontrol, yağmurda skor ile martı/efekt çakışması kontrol.
+3. **İkinci koleksiyon + değişen paylaşım kartı** — kedi defteri veya düşüş sonları; 0 puanlık koşuda paylaşım yerine komik an.
+4. **TestFlight'tan ölçüm** (Codex) — ilk dakikada kontrol anlaşılıyor mu, yeniden başlama isteği var mı.
+
+## 5. Editör notlarına düzeltmeler (benim kontrolüm)
+- Menüdeki "PAYLASIM KARTPOSTALI / MEYDAN OKUMA = 2 DK" yazıları sürüm etiketi (BUILD_TAG); App Store öncesi zaten kalkacak listede. "Ş" eksikliği de bu etiketten.
+- "Kartpostal hep Galata": değil — kart fotoğrafı ulaşılan durağa göre değişiyor; ekran görüntüsünde test koşusu olduğu için Galata görünüyordu. 0-1 duraklı koşuda ise hep aynı damga görseli çıkıyor; bu eleştiri geçerli.
+- "PERFECT!" İngilizce: doğru (`app/index.tsx:918, 1560`).
+- Codex "mevcut kedi" diyor; oyunda kedi yok (yalnız kartpostal notunda geçiyor).
+- Yağmurda "REKOR" ile çakışma: 07-yagmur-v2 görüntüsü skor katmanı öne alınmadan önce çekildi; telefonda kontrol edilmeli.
+
+## 6. Önerim (sıra)
+1. **Maşallah serisi + nazar boncuğu** ve "PERFECT!"in Türkçeleşmesi — küçük, yalnız kod (+1 küçük boncuk görseli), iki editörün de "iniş hissi" eleştirisine doğrudan cevap.
+2. **Balkon seyircileri** — iki editörün ortak fikri; 3-4 pencere görseli (Kıvılcım onayı gerekir), tepki inişe bağlı.
+3. **Çatı kedileri + kedi defteri** — kartpostallardan sonraki ikinci koleksiyon.
+4. Sonra: düşüş repertuarı (2-3 sonla), Hanım arıyor, bıyık barometresi.
+# Byzantion — Yeni Fikirler ve Para Kazanma Raporu (2026-11-18)
+
+Kullanıcı: "hepsini diğer editörlerle paylaş ve fikirlerini al; ayrıca bu oyunda nasıl para kazanacağız, bunu da değerlendirsinler."
+Danışılan: Codex (`codex-gorusu.md`) ve ikinci bir Claude editörü (özeti aşağıda). Brif: `brief.md`. Kod değişmedi.
+
+## A. Fikirler — iki editörün kararı
+
+| # | Fikir | Codex | Claude editörü | Ortak sonuç |
+|---|---|---|---|---|
+| 9 | Paylaşılan skor kartpostalı | EVET (1.) | EVET (1.) | **Yap — en önemlisi** |
+| 1 | Lodosta vapurlar iptal | EVET (2.) | EVET | **Yap** |
+| 3 | Gece yarısı amcası | EVET (3.) | EVET | **Yap** |
+| 10 | Sokak sesleri | EVET | EVET ("en ucuz kazanım") | **Yap** |
+| 8 | Günlük seri | SONRA | EVET (2.; "1 gün affet" hakkıyla) | Ayrıştı — bkz. not |
+| 2 | Kar tatili | SONRA | EVET (şaka diliyle: "Tatil mi acaba?") | Ayrıştı |
+| 4 | Yaz kıyafeti (atlet + don) | SONRA | SONRA (haziran öncesi; satılık ilk kıyafet olabilir) | **Sonra** |
+| 5 | Martı vergisi | SONRA | SONRA | **Sonra** |
+| 7 | Çay molası | SONRA | HAYIR (akışı keser) | **Hayır / en fazla durakta görsel** |
+| 6 | Teyzenin sepeti | HAYIR | HAYIR (zıplama odağını böler, çarpışma kuralına sürtünür) | **Hayır** |
+
+**Ayrışma notu:** Claude editörü günlük seriyi oyuncuyu geri getirmenin en kanıtlanmış aracı sayıyor (kartpostallarla doğal bağ). Codex seri kaçınca hayal kırıklığından çekiniyor. Uzlaşma: seri olsun ama ceza olmasın — "1 gün affet" hakkı, kaçırınca sıfırlanmasın, yalnız bekletsin.
+
+**Yeni fikirler:**
+- **Günlük görev** (Claude): "Bugün Galata'yı geç", "lodosta 30 kule". Günün haritası ve semtler hazır, ucuz.
+- **Takvim etkinlikleri** (Claude): yılbaşı, 29 Ekim, Hıdrellez, bayram sabahı; sınırlı süreli kıyafet ve kartpostal.
+- **Hayalet yarışta kıyafet görünsün** (Claude): arkadaşın amcası kendi kıyafetiyle koşar → kıyafet almanın sosyal sebebi.
+- **Kule/durakta İstanbul bilmecesi** (Codex): cevabı yanlışsa ceza yok.
+- **En iyi koşudan otomatik kişisel kartpostal** (Codex) — paylaşım kartpostalıyla birleşir.
+
+## B. Para kazanma
+
+### Gerçekçi zemin
+- Türkiye düşük gelirli bir reklam pazarı. Appodeal'ın raporları Türkiye'yi ayrı vermiyor; iki editörün **tahmini**: iOS ödüllü video 1.000 gösterim başına **1–5 $**, geçiş reklamı 1–3 $. Reklam takibine izin vermeyen oyuncuda daha da düşük.
+- Rakamlar oyuncu başına günde kaç reklam varsaydığına göre çok değişiyor (aşağıdaki tablo iki varsayımı birlikte veriyor).
+- Tek kişilik, reklam bütçesiz bir oyun ilk aylarda tipik olarak **1–5 bin indirme, günde 50–300 aktif oyuncu** görür (Claude editörü tahmini). Bu, yıllık 99 $ Apple ücretini çıkarır, geçim sağlamaz.
+
+| Günlük aktif oyuncu | Codex (kişi başı günde 1 ödüllü reklam) | Claude editörü (3 ödüllü + 1–2 geçiş) |
+|---|---|---|
+| 100 | — | ayda 30–60 $ |
+| 1.000 | ayda 21–105 $ | ayda 300–600 $ |
+| 10.000 | ayda 210–1.050 $ | ayda 3–6 bin $ |
+
+Kıyafet satışı: oyuncuların %1–3'ü alır (tahmin); 10 bin indirmede komisyon sonrası toplam ~150–400 $.
+
+### Modeller
+
+| Model | İki editörün görüşü |
+|---|---|
+| **Kıyafet satışı (uygulama içi)** | İkisi de **evet**. Sistem hazır: kıyafet 9 poza oturuyor (kış, yağmur). Skor/güç satma, yalnız görünüş. "Satın alımları geri yükle" düğmesi zorunlu. |
+| **"Amcaya çay ısmarla"** | İkisi de evet; Claude: "en kolay ilk gelir", Türk kültürüne çok uyuyor. Apple'da yalnız uygulama içi satın alma olarak olur (dış bağış bağlantısı yasak). |
+| **Ödüllü reklam** ("bir kez daha dene / devam et") | İkisi de uygun buluyor, ama **zamanlama ayrışıyor**: Codex ilk sürümde isteğe bağlı olabilir diyor; Claude ilk sürümde hiç reklam olmasın, günde ~1.000 aktif oyuncu geçince eklensin diyor. |
+| **Geçiş reklamı** (zorla araya giren) | İkisi de **şimdilik hayır** — kısa koşulu oyunda can sıkar; ancak büyük kitlede, seyrek. |
+| **"Reklamsız" tek ödeme** | Ancak reklam eklenince anlamlı. |
+| **Abonelik / sezon** | İkisi de **hayır** — sürekli içerik ister, tek kişiye ağır. |
+| **Ücretli uygulama** | İkisi de **hayır** — bilinmeyen oyunda indirmeyi öldürür, Türkiye fiyata duyarlı. |
+| **Sponsorluk** (simit, çay, vapur, turizm) | **Sonra** — ~10 bin aylık oyuncu olmadan konuşulmaz; marka/logo izinsiz kullanılamaz; belediye işbirliği siyasi risk taşır. |
+
+### Önerilen yol (birleşik)
+1. **Sürüm 1: ücretsiz, reklamsız, takip yok.** Gelir: "Amcaya çay ısmarla" (3 kademe) + 1–2 kıyafet paketi. Artısı: gizlilik etiketi sade, takip izni ekranı gerekmez, Apple incelemesi kolay, çocuk izleyici riski düşük.
+2. **Büyümeye yatır:** paylaşım kartpostalı + günlük seri. İki editöre göre asıl kaldıraç reklam değil, bunlar (bedava yayılma + geri gelme).
+3. **4–8 hafta ölç:** ertesi gün / 7. gün geri gelme, günlük oyun sayısı, paylaşım etkisi.
+4. **Günde ~1.000 aktif oyuncuyu geçerse:** yalnız isteğe bağlı ödüllü reklam (kişiselleştirilmemiş başlarsa takip izni ekranı gerekmez).
+5. **5–10 bini geçerse:** seyrek geçiş reklamı + "Reklamsız" ödeme, sponsor görüşmeleri.
+
+### App Store'dan önce yapılacaklar
+- Apple ücretli uygulamalar sözleşmesi, banka ve vergi formları; **Small Business Program** başvurusu (komisyon %15).
+- AB'de dağıtım için **tacir (DSA) beyanı** (tacir olursan adres/telefon mağazada görünür) — doğrulanmalı.
+- **Gizlilik politikası** sayfası (KVKK/GDPR uyumlu kısa metin) ve **gizlilik etiketi** (Game Center, hava servisi; konum kullanılmıyor).
+- **Yaş derecesi:** patlama, osuruk sesi, kurukafa → "seyrek karikatür şiddeti / kaba mizah". Çocuk kategorisine girme (orada üçüncü taraf reklam yasak).
+- Satış ürünleri: Türkçe/İngilizce adlar, Türkiye'de en alt fiyat kademeleri.
+- **"Byzantion" ad kontrolü:** App Store'da ve TÜRKPATENT'te benzer ad aranmalı.
+- Türkçe/İngilizce mağaza metni ve ekran görüntüleri.
+- Hava kaynağı: `OPEN_METEO_FALLBACK = false` (WeatherKit), hava deneme dokunuşu kaldırılmalı (zaten açık iş).
+- Reklam eklenince ayrıca: app-ads.txt için web alanı, SKAdNetwork listesi, AB onay ekranı, güncel gizlilik etiketi.
+
+## C. Önerilen sıra (benim birleştirmem)
+1. **Paylaşılan skor kartpostalı** — büyüme; iki editörün 1 numarası.
+2. **Lodosta vapur iptali + gece yarısı amcası + sokak sesleri** — ucuz, İstanbul kimliği; tek turda yapılabilir.
+3. **Günlük seri (cezasız) + günlük görev** — geri getirme.
+4. **Gelir altyapısı:** "Amcaya çay ısmarla" + ilk kıyafet paketi (yaz atleti/don adayı) — App Store'a çıkışla birlikte.
+
+Kaynaklar: Appodeal eCPM raporları (2025, Q4 2024); Apple inceleme kuralları, gizlilik/ATT ve Small Business Program sayfaları; Google Families reklam kuralları (Codex'in bağlantıları `codex-gorusu.md` içinde). Türkiye'ye özel reklam rakamları ve dönüşüm oranları editörlerin **tahminidir**; RevenueCat ücretsiz katmanı ve AB tacir beyanı ayrıntıları doğrulanmadı.
+# HIKAYE4-2026-11-12 — Tohum: "beklenen İstanbul depremi"
+
+## Nasıl buraya gelindi
+Üç tur hikâye önerisinin hepsi reddedildi (vapur ateşçisi/buhar; komik gizemler: martı dişi, gökteki senet, Tut Amca, simit; büyük gizemler: Galata kulesi yok, haritada olmayan mahalle/Çatıköy, yer değiştiren ev, göç eden binalar). Kullanıcıya 12 tek cümlelik fikir verildi; kullanıcının cevabı: **"beklenen İstanbul deprem"**, ardından **"beklenen büyük İstanbul depremi"**. Daha önce netleştirdiği istekler geçerli: büyük bir sır/gizem, gaz şakası hikâyeden bağımsız, ton gizem ağır basan, yavaş açılan, ilk başta anlaşılmayan, bilinen bir eserin kopyası olmayan; sonunda bir isim (esprili ya da merak uyandıran, İngilizce olabilir, "Çarşamba" değil, adda fart/osuruk yok).
+
+## HASSASİYET ÇERÇEVESİ (zorunlu)
+Beklenen İstanbul depremi gerçek bir korku; 1999 ve 2023 depremleri milyonlarca insanın gerçek travması. Hikâye:
+- Yıkım, enkaz, ölüm, yaralı, kurban göstermez; felaketi "eğlence"/ödül yapmaz; korku pornografisi ve panik yaratmaz.
+- Gerçek kurum, kişi, bilim insanı, tarih/kehanet vermez ("şu gün olacak" yok); yanlış bilimsel iddia yok.
+- Saygılı, umutlu ya da dayanışmacı bir sonla biter; isterse hazırlıklı olmaya (toplanma alanı, deprem çantası, komşuluk) incelikle değinebilir ama ders vermez, reklam gibi olmaz.
+- Apple App Store yönergeleri (hassas olayları istismar etmeme) açısından güvenli olmalı.
+- Mizah: amca ve gaz şakası oyunda kalıyor; hikâye depremle dalga geçmez.
+
+## Oyunda olanlar
+Bordo eşofmanlı bıyıklı amca İstanbul çatılarından zıplıyor; sonsuz koşu, düşünce baştan; duraklar her 15 kulede (Karaköy, Galata, Sirkeci, Eminönü İskelesi 60), gece seferi, gökyüzü sabahtan geceye; kartpostal albümü; martı sürüleri; uzak vapur düdüğü; patlama eşiği (tam kıvam/dayanamadı); şarjda yüz ifadeleri. Oyuncuların çoğu 15. kuleye varmıyor → ipuçları ilk dakikada ve toplam oynamayla birikmeli. Fizik/kamera/çatı silueti sabit. Metin çok az.
+
+## İstenen (≤1,5 sayfa, Türkçe)
+1. Bu tohumdan **2 gizem** (tek cümle çekirdek; ilk turda "bu ne ya?" anı — ör. martıların tuhaf davranışı, denizin hafif çekilmesi, saatlerin durması, sokak hayvanlarının çatılara çıkması… ama kendi özgün fikrin; ortadaki yanlış yorum; final açılımı). Gizem "deprem olacak mı?" değil, daha özgün bir soru olsun; deprem hikâyenin arka planı ya da büyük gerçeği olabilir.
+2. Açılma planı ve hangi oyun parçası neyi taşır.
+3. Hassasiyet çerçevesine nasıl uyduğu (1–2 cümle) ve risk.
+4. Her biri için 4+ isim, en iyisini işaretle.
+5. Önerin.
+# HIKAYE4-2026-11-12 — Kıvılcım’ın bağımsız koordinatör görüşü
+
+**Temel karar:** Beklenen büyük İstanbul depremi, şehrin hazırlık ihtiyacının gerçek arka planıdır; oyunda deprem anı, tahmin veya felaket ödülü yoktur. Büyük soru “Ne zaman olacak?” değil, **“Şehirdeki bu işaretleri kim, neden bırakıyor?”** Gaz şakası oynanışta kalır, hikâyenin açıklaması değildir.
+
+## 1. Pencerelerin dili
+
+**Çekirdek:** Farklı semtlerde aynı sırayla yanıp sönen pencereleri tek bir gizli merkez yönetiyor sanılır; aslında birbirini tanımayan komşuların kurduğu şehir çapında bir “buradayım” zinciridir.
+
+**İlk turdaki aykırılık:** İlk beş kulede, biri yakında biri uzakta iki pencere amcanın geçişinden bağımsız olarak aynı üç kısa ışık ritmini verir. Martılar/ses olayı açıklamaz. **Ortadaki yanlış yorum:** Tek merkezli alarm veya gizli uyarı. Kartpostalların farklı semtlerde aynı üç işareti taşıması bu kuşkuyu büyütür. **Final:** Gece görüşünde ışık tek bir merkezden yayılmaz; çok sayıda sıradan evden birbirine cevap verir. Son kartta tek küçük sözcük: **“Buradayız.”** Bir kişi İstanbul’u kurtaran kahraman değildir; beklenen risk karşısında birbirini unutmamaya karar veren bir şehir vardır. Amca bu ağı keşfeden gözlemci olur.
+
+**Açılma:** İlk dakika iki pencere; 15/30/45’teki kartlar ışık ritmini farklı adreslerde tekrarlar. 60’ta iskele tarafındaki karanlık pencere de cevap verir. Gece, geniş çekimde evlerin birbirine yanıt verdiği örüntü gösterilir. Tekrar oynarken albümde açılan kartlar kalır ve ilk kulelerdeki iki pencere artık anlam taşır. Mevcut cephe/pencere, kart albümü, durak ve gece tonu ile zamanlama prototipi yapılabilir: **0 yeni üretim çağrısı**. Son sanat için tahminen 4 kart yüzü ve 1 gece kompozisyonu gerekir; ayrı kredi/onay.
+
+**Hassasiyet ve risk:** Işıklar deprem habercisi veya bilimsel uyarı olarak sunulmaz; kimseye pencereden sinyal vermeyi gerçek güvenlik yöntemi diye öğretmez. Risk, oyuncunun bunu erken “alarm” sanması: finalden önce kısa bir kartta ev/komşu işareti yer almalı, acil durum sireni kullanılmamalı.
+
+**İsimler:** **Kim Işığı Yaktı?** ★, Üç Kısa Işık, Şehir Cevap Veriyor, Karşı Pencere; Who Lit the City?, Three Lights, The Answering City, Window to Window. İlk aday merakı taşır, depremi eğlence vaadine dönüştürmez.
+
+## 2. Boşlukların haritası
+
+**Çekirdek:** Amcanın topladığı kartpostallardaki “basılmamış” beyaz alanlar eksik baskı sanılır; üst üste gelince şehrin mahalle mahalle önceden belirlediği buluşma noktalarını gösterir.
+
+**İlk turdaki aykırılık:** İlk kartın görüntüsünde bütün şehir çizilmişken tek küçük meydan kâğıtta beyazdır; aynı boşluk oyun ufkunda da fark edilir. **Ortadaki yanlış yorum:** Haritadan silinmiş yerler veya saklanan bir tehlike. **Final:** Beş kart şeffaf katman gibi üst üste gelince beyaz alanlar bir yok oluş çizimi değil, birbirini tamamlayan **açık buluşma yerleri ağı** olur. Gece sahnesinde bu yerler sakin ışıklarla görünür; son kartta küçük bir işaret: **“Yan yana.”** Sır, tek gizli yapı değil, bütün semtlerin ayrı ayrı aynı kararı almış olmasıdır.
+
+**Açılma:** İlk dakika bir beyaz alan; durak kartlarında her seferinde farklı boşluk. İskelede kartları çevirince işaretlerin hizalandığı görülür; gece şehir ölçeği anlaşılır. Yeniden oynamada albüm birikir. Mevcut kartlar ve gece katmanı üzerinde basit beyaz şekillerle **0 üretim çağrılı** taslak denenir. Nihai sanat için yaklaşık 5 kart katmanı ve 1 gece görünümü gerekir.
+
+**Hassasiyet ve risk:** Harita gerçek toplanma alanı veya tahliye talimatı değildir; oyunda güvenli güzergâh iddiası yapılmaz. Risk, soyut beyaz boşlukların mobil ekranda okunmaması ve gerçek konum sanılması. Kurgusal işaret ve açık “oyun dünyası” sunumu gerekir.
+
+**İsimler:** **Boş Bırakılan Yer** ★, Beşinci İşaret, Yan Yana, Şehrin Arası; The Blank Spot, Places We Keep, Between Us, The Fifth Mark. İlk aday hem görsel gizemi hem kasıtlı hazırlığı sakince çağrıştırır.
+
+## 5. Öneri
+
+**Pencerelerin dili** yönünü seçerim. İlk dakikada iki basit ışıkla anlaşılır bir çelişki kurar; gece açılımı büyük ölçekte, yıkım göstermeden çalışır. Amcanın komik oynanışı ile deprem konusunun saygınlığı ayrı kalır. Bu turda isim kilitlenmemeli; kullanıcı, diğer bağımsız görüşler ve ad uygunluğu kontrolünden sonra karar vermeli. En kritik test: iPhone’da ilk iki ışığın gerçekten fark edilmesi ve finalin alarm gibi algılanmaması.
+
+exec
+/bin/zsh -lc "sed -n '1,200p' src/game/config.ts && sed -n '1,220p' src/game/jump.ts && sed -n '1,220p' src/game/landing.ts && sed -n '1,180p' src/game/procedural-course.ts && rg -n \"teleport|ışın|portal|gizem|yer değişt|kapı|ayna\" ai_review_evidence" in /Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend
+codex
+İlk bulgular: kurukafa zaten aynı uçuşun ortasında toplanıyor ve yalnız iniş yüzeylerini değiştiriyor; dolayısıyla yeni “ışınlanma” fikrini ayrı bir sahne/bağlam katmanı olarak tasarlamak mümkün. Geçmiş raporlardaki balkon seyircileri, kediler, sesler, kartpostal koleksiyonu ve “pencerelerin dili” gizemiyle çakışmamaya özellikle dikkat ediyorum.
+exec
+/bin/zsh -lc "sed -n '1,180p' src/game/landing.ts && sed -n '1,180p' src/game/procedural-course.ts" in /Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend
+ succeeded in 0ms:
+import { CONFIG } from "./config";
+
+type LandingPlatform = { x: number; width: number; topY: number };
+
+// Swept sole contact: use the horizontal position at the instant the feet cross
+// the top, not at frame end. No invisible ledge or snap from below the surface.
+export function findFootLanding(
+  platforms: readonly LandingPlatform[], fromX: number, toX: number,
+  fromBottom: number, toBottom: number, bodyWidth: number,
+) {
+  "worklet";
+  const drop = toBottom - fromBottom;
+  if (drop <= 0) return null;
+  let first: { index: number; x: number; time: number } | null = null;
+  for (let index = 0; index < platforms.length; index++) {
+    const p = platforms[index];
+    if (fromBottom > p.topY || toBottom < p.topY) continue;
+    const time = (p.topY - fromBottom) / drop;
+    const x = fromX + (toX - fromX) * time;
+    for (let foot = 0; foot < CONFIG.footSoles.length; foot++) {
+      const sole = CONFIG.footSoles[foot];
+      const left = x + (sole[0] - 0.5) * bodyWidth;
+      const right = x + (sole[1] - 0.5) * bodyWidth;
+      if (right >= p.x && left <= p.x + p.width) {
+        if (first === null || time < first.time) first = { index, x, time };
+        break;
+      }
+    }
+  }
+  return first;
+}
+import { CONFIG, ILK_DURAK_KOLAY, EASY_START } from "./config";
+import { jumpVelocity, flightGravity } from "./jump";
+import { DURAK_SEFER, FIRST_STOP, isStopTower, stopDifficulty } from "./stops";
+
+// Extracted from app/index.tsx (was inlined there) so this exact math has a
+// single source of truth that both the live game and offline simulation/test
+// scripts import directly, instead of a hand-copied duplicate risking silent
+// drift. Behavior is unchanged from before the extraction.
+
+export function lerp(a: number, b: number, t: number) {
+  "worklet";
+  return a + (b - a) * t;
+}
+
+// One mulberry32 step: given the current 32-bit state, returns the next
+// state and a float in [0,1). Pure/side-effect-free so the live game (which
+// stores state in a Reanimated SharedValue) and offline tests can share the
+// exact same generator instead of two copies of the same algorithm.
+export function mulberry32Step(state: number) {
+  "worklet";
+  let t = (state + 0x6d2b79f5) | 0;
+  const nextState = t;
+  t = Math.imul(t ^ (t >>> 15), t | 1);
+  t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+  const value = ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  return { value, nextState };
+}
+
+// Convenience closure for non-worklet callers (offline tests/tools): wraps
+// mulberry32Step behind a simple rand() with internal state. The live game
+// does NOT use this -- it keeps state in rngState (a SharedValue) via
+// mulberry32Step directly, since a worklet closure can't hold plain mutable
+// state across UI-thread frame callbacks the way this closure does.
+export function makeRand(seed: number) {
+  let state = seed | 0;
+  return function rand() {
+    const r = mulberry32Step(state);
+    state = r.nextState;
+    return r.value;
+  };
+}
+
+export type Platform = { id: number; x: number; topY: number; width: number; cat: number };
+
+// Pure procedural generation math, previously inlined in app/index.tsx's
+// makeNextPlatform. Independent of REFERENCE_TRIAL/EXPERIMENTAL_COURSE --
+// callers decide whether to use this result or substitute a measured
+// reference-course platform instead (see USE_REFERENCE_COURSE in app/index.tsx).
+export function generateProceduralPlatform(
+  prev: Platform,
+  id: number,
+  rand: () => number,
+  screenWidth: number,
+): Platform {
+  "worklet";
+  const warm = id <= CONFIG.warmupTowers; // gentle warm-up section
+  // DURAK SEFERİ (2026-11-12): doğrusal artış yerine durak başına bir basamak.
+  const t = DURAK_SEFER ? stopDifficulty(id) : Math.min(1, id / CONFIG.difficultyRamp); // 0 early -> 1 late
+  // Durak kulesi = nefes molası: geniş, öncekine yakın yükseklik, kısa/orta aralık.
+  const breath = DURAK_SEFER && isStopTower(id);
+  // KOLAY İLK DURAK: 1-14. kule (bkz. config.ts ILK_DURAK_KOLAY).
+  const easy = ILK_DURAK_KOLAY && DURAK_SEFER && id < FIRST_STOP;
+  // gap distance (grows with difficulty; warm-up = short/medium only)
+  const gMin = warm ? CONFIG.gapEarly.min : lerp(CONFIG.gapEarly.min, CONFIG.gapLate.min, t);
+  const gMaxBase = warm
+    ? CONFIG.warmupGapMax
+    : lerp(CONFIG.gapEarly.max, CONFIG.gapLate.max, t);
+  const gMaxRaw = easy ? Math.min(gMaxBase, EASY_START.gapMax) : gMaxBase;
+  const gMax = breath ? Math.max(gMin, (gMin + gMaxRaw) / 2) : gMaxRaw;
+  const gapSample = rand();
+  // Sample within the world bounds instead of clamping: clamping stacks
+  // consecutive tower tops at exactly the same upper/lower limit.
+  const hvRaw = warm
+    ? CONFIG.heightVarWarmup
+    : lerp(CONFIG.heightVarEarly, CONFIG.heightVarLate, t);
+  const hv = breath ? Math.min(hvRaw, 70) : easy ? Math.min(hvRaw, EASY_START.heightVar) : hvRaw;
+  // +y aşağı: negatif delta = daha yüksek hedef. Kolay ilk durakta tırmanış ayrıca sınırlı.
+  const climb = easy ? Math.min(hv, EASY_START.maxClimb) : hv;
+  const minDelta = Math.max(-climb, CONFIG.platformMinTopY - prev.topY);
+  const maxDelta = Math.min(hv, CONFIG.platformMaxTopY - prev.topY);
+  const topY = prev.topY + minDelta + rand() * (maxDelta - minDelta);
+  // width category: warm-up = WIDE/MEDIUM only; late adds more NARROW
+  let wWide: number;
+  let wMed: number;
+  let wNar: number;
+  if (warm) {
+    wWide = 0.62;
+    wMed = 0.38;
+    wNar = 0;
+  } else {
+    wWide = lerp(CONFIG.wideWeight.early, CONFIG.wideWeight.late, t);
+    wMed = 0.4;
+    wNar = lerp(CONFIG.narrowWeight.early, CONFIG.narrowWeight.late, t);
+    if (id <= CONFIG.noNarrowBeforeId) wNar = 0; // forgiving start
+    if (easy) {
+      wWide = EASY_START.wideWeight;
+      wMed = EASY_START.mediumWeight;
+      wNar = 0;
+    }
+  }
+  if (prev.cat === 2) wNar *= 0.25; // avoid consecutive narrow towers
+  if (breath) {
+    wWide = 1;
+    wMed = 0;
+    wNar = 0;
+  }
+  const sum = wWide + wMed + wNar;
+  const r = rand() * sum;
+  let cat: number;
+  let wr: { min: number; max: number };
+  if (r < wWide) {
+    cat = 0;
+    wr = CONFIG.widthWide;
+  } else if (r < wWide + wMed) {
+    cat = 1;
+    wr = CONFIG.widthMedium;
+  } else {
+    cat = 2;
+    wr = CONFIG.widthNarrow;
+  }
+  const width = wr.min + rand() * (wr.max - wr.min);
+  // Couple horizontal spacing to the actual downward crossing of this height.
+  // Reserve distance from the previous LEFT edge, not only its center.
+  const full = jumpVelocity(1, screenWidth);
+  const gravity = flightGravity(screenWidth);
+  const discriminant = full.vy * full.vy + 2 * gravity * (topY - prev.topY);
+  const flightTime = (-full.vy + Math.sqrt(Math.max(0, discriminant))) / gravity;
+  const reachableGap = full.vx * flightTime * (1 - CONFIG.reachReserve) - prev.width - width / 2;
+  const safeMax = Math.max(0, Math.min(gMax, reachableGap));
+  const safeMin = Math.min(gMin, safeMax);
+  const gap = safeMin + gapSample * (safeMax - safeMin);
+  return { id, x: prev.x + prev.width + gap, topY, width, cat };
+}
+
+// ---------------------------------------------------------------------------
+// REVIZYON-027: everything ABOVE this line is byte-identical to commit 7b8bd6b
+// (except ZORLUK KADEMESİ 1, 2026-11-14: width weights now read from CONFIG)
+// (frontend/src/game/procedural-course.ts). Everything below is render-only
+// support kept from the working tree: it never feeds generateProceduralPlatform.
+// ---------------------------------------------------------------------------
+
+// Rooftop sprite geometry (measured from the real alpha-keyed PNGs): used ONLY
+// by app/index.tsx to size/place the chimney art from a platform's physical
+// topY/width. cat 0=wide->long, 1=medium, 2=narrow->short.
+export const ROOFTOP_ASSET_GEOMETRY = [
+  { w: 533, h: 756, capTopPx: 3, capWidthPx: 223 }, // long
+  { w: 526, h: 556, capTopPx: 3, capWidthPx: 225 }, // medium
+  { w: 517, h: 408, capTopPx: 3, capWidthPx: 224 }, // short
+] as const;
+export const ROOFTOP_GROUND_Y = 150;
+
+export type PlatformVisualType = "normal" | "chimney";
+// Purely visual (smoke anchor); decided from the platform id, never reads rand.
+export function classifyPlatformVisualType(id: number): PlatformVisualType {
+  "worklet";
+  if (id <= 0) return "normal";
+  const hash = Math.imul(id ^ 0x45d9f3b, 0x45d9f3b) >>> 0;
+  return hash % 7 === 0 ? "chimney" : "normal";
+}
+
+collab: Wait
+collab: Wait
+codex
+# MERAK-2026-11-27 — Editör değerlendirme raporu
+
+Depodaki `jump.ts`, `landing.ts` ve `procedural-course.ts` mevcut sınırı netleştiriyor: zıplama, iniş, kule dizisi ve kamera aynı kalmalı. Bu yüzden öneriler, **oyuncuyu başka bir yerdeymiş gibi hissettiren sahne ve kural katmanları** üzerine kurulu. İki bağımsız editör de ışınlanma fikrini güçlü buldu; ortak şartları, geçişin zıplama matematiğini ve iniş okunurluğunu etkilememesi.
+
+**Maliyet notu:** Kod ve yeni görsel ihtiyacını ayrı belirttim. Görsel üretimi bu raporun kapsamına dahil değil.
+
+## Fikirler
+
+### 1. Başka İstanbul’a açılan kapı — cüretkâr
+
+Yeni bir nesneye değince görüntü bir an dalgalanıyor. Amca aynı zıplamayı tamamlıyor; inişten sonra tanıdık Boğaz’ın yerinde, kıyısı benzer ama silueti imkânsız başka bir İstanbul görüyorsun.
+
+**Merak:** “Nereye geldim, bu şehir nerede?” sorusu doğurur; kısa bir ekran görüntüsü bile arkadaşlara anlatılacak bir an yaratabilir.
+
+**Zıplama:** Amcanın uçuşu, kulelerin konumu, kamera ve puan aynı kalır. Yalnız arka plan ve cephe görünümü geçici olarak değişir; “ışınlanma” sahne geçişiyle hissettirilir.
+
+**Maliyet:** Kod orta; ilk denemede mevcut varlıklarla görsel düşük, kalıcı sürümde 1–2 yeni fon veya siluet orta.
+
+**En büyük risk:** Yeni yer ayrı bir parkur gibi görünürse, oyuncu iniş düzeninin değişmesini bekleyebilir.
+
+### 2. Boğaz’ın su altındaki yüzü — cüretkâr
+
+Nesneyi topladığında gökyüzü su rengine döner, çatılar suyun altındaymış gibi görünür. Amca aynı çatılara zıplamayı sürdürürken, aşağıdaki yansımada farklı bir kıyı çizgisi belirir.
+
+**Merak:** Bu, gerçek bir yer değişiminden çok “Boğaz’ın altında başka bir şehir mi var?” hissi verir.
+
+**Zıplama:** Su efekti ve yansıma yalnız arka plan katmanında kalır. Kule kenarları ve amcanın iniş alanı net görünür.
+
+**Maliyet:** Kod orta; ilk denemede yeni görsel düşük, devamlı içerikte 1–2 fon varyantı orta.
+
+**En büyük risk:** Yansıma veya parıltı kule kenarlarını örterse iniş takibi zorlaşır.
+
+### 3. Haritada olmayan kıyı — cüretkâr
+
+Uzakta, mevcut haritada bulunmayan küçük bir mahalle görünür. Ona yaklaştığını sanırken kaybolur; başka bir koşuda kıyının farklı bir noktasında yeniden belirir.
+
+**Merak:** Oyuncuya peşine düşüp yerini bulma ve başkasına gösterme isteği verebilir.
+
+**Zıplama:** Mahalle yalnızca uzak fon çizimidir. Kule üretimi, konumlar ve kamera değişmez.
+
+**Maliyet:** Kod orta; bir yeni siluet ve birkaç konumlandırma varyantı için görsel düşük-orta.
+
+**En büyük risk:** Seyrek işaretler olmadan bir tasarım tercihi yerine çizim hatası sanılabilir.
+
+### 4. Yanlış gökyüzü
+
+Bir nesneyi aldıktan sonra gündüz göğünde yıldızlar görünür; deniz ve çatılar gündüz ışığında kalır. Birkaç sıçrama boyunca yıldızlar gökyüzünde aynı yerde durur, sonra görünüm kendiliğinden normale döner.
+
+**Merak:** “Gökyüzü başka bir zamandan mı sızdı?” sorusunu cevaplamadan bırakır.
+
+**Zıplama:** Gökyüzü ayrı dekor katmanıdır. Kuleler, kamera ve sıçrama aynı kalır.
+
+**Maliyet:** Kod düşük-orta; mevcut gece/gökyüzü varlıkları kullanılabilirse görsel düşük.
+
+**En büyük risk:** Etki mevcut gece-gündüz değişimiyle karıştırılabilir; oyuncunun fark edeceği kadar belirgin, ama dikkat dağıtmayacak kadar sınırlı olmalı.
+
+### 5. Gölge önce iniyor
+
+Bir zıplamada amcanın gölgesi ondan önce sonraki çatıda belirir. Amca normal şekilde inişini yapar; gölge ayaklarının altına geri döner.
+
+**Merak:** Gölgenin geleceği görüp görmediğini düşündürür; açıklama vermeden sonraki karşılaşmalara ipucu bırakabilir.
+
+**Zıplama:** Gölge dekoratif kalır; hedef, çarpışma veya iniş yardımı olarak kullanılmaz.
+
+**Maliyet:** Kod küçük-orta; yeni görsel gerekmeyebilir.
+
+**En büyük risk:** Gölge, oyuncu tarafından iniş işareti sanılırsa kontrol algısını değiştirir.
+
+### 6. Ters İstanbul — cüretkâr
+
+Bir nesneyi aldıktan sonra şehir birkaç saniyeliğine ters görünür: deniz yukarı, gökyüzü aşağı akar. Amca ve çatılar normal yönlerinde kalır; ardından sahne yerine oturur.
+
+**Merak:** Oyuncu, gözünün gördüğü şeye güvenemediği kısa bir an yaşar.
+
+**Zıplama:** Terslik yalnız arka plan katmanında uygulanır. Kontroller, karakter, kuleler ve kamera matematiği değişmez.
+
+**Maliyet:** Kod orta; mevcut arka plan katmanları kullanılabilirse görsel düşük.
+
+**En büyük risk:** Hızlı veya uzun bir dönüş rahatsız edebilir. Yazılar ve iniş yüzeyleri ters çevrilmemeli.
+
+### 7. Vapurun penceresindeki ikinci amca
+
+Uzakta geçen bir vapurun tek penceresinde amcanın silueti görünür. Birkaç kule sonra vapur yeniden geçer; bu kez pencerede siluet yoktur, sadece bırakılmış bir eşya vardır.
+
+**Merak:** “O muydu, başka biri mi; vapur nereye gidiyor?” sorularını küçük ipuçlarıyla büyütür.
+
+**Zıplama:** Olay uzak arka planda kalır; oynanabilir alana girmez.
+
+**Maliyet:** Kod orta; uzak ölçekte bir siluet için görsel düşük.
+
+**En büyük risk:** Oyuncu olayı kaçırabilir. Daha sık veya büyük gösterilirse de sıçrama odağını çalar.
+
+### 8. Çatılardaki imkânsız adres
+
+Bazı çatıların yanındaki küçük levhalarda kule numarası ileri gitmek yerine geriye sayar. Son levhada amcanın bulunduğu yerin adı görünür; bir sonraki karşılaşmada aynı levha “Daha gelmedin” der.
+
+**Merak:** Şehir oyuncunun rotasını önceden biliyor gibi hissettirir; kısa metin, açıklamadan çok soru bırakır.
+
+**Zıplama:** Levhalar cephe dekorudur, kule üstüne veya iniş alanına taşmaz.
+
+**Maliyet:** Kod düşük-orta; tabela varlıkları gerekiyorsa görsel düşük.
+
+**En büyük risk:** Küçük ekranda metin okunmazsa gizem çalışmaz; gerçek adres izlenimi de vermemeli.
+
+## Editörlerin ortak değerlendirmesi
+
+İki editör de **“başka bir İstanbul’a geçişi”** en güçlü yön olarak seçti. Bir görüş, aynı sıçramayla su altı Boğaz’ına geçişi; diğeri ise bilet gibi farklı bir nesnenin açtığı alternatif şehir manzarasını önerdi. Ortak tasarım ilkesi şu: oyuncu gerçekten “başka yere geldiğini” hissetsin, fakat bu his kule dizisinin veya sıçrama kontrolünün değişmesine bağlı olmasın.
+
+Gölge ve ters şehir gibi fikirler daha ucuz prototiplenebilir; ancak merak uyandırma gücü ve paylaşılabilir tek kare potansiyeli bakımından ışınlanma fikrinin gerisinde kalıyor.
+
+## Benim 1 numaram ve ilk deneme
+
+**1 numaram: Başka İstanbul’a açılan kapı.** Kullanıcının ışınlanma fikrini ciddiye alıyor ve “orası neresi?” sorusunu doğrudan kuruyor. Ayrıca sahne değişimiyle sınırlanırsa kurukafanın mevcut iniş alanı etkisini tekrar etmez ve zıplamanın çekirdeğine dokunmaz.
+
+**En küçük ilk sürüm:** Kurukafadan ayrı, seyrek görünen tek bir nesne seç. Toplandığında 3–5 saniye boyunca sadece fon rengini ve kıyı siluetini değiştir; tek bir belirgin anomali ekle, örneğin uzakta iki Kız Kulesi görünmesi. Kuleler, fizik, kamera ve puan aynı kalsın. Yeni görsel üretimine geçmeden önce mevcut sahne varlıklarıyla kaba bir ekran denemesinde şu iki şeyi değerlendir: Oyuncu bunun başka bir yer olduğunu anlıyor mu ve sonraki inişini hâlâ rahat okuyabiliyor mu?
+2026-11-27T08:22:06.265880Z ERROR codex_core::session: failed to record rollout items: thread 01a21c17-2505-74e2-ab57-475a3eddd337 not found
+2026-11-27T08:22:06.266074Z ERROR codex_core::session: failed to record rollout items: thread 01a21c17-2505-74e2-ab57-475a3eddd337 not found
+tokens used
+65.668
+# MERAK-2026-11-27 — Editör değerlendirme raporu
+
+Depodaki `jump.ts`, `landing.ts` ve `procedural-course.ts` mevcut sınırı netleştiriyor: zıplama, iniş, kule dizisi ve kamera aynı kalmalı. Bu yüzden öneriler, **oyuncuyu başka bir yerdeymiş gibi hissettiren sahne ve kural katmanları** üzerine kurulu. İki bağımsız editör de ışınlanma fikrini güçlü buldu; ortak şartları, geçişin zıplama matematiğini ve iniş okunurluğunu etkilememesi.
+
+**Maliyet notu:** Kod ve yeni görsel ihtiyacını ayrı belirttim. Görsel üretimi bu raporun kapsamına dahil değil.
+
+## Fikirler
+
+### 1. Başka İstanbul’a açılan kapı — cüretkâr
+
+Yeni bir nesneye değince görüntü bir an dalgalanıyor. Amca aynı zıplamayı tamamlıyor; inişten sonra tanıdık Boğaz’ın yerinde, kıyısı benzer ama silueti imkânsız başka bir İstanbul görüyorsun.
+
+**Merak:** “Nereye geldim, bu şehir nerede?” sorusu doğurur; kısa bir ekran görüntüsü bile arkadaşlara anlatılacak bir an yaratabilir.
+
+**Zıplama:** Amcanın uçuşu, kulelerin konumu, kamera ve puan aynı kalır. Yalnız arka plan ve cephe görünümü geçici olarak değişir; “ışınlanma” sahne geçişiyle hissettirilir.
+
+**Maliyet:** Kod orta; ilk denemede mevcut varlıklarla görsel düşük, kalıcı sürümde 1–2 yeni fon veya siluet orta.
+
+**En büyük risk:** Yeni yer ayrı bir parkur gibi görünürse, oyuncu iniş düzeninin değişmesini bekleyebilir.
+
+### 2. Boğaz’ın su altındaki yüzü — cüretkâr
+
+Nesneyi topladığında gökyüzü su rengine döner, çatılar suyun altındaymış gibi görünür. Amca aynı çatılara zıplamayı sürdürürken, aşağıdaki yansımada farklı bir kıyı çizgisi belirir.
+
+**Merak:** Bu, gerçek bir yer değişiminden çok “Boğaz’ın altında başka bir şehir mi var?” hissi verir.
+
+**Zıplama:** Su efekti ve yansıma yalnız arka plan katmanında kalır. Kule kenarları ve amcanın iniş alanı net görünür.
+
+**Maliyet:** Kod orta; ilk denemede yeni görsel düşük, devamlı içerikte 1–2 fon varyantı orta.
+
+**En büyük risk:** Yansıma veya parıltı kule kenarlarını örterse iniş takibi zorlaşır.
+
+### 3. Haritada olmayan kıyı — cüretkâr
+
+Uzakta, mevcut haritada bulunmayan küçük bir mahalle görünür. Ona yaklaştığını sanırken kaybolur; başka bir koşuda kıyının farklı bir noktasında yeniden belirir.
+
+**Merak:** Oyuncuya peşine düşüp yerini bulma ve başkasına gösterme isteği verebilir.
+
+**Zıplama:** Mahalle yalnızca uzak fon çizimidir. Kule üretimi, konumlar ve kamera değişmez.
+
+**Maliyet:** Kod orta; bir yeni siluet ve birkaç konumlandırma varyantı için görsel düşük-orta.
+
+**En büyük risk:** Seyrek işaretler olmadan bir tasarım tercihi yerine çizim hatası sanılabilir.
+
+### 4. Yanlış gökyüzü
+
+Bir nesneyi aldıktan sonra gündüz göğünde yıldızlar görünür; deniz ve çatılar gündüz ışığında kalır. Birkaç sıçrama boyunca yıldızlar gökyüzünde aynı yerde durur, sonra görünüm kendiliğinden normale döner.
+
+**Merak:** “Gökyüzü başka bir zamandan mı sızdı?” sorusunu cevaplamadan bırakır.
+
+**Zıplama:** Gökyüzü ayrı dekor katmanıdır. Kuleler, kamera ve sıçrama aynı kalır.
+
+**Maliyet:** Kod düşük-orta; mevcut gece/gökyüzü varlıkları kullanılabilirse görsel düşük.
+
+**En büyük risk:** Etki mevcut gece-gündüz değişimiyle karıştırılabilir; oyuncunun fark edeceği kadar belirgin, ama dikkat dağıtmayacak kadar sınırlı olmalı.
+
+### 5. Gölge önce iniyor
+
+Bir zıplamada amcanın gölgesi ondan önce sonraki çatıda belirir. Amca normal şekilde inişini yapar; gölge ayaklarının altına geri döner.
+
+**Merak:** Gölgenin geleceği görüp görmediğini düşündürür; açıklama vermeden sonraki karşılaşmalara ipucu bırakabilir.
+
+**Zıplama:** Gölge dekoratif kalır; hedef, çarpışma veya iniş yardımı olarak kullanılmaz.
+
+**Maliyet:** Kod küçük-orta; yeni görsel gerekmeyebilir.
+
+**En büyük risk:** Gölge, oyuncu tarafından iniş işareti sanılırsa kontrol algısını değiştirir.
+
+### 6. Ters İstanbul — cüretkâr
+
+Bir nesneyi aldıktan sonra şehir birkaç saniyeliğine ters görünür: deniz yukarı, gökyüzü aşağı akar. Amca ve çatılar normal yönlerinde kalır; ardından sahne yerine oturur.
+
+**Merak:** Oyuncu, gözünün gördüğü şeye güvenemediği kısa bir an yaşar.
+
+**Zıplama:** Terslik yalnız arka plan katmanında uygulanır. Kontroller, karakter, kuleler ve kamera matematiği değişmez.
+
+**Maliyet:** Kod orta; mevcut arka plan katmanları kullanılabilirse görsel düşük.
+
+**En büyük risk:** Hızlı veya uzun bir dönüş rahatsız edebilir. Yazılar ve iniş yüzeyleri ters çevrilmemeli.
+
+### 7. Vapurun penceresindeki ikinci amca
+
+Uzakta geçen bir vapurun tek penceresinde amcanın silueti görünür. Birkaç kule sonra vapur yeniden geçer; bu kez pencerede siluet yoktur, sadece bırakılmış bir eşya vardır.
+
+**Merak:** “O muydu, başka biri mi; vapur nereye gidiyor?” sorularını küçük ipuçlarıyla büyütür.
+
+**Zıplama:** Olay uzak arka planda kalır; oynanabilir alana girmez.
+
+**Maliyet:** Kod orta; uzak ölçekte bir siluet için görsel düşük.
+
+**En büyük risk:** Oyuncu olayı kaçırabilir. Daha sık veya büyük gösterilirse de sıçrama odağını çalar.
+
+### 8. Çatılardaki imkânsız adres
+
+Bazı çatıların yanındaki küçük levhalarda kule numarası ileri gitmek yerine geriye sayar. Son levhada amcanın bulunduğu yerin adı görünür; bir sonraki karşılaşmada aynı levha “Daha gelmedin” der.
+
+**Merak:** Şehir oyuncunun rotasını önceden biliyor gibi hissettirir; kısa metin, açıklamadan çok soru bırakır.
+
+**Zıplama:** Levhalar cephe dekorudur, kule üstüne veya iniş alanına taşmaz.
+
+**Maliyet:** Kod düşük-orta; tabela varlıkları gerekiyorsa görsel düşük.
+
+**En büyük risk:** Küçük ekranda metin okunmazsa gizem çalışmaz; gerçek adres izlenimi de vermemeli.
+
+## Editörlerin ortak değerlendirmesi
+
+İki editör de **“başka bir İstanbul’a geçişi”** en güçlü yön olarak seçti. Bir görüş, aynı sıçramayla su altı Boğaz’ına geçişi; diğeri ise bilet gibi farklı bir nesnenin açtığı alternatif şehir manzarasını önerdi. Ortak tasarım ilkesi şu: oyuncu gerçekten “başka yere geldiğini” hissetsin, fakat bu his kule dizisinin veya sıçrama kontrolünün değişmesine bağlı olmasın.
+
+Gölge ve ters şehir gibi fikirler daha ucuz prototiplenebilir; ancak merak uyandırma gücü ve paylaşılabilir tek kare potansiyeli bakımından ışınlanma fikrinin gerisinde kalıyor.
+
+## Benim 1 numaram ve ilk deneme
+
+**1 numaram: Başka İstanbul’a açılan kapı.** Kullanıcının ışınlanma fikrini ciddiye alıyor ve “orası neresi?” sorusunu doğrudan kuruyor. Ayrıca sahne değişimiyle sınırlanırsa kurukafanın mevcut iniş alanı etkisini tekrar etmez ve zıplamanın çekirdeğine dokunmaz.
+
+**En küçük ilk sürüm:** Kurukafadan ayrı, seyrek görünen tek bir nesne seç. Toplandığında 3–5 saniye boyunca sadece fon rengini ve kıyı siluetini değiştir; tek bir belirgin anomali ekle, örneğin uzakta iki Kız Kulesi görünmesi. Kuleler, fizik, kamera ve puan aynı kalsın. Yeni görsel üretimine geçmeden önce mevcut sahne varlıklarıyla kaba bir ekran denemesinde şu iki şeyi değerlendir: Oyuncu bunun başka bir yer olduğunu anlıyor mu ve sonraki inişini hâlâ rahat okuyabiliyor mu?
