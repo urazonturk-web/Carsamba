@@ -4,6 +4,8 @@
 export const HAREKET_ON = true as boolean;
 /** 5 çizilmiş ara kare (itiş, açılma, toplanma, uzanma, çökme). false = paket 1 (3 uçuş çizimi + şarj kareleriyle çömelme). */
 export const ARA_KARE_ON = false as boolean;
+/** Tek sayfa 6 kare (UCUS-SAYFA 2026-11-27). false = paket 1. */
+export const SAYFA_ON = true as boolean;
 
 /** Yörüngeye eğilme sınırları (derece). + = öne (gidiş yönüne), - = geriye. */
 export const EGIM_ON_MAX = 12;
@@ -60,6 +62,19 @@ export function kolDurumu(airborne: boolean, idle: boolean, dususVar: boolean, v
     // uzun atış 7 kare: itiş → fırlama → açılma → süzülme → toplanma → dalış → uzanma.
     // Kalkış yüksekliğinin çok altına inince (r ≥ 1,3: büyük olasılıkla düşüş) kollar açık "eyvah".
     // GERI-DONUS (27.11 videosu "inanılmaz derecede kötü"; kullanıcı "Evet, ikisi de"): ara kareler kapalı → paket 1.
+    // UCUS-SAYFA (27.11, "Evet, bağla"): orta ve uzun atış tek sayfadaki 6 kareyle: 11 itiş, 12 yükseliş, 13 süzülme,
+    // 14 düşüşe geçiş, 15 uzanma (16 iniş çömelmesi yerde, kare döngüsü verir). r ≥ 1,3 (büyük olasılıkla düşüş) kollar açık.
+    if (SAYFA_ON && birakilan >= 0.2) {
+      if (r >= 1.3) return 1;
+      if (birakilan >= 0.4) {
+        if (r <= -0.8) return 11;
+        if (r <= -0.35) return 12;
+        if (r < 0.25) return 13;
+        if (r < 0.6) return 14;
+        return 15;
+      }
+      return r <= -0.6 ? 11 : r < 0.5 ? 14 : 15;
+    }
     if (!ARA_KARE_ON) {
       if (birakilan >= 0.4) return r <= -0.55 ? 3 : r < 0.3 ? 2 : r < 1.3 ? 4 : 1;
       return r > -0.6 ? 1 : 0;
@@ -87,9 +102,9 @@ export const GECIS_ESNE = 0.04;
 /** GECIS (19:57 videosu, "geçişler sert"; rapor ai_review_evidence/GECIS-VIDEO-2026-11-26/RAPOR.md, Paket 1).
  *  Çizimlerdeki gövde ekseni (derece, öne +): 0 şarj/duruş, 1 denge, 2 süzülme, 3 fırlama, 4 dalış.
  *  Poz değişiminde yeni çizim eski gövde açısıyla başlar, YÜZ noktası etrafında kendi açısına döner. */
-export const GOVDE_ACI = [3, 3, 25, 41, 20, 20, 30, 25, 8, 15];
+export const GOVDE_ACI = [3, 3, 25, 41, 20, 20, 30, 25, 8, 15, 0, 18, 25, 20, 3, 3, 10];
 /** Durum → REACTION_POSES k (1 tabanlı). */
-export const KOL_K = [0, 2, 4, 5, 6, 7, 8, 9, 10, 11];
+export const KOL_K = [0, 2, 4, 5, 6, 7, 8, 9, 10, 11, 0, 12, 13, 14, 15, 16, 17];
 export const TELAFI_MAX = 25;
 export const TELAFI_SONUM = 12; // 1/sn (~85 ms zaman sabiti)
 /** Uçuş pozlarında yüz noktası, pozun ayak/pivot noktasına göre (sprite px; süzülmede ölçüldü). */

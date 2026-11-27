@@ -1,0 +1,74 @@
+[
+ {
+  "kare": 1,
+  "ad": "itis",
+  "w": 852,
+  "h": 1191,
+  "pivotX": 397,
+  "pivotY": 1162,
+  "yuzAlan": 65930,
+  "yuzX": 211,
+  "yuzY": 819,
+  "ayakAlti": 0
+ },
+ {
+  "kare": 2,
+  "ad": "yukselis",
+  "w": 819,
+  "h": 1224,
+  "pivotX": 401,
+  "pivotY": 1172,
+  "yuzAlan": 60418,
+  "yuzX": 161,
+  "yuzY": 842,
+  "ayakAlti": -23
+ },
+ {
+  "kare": 3,
+  "ad": "suzulme",
+  "w": 1030,
+  "h": 1163,
+  "pivotX": 542,
+  "pivotY": 1193,
+  "yuzAlan": 60503,
+  "yuzX": 111,
+  "yuzY": 865,
+  "ayakAlti": 59
+ },
+ {
+  "kare": 4,
+  "ad": "dusus",
+  "w": 1004,
+  "h": 1233,
+  "pivotX": 544,
+  "pivotY": 1204,
+  "yuzAlan": 59109,
+  "yuzX": 61,
+  "yuzY": 887,
+  "ayakAlti": -1
+ },
+ {
+  "kare": 5,
+  "ad": "uzanma",
+  "w": 892,
+  "h": 1269,
+  "pivotX": 535,
+  "pivotY": 1241,
+  "yuzAlan": 59943,
+  "yuzX": 12,
+  "yuzY": 910,
+  "ayakAlti": 0
+ },
+ {
+  "kare": 6,
+  "ad": "comelme",
+  "w": 809,
+  "h": 1174,
+  "pivotX": 356,
+  "pivotY": 1147,
+  "yuzAlan": 61048,
+  "yuzX": 113,
+  "yuzY": 812,
+  "ayakAlti": 0
+ }
+]

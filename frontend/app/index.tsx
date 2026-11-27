@@ -61,7 +61,7 @@ import { MAHALLE_ON, MAHALLE_SPEECH_ON, CUMBA_SOURCE, CUMBA_KEDI_SOURCE, CUMBA_A
 import { OZEL_GUN_ON, OZEL_GUN_TEST_TAP, OZEL_GUNLER, OZEL_GUN_TEST_ORDER, todaysEvent } from "../src/game/ozelGun";
 import { RIG_ON, rigUcus, rigInis } from "../src/game/rig";
 import { RigAmca } from "../src/game/RigAmca";
-import { ARA_KARE_ON, GOVDE_ACI, TELAFI_MAX, TELAFI_SONUM, YUZ_DX, YUZ_DY, POZ_EN_AZ, INIS_TUT, INIS_SURE, DALIS_KAY } from "../src/game/hareket";
+import { ARA_KARE_ON, SAYFA_ON, GOVDE_ACI, TELAFI_MAX, TELAFI_SONUM, YUZ_DX, YUZ_DY, POZ_EN_AZ, INIS_TUT, INIS_SURE, DALIS_KAY } from "../src/game/hareket";
 import { kolDurumu, ARA_KARE_EGIM, GECIS_SONUM, GECIS_DONME, GECIS_ESNE, SUZUL_DALGA, SUZUL_NEFES, SUZUL_HZ } from "../src/game/hareket";
 import { HAREKET_ON, ucusEgim, ucusPoz, EGIM_HIZ, ESNE_BOY, ESNE_EN, SALLAN_DERECE, KABAR_ORAN, OHBE_MAX } from "../src/game/hareket";
 import BagajIstifi, { BAGAJ_ON, BAGAJ_TEST, BAGAJ_DURAK } from "../src/game/BagajIstifi";
@@ -393,7 +393,7 @@ const AnimatedImage = Animated.createAnimatedComponent(Image);
 const BG_SCROLL_TEST = true as boolean;
 const BG_SCROLL_RATIO = 0.45;
 const BG_SCROLL_TILES = 4;
-const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "PAKET 1 GERI") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
+const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "TEK SAYFA 6 KARE") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
 const DIAG_MAX_EXAMPLES = 6;
 const HOUSE_AB_FROZEN = false as boolean;
 // REVIZYON-066 experiment (one variable): expo-linear-gradient's iOS layer
@@ -2896,6 +2896,8 @@ export default function Game() {
       let kd = kolDurumu(havada, phase.value === PHASE.IDLE && inisCok.value < 0.01, dusus.value !== 0, vy.value, ucusV0.value, releasedCharge.value, kenar.value);
       // GECIS-ARA: orta/uzun atıştan inişin ilk ~130 ms'i çizilmiş çökme karesi; sonra şarj kareleriyle doğrulma.
       if (ARA_KARE_ON && phase.value === PHASE.IDLE && dusus.value === 0 && inisCok.value > 0.12 && releasedCharge.value >= 0.2) kd = 9;
+      // UCUS-SAYFA: orta/uzun atıştan inişin ilk anı sayfanın 6. karesi (çömelme); sonra şarj kareleriyle doğrulma.
+      if (SAYFA_ON && phase.value === PHASE.IDLE && dusus.value === 0 && inisCok.value > 0.12 && releasedCharge.value >= 0.2) kd = 16;
       // RIG: orta/uzun atışta uçuş ve iniş çökmesi parçalı amcayla (kıyafet/şapka/kirli yoksa; tepki pozu başlayınca biter).
       if (RIG_ON && BEDEN_ON) {
         const kiyafet = Math.max(rainWear.value, winterWear.value, pajama.value, dirty.value, umbVis.value, snowAmt.value, sapkaSV.value);

@@ -103,6 +103,16 @@ export const REACTION_POSES = [
   { source: require("@/assets/characters/beden/amca-ara-toplanma.png"), w: 1260, h: 1260, pivotX: 710, pivotY: 1227 },
   { source: require("@/assets/characters/beden/amca-ara-uzanma.png"), w: 514, h: 1098, pivotX: 210, pivotY: 1092 },
   { source: require("@/assets/characters/beden/amca-ara-cokme.png"), w: 558, h: 1141, pivotX: 278, pivotY: 1135 },
+  // UCUS-SAYFA (2026-11-27, kullanıcı kabul: "Evet, bağla"): Kıvılcım tek sayfada 6 kare (k 12–17; aynı çağrıda çizildi → aynı adam).
+  // Hücre 512 px ×2,5 (baş boyu charge-000 ile göz akı genişliğinden eşitlendi: 71 px / 28 px). Pivot: 1 itiş, 5 uzanma, 6 çömelme ayak tabanı
+  // pivot satırında, ayak ortası pivotun 86 px solunda (charge-000 gibi); 2–4 havada, yüz noktası 1 ile 5 arasında doğrusal.
+  // Ölçüm: ai_review_evidence/UCUS-SAYFA-2026-11-27/kareler.json.
+  { source: require("@/assets/characters/beden/amca-sayfa-1-itis.png"), w: 852, h: 1191, pivotX: 397, pivotY: 1162 },
+  { source: require("@/assets/characters/beden/amca-sayfa-2-yukselis.png"), w: 819, h: 1224, pivotX: 401, pivotY: 1172 },
+  { source: require("@/assets/characters/beden/amca-sayfa-3-suzulme.png"), w: 1030, h: 1163, pivotX: 542, pivotY: 1193 },
+  { source: require("@/assets/characters/beden/amca-sayfa-4-dusus.png"), w: 1004, h: 1233, pivotX: 544, pivotY: 1204 },
+  { source: require("@/assets/characters/beden/amca-sayfa-5-uzanma.png"), w: 892, h: 1269, pivotX: 535, pivotY: 1241 },
+  { source: require("@/assets/characters/beden/amca-sayfa-6-comelme.png"), w: 809, h: 1174, pivotX: 356, pivotY: 1147 },
 ] as const;
 
 /** Tepki pozu şu an görünür mü? Yalnız yerde (PHASE.IDLE) ve hiçbir kıyafet/efekt katmanı görünmüyorken.

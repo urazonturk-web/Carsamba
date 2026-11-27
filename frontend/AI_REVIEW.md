@@ -3440,3 +3440,11 @@ TASK: 27.11 09:30 telefon videosu, kullanıcı "inanılmaz derecede kötü olmu�
 EVIDENCE: Gözlem: ai_review_evidence/RIG-VIDEO-2026-11-27/yakin2.jpg (0:01.7–0:02.2): kollar/bacaklar gövdeye yapıştırılmış çıkartma gibi, ceket eteği belden ayrı bez gibi sallanıyor, toplanmada kollar göğüste çaprazlanıp düğüm oluyor, gövde başa göre ince.
 CHANGED: rig.ts RIG_ON=false; hareket.ts yeni ARA_KARE_ON=false → kolDurumu uzun atışta paket 1 kuralı (r≤−0,55 fırlama, <0,3 süzülme, <1,3 dalış, sonra kollar açık), DALIS_KAY 170 ve dalış kayması r 0,3→1; index.tsx çökme karesi (kd 9) yalnız ARA_KARE_ON iken. BUILD_TAG "PAKET 1 GERI"; telefona kuruldu (strings main.jsbundle eşleşti). Fizik/kamera/çarpışma değişmedi.
 OPEN_ISSUES: Simülatörde ayrıca oynatılmadı (kod 9e2a900 hâlindeki kuralın aynısı). Rig ve ara kare dosyaları depoda duruyor, anahtarla kapalı.
+
+## UCUS-SAYFA — tek sayfa 6 uçuş karesi oyuna bağlandı — 2026-11-27
+TASK: kullanıcı "Evet, bağla" (Kıvılcım'ın tek görselde çizdiği 6 kare).
+CHANGED: assets/characters/beden/amca-sayfa-{1-itis,2-yukselis,3-suzulme,4-dusus,5-uzanma,6-comelme}.png (REACTION_POSES k 12–17). hareket.ts SAYFA_ON=true: uzun atış r ≤ −0,8 itiş, ≤ −0,35 yükseliş, < 0,25 süzülme, < 0,6 düşüş, sonra uzanma; orta atış itiş → düşüş → uzanma; r ≥ 1,3 kollar açık (eski). index.tsx: orta/uzun atış inişinin ilk anı (inisCok > 0,12) 6. kare. GOVDE_ACI/KOL_K 11–16 eklendi. BUILD_TAG "TEK SAYFA 6 KARE". Fizik/kamera/çarpışma/puan değişmedi.
+1) Dosya: Kıvılcım ham çıktısı 1536×1024 (3×2 hücre, 512 px), alfa < 8 sıfırlandı, ×2,5 LANCZOS, kutuya kırpıldı.
+2) Ölçü/pivot: ölçek göz akı genişliğinden (charge-000 71 px, hücre 28 px → ×2,5; ilk deneme yüz-ten alanıyla ×2,7 çıktı, önizlemede baş büyük kaldı, düzeltildi). Pivot: 1, 5, 6 ayak tabanı pivot satırında, ayak ortası pivotun 86 px solunda; 2–4 yüz noktası 1 ile 5 arasında doğrusal. Sayılar kareler.json, görsel pivot-sira.jpg.
+3) Katman: mevcut ReactionLayer (aynı anda tek gövde); şarj pozları ucusKol ≥ 1 iken gizli.
+4) Risk: hücre kaynağı 512 px → ×2,5 büyütme, telefonda hafif yumuşak olabilir. Kıyafetli/kirli/şapkalı hâllerin sayfa karesi yok (o hâllerde eski kurallar). Simülatörde uzun zıplama görüldü (sim-yakin.jpg); 6. kare (çömelme) kenara inişte denge tepkisi öncelikli olduğu için bu kayıtta görünmedi. Telefonda video ile denetlenmedi.
