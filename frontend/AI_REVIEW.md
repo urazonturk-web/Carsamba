@@ -3454,3 +3454,8 @@ TASK: kullanıcı "bu şekilde daha iyi". Önceki isteklerin denetimi: geçiş s
 EVIDENCE: Gözlem: inis.jpg (telefon 7,45–8,05 sn): uzanma karesinden doğrudan ince şarj pozuna geçiyor, 6. kare (çömelme) yok. Ölçüm/kod: index.tsx inişte `releasedCharge.value = 0` çömelme kuralından önce çalışıyor → kd 16 (ve önceki kd 9) hiç tetiklenmemiş.
 CHANGED: index.tsx yeni sonAtis (inişte releasedCharge'ın son değeri), çömelme kuralı sonAtis ≥ 0,2'ye bakıyor. BUILD_TAG "TEK SAYFA 6 KARE + COMELME". Simülatörde iniş: 6. kare ~100 ms görünüyor, ardından kenar denge tepkisi (sim2-inis.jpg). Telefona kuruldu (strings eşleşti).
 OPEN_ISSUES: Aynı nedenle index.tsx'teki iniş çömelme derinliği (`releasedCharge.value < 0.25 ? 0.25 : …`) her zaman 0,25 seçiyor (eskiden beri); dokunulmadı, kullanıcı kararı bekliyor. Telefonda yeni paketle video çekilmedi.
+
+## INIS-DERINLIK — iniş çömelme derinliği düzeltildi — 2026-11-27
+TASK: kullanıcı "Evet, düzelt" (önceki bölümdeki OPEN_ISSUES).
+CHANGED: index.tsx iniş: `cok` artık sonAtis'e bakıyor (sonAtis < 0,25 → 0,25; sert > 1 → 0,5; değilse 0,375). Önceden releasedCharge burada 0 olduğu için her inişte 0,25 seçiliyordu. Orta/uzun atışta 6. kare (inisCok > 0,12) tahminen ~120 ms görünür (önce ~70 ms). BUILD_TAG "TEK SAYFA 6 KARE + DERIN INIS". Fizik/kamera/puan değişmedi (inisCok yalnız çizim).
+EVIDENCE: Simülasyon gözlemi sim3-inis.jpg: düz inişte uzanma → çömelme karesi (2 kare @20 fps) → doğrulma. Telefona kuruldu (strings eşleşti). Telefonda video çekilmedi.
