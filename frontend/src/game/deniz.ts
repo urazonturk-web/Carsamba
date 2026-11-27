@@ -7,7 +7,7 @@ import { CONFIG } from "./config";
 import { flightGravity, jumpVelocity } from "./jump";
 import { isStopTower } from "./stops";
 
-export const MARTI_ON = true as boolean;
+export const MARTI_ON = false as boolean; // 22:04 videosu: kullanıcı "bu fikri de beğenmedim" → "Evet, kapat"
 /** Gri kutu: her koşuda bu kuleden sonraki boşlukta simit (gerçek sürümde ilk koşu garantili, sonra seyrek). */
 export const MARTI_TETIK_ID = 1;
 /** Simit, prev→next yayının tepesinin bu kadar üstünde (dünya birimi; alçak = kolay). */

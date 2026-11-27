@@ -3509,3 +3509,9 @@ CHANGED:
 4) Kod: deniz.ts BOLUM_TEMA "carsi", carsiBolumu (bölgeye göre yükseklik/genişlik, erişim jumpVelocity/flightGravity ile, pay 0,12), bolumUret. index.tsx: anahtar yakalanınca bölüm listenin sonuna eklenir, amca anında ilk tonoza konur, kamera oraya oturur (camX/camXR), onLanding(+1). Dönüş: bölümden sonraki ilk kuleye basınca parlama ve carsiAktif 0. Hata düzeltmesi: kare sonundaki kule üretimi `list` yerine `platforms.value` okur (aynı karedeki ışınlanmada bölüm siliniyordu). Martı teması (BOLUM_TEMA "deniz") kodda duruyor.
 EVIDENCE: Simülasyon sonucu: ai_review_evidence/KAPALICARSI-2026-11-27/sim_carsi.cjs 200 tohum, 2000 yüzey çifti, üç ayak konumu; ulaşılamayan çift 0. Simülatör gözlemi: sim-anahtar-carsi.jpg (anahtar, geçiş, çarşı katmanları, parçalar), bölümde düşüşte sahile dönüş ve parlama görüldü. Telefona kuruldu (strings "KAPALICARSI" = 1). Telefonda denenmedi.
 4) Risk: parçaların altındaki duvarlar kodla çizilmiş bantlı kutular (geçici); han parçası/şeridin han kısmı İtalyan villasına benziyor; şerit 2172 px'ten ~3× büyütülüyor (yumuşak); bölüm 15. kuleye denk gelirse durak kulesinin üstünden geçiliyor.
+
+## KAPALICARSI-KAPAT — bölüm kapatıldı — 2026-11-27
+TASK: kullanıcı 22:04 videosu "bu fikri de beğenmedim" → "Evet, kapat".
+EVIDENCE (gözlem, ai_review_evidence/KAPALICARSI-VIDEO-2026-11-27/genel.jpg): çarşı bölümü çalışıyor; ama taş sütunlar kule gibi okunuyor ("aynı oyun, başka kaplama"), fener sisi (kimlik aralığına bağlı) çarşı bölümüne denk gelip manzarayı kararttı, geçiş parlaması kısa.
+CHANGED: deniz.ts MARTI_ON=false (tüm martı/çarşı yolları bu bayrakla kapalı). BUILD_TAG "TEK SAYFA 6 KARE + YUMUSAK DOGRULMA". Kalan tek ortak değişiklik: kare sonu kule üretimi `platforms.value` okur (aynı değer; davranış farkı yok). Telefona kuruldu.
+OPEN_ISSUES: fener sisi bölümlerle çakışabiliyordu (bayrak kapalıyken önemsiz). Süreç önerisi: yeni fikirler önce 4–6 karelik Kıvılcım şeridiyle onaylatılacak.
