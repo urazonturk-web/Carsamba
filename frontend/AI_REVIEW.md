@@ -3469,3 +3469,8 @@ EVIDENCE: Gözlem (App Store Connect, 10:2x): grup "5 Builds", 1.0.0 (6) Testing
 TASK: kullanıcı videoyu yorumsuz gönderdi. Önceki isteklerin denetimi: uçuş 6 kareyle akıyor (genel.jpg); iniş çömelme karesi artık görünüyor ve derin (inis1.jpg, 6,05–6,55 sn @30 fps: uzanma → çömelme ~5 kare ≈ 165 ms, landPulse ile basık → yerdeki çizim).
 EVIDENCE: Gözlem dikis.jpg (6,25 → 6,30 sn): sayfa çömelmesinden (geniş, derin) bir karede neredeyse dik, ince yerdeki şarj çizimine geçiş. Neden (kod): çömelme karesi inisCok > 0,12 iken; o anda şarj karesi round(0,12·8) = 1 (charge-012, neredeyse dik) → derin çömelmeden dik duruşa tek kare sıçrama. Ayrıca iki çizim üslubu farklı (sayfa daha tombul, saç daha kabarık).
 OPEN_ISSUES: (a) devir eşiğini yükseltmek (ör. inisCok ≤ 0,3 → charge-025/037'ye devir) tek sayı; (b) yerdeki pozların sayfa üslubunda yeniden çizimi kıyafet katmanlarını (yağmur/kış/pijama şarj çizimlerine hizalı) etkiler, büyük iş. Kullanıcı kararı bekliyor.
+
+## YUMUSAK-DOGRULMA — çömelmeden doğrulma yumuşatıldı — 2026-11-27
+TASK: kullanıcı "Evet, yumuşat" (VIDEO-1038 OPEN_ISSUES a).
+CHANGED: index.tsx kd 16 koşulu inisCok > 0,12 → > 0,25. Devirde şarj dizisi charge-025'ten (round(0,25·8)=2) başlar, sonra 012 → 000. Sayfa çömelmesi tahminen ~65 ms (c 0,375) / ~85 ms (c 0,5) görünür. sonAtis 0,20–0,25 arası atışlarda (c = 0,25) sayfa çömelmesi artık hiç gösterilmez. BUILD_TAG "TEK SAYFA 6 KARE + YUMUSAK DOGRULMA". Fizik değişmedi.
+EVIDENCE: Simülasyon gözlemi sim-dogrulma2.jpg: derin çömelme (2 kare) → dizler kırık şarj çizimi (1 kare) → dik. Simülatör kaydı değişken kare hızlı; telefonda video çekilmedi. Telefona kuruldu (strings eşleşti).
