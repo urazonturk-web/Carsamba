@@ -1,0 +1,22 @@
+Kıvılcım için — UCUS-SAYFA-2026-11-27: amcanın uçuşu, TEK SAYFADA 6 kare (Byzantion)
+
+Kullanıcı onayı: "Evet, ikisi de" (2026-11-27) — TAM 1 görsel üretim çağrısı. Yeniden deneme ya da ek varyasyon YAPMA; sorun çıkarsa dur ve tek satırla bildir.
+Neden tek sayfa: ayrı ayrı çizilen karelerde baş boyu, oran ve renk her seferinde değişti; geçişler bu yüzden sert göründü. Altı kare AYNI görselde çizilirse aynı adam olur.
+Ekli referanslar: charge-000-r12.png (duruş) ve amca-ucus-suzulme.png (süzülme) — aynı karakter, aynı üslup.
+
+Çıktı: bu klasöre amca-ucus-sayfa.png (şeffaf PNG; 3 sütun × 2 satır ızgara, her hücre eşit boy, en az 2400×1600 px toplam).
+
+İstem (İngilizce, olduğu gibi kullan):
+A single animation sprite sheet: 6 frames of ONE continuous jump of the same character, arranged in a 3-column × 2-row grid of equal-size cells, read left-to-right, top row then bottom row. Transparent background, no grid lines, no numbers, no text, no ground, no shadow, no dust, no motion lines, no effects.
+Character (identical in every frame, copy the attached references exactly): comic-book caricature, thick black ink outlines, soft cel shading. Middle-aged Istanbul neighbourhood uncle: oversized head (about 45% of body height), big bulbous nose, thick black walrus moustache, messy curly black hair, stubble, heavy-lidded eyes. Maroon tracksuit with two white stripes along sleeves and legs, zip-up jacket, white sneakers. Strict side profile facing RIGHT in every frame.
+Consistency rules (most important): the head is the exact same size, same face drawing and same calm deadpan expression in all 6 frames; same body proportions, same line weight, same colours. Only the limbs, torso tilt and the jacket hem change. The jacket stays zipped; only its lower hem flutters slightly. Each figure is centred in its cell at the same scale, nothing cropped, generous empty margin around each figure.
+Frames (smooth in-betweens of one motion, each pose only a small step from the previous one):
+1. Push-off: body leaning forward about 15°, knees bent, toes just leaving the ground, arms swinging back behind the hips.
+2. Rising: body tilted forward about 25°, both legs trailing straight down and slightly back, arms coming forward at chest height.
+3. Glide at the top: torso tilted about 20° forward, near arm extended forward palm down, far arm back, legs in a relaxed scissor (front knee raised, back leg extended).
+4. Starting to fall: torso upright, arms spread out to the sides at shoulder height for balance, knees lifting slightly, legs together.
+5. Reaching for the ground: torso upright, legs extended down with knees slightly bent, feet together and flat, arms out low to the sides, palms down.
+6. Landing crouch: feet flat on an invisible floor, knees bent deeply, torso leaning slightly forward, arms forward low for balance.
+
+Kurallar: film ya da karakter adı yok; Arapça ünlem/dini motif yok. Oyun koduna dokunma; kullanıcı kabul etmeden oyuna girmez.
+Bitince tek satır: dosya adı, boyut, sorun var mı.
