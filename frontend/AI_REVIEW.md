@@ -3434,3 +3434,9 @@ EVIDENCE:
 2. Ölçü/pivot: eklemler alfa ağırlık merkezinden (eklemler.json); ölçek RIG_K 1,437 (baş yüz alanı charge-000 ile eşit), uzuvlar ×0,8; kalça ayak noktasının RIG_DX −100 solunda, bacak boyu kadar üstünde.
 3. Katman: ChargePoses ile aynı charOpStyle sarmalayıcısı içinde, ondan sonra.
 4. Risk: yer↔hava geçişinde çizim ↔ rig değişimi (aynı baş ama gövde inceliği farklı); kıyafet sürümleri yok; açılar göz kararı (onizle.py ile önizlendi); 13 ek görüntü katmanı telefonda ölçülmedi. Simülatör: sim-rig-30fps.jpg, sim-rig-ucus.jpg (sürekli hareket, poz atlaması yok). Telefona kuruldu; kullanıcı videosuyla doğrulanmadı.
+
+## GERI-DONUS — parçalı amca kapatıldı — 2026-11-27
+TASK: 27.11 09:30 telefon videosu, kullanıcı "inanılmaz derecede kötü olmuş"; "Evet, ikisi de" (paket 1'e dön + tek sayfa 6 kare çizdir).
+EVIDENCE: Gözlem: ai_review_evidence/RIG-VIDEO-2026-11-27/yakin2.jpg (0:01.7–0:02.2): kollar/bacaklar gövdeye yapıştırılmış çıkartma gibi, ceket eteği belden ayrı bez gibi sallanıyor, toplanmada kollar göğüste çaprazlanıp düğüm oluyor, gövde başa göre ince.
+CHANGED: rig.ts RIG_ON=false; hareket.ts yeni ARA_KARE_ON=false → kolDurumu uzun atışta paket 1 kuralı (r≤−0,55 fırlama, <0,3 süzülme, <1,3 dalış, sonra kollar açık), DALIS_KAY 170 ve dalış kayması r 0,3→1; index.tsx çökme karesi (kd 9) yalnız ARA_KARE_ON iken. BUILD_TAG "PAKET 1 GERI"; telefona kuruldu (strings main.jsbundle eşleşti). Fizik/kamera/çarpışma değişmedi.
+OPEN_ISSUES: Simülatörde ayrıca oynatılmadı (kod 9e2a900 hâlindeki kuralın aynısı). Rig ve ara kare dosyaları depoda duruyor, anahtarla kapalı.

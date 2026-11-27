@@ -2094,3 +2094,4 @@ TESLIM_HAZIR: TestFlight 1.0.0 (5) arkadaşlarda — Testing.
 TESLIM_HAZIR: GECIS-ARA-2026-11-26 — Kıvılcım 5 ara kare (itiş, açılma, toplanma, uzanma, çökme) önizleme: ai_review_evidence/GECIS-ARA-2026-11-26/sira.jpg; oyuna bağlanmadı, kullanıcı kabulü bekleniyor.
 TESLIM_HAZIR: GECIS-ARA-2026-11-26 — 5 ara kare oyunda (ARA KARELER; ai_review_evidence/GECIS-ARA-2026-11-26/sim-ara-kareler.jpg); telefon videosu bekleniyor.
 TESLIM_HAZIR: RIG-2026-11-26 — parçalı amca uçuşu telefonda (PARCALI AMCA; ai_review_evidence/RIG-2026-11-26/); telefon videosu bekleniyor.
+TESLIM_HAZIR: GERI-DONUS-2026-11-27 — 27.11 telefon videosu ("inanılmaz derecede kötü"): parçalı amca (RIG_ON) ve 5 ara kare (ARA_KARE_ON) kapatıldı, uçuş paket 1 hâline döndü; telefonda "PAKET 1 GERI"; kanıt ai_review_evidence/RIG-VIDEO-2026-11-27/; tek sayfa 6 kare Kıvılcım önizlemesi kullanıcı kabulünü bekliyor.

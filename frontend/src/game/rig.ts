@@ -2,7 +2,7 @@
 // Amcanın uçuşu parçalı (iskelet) animasyon: baş, gövde, ceket eteği, kol, bacak eklemlerden döner; pozlar
 // yalnız açı tablosudur ve her karede yumuşak karışır → ani resim değişimi yok, baş/yüz hep aynı.
 // YALNIZ ÇİZİM: fizik, kamera, çarpışma, puan okumaz/yazmaz. RIG_ON false → bugünkü çizimli uçuş.
-export const RIG_ON = true as boolean;
+export const RIG_ON = false as boolean; // 27.11 telefon videosu: kâğıt kukla görünümü, kapatıldı
 
 /** Parça sayfası pikselinden poz pikseline (charge-000 ile aynı baş boyu; yüz alanından ölçüldü). */
 export const RIG_K = 1.437;
