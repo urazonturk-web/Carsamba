@@ -101,6 +101,7 @@ function hideOpening() {
 }
 setTimeout(hideOpening, 6000); // güvenlik: bir şey takılırsa açılış ekranında kalmasın
 const MENU_ON = true; // açılış menüsü
+import { MARTI_ON, MARTI_TETIK_ID, SIMIT_LIFT, SIMIT_SIZE, SIMIT_HIT_R, TASIMA_MS, TASIMA_YAY, PHASE_CARRIED, BOLUM_N, KONTEYNER_N, bolumSigar, denizBolumu, denizX, hareketliListe } from "../src/game/deniz";
 import { KURUKAFA_ON, SKULL_SOURCE, SKULL_SIZE, SKULL_HIT_R, skullTouches, skullAfter, skullLift, skullPoint, scaledPlatforms, rollSkullEffect } from "../src/game/kurukafa";
 import { referencePlatform, referenceTowerWidth } from "../src/game/reference-course";
 import { generateProceduralPlatform, mulberry32Step, classifyPlatformVisualType, ROOFTOP_GROUND_Y, type PlatformVisualType } from "../src/game/procedural-course";
@@ -393,7 +394,7 @@ const AnimatedImage = Animated.createAnimatedComponent(Image);
 const BG_SCROLL_TEST = true as boolean;
 const BG_SCROLL_RATIO = 0.45;
 const BG_SCROLL_TILES = 4;
-const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "TEK SAYFA 6 KARE + YUMUSAK DOGRULMA") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
+const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "MARTI KAPTI (GRI KUTU)") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
 const DIAG_MAX_EXAMPLES = 6;
 const HOUSE_AB_FROZEN = false as boolean;
 // REVIZYON-066 experiment (one variable): expo-linear-gradient's iOS layer
@@ -731,6 +732,7 @@ const FART_FEET_DX = SOLE_CENTER_OFFSET + ANCHOR_SHIFT_PX * SPRITE_SCALE;
 const FART_HIP = FART_CHAR_H * 0.27;
 const FART_BACK = FART_CHAR_H * 0.11;
 const FART_BOX = FART_CHAR_H * 0.45;
+const MARTI_SOURCE = require("@/assets/environment/ambient/marti.png");
 const POOL = 14; // fixed pool of platform views (only ~5 are visible at once)
 const POOL_IDX = Array.from({ length: POOL }, (_, i) => i);
 // REVIZYON-060: a pool slot shows the platform whose id % POOL equals the
@@ -1694,6 +1696,26 @@ export default function Game() {
   const effectK = useSharedValue(1); // 1.2 / 0.8 / 1
   const effectLeft = useSharedValue(0); // kalan iniş
   const skullBob = useSharedValue(0); // süzülme (0..1 döngü)
+  // MARTI KAPTI (gri kutu): simit, taşınma, deniz bölümü.
+  const simitX = useSharedValue(0);
+  const simitY = useSharedValue(0);
+  const simitVis = useSharedValue(0);
+  const simitAlindi = useSharedValue(0);
+  const martiIzin = useSharedValue(1); // yarış/meydan okumada 0
+  const tasT0 = useSharedValue(0);
+  const tasX0 = useSharedValue(0);
+  const tasY0 = useSharedValue(0);
+  const tasX1 = useSharedValue(0);
+  const tasY1 = useSharedValue(0);
+  const tasId = useSharedValue(-1);
+  const tasU = useSharedValue(-1); // -1 taşınmıyor, 0..1 taşınma ilerleyişi (martı çizimi)
+  const denizT = useSharedValue(0); // kayıkların saati (sn)
+  const denizIlk = useSharedValue(-1);
+  const denizSon = useSharedValue(-1);
+  const govdeX0 = useSharedValue(0);
+  const govdeX1 = useSharedValue(0);
+  const govdeY = useSharedValue(0);
+  const ayakOfs = useSharedValue(0);
   useEffect(() => {
     if (KURUKAFA_ON) skullBob.value = withRepeat(withTiming(1, { duration: 1600, easing: Easing.linear }), -1, false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1866,6 +1888,7 @@ export default function Game() {
       baseY.value = first.topY;
       kAmcaX.value = first.x + first.width * 0.55; // kargalar baştan amcaya dönük
       phase.value = PHASE.IDLE;
+      if (MARTI_ON) { simitVis.value = 0; simitAlindi.value = 0; tasU.value = -1; tasId.value = -1; denizIlk.value = -1; denizSon.value = -1; govdeX1.value = govdeX0.value; ayakOfs.value = 0; }
 
       if (USE_FIXED_PANEL_COURSE) {
         // GORSEL-017: the entire course for this delivery IS this fixed
@@ -2344,6 +2367,7 @@ export default function Game() {
     setGameOver(false);
     setMenuOpen(false);
     setPerfectVisible(false);
+    if (MARTI_ON) martiIzin.value = (YARIS_ON && raceRef.current && !raceRef.current.ended) || (MEYDAN_ON && challengeRef.current) ? 0 : 1;
     if (YARIS_ON && raceRef.current && !raceRef.current.ended) {
       initWorld(raceRef.current.seed);
     } else if (MEYDAN_ON && challengeRef.current) {
@@ -2946,6 +2970,52 @@ export default function Game() {
     fps.value = fps.value * 0.9 + (1 / dt) * 0.1;
     const list = platforms.value;
 
+    // MARTI KAPTI: kayık saati, kayıkta dururken amca kayıkla gider, simit yerleşimi, martıyla taşınma.
+    if (MARTI_ON) {
+      denizT.value += dt;
+      if ((phase.value === PHASE.IDLE || phase.value === PHASE.CHARGING) && denizIlk.value >= 0) {
+        for (let i = 0; i < list.length; i++) {
+          const q = list[i];
+          if (q.id === standingPlatformId.value) { if (q.amp) px.value = denizX(q, denizT.value) + ayakOfs.value; break; }
+        }
+      }
+      let sv = 0;
+      if (simitAlindi.value === 0 && martiIzin.value === 1 && lastLandedId.value <= MARTI_TETIK_ID) {
+        let a: any = null, b: any = null;
+        for (let i = 0; i < list.length; i++) {
+          if (list[i].id === MARTI_TETIK_ID) a = list[i];
+          else if (list[i].id === MARTI_TETIK_ID + 1) b = list[i];
+        }
+        if (a && b) {
+          const sp = skullPoint(a, b, PH / 2, W, SIMIT_LIFT);
+          simitX.value = sp.x;
+          simitY.value = sp.y;
+          sv = 1;
+        }
+      }
+      simitVis.value = sv;
+      if (phase.value === PHASE_CARRIED) {
+        const u = Math.min(1, (frame.timestamp - tasT0.value) / TASIMA_MS);
+        const e = u * u * (3 - 2 * u);
+        tasU.value = u;
+        px.value = tasX0.value + (tasX1.value - tasX0.value) * e;
+        py.value = tasY0.value + (tasY1.value - tasY0.value) * e - TASIMA_YAY * Math.sin(Math.PI * u);
+        if (u >= 1) {
+          tasU.value = -1;
+          px.value = tasX1.value;
+          py.value = tasY1.value;
+          baseY.value = tasY1.value + PH / 2;
+          phase.value = PHASE.IDLE;
+          standingPlatformId.value = tasId.value;
+          standingPlatformIsChimney.value = false;
+          ayakOfs.value = 0;
+          lastLandedId.value = tasId.value;
+          landPulse.value = withSequence(withTiming(0.6, { duration: 45 }), withTiming(-0.12, { duration: 85 }), withTiming(0, { duration: 100 }));
+          runOnJS(onLanding)(0, 1, tasId.value, 0.5);
+        }
+      }
+    }
+
     // --- charge ---
     // Recomputed fresh from timestamps every frame instead of accumulating a
     // per-frame delta. This removes drift AND the charge-start boundary
@@ -3052,11 +3122,48 @@ export default function Game() {
         }
       }
 
-      if (vy.value > 0) {
-        const landList = KURUKAFA_ON && effectLeft.value > 0 ? scaledPlatforms(list, effectK.value) : list;
+      // MARTI KAPTI: simide değince martı kapar; deniz bölümü listenin sonuna eklenir, amca oraya taşınır.
+      if (MARTI_ON && simitVis.value === 1) {
+        const feetY = py.value + PH / 2;
+        const bodyCx = px.value + SOLE_CENTER_OFFSET;
+        const last = list[list.length - 1];
+        if (last && bolumSigar(idCounter.value) && skullTouches(simitX.value, simitY.value, SIMIT_SIZE * SIMIT_HIT_R, bodyCx - CHAR_BODY_HALF_W, feetY - FART_CHAR_H, bodyCx + CHAR_BODY_HALF_W, feetY)) {
+          const seg = denizBolumu(last, idCounter.value, runSeed.value, W);
+          idCounter.value += BOLUM_N;
+          platforms.value = list.concat(seg);
+          denizIlk.value = seg[0].id;
+          denizSon.value = seg[seg.length - 1].id;
+          let gx1 = seg[0].x;
+          let gy = -1e9;
+          for (let k = 0; k < KONTEYNER_N; k++) { gx1 = seg[k].x + seg[k].width; if (seg[k].topY > gy) gy = seg[k].topY; }
+          govdeX0.value = seg[0].x - 90;
+          govdeX1.value = gx1 + 140;
+          govdeY.value = gy + 40;
+          simitAlindi.value = 1;
+          simitVis.value = 0;
+          tasT0.value = frame.timestamp;
+          tasX0.value = px.value;
+          tasY0.value = py.value;
+          tasX1.value = seg[0].x + seg[0].width / 2;
+          tasY1.value = seg[0].topY - PH / 2;
+          tasId.value = seg[0].id;
+          tasU.value = 0;
+          lastLandedId.value = seg[0].id - 1;
+          vx.value = 0;
+          vy.value = 0;
+          dusus.value = 0;
+          phase.value = PHASE_CARRIED;
+          runOnJS(showThought)("Bırak simidimi!");
+        }
+      }
+
+      if (vy.value > 0 && phase.value === PHASE.AIRBORNE) {
+        const effList = MARTI_ON && denizIlk.value >= 0 ? hareketliListe(list, denizT.value) : list;
+        const landList = KURUKAFA_ON && effectLeft.value > 0 ? scaledPlatforms(effList, effectK.value) : effList;
         const contact = findFootLanding(landList, prevX, px.value, prevBottom, newBottom, CHARACTER_WIDTH * 0.8);
         if (contact) {
-          const p = list[contact.index];
+          const p = effList[contact.index];
+          if (MARTI_ON) ayakOfs.value = contact.x - p.x;
           const cx = contact.x;
           if (HAREKET_ON) {
             // Görünen kenar (Kurukafa ölçekli liste dahil): ayak bu kulede %15'ten az pay bıraktıysa kenarda.
@@ -3200,7 +3307,8 @@ export default function Game() {
       // DÜŞÜŞ (yalnız görüntü): ayak, inişin kullandığı listedeki tüm yüzeylerin altına indiyse düşüş kesin → çırpınma.
       if (DUSUS_ON && phase.value === PHASE.AIRBORNE) {
         if (dusus.value === 0) {
-          const ll = KURUKAFA_ON && effectLeft.value > 0 ? scaledPlatforms(list, effectK.value) : list;
+          const el = MARTI_ON && denizIlk.value >= 0 ? hareketliListe(list, denizT.value) : list;
+          const ll = KURUKAFA_ON && effectLeft.value > 0 ? scaledPlatforms(el, effectK.value) : el;
           if (dususKesin(vy.value, py.value + PH / 2, ll)) { dusus.value = 1; dususAt.value = frame.timestamp; }
         } else {
           const kare = 1 + (Math.floor((frame.timestamp - dususAt.value) / DUSUS_KARE_MS) % 2);
@@ -3212,9 +3320,38 @@ export default function Game() {
       // End a missed jump after the player has left the VISIBLE fixed-Y
       // camera, not after crossing the now-independent physics camera.
       if ((py.value - camYR.value) * CONFIG.cameraZoom > H + 60) {
-        phase.value = PHASE.DEAD;
-        running.value = 0;
-        runOnJS(onGameOver)();
+        let kurtar: any = null;
+        if (MARTI_ON && denizIlk.value >= 0 && lastLandedId.value >= denizIlk.value - 1 && lastLandedId.value < denizSon.value + 1) {
+          let sonP: any = null;
+          for (let i = 0; i < list.length; i++) {
+            if (list[i].id === denizSon.value + 1) kurtar = list[i];
+            if (list[i].id === denizSon.value) sonP = list[i];
+          }
+          // Bölümden sonraki kule henüz üretilmediyse şimdi üret (yalnız sıradaki id ise; ana üreticiyle).
+          if (!kurtar && sonP && idCounter.value === denizSon.value + 1 && list[list.length - 1].id === denizSon.value) {
+            kurtar = makeNextPlatform(sonP, idCounter.value);
+            idCounter.value += 1;
+            platforms.value = list.concat([kurtar]);
+          }
+        }
+        if (kurtar) {
+          // ŞIP: denizde düşmek cezasız; amca bölümden sonraki ilk kulede belirir (puan yok, koşu sürer).
+          px.value = kurtar.x + kurtar.width / 2;
+          py.value = kurtar.topY - PH / 2;
+          vx.value = 0;
+          vy.value = 0;
+          baseY.value = kurtar.topY;
+          phase.value = PHASE.IDLE;
+          dusus.value = 0;
+          lastLandedId.value = kurtar.id;
+          standingPlatformId.value = kurtar.id;
+          ayakOfs.value = 0;
+          runOnJS(showThought)("Şıp! Islandık ama devam.");
+        } else {
+          phase.value = PHASE.DEAD;
+          running.value = 0;
+          runOnJS(onGameOver)();
+        }
       }
     }
 
@@ -3455,6 +3592,23 @@ export default function Game() {
     transform: [{ translateX: doorX.value - DOOR_W / 2 }, { translateY: doorBottom.value - DOOR_H }],
   }));
   const doorOpenStyle = useAnimatedStyle(() => ({ opacity: doorOpen.value }));
+  // MARTI KAPTI (gri kutu) çizimleri: simit halkası, taşıyan martı, gemi gövdesi.
+  const simitStyle = useAnimatedStyle(() => {
+    const a = skullBob.value * Math.PI * 2;
+    return { opacity: simitVis.value, transform: [{ translateX: simitX.value - SIMIT_SIZE / 2 }, { translateY: simitY.value - SIMIT_SIZE / 2 + Math.sin(a) * 6 }, { rotate: `${Math.sin(a) * 10}deg` }] };
+  });
+  const MARTI_W = 230;
+  const MARTI_H = (MARTI_W * 103) / 222;
+  const martiStyle = useAnimatedStyle(() => {
+    const on = tasU.value >= 0 ? 1 : 0;
+    const cx = px.value + SOLE_CENTER_OFFSET;
+    const top = py.value + PH / 2 - FART_CHAR_H - MARTI_H * 0.55;
+    return { opacity: on, transform: [{ translateX: cx - MARTI_W / 2 }, { translateY: top }, { scaleY: 0.75 + 0.25 * Math.sin(denizT.value * 16) }] };
+  });
+  const govdeStyle = useAnimatedStyle(() => {
+    const on = denizIlk.value >= 0 && govdeX1.value > govdeX0.value ? 1 : 0;
+    return { opacity: on, width: Math.max(0, govdeX1.value - govdeX0.value), transform: [{ translateX: govdeX0.value }, { translateY: govdeY.value }] };
+  });
   const skullStyle = useAnimatedStyle(() => {
     const a = skullBob.value * Math.PI * 2;
     return {
@@ -4062,6 +4216,12 @@ export default function Game() {
             effectK={KURUKAFA_ON ? effectK : undefined}
           />
         ))}
+        {MARTI_ON && (
+          <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, height: 900, backgroundColor: "#2b3a4a", borderTopWidth: 10, borderTopColor: "#9b2d22" }, govdeStyle]}>
+            <View style={{ position: "absolute", left: 0, right: 0, top: 70, height: 8, backgroundColor: "#e8e2d0" }} />
+          </Animated.View>
+        )}
+        {MARTI_ON && POOL_IDX.map((i) => <DenizSlot key={`deniz-${i}`} index={i} platforms={platforms} denizT={denizT} govdeY={govdeY} />)}
         {HEDEF_PARILTI && (
           <Animated.View style={[styles.targetGlow, targetGlowStyle]}>
             <LinearGradient pointerEvents="none" colors={["rgba(255,236,170,0)", "rgba(255,226,140,0.55)", "rgba(255,248,214,0.95)"]} locations={[0, 0.75, 1]} style={styles.houseGradFill} />
@@ -4119,6 +4279,16 @@ export default function Game() {
             {[fly0, fly1, fly2].map((st, i) => (
               <Animated.View key={i} style={[{ position: "absolute", left: -3, top: -3, width: 9, height: 7, borderRadius: 4, backgroundColor: "#141414" }, st]} />
             ))}
+          </Animated.View>
+        )}
+        {MARTI_ON && (
+          <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, width: SIMIT_SIZE, height: SIMIT_SIZE, borderRadius: SIMIT_SIZE / 2, borderWidth: SIMIT_SIZE * 0.28, borderColor: "#b9772f" }, simitStyle]}>
+            <View style={{ position: "absolute", left: -SIMIT_SIZE * 0.28, top: -SIMIT_SIZE * 0.28, width: SIMIT_SIZE, height: SIMIT_SIZE, borderRadius: SIMIT_SIZE / 2, borderWidth: 3, borderColor: "#6e3f14", borderStyle: "dotted" }} />
+          </Animated.View>
+        )}
+        {MARTI_ON && (
+          <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, width: MARTI_W, height: MARTI_H }, martiStyle]}>
+            <Image source={MARTI_SOURCE} resizeMode="stretch" fadeDuration={0} style={{ width: "100%", height: "100%" }} />
           </Animated.View>
         )}
         {KURUKAFA_ON && (
@@ -5080,7 +5250,7 @@ const PlatformHouseView = memo(function PlatformHouseView({ index, platforms, st
   const geom = (list: any[]) => {
     "worklet";
     const p = slotPlatform(list, index);
-    if (!p) return null;
+    if (!p || p.deniz) return null;
     const r = houseRun(p, platformById(list, p.id - 1), platformById(list, p.id + 1));
     return { p, r, rise: r * HOUSE_HIP_SLOPE, fw: p.width + 2 * r };
   };
@@ -5488,6 +5658,26 @@ const PopupHouseView = memo(function PopupHouseView({ index, platforms, styles }
   );
 });
 
+// MARTI KAPTI (gri kutu): deniz bölümü yüzeyleri. 1 konteyner istifi (güverteye kadar), 2 sallanan kayık, 3 iskele.
+const KONTEYNER_RENK = ["#c0392b", "#2e6da4", "#2f8f5b", "#d08a26"];
+const DenizSlot = memo(function DenizSlot({ index, platforms, denizT, govdeY }: any) {
+  const st = useAnimatedStyle(() => {
+    const p = slotPlatform(platforms.value, index);
+    if (!p || !p.deniz) return { opacity: 0, transform: [{ translateX: -99999 }, { translateY: -99999 }] };
+    const x = denizX(p, denizT.value);
+    const h = p.deniz === 1 ? Math.max(40, govdeY.value - p.topY + 12) : p.deniz === 2 ? 46 : 520;
+    const bg = p.deniz === 1 ? KONTEYNER_RENK[p.renk % 4] : p.deniz === 2 ? "#8a5a2b" : "#6d5a46";
+    const rot = p.deniz === 2 ? Math.sin(p.w * denizT.value * 1.3 + p.ph) * 3 : 0;
+    return { opacity: 1, width: p.width, height: h, backgroundColor: bg, transform: [{ translateX: x }, { translateY: p.topY }, { rotate: `${rot}deg` }] };
+  });
+  return (
+    <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, borderTopWidth: 6, borderTopColor: "rgba(255,255,255,0.55)", borderLeftWidth: 2, borderRightWidth: 2, borderColor: "rgba(0,0,0,0.35)" }, st]}>
+      <View style={{ position: "absolute", left: "30%", top: 6, bottom: 0, width: 2, backgroundColor: "rgba(0,0,0,0.18)" }} />
+      <View style={{ position: "absolute", left: "65%", top: 6, bottom: 0, width: 2, backgroundColor: "rgba(0,0,0,0.18)" }} />
+    </Animated.View>
+  );
+});
+
 const PlatformView = memo(function PlatformView({ index, platforms, styles, onArtLoad, onArtStart, onArtError, effectK }: any) {
   // KURUKAFA: etki sürerken iniş yüzeyinin yeni genişliği tepede şeritle gösterilir
   // (büyüdüyse altın, küçüldüyse kırmızı). Yalnız çizim; çatı silüeti değişmez.
@@ -5504,7 +5694,7 @@ const PlatformView = memo(function PlatformView({ index, platforms, styles, onAr
   });
   const style = useAnimatedStyle(() => {
     const p = slotPlatform(platforms.value, index);
-    if (!p) {
+    if (!p || p.deniz) {
       return {
         opacity: 0,
         transform: [{ translateX: -99999 }, { translateY: -99999 }],
@@ -5547,7 +5737,7 @@ const PlatformView = memo(function PlatformView({ index, platforms, styles, onAr
   // p.x/p.width/p.topY, writes nothing.
   const capRimStyle = useAnimatedStyle(() => {
     const p = slotPlatform(platforms.value, index);
-    if (!p) return { opacity: 0, transform: [{ translateX: -99999 }, { translateY: -99999 }] };
+    if (!p || p.deniz) return { opacity: 0, transform: [{ translateX: -99999 }, { translateY: -99999 }] };
     return { opacity: 1, width: p.width, transform: [{ translateX: p.x }, { translateY: p.topY }] };
   });
   return (

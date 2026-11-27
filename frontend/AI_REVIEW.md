@@ -3479,3 +3479,15 @@ EVIDENCE: Simülasyon gözlemi sim-dogrulma2.jpg: derin çömelme (2 kare) → d
 TASK: kullanıcı "arkadaşlara da TestFlight'tan yükle" (build 7) ve "merak uyandıracak bir şey … editörlerle değerlendirip rapor sunun".
 CHANGED: ios/ (gitignore) build 7; arşiv byzantion-7.xcarchive ("YUMUSAK DOGRULMA" main.jsbundle'da), yüklendi; Arkadaşlar grubunda 1.0.0 (7) Testing. Rapor: ai_review_evidence/MERAK-2026-11-27/ (brief, Kıvılcım + 4 editör görüşü, RAPOR.md). Oyun kodu değişmedi.
 OPEN_ISSUES: Kullanıcının andığı "Arda" ve "Ada" adlı editörler projede bulunamadı; her zamanki ekip kullanıldı.
+
+## MARTI-GRI-KUTU — "Martı Kaptı" ilk deneme — 2026-11-27
+TASK: kullanıcı "Evet, dene" (MERAK2 raporu, ekip önerisi: gemi + 2 yavaş kayık, cezasız düşüş, normal puan, görsel yok).
+CHANGED:
+- Yeni src/game/deniz.ts: MARTI_ON, MARTI_TETIK_ID (=1; simülatör denemesinde 0), bölüm üreticisi denizBolumu (tohum+id karması, ana RNG'ye dokunmaz; erişim jumpVelocity/flightGravity ile, pay 0,12, kayık genliği 45 birim), denizX, hareketliListe, bolumSigar (bölüm durak kulesine denk gelmez).
+- app/index.tsx: simit yerleşimi (skullPoint, +60 lift), simide değince PHASE_CARRIED (4): bölüm listenin SONUNA eklenir (görünen kuleler kaybolmaz), amca 1,5 sn'de martıyla ilk konteynere taşınır, inişte onLanding(+1). Kayıktayken amca kayıkla gider (ayakOfs). İniş ve düşüş testi bölüm varken hareketliListe ile (findFootLanding aynı). Bölümde düşünce oyun bitmez: bölümden sonraki ilk kulede belirir ("Şıp!"), gerekirse o kule ana üreticiyle (makeNextPlatform) üretilir. Yarış/meydan okumada simit yok (martiIzin). Evler/kapaklar deniz yüzeylerinde gizli; yeni çizim: gemi gövdesi, konteyner/kayık/iskele kutuları, simit halkası, mevcut marti.png. BUILD_TAG "MARTI KAPTI (GRI KUTU)".
+- DEĞİŞMEYEN: jump.ts, landing.ts, procedural-course.ts, config.ts, kamera.
+EVIDENCE:
+- Simülasyon sonucu: ai_review_evidence/MARTI-2026-11-27/sim_marti_deniz.cjs 40 tohum (gerçek config/jump/landing/stops/deniz kodu): 320 yüzey çifti, 24 faz × 3 ayak konumu; her durumda en az bir basışla ulaşılamayan çift 0 (ulaşılabilirlik araması; sabit basış tekrarı değil).
+- Simülatör gözlemi: sim-marti-kapti.jpg — simit, martı kapma, kulelerin üstünden uçuş, gemiye iniş; konteynere iniş ve puan; denizde düşüşte cezasız dönüş (iki kez). Hareketli kayığa iniş simülatörde gözle görülmedi.
+- Telefona kuruldu (strings main.jsbundle "MARTI KAPTI (GRI KUTU)" = 1). Telefonda denenmedi.
+OPEN_ISSUES: Simit alınınca önceden üretilmiş kuleler atlanır; sonraki kule dizisi simitsiz koşudan farklıdır (yalnız normal koşuda; yarış/meydan okumada simit yok). Karga/kedi/komşu gibi kule süsleri deniz yüzeylerine denk gelebilir. Gövde düz koyu blok (gri kutu). Taşınırken amca duruş pozunda.
