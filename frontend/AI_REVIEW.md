@@ -3448,3 +3448,9 @@ CHANGED: assets/characters/beden/amca-sayfa-{1-itis,2-yukselis,3-suzulme,4-dusus
 2) Ölçü/pivot: ölçek göz akı genişliğinden (charge-000 71 px, hücre 28 px → ×2,5; ilk deneme yüz-ten alanıyla ×2,7 çıktı, önizlemede baş büyük kaldı, düzeltildi). Pivot: 1, 5, 6 ayak tabanı pivot satırında, ayak ortası pivotun 86 px solunda; 2–4 yüz noktası 1 ile 5 arasında doğrusal. Sayılar kareler.json, görsel pivot-sira.jpg.
 3) Katman: mevcut ReactionLayer (aynı anda tek gövde); şarj pozları ucusKol ≥ 1 iken gizli.
 4) Risk: hücre kaynağı 512 px → ×2,5 büyütme, telefonda hafif yumuşak olabilir. Kıyafetli/kirli/şapkalı hâllerin sayfa karesi yok (o hâllerde eski kurallar). Simülatörde uzun zıplama görüldü (sim-yakin.jpg); 6. kare (çömelme) kenara inişte denge tepkisi öncelikli olduğu için bu kayıtta görünmedi. Telefonda video ile denetlenmedi.
+
+## UCUS-SAYFA-VIDEO — 09:52 telefon videosu denetimi + çömelme düzeltmesi — 2026-11-27
+TASK: kullanıcı "bu şekilde daha iyi". Önceki isteklerin denetimi: geçiş sertliği (19:57, 20:48, 21:22, 09:30) → uçuşta 6 kare tutarlı akıyor, baş boyu sabit (ziplama.jpg); paket 1'e dönüş ve parçalı amca kapalı (doğrulandı, rig görünmüyor).
+EVIDENCE: Gözlem: inis.jpg (telefon 7,45–8,05 sn): uzanma karesinden doğrudan ince şarj pozuna geçiyor, 6. kare (çömelme) yok. Ölçüm/kod: index.tsx inişte `releasedCharge.value = 0` çömelme kuralından önce çalışıyor → kd 16 (ve önceki kd 9) hiç tetiklenmemiş.
+CHANGED: index.tsx yeni sonAtis (inişte releasedCharge'ın son değeri), çömelme kuralı sonAtis ≥ 0,2'ye bakıyor. BUILD_TAG "TEK SAYFA 6 KARE + COMELME". Simülatörde iniş: 6. kare ~100 ms görünüyor, ardından kenar denge tepkisi (sim2-inis.jpg). Telefona kuruldu (strings eşleşti).
+OPEN_ISSUES: Aynı nedenle index.tsx'teki iniş çömelme derinliği (`releasedCharge.value < 0.25 ? 0.25 : …`) her zaman 0,25 seçiyor (eskiden beri); dokunulmadı, kullanıcı kararı bekliyor. Telefonda yeni paketle video çekilmedi.
