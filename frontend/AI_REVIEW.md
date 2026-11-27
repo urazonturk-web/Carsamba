@@ -3464,3 +3464,8 @@ EVIDENCE: Simülasyon gözlemi sim3-inis.jpg: düz inişte uzanma → çömelme 
 TASK: kullanıcı "arkadaşlara da TestFlight'tan yükle".
 CHANGED: ios/ (gitignore) CURRENT_PROJECT_VERSION ve CFBundleVersion 6. Arşiv ~/Library/Developer/Xcode/Archives/byzantion-6.xcarchive (main.jsbundle'da "DERIN INIS" var), exportArchive ile yüklendi ("Uploaded frontend"; hermesvm dSYM uyarısı, zararsız). App Store Connect: Arkadaşlar grubuna build 6 eklendi, durum Testing, testçilere otomatik bildirim açık.
 EVIDENCE: Gözlem (App Store Connect, 10:2x): grup "5 Builds", 1.0.0 (6) Testing. Testçi listesi: 6 anonim arkadaş, hepsinde build 5 kurulu, oturumlar 122/92/58/43/10/1, çökme yok.
+
+## VIDEO-1038 — 10:38 telefon videosu denetimi — 2026-11-27
+TASK: kullanıcı videoyu yorumsuz gönderdi. Önceki isteklerin denetimi: uçuş 6 kareyle akıyor (genel.jpg); iniş çömelme karesi artık görünüyor ve derin (inis1.jpg, 6,05–6,55 sn @30 fps: uzanma → çömelme ~5 kare ≈ 165 ms, landPulse ile basık → yerdeki çizim).
+EVIDENCE: Gözlem dikis.jpg (6,25 → 6,30 sn): sayfa çömelmesinden (geniş, derin) bir karede neredeyse dik, ince yerdeki şarj çizimine geçiş. Neden (kod): çömelme karesi inisCok > 0,12 iken; o anda şarj karesi round(0,12·8) = 1 (charge-012, neredeyse dik) → derin çömelmeden dik duruşa tek kare sıçrama. Ayrıca iki çizim üslubu farklı (sayfa daha tombul, saç daha kabarık).
+OPEN_ISSUES: (a) devir eşiğini yükseltmek (ör. inisCok ≤ 0,3 → charge-025/037'ye devir) tek sayı; (b) yerdeki pozların sayfa üslubunda yeniden çizimi kıyafet katmanlarını (yağmur/kış/pijama şarj çizimlerine hizalı) etkiler, büyük iş. Kullanıcı kararı bekliyor.
