@@ -20,6 +20,9 @@ export const TASIMA_YAY = 260;
 /** Taşınma fazı (config.ts PHASE'e eklenmedi; yalnız bu özellik kullanır). */
 export const PHASE_CARRIED = 4;
 
+/** KAPALIÇARŞI (2026-11-27, kullanıcı "Evet, bağla"): havada çarşı anahtarı → beyaz parlama → amca Kapalıçarşı
+ *  çatılarında (tonoz → bedesten kubbeleri → han); son yüzeyden sonra kuleler, parlamayla sahile dönüş. "deniz" = martı denemesi. */
+export const BOLUM_TEMA = "carsi" as "carsi" | "deniz";
 export const KONTEYNER_N = 4;
 export const KAYIK_N = 2;
 /** Kayığın yana sallanma genliği (dünya birimi; ekranda ×0,4) ve açısal hızı (rad/sn). */
@@ -27,12 +30,15 @@ export const KAYIK_AMP = 45;
 export const KAYIK_W = 2.2;
 /** Erişim payı: tam şarj menzilinin bu oranı kadar boşluk bırakılır (ana üreticideki 0,06'dan cömert). */
 const PAY = 0.12;
-/** Bölümün kapladığı id sayısı (konteynerler + kayıklar + iskele). */
-export const BOLUM_N = KONTEYNER_N + KAYIK_N + 1;
+/** Kapalıçarşı güzergâhı: parça türleri (src/game assets/environment/carsi/parca-*.png sırası). */
+export const CARSI_DIZI = [0, 0, 3, 4, 1, 1, 5, 1, 2, 2] as const; // 0 tonoz,1 kubbe,2 parapet,3 geçit,4 ışıklık,5 baca
+/** Bölümün kapladığı id sayısı. */
+export const BOLUM_N = BOLUM_TEMA === "carsi" ? CARSI_DIZI.length : KONTEYNER_N + KAYIK_N + 1;
 
 export type DenizP = {
   id: number; x: number; topY: number; width: number; cat: number; visualType: "normal";
-  deniz: 1 | 2 | 3; // 1 konteyner, 2 kayık, 3 iskele
+  deniz: number; // deniz: 1 konteyner, 2 kayık, 3 iskele; çarşı: 10 + parça türü
+  bolge?: number; // çarşı: 0 tonozlar, 1 bedesten, 2 han
   amp: number; w: number; ph: number;
   renk: number;
 };
@@ -122,4 +128,36 @@ export function hareketliListe(list: any[], t: number) {
     out.push(q.amp ? { ...q, x: denizX(q, t) } : q);
   }
   return out;
+}
+
+/** Kapalıçarşı bölümü: durağan yüzeyler, bölgeye göre yükseklik ve genişlik (tohum + id karması; ana RNG'ye dokunmaz). */
+export function carsiBolumu(prev: { id: number; x: number; topY: number; width: number }, ilkId: number, seed: number, screenW: number): DenizP[] {
+  "worklet";
+  const out: DenizP[] = [];
+  let cur: any = prev;
+  const taban = Math.min(CONFIG.platformMaxTopY - 140, Math.max(CONFIG.platformMinTopY + 220, prev.topY));
+  const GEN = [96, 78, 104, 84, 62, 48]; // tonoz, kubbe, parapet, geçit, ışıklık, baca
+  for (let k = 0; k < CARSI_DIZI.length; k++) {
+    const id = ilkId + k;
+    const tur = CARSI_DIZI[k];
+    const r1 = h01(seed, id * 5 + 1), r2 = h01(seed, id * 5 + 2), r3 = h01(seed, id * 5 + 3);
+    const bolge = tur === 0 || tur === 3 || tur === 4 ? 0 : tur === 2 ? 2 : 1;
+    // Bölge yükseklikleri: tonozlar tabanda, bedesten biraz yukarıda, baca ve han en yukarıda (+y aşağı).
+    const yuk = tur === 3 ? 40 : tur === 4 ? -10 : tur === 0 ? 0 : tur === 1 ? -60 : tur === 5 ? -120 : -150;
+    const topY = Math.max(CONFIG.platformMinTopY, Math.min(CONFIG.platformMaxTopY, taban + yuk + (r2 - 0.5) * 40));
+    const width = GEN[tur] + r1 * 10;
+    const gapHedef = 120 + r3 * 90;
+    const enCok = erisimBosluk(cur, topY, width, screenW);
+    const gap = Math.max(40, Math.min(gapHedef, enCok));
+    const p: DenizP = { id, x: cur.x + cur.width + gap, topY, width, cat: 0, visualType: "normal", deniz: 10 + tur, amp: 0, w: 0, ph: 0, renk: 0, bolge };
+    out.push(p);
+    cur = p;
+  }
+  return out;
+}
+
+/** Tema seçici. */
+export function bolumUret(prev: { id: number; x: number; topY: number; width: number }, ilkId: number, seed: number, screenW: number): DenizP[] {
+  "worklet";
+  return BOLUM_TEMA === "carsi" ? carsiBolumu(prev, ilkId, seed, screenW) : denizBolumu(prev, ilkId, seed, screenW);
 }

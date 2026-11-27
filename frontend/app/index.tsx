@@ -101,7 +101,7 @@ function hideOpening() {
 }
 setTimeout(hideOpening, 6000); // güvenlik: bir şey takılırsa açılış ekranında kalmasın
 const MENU_ON = true; // açılış menüsü
-import { MARTI_ON, MARTI_TETIK_ID, SIMIT_LIFT, SIMIT_SIZE, SIMIT_HIT_R, TASIMA_MS, TASIMA_YAY, PHASE_CARRIED, BOLUM_N, KONTEYNER_N, bolumSigar, denizBolumu, denizX, hareketliListe } from "../src/game/deniz";
+import { MARTI_ON, MARTI_TETIK_ID, SIMIT_LIFT, SIMIT_SIZE, SIMIT_HIT_R, TASIMA_MS, TASIMA_YAY, PHASE_CARRIED, BOLUM_N, KONTEYNER_N, BOLUM_TEMA, bolumSigar, bolumUret, denizX, hareketliListe } from "../src/game/deniz";
 import { KURUKAFA_ON, SKULL_SOURCE, SKULL_SIZE, SKULL_HIT_R, skullTouches, skullAfter, skullLift, skullPoint, scaledPlatforms, rollSkullEffect } from "../src/game/kurukafa";
 import { referencePlatform, referenceTowerWidth } from "../src/game/reference-course";
 import { generateProceduralPlatform, mulberry32Step, classifyPlatformVisualType, ROOFTOP_GROUND_Y, type PlatformVisualType } from "../src/game/procedural-course";
@@ -394,7 +394,7 @@ const AnimatedImage = Animated.createAnimatedComponent(Image);
 const BG_SCROLL_TEST = true as boolean;
 const BG_SCROLL_RATIO = 0.45;
 const BG_SCROLL_TILES = 4;
-const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "MARTI KAPTI v2") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
+const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "KAPALICARSI") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
 const DIAG_MAX_EXAMPLES = 6;
 const HOUSE_AB_FROZEN = false as boolean;
 // REVIZYON-066 experiment (one variable): expo-linear-gradient's iOS layer
@@ -483,6 +483,18 @@ const BG_LOW_SIL_H = 748;
 // REVIZYON-023: start decoding every first-scene bitmap at module load (before
 // the component mounts) into expo-image's memory cache, so the live scene and
 // the start cover mount from cache instead of decoding on first render.
+// KAPALIÇARŞI (2026-11-27, kullanıcı "Evet, bağla"; Kıvılcım 3 çağrı, ai_review_evidence/KAPALICARSI-2026-11-27/).
+const CARSI_UZAK = require("@/assets/environment/carsi/uzak.jpg"); // 2172×724
+const CARSI_SERIT = require("@/assets/environment/carsi/serit.png"); // 2172×724, şeffaf üst
+// Parçalar: yürünen satır (ust) ve o satırdaki opak aralık (x0..x1) parcalar.json'dan; kubbe omzu (64), geçit ızgarası (110), ışıklık camı (8).
+const CARSI_PARCA = [
+  { src: require("@/assets/environment/carsi/parca-tonoz.png"), w: 479, h: 184, ust: 3, x0: 43, x1: 452 },
+  { src: require("@/assets/environment/carsi/parca-kubbe.png"), w: 512, h: 307, ust: 64, x0: 166, x1: 340 },
+  { src: require("@/assets/environment/carsi/parca-parapet.png"), w: 478, h: 171, ust: 1, x0: 3, x1: 455 },
+  { src: require("@/assets/environment/carsi/parca-gecit.png"), w: 457, h: 202, ust: 110, x0: 18, x1: 444 },
+  { src: require("@/assets/environment/carsi/parca-isiklik.png"), w: 427, h: 218, ust: 8, x0: 191, x1: 314 },
+  { src: require("@/assets/environment/carsi/parca-baca.png"), w: 192, h: 286, ust: 4, x0: 46, x1: 152 },
+] as const;
 const PRELOAD_MODULES: number[] = [
   MASTER_NEIGHBORHOOD_SOURCE, DISTRICT_SOURCE, DISTRICT_BODY_SOURCE, HOUSE_ROOF_SOURCE, HOUSE_GUTTER_SOURCE, HOUSE_FACADE_SOURCE, BG_LOW_SIL_SOURCE,
   PU_ROOF_MID_SOURCE, PU_ROOF_HIP_L_SOURCE, PU_ROOF_HIP_R_SOURCE, PU_WALL_SOURCE, PU_BACKDROP_SOURCE, PU_SUN_SOURCE, PU_CLOUD_A_SOURCE, PU_CLOUD_B_SOURCE, PU_CLOUD_C_SOURCE, PU_ERASER_SOURCE, PU_ERASED_SOURCE,
@@ -490,6 +502,7 @@ const PRELOAD_MODULES: number[] = [
   ...(PIJAMA_ON ? [HAT_SOURCE, SLIPPER_SOURCE, DOOR_CLOSED_SOURCE, DOOR_OPEN_SOURCE] : []),
   ...(KIS_ON ? [WINTER_HAT_SOURCE, WINTER_SCARF_SOURCE] : []),
   ...(KURUKAFA_ON ? [SKULL_SOURCE] : []),
+  ...(MARTI_ON && BOLUM_TEMA === "carsi" ? [CARSI_UZAK, CARSI_SERIT, ...CARSI_PARCA.map((q) => q.src)] : []),
 ];
 (async () => {
   try {
@@ -1718,6 +1731,10 @@ export default function Game() {
   const govdeX1 = useSharedValue(0);
   const govdeY = useSharedValue(0);
   const ayakOfs = useSharedValue(0);
+  const carsiAktif = useSharedValue(0); // Kapalıçarşı katmanları görünür mü
+  const segX0 = useSharedValue(0);
+  const segX1 = useSharedValue(1);
+  const flas = useSharedValue(0); // beyaz parlama
   useEffect(() => {
     if (KURUKAFA_ON) skullBob.value = withRepeat(withTiming(1, { duration: 1600, easing: Easing.linear }), -1, false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1890,7 +1907,7 @@ export default function Game() {
       baseY.value = first.topY;
       kAmcaX.value = first.x + first.width * 0.55; // kargalar baştan amcaya dönük
       phase.value = PHASE.IDLE;
-      if (MARTI_ON) { simitVis.value = 0; simitAlindi.value = 0; tasU.value = -1; tasId.value = -1; denizIlk.value = -1; denizSon.value = -1; govdeX1.value = govdeX0.value; ayakOfs.value = 0; }
+      if (MARTI_ON) { simitVis.value = 0; simitAlindi.value = 0; tasU.value = -1; tasId.value = -1; denizIlk.value = -1; denizSon.value = -1; govdeX1.value = govdeX0.value; ayakOfs.value = 0; carsiAktif.value = 0; flas.value = 0; }
 
       if (USE_FIXED_PANEL_COURSE) {
         // GORSEL-017: the entire course for this delivery IS this fixed
@@ -2975,6 +2992,12 @@ export default function Game() {
     // MARTI KAPTI: kayık saati, kayıkta dururken amca kayıkla gider, simit yerleşimi, martıyla taşınma.
     if (MARTI_ON) {
       denizT.value += dt;
+      // KAPALIÇARŞI dönüşü: bölümden sonraki ilk kuleye basınca parlama ve sahil.
+      if (carsiAktif.value === 1 && denizSon.value >= 0 && lastLandedId.value > denizSon.value) {
+        carsiAktif.value = 0;
+        flas.value = 1;
+        flas.value = withTiming(0, { duration: 650, easing: Easing.out(Easing.quad) });
+      }
       if ((phase.value === PHASE.IDLE || phase.value === PHASE.CHARGING) && denizIlk.value >= 0) {
         for (let i = 0; i < list.length; i++) {
           const q = list[i];
@@ -3139,7 +3162,7 @@ export default function Game() {
             ek.push(n);
             last = n;
           }
-          const seg = denizBolumu(last, idCounter.value, runSeed.value, W);
+          const seg = bolumUret(last, idCounter.value, runSeed.value, W);
           idCounter.value += BOLUM_N;
           platforms.value = list.concat(ek, seg);
           denizIlk.value = seg[0].id;
@@ -3147,9 +3170,11 @@ export default function Game() {
           let gx1 = seg[0].x;
           let gy = -1e9;
           for (let k = 0; k < KONTEYNER_N; k++) { gx1 = seg[k].x + seg[k].width; if (seg[k].topY > gy) gy = seg[k].topY; }
-          govdeX0.value = seg[0].x - 90;
-          govdeX1.value = gx1 + 140;
-          govdeY.value = gy + 40;
+          if (BOLUM_TEMA === "deniz") {
+            govdeX0.value = seg[0].x - 90;
+            govdeX1.value = gx1 + 140;
+            govdeY.value = gy + 40;
+          }
           simitAlindi.value = 1;
           simitVis.value = 0;
           tasT0.value = frame.timestamp;
@@ -3163,8 +3188,32 @@ export default function Game() {
           vx.value = 0;
           vy.value = 0;
           dusus.value = 0;
-          phase.value = PHASE_CARRIED;
-          runOnJS(showThought)("Bırak simidimi!");
+          if (BOLUM_TEMA === "carsi") {
+            // ANİ GEÇİŞ: beyaz parlama, amca Kapalıçarşı'nın ilk tonozunda ayakta; kamera oraya oturur.
+            const f = seg[0];
+            px.value = f.x + f.width / 2;
+            py.value = f.topY - PH / 2;
+            baseY.value = f.topY;
+            phase.value = PHASE.IDLE;
+            standingPlatformId.value = f.id;
+            standingPlatformIsChimney.value = false;
+            lastLandedId.value = f.id;
+            ayakOfs.value = 0;
+            tasU.value = -1;
+            const camNew = px.value - (CONFIG.cameraStartFraction * W) / CONFIG.cameraZoom;
+            camX.value = camNew;
+            camXR.value = Math.max(camXR.value, camNew);
+            segX0.value = f.x;
+            segX1.value = seg[seg.length - 1].x + seg[seg.length - 1].width;
+            carsiAktif.value = 1;
+            flas.value = 1;
+            flas.value = withTiming(0, { duration: 650, easing: Easing.out(Easing.quad) });
+            runOnJS(onLanding)(0, 1, f.id, 0.5);
+            runOnJS(showThought)("Burası neresi? Çarşının çatısı!");
+          } else {
+            phase.value = PHASE_CARRIED;
+            runOnJS(showThought)("Bırak simidimi!");
+          }
         }
       }
 
@@ -3374,7 +3423,8 @@ export default function Game() {
     // --- procedural spawn ahead + cleanup behind (reassign, never mutate) ---
     const s = CONFIG.cameraZoom;
     const viewW = W / s;
-    let working = list;
+    // KAPALIÇARŞI: ışınlanma aynı karede listeyi uzatıp kamerayı ileri alır; eski kopyayla üretim bölümü silerdi.
+    let working = platforms.value;
     let changed = false;
     let last = working[working.length - 1];
     // GORSEL-017: fixed panel course has no procedural continuation -- the
@@ -3616,6 +3666,19 @@ export default function Game() {
     const top = py.value + PH / 2 - FART_CHAR_H - MARTI_H * 0.55;
     return { opacity: on, transform: [{ translateX: cx - MARTI_W / 2 }, { translateY: top }, { scaleY: 0.75 + 0.25 * Math.sin(denizT.value * 16) }] };
   });
+  // KAPALIÇARŞI arka planı: güzergâh boyunca ilerleme (0 → 1) — uzak katman yavaş, şerit tam yolculuk (tekrarsız).
+  const CU_H = Math.round(H * 0.74), CU_W = Math.round((CU_H * 2172) / 724);
+  const CS_H = Math.round(H * 0.56), CS_W = Math.round((CS_H * 2172) / 724);
+  // R062 kuralı: SharedValue'lar güncelleyicinin kendi kapanışında okunmalı (iç fonksiyonda okununca eşleyici donar).
+  const carsiIlerle = (cx: number, a: number, b: number) => {
+    "worklet";
+    const mid = cx + (W * 0.5) / CONFIG.cameraZoom;
+    return Math.max(0, Math.min(1, (mid - a) / Math.max(1, b - a)));
+  };
+  const carsiBgStyle = useAnimatedStyle(() => ({ opacity: carsiAktif.value }));
+  const carsiUzakStyle = useAnimatedStyle(() => ({ transform: [{ translateX: -carsiIlerle(camXR.value, segX0.value, segX1.value) * (CU_W - W) * 0.35 }] }));
+  const carsiSeritStyle = useAnimatedStyle(() => ({ transform: [{ translateX: -carsiIlerle(camXR.value, segX0.value, segX1.value) * (CS_W - W) }] }));
+  const flasStyle = useAnimatedStyle(() => ({ opacity: flas.value }));
   const govdeStyle = useAnimatedStyle(() => {
     const on = denizIlk.value >= 0 && govdeX1.value > govdeX0.value ? 1 : 0;
     return { opacity: on, width: Math.max(0, govdeX1.value - govdeX0.value), transform: [{ translateX: govdeX0.value }, { translateY: govdeY.value }] };
@@ -3935,6 +3998,16 @@ export default function Game() {
       )}
       {AMBIENT_ON && !POPUP && (
         <AmbientEvents W={W} H={H} active={assetsReady && !gameOver} onHorn={() => { if (SFX_ON) playSfx("horn_far"); }} />
+      )}
+      {MARTI_ON && BOLUM_TEMA === "carsi" && (
+        <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, width: W, height: H, overflow: "hidden", backgroundColor: "#9cc3e6" }, carsiBgStyle]}>
+          <Animated.View style={[{ position: "absolute", left: 0, top: 0, width: CU_W, height: CU_H }, carsiUzakStyle]}>
+            <Image source={CARSI_UZAK} style={{ width: "100%", height: "100%" }} resizeMode="stretch" fadeDuration={0} />
+          </Animated.View>
+          <Animated.View style={[{ position: "absolute", left: 0, top: H - CS_H, width: CS_W, height: CS_H }, carsiSeritStyle]}>
+            <Image source={CARSI_SERIT} style={{ width: "100%", height: "100%" }} resizeMode="stretch" fadeDuration={0} />
+          </Animated.View>
+        </Animated.View>
       )}
       {POPUP && (
         <>
@@ -4287,9 +4360,19 @@ export default function Game() {
             ))}
           </Animated.View>
         )}
-        {MARTI_ON && (
+        {MARTI_ON && BOLUM_TEMA === "deniz" && (
           <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, width: SIMIT_SIZE, height: SIMIT_SIZE, borderRadius: SIMIT_SIZE / 2, borderWidth: SIMIT_SIZE * 0.28, borderColor: "#b9772f" }, simitStyle]}>
             <View style={{ position: "absolute", left: -SIMIT_SIZE * 0.28, top: -SIMIT_SIZE * 0.28, width: SIMIT_SIZE, height: SIMIT_SIZE, borderRadius: SIMIT_SIZE / 2, borderWidth: 3, borderColor: "#6e3f14", borderStyle: "dotted" }} />
+          </Animated.View>
+        )}
+        {MARTI_ON && BOLUM_TEMA === "carsi" && (
+          // Çarşı anahtarı (kodla çizim): halka + gövde + diş, hafif ışıltı.
+          <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, width: SIMIT_SIZE, height: SIMIT_SIZE }, simitStyle]}>
+            <View style={{ position: "absolute", left: SIMIT_SIZE * 0.05, top: SIMIT_SIZE * 0.05, width: SIMIT_SIZE * 0.9, height: SIMIT_SIZE * 0.9, borderRadius: SIMIT_SIZE, backgroundColor: "rgba(255,230,150,0.35)" }} />
+            <View style={{ position: "absolute", left: SIMIT_SIZE * 0.12, top: SIMIT_SIZE * 0.3, width: SIMIT_SIZE * 0.36, height: SIMIT_SIZE * 0.36, borderRadius: SIMIT_SIZE, borderWidth: SIMIT_SIZE * 0.08, borderColor: "#c99a2e" }} />
+            <View style={{ position: "absolute", left: SIMIT_SIZE * 0.45, top: SIMIT_SIZE * 0.44, width: SIMIT_SIZE * 0.45, height: SIMIT_SIZE * 0.09, backgroundColor: "#c99a2e", borderRadius: 3 }} />
+            <View style={{ position: "absolute", left: SIMIT_SIZE * 0.72, top: SIMIT_SIZE * 0.5, width: SIMIT_SIZE * 0.07, height: SIMIT_SIZE * 0.16, backgroundColor: "#c99a2e" }} />
+            <View style={{ position: "absolute", left: SIMIT_SIZE * 0.83, top: SIMIT_SIZE * 0.5, width: SIMIT_SIZE * 0.07, height: SIMIT_SIZE * 0.12, backgroundColor: "#c99a2e" }} />
           </Animated.View>
         )}
         {MARTI_ON && (
@@ -4302,7 +4385,8 @@ export default function Game() {
             <View style={{ position: "absolute", left: 0, right: 0, top: 70, height: 8, backgroundColor: "#e8e2d0" }} />
           </Animated.View>
         )}
-        {MARTI_ON && BOLUM_IDX.map((i) => <DenizSlot key={`deniz-${i}`} index={i} platforms={platforms} denizT={denizT} govdeY={govdeY} denizIlk={denizIlk} />)}
+        {MARTI_ON && BOLUM_TEMA === "deniz" && BOLUM_IDX.map((i) => <DenizSlot key={`deniz-${i}`} index={i} platforms={platforms} denizT={denizT} govdeY={govdeY} denizIlk={denizIlk} />)}
+        {MARTI_ON && BOLUM_TEMA === "carsi" && BOLUM_IDX.map((i) => <CarsiSlot key={`carsi-${i}`} index={i} platforms={platforms} denizIlk={denizIlk} />)}
         {KURUKAFA_ON && (
           <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, width: SKULL_SIZE, height: SKULL_SIZE }, skullStyle]}>
             <Image source={SKULL_SOURCE} resizeMode="stretch" fadeDuration={0} style={{ width: "100%", height: "100%" }} />
@@ -4453,6 +4537,7 @@ export default function Game() {
           <Ico name="xmark" size={18} color="#fff8ec" />
         </Pressable>
       )}
+      {MARTI_ON && <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, width: W, height: H, backgroundColor: "#fffaf0" }, flasStyle]} />}
       {/* Score HUD */}
       {!gameOver && assetsReady && !menuOpen && !raceResult && <View style={[styles.hud, { top: insets.top + 24 }]} onLayout={(e) => { const l = e.nativeEvent.layout; setHudBottom(l.y + l.height); }}>
         <Text style={[styles.scoreText, (POPUP || nightHud) && styles.puScoreText]} testID="score-value">
@@ -5677,7 +5762,7 @@ const DenizSlot = memo(function DenizSlot({ index, platforms, denizT, govdeY, de
     const list = platforms.value;
     let p: any = null;
     for (let i = 0; i < list.length; i++) if (list[i].deniz && list[i].id - denizIlk.value === index) { p = list[i]; break; }
-    if (!p || !p.deniz) return { opacity: 0, transform: [{ translateX: -99999 }, { translateY: -99999 }] };
+    if (!p || !p.deniz || p.deniz >= 10) return { opacity: 0, transform: [{ translateX: -99999 }, { translateY: -99999 }] };
     const x = denizX(p, denizT.value);
     const h = p.deniz === 1 ? Math.max(40, govdeY.value - p.topY + 12) : p.deniz === 2 ? 46 : 520;
     const bg = p.deniz === 1 ? KONTEYNER_RENK[p.renk % 4] : p.deniz === 2 ? "#8a5a2b" : "#6d5a46";
@@ -5689,6 +5774,54 @@ const DenizSlot = memo(function DenizSlot({ index, platforms, denizT, govdeY, de
       <View style={{ position: "absolute", left: "30%", top: 6, bottom: 0, width: 2, backgroundColor: "rgba(0,0,0,0.18)" }} />
       <View style={{ position: "absolute", left: "65%", top: 6, bottom: 0, width: 2, backgroundColor: "rgba(0,0,0,0.18)" }} />
     </Animated.View>
+  );
+});
+
+// KAPALIÇARŞI yüzeyi: parça görseli, yürünen satırı (ust) p.topY'ye, yürünen aralığı (x0..x1) p.width'e oturur;
+// altında taş duvar (güzergâh şeridinin önünde çatı kütlesi). Yalnız çizim; çarpışma p.x/p.topY/p.width.
+/** Parça görselinin yürünen aralığa oranı ve duvar bantları (taş sıra + tuğla derz). */
+const CARSI_GORSEL = 1.35;
+const DUVAR_BANT = Array.from({ length: 20 }, (_, k) => k);
+const CarsiSlot = memo(function CarsiSlot({ index, platforms, denizIlk }: any) {
+  // R062: platforms/denizIlk güncelleyicinin kendi kapanışında okunur, bul() yalnız değer alır.
+  const bul = (list: any[], ilk: number) => {
+    "worklet";
+    for (let i = 0; i < list.length; i++) if (list[i].deniz >= 10 && list[i].id - ilk === index) return list[i];
+    return null;
+  };
+  const duvar = useAnimatedStyle(() => {
+    const p = bul(platforms.value, denizIlk.value);
+    if (!p) return { opacity: 0, transform: [{ translateX: -99999 }, { translateY: -99999 }] };
+    const q = CARSI_PARCA[p.deniz - 10];
+    const sc = (p.width * CARSI_GORSEL) / (q.x1 - q.x0);
+    const alt = p.topY + (q.h - q.ust) * sc * 0.7;
+    const gx = p.deniz - 10 === 5 ? p.width * 0.9 : p.width * 1.05;
+    return { opacity: 1, width: gx, transform: [{ translateX: p.x + (p.width - gx) / 2 }, { translateY: alt }] };
+  });
+  const stil = CARSI_PARCA.map((q, k) =>
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useAnimatedStyle(() => {
+      const p = bul(platforms.value, denizIlk.value);
+      if (!p || p.deniz - 10 !== k) return { opacity: 0, transform: [{ translateX: -99999 }, { translateY: -99999 }] };
+      // Görsel, yürünen aralıktan CARSI_GORSEL kat geniş (çatı kütlesi); yürünen aralığın ortası p'nin ortasında.
+      const sc = (p.width * CARSI_GORSEL) / (q.x1 - q.x0);
+      const ox = p.x + p.width / 2 - ((q.x0 + q.x1) / 2) * sc;
+      return { opacity: 1, width: q.w * sc, height: q.h * sc, transform: [{ translateX: ox }, { translateY: p.topY - q.ust * sc }] };
+    })
+  );
+  return (
+    <>
+      <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, height: 900, overflow: "hidden", backgroundColor: "#9a6a4c", borderLeftWidth: 4, borderRightWidth: 4, borderColor: "rgba(60,30,15,0.45)" }, duvar]}>
+        {DUVAR_BANT.map((k) => (
+          <View key={k} style={{ position: "absolute", left: 0, right: 0, top: k * 46, height: k % 3 === 0 ? 14 : 3, backgroundColor: k % 3 === 0 ? "#c9a77f" : "rgba(235,215,185,0.35)" }} />
+        ))}
+      </Animated.View>
+      {CARSI_PARCA.map((q, k) => (
+        <Animated.View key={k} pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0 }, stil[k]]}>
+          <Image source={q.src} style={{ width: "100%", height: "100%" }} resizeMode="stretch" fadeDuration={0} />
+        </Animated.View>
+      ))}
+    </>
   );
 });
 
