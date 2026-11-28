@@ -27,3 +27,10 @@ Kullanıcı: "peşimdeki kedi ile devam edelim" (anket: Kedi 17, Veresiye 15, Si
 - Görselde dama arka plan "boyanmış" geldi (alfa yok); kenardan taşma doldurmayla temizlendi → kedi-pozlar-seffaf.png (piksellerin %77'si şeffaf). Önizleme: kedi-pozlar-onizleme.jpg.
 - Not: 2. poz (geri bakma) başı tam geriye çevrik değil, öne-yukarı bakıyor.
 - Oyuna BAĞLANMADI; kullanıcı kabulü bekleniyor.
+
+## Pozlar oyuna bağlandı (kullanıcı: "Evet, bağla")
+- assets/environment/mahalle/tekir-{bekleme,hazir,kalkis,havada,inis}.png: poz sayfasından kesildi (aynı ölçek), takip noktaları alfa taramasıyla (yerde basan patiler, havada gövde ortası). TEKIR_S = 110/359 (bekleme ≈ 110 birim).
+- Sıçrayış rehberHop 0→1 (1000 ms): hazırlanma (0–0,18) → kalkış (–0,30) → havada (–0,78) → iniş (–0,90) → oturma. Bekleme pozunda nefes (scaleY %2,5, 1,3 sn).
+- İzlenmeyince geri bakma: oturan poz 700 ms sola (amcaya) aynalanır, sonra sıçrar. Kıvılcım'ın 2. pozu (geri bakma) başı geri çevrilmediği için kullanılmadı (kanıt klasöründe tekir-geribak.png).
+- Katman: kuleler önünde, karakter arkasında (önceki gibi). Pencere finali hâlâ gri kutu (sarı dikdörtgen).
+- Kanıt: sim-kedi-poz.mp4, poz-kareler.jpg (simülatör, otomatik pilot). Telefon: BUILD_TAG "PESIMDEKI KEDI 5 POZ", paket strings = 1, devicectl yükleme başarılı. Telefonda elle oynanmadı.

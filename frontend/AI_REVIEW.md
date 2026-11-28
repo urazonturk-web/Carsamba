@@ -3535,3 +3535,9 @@ CHANGED: Yeni src/game/rehber.ts (hedef seçimi + adillik araması, REHBER_OTO k
 EVIDENCE: Simülasyon sonucu (sim_rehber.cjs, gerçek kod, 40 tohum × 43 kule × 3 ayak): W=393 N+1 pencere medyan %16,0, N+2 %11,5, iki ileri %97,2, seçilen hedefe inmeyen 0; W=440 N+1 %15,0, N+2 %11,0, iki ileri %99,7, inmeyen 0. Simülatör videosu sim-kedi.mp4 (otomatik pilot; 4 izleme + final). Telefon paketi: strings main.jsbundle | grep PESIMDEKI KEDI = 1; devicectl yükleme başarılı. Telefonda elle oynanmadı.
 OPEN_ISSUES: Kurukafa DAR kuleler etkisinde adillik denetimi ölçeksiz genişlikle; final penceresi gri kutu; kedi tepki balonu yok.
 NEXT: Kullanıcı videosu/değerlendirmesi; beğenilirse Kıvılcım ile kedi sıçrama pozları ve pencere sahnesi.
+
+## KEDI-POZ-BAG-2026-11-28 — kedi pozları oyuna bağlandı — 2026-11-28
+TASK: Kabul edilen 6 pozlu sayfadan 5 pozu kedi rehberine bağla.
+CHANGED: app/index.tsx (TEKIR_POZ, kediDurum worklet, 5 katman, rehberBak/rehberNefes, sıçrama 1000 ms), 5 yeni PNG (assets/environment/mahalle/tekir-*.png). Fizik/kamera/kule üretimi/puan değişmedi.
+EVIDENCE: Dosya: kedi-pozlar-seffaf.png'den kesildi. Ölçü/pivot: alfa taraması (ör. bekleme 336×371, ayak (174,364)). Katman: kuleler önü, karakter arkası. Simülatör videosu sim-kedi-poz.mp4; telefon paketi strings PESIMDEKI KEDI 5 POZ = 1, yükleme başarılı.
+OPEN_ISSUES: Geri bakma aynalanmış oturuşla; pencere finali gri kutu (Kıvılcım çiziyor); telefonda elle oynanmadı.
