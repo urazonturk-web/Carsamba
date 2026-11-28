@@ -3522,3 +3522,9 @@ CHANGED: Kod değişmedi. Yeni: ai_review_evidence/SERIT-2026-11-28/ (brief, 4 e
 EVIDENCE: Kıvılcım 3 çağrı (şerit başına 1). Görseller oyuna bağlanmadı.
 OPEN_ISSUES: Simit/sepet şeritlerinde amca üslubu oyundan yumuşak. Fikir seçimi kullanıcıda.
 NEXT: Kullanıcı bir fikir seçerse gri kutu prototip.
+
+## SERIT-ANKET-2026-11-28 — editör anketi — 2026-11-28
+TASK: Üç fikir şeridi için 7 editöre 3-2-1 sıralama anketi.
+CHANGED: Kod değişmedi. Yeni: SERIT-2026-11-28/anket.md, anket/ (7 oy + codex kayıtları), ANKET-SONUC.md.
+EVIDENCE: Kedi 17 (4 birincilik), Veresiye 15 (3), Simit 10 (0). Kıvılcım görsel üretmeden metinle oy verdi.
+OPEN_ISSUES: Kedi ile Veresiye arası fark küçük; birleşik tasarım önerisi kullanıcı onayı bekliyor.
