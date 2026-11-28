@@ -34,3 +34,7 @@ Kullanıcı: "peşimdeki kedi ile devam edelim" (anket: Kedi 17, Veresiye 15, Si
 - İzlenmeyince geri bakma: oturan poz 700 ms sola (amcaya) aynalanır, sonra sıçrar. Kıvılcım'ın 2. pozu (geri bakma) başı geri çevrilmediği için kullanılmadı (kanıt klasöründe tekir-geribak.png).
 - Katman: kuleler önünde, karakter arkasında (önceki gibi). Pencere finali hâlâ gri kutu (sarı dikdörtgen).
 - Kanıt: sim-kedi-poz.mp4, poz-kareler.jpg (simülatör, otomatik pilot). Telefon: BUILD_TAG "PESIMDEKI KEDI 5 POZ", paket strings = 1, devicectl yükleme başarılı. Telefonda elle oynanmadı.
+
+## Final penceresi (kullanıcı: "sarı pencere o şekilde mi kalacak?" → "Evet, çizdir")
+- Kıvılcım 1 çağrı (codex-PENCERE.log): kedi-pencere.png 1024×1536 RGBA (gerçek alfa, %32 şeffaf). Yeşil ahşap cumba, içi sıcak ışıklı, dantel perde, sağda mama kabını bırakan el; pervaz üst yüzeyi ≈ y 975 px (%63,5). İç içe yola kaydetti, oradan alındı.
+- Önizleme: pencere-onizleme.jpg (kedi pervazda). Oyuna BAĞLANMADI; kullanıcı kabulü bekleniyor.

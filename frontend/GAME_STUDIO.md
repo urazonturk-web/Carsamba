@@ -2115,3 +2115,4 @@ TESLIM_HAZIR: SERIT-ANKET-2026-11-28 — 7 editör anketi: Peşimdeki Kedi 17, V
 TESLIM_HAZIR: KEDI-REHBER-2026-11-28 — Peşimdeki Kedi gri kutu (src/game/rehber.ts, ai_review_evidence/KEDI-REHBER-2026-11-28/); telefona yüklendi, kullanıcının oynayıp değerlendirmesi bekleniyor.
 TESLIM_HAZIR: KEDI-POZ-2026-11-28 — tekir kedi 6 poz sayfası (ai_review_evidence/KEDI-REHBER-2026-11-28/kedi-pozlar-seffaf.png); oyuna bağlanmadı, kullanıcı kabulü bekleniyor.
 TESLIM_HAZIR: KEDI-POZ-BAG-2026-11-28 — kedi 5 pozla hareket ediyor (telefonda, BUILD_TAG PESIMDEKI KEDI 5 POZ); pencere finali çiziliyor.
+TESLIM_HAZIR: KEDI-PENCERE-2026-11-28 — final ışıklı pencere görseli (ai_review_evidence/KEDI-REHBER-2026-11-28/kedi-pencere.png); oyuna bağlanmadı, kullanıcı kabulü bekleniyor.
