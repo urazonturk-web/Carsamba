@@ -42,3 +42,10 @@ serit/serit-tuttum.png (1536×1024), komut serit/prompt.md. 5 kare: peşinden ge
 poz3/kedi-pozlar3.png (1536×1024, gerçek alfa: min 0). Bağlı bileşen ile 8 poza kesildi: poz3/tekir3-{hazir,hazirlanma,kalkis,havada,inis,uzanma,tutma,uyuma}.png.
 Ölçüm (alfa>40 piksel alanı): havada/oturuş oranı eski sayfada 0,78, yenide 0,89 → gövde ölçeği tutarlı, zıplarken küçülme büyük ölçüde giderildi. Hücre sınırları taştığı için ızgara değil bileşen kesimi kullanıldı.
 Oran önizlemesi poz3/oran-onizleme.jpg: oturan kedi amca boyunun %36'sı ölçeğinde. Oyuna bağlanmadı, kullanıcı kabulü bekleniyor.
+
+## Oyuna bağlandı: "Tuttum!" v1 (2026-11-28, kullanıcı "Evet, bağla")
+Kod: src/game/rehber.ts (KEDI_UYKU_N=5, iskaSarj yalnız kanıt pilotu), app/index.tsx (kediHak/kediUyku/kediTut, onLanding kedi bloğu, düşüş bloğunda kurtarış, kediDurum yeniden, 8 yeni poz). BUILD_TAG "KEDI TUTTUM v1".
+Akış: kedi amcanın indiği kulenin arka ucuna (%16) sıçrar. Düşüş kesinleşince (dususKesin, dusus=1) hakkı varsa ve amcanın zıpladığı kuledeyse amcayı o kuleye koyar (Şıp yerleştirmesiyle aynı satırlar; amca kulenin %25'inde), kedi ön kenarda uzanma (0,45 sn) + tutma (1,05 sn) pozunda amcanın ÖNÜNDE çizilir, sonra ön kenarda uyur. 5 iniş sonra uyanır, rehberHedef ile öne geçer; onun kulesine inersen hak geri gelir ve yeniden peşinden gelir. Deniz bölümünde kedi kurtarmaz (Şıp önce). Eski pencere/kartpostal finali akıştan çıktı (kod duruyor, tetiklenmiyor).
+Ölçek: TEKIR_S = 81/345 → oturan kedi ≈ amca boyunun %40'ı (video 15-43'te ~%67).
+Simülatör kanıtı (otomatik pilot, Release): sim-tuttum.mp4; sim/kurtaris-yakin3.jpg (kurtarış anı, 6 kare/sn), sim/kurtaris-yakin.jpg ve kurtaris-yakin2.jpg (ilk iki deneme: kedi amcanın bacaklarının arkasında kalıyordu → amca %25'e, kurtarış pozları amcanın önüne alındı), sim/sheet3.jpg (uyanış 7. puanda, hak geri 11. puanda), sim/tam3.jpg (tam akış).
+Riskler: çok dar kulede kedi ile amca yine kısmen üst üste; kurtarışta amca anında kuleye konur (çekilme animasyonu yok); telefonda elle oynanmadı; Kurukafa daraltmasında dar kulede görünüm denenmedi.

@@ -101,7 +101,7 @@ function hideOpening() {
 }
 setTimeout(hideOpening, 6000); // güvenlik: bir şey takılırsa açılış ekranında kalmasın
 const MENU_ON = true; // açılış menüsü
-import { REHBER_ON, REHBER_N, rehberHedef, REHBER_OTO, ortaSarj } from "../src/game/rehber";
+import { REHBER_ON, rehberHedef, REHBER_OTO, ortaSarj, KEDI_UYKU_N, iskaSarj } from "../src/game/rehber";
 import { MARTI_ON, MARTI_TETIK_ID, SIMIT_LIFT, SIMIT_SIZE, SIMIT_HIT_R, TASIMA_MS, TASIMA_YAY, PHASE_CARRIED, BOLUM_N, KONTEYNER_N, BOLUM_TEMA, bolumSigar, bolumUret, denizX, hareketliListe } from "../src/game/deniz";
 import { KURUKAFA_ON, SKULL_SOURCE, SKULL_SIZE, SKULL_HIT_R, skullTouches, skullAfter, skullLift, skullPoint, scaledPlatforms, rollSkullEffect } from "../src/game/kurukafa";
 import { referencePlatform, referenceTowerWidth } from "../src/game/reference-course";
@@ -395,7 +395,7 @@ const AnimatedImage = Animated.createAnimatedComponent(Image);
 const BG_SCROLL_TEST = true as boolean;
 const BG_SCROLL_RATIO = 0.45;
 const BG_SCROLL_TILES = 4;
-const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "KEDI v2: YENI POZLAR + KARTPOSTAL") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
+const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "KEDI TUTTUM v1") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
 const DIAG_MAX_EXAMPLES = 6;
 const HOUSE_AB_FROZEN = false as boolean;
 // REVIZYON-066 experiment (one variable): expo-linear-gradient's iOS layer
@@ -1107,6 +1107,12 @@ export default function Game() {
   const rehberFinal = useSharedValue(0);
   const rehberBak = useSharedValue(0); // izlenmeyince kedi amcaya döner bakar
   const rehberNefes = useSharedValue(0);
+  // TUTTUM!: kurtarış hakkı (1/0), uyku (1/0), kurtarış animasyonu 0→1 (1 = yok), uyanınca hakkı geri kazanma (borç).
+  const kediHak = useSharedValue(1);
+  const kediUyku = useSharedValue(0);
+  const kediTut = useSharedValue(1);
+  const kediBorcRef = useRef(false);
+  const kediUykuSayRef = useRef(0);
   useEffect(() => {
     if (REHBER_ON) rehberNefes.value = withRepeat(withTiming(1, { duration: 1300, easing: Easing.inOut(Easing.sin) }), -1, true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1366,6 +1372,13 @@ export default function Game() {
     if (toastTimer.current) clearTimeout(toastTimer.current);
     toastTimer.current = setTimeout(() => setToast(null), 2600);
   }, []);
+  // TUTTUM!: kedi amcayı tuttu (UI iş parçacığından çağrılır).
+  const kediKurtardi = useCallback(() => {
+    kediUykuSayRef.current = 0;
+    showToast("🐈 Tuttum! Tekir seni yakandan yakaladı.");
+    setTimeout(() => showThought("Sen dinlen, ben dikkatli olurum."), 1700);
+    if (REHBER_OTO) setTimeout(() => otoZiplaRef.current(), 3200);
+  }, [showToast, showThought]);
   useEffect(() => {
     if (!OYUN_SONU_TEST) return;
     if (gameOver) { const t = setTimeout(() => showToast("⚔️ Uzun deneme bildirimi: Arkadaşın Mehmet Ali Kadıköylüoğlu senin 48 puanını oynadı ve 52 yaptı, seni geçti! Bu metin bilerek çok uzun yazıldı; iki satırdan sonrası üç nokta ile kısalmalı ve kart ile çakışmamalı."), 900); return () => clearTimeout(t); }
@@ -2066,31 +2079,41 @@ export default function Game() {
       }
     }
     if (KARGA_ON) kargaKacirRef.current(landedId, ratio);
-    if (REHBER_ON && !raceRef.current && rehberFinal.value === 0) {
-      // PEŞİMDEKİ KEDİ: kedinin kulesine indiysen izledin; kedi yeniden (adilse) iki kule ileri sıçrar.
-      const izledi = rehberId.value >= 0 && landedId === rehberId.value;
-      if (izledi) rehberAdimRef.current += 1;
+    if (REHBER_ON && !raceRef.current && rehberId.value >= 0) {
+      // TUTTUM!: kedi peşinden gelir; uyuyorsa sayar, uyanınca öne geçer, onun kulesine inersen hak geri gelir.
       const list = platforms.value;
       const lp = platformById(list, landedId);
-      if (izledi && rehberAdimRef.current >= REHBER_N) {
-        rehberFinal.value = withTiming(1, { duration: 900 });
-        // Video 14-01: final fark edilmiyordu → kartpostal birkaç saniye açılır (kamera değişmez, oyun sürer).
-        setTimeout(() => setTekirKart(true), 700);
-        setTimeout(() => setTekirKart(false), 4700);
-      } else if (lp) {
-        const hedef = rehberHedef(list, landedId, lp.x + lp.width * ratio, W, CHARACTER_WIDTH * 0.8);
-        if (hedef >= 0 && hedef !== rehberId.value) {
-          rehberEski.value = rehberId.value >= 0 ? rehberId.value : landedId;
-          rehberId.value = hedef;
-          rehberHop.value = 0;
-          // İzlenmediyse önce amcaya döner bakar ("Sen nereye?"), sonra sıçrar.
-          if (!izledi) rehberBak.value = withSequence(withTiming(1, { duration: 0 }), withDelay(700, withTiming(0, { duration: 0 })));
-          // Video 14-01: izlenince kedi amcanın yanında sıkışıyordu → iner inmez sıçrar.
-          rehberHop.value = withDelay(izledi ? 0 : 800, withTiming(1, { duration: 1000, easing: Easing.linear }));
+      const sicra = (hedef: number, gecikme: number) => {
+        rehberEski.value = rehberId.value >= 0 ? rehberId.value : landedId;
+        rehberId.value = hedef;
+        cancelAnimation(rehberHop);
+        rehberHop.value = 0;
+        rehberHop.value = withDelay(gecikme, withTiming(1, { duration: 800, easing: Easing.linear }));
+      };
+      if (kediUyku.value === 1) {
+        kediUykuSayRef.current += 1;
+        if (kediUykuSayRef.current >= KEDI_UYKU_N && lp) {
+          const hedef = rehberHedef(list, landedId, lp.x + lp.width * ratio, W, CHARACTER_WIDTH * 0.8);
+          if (hedef >= 0) {
+            kediUyku.value = 0;
+            kediBorcRef.current = true;
+            sicra(hedef, 300);
+            setTimeout(() => showToast("🐈 Tekir uyandı! Onun çatısına in, kurtarış hakkın geri gelsin."), 300);
+          }
         }
-        if (izledi) setTimeout(() => showToast(`🐈 Tekir'i izliyorsun ${rehberAdimRef.current}/${REHBER_N}`), 300);
+      } else if (kediBorcRef.current) {
+        if (landedId === rehberId.value) {
+          kediBorcRef.current = false;
+          kediHak.value = 1;
+          setTimeout(() => showToast("🐈 Tekir yine arkanda: bir kez tutar."), 300);
+        } else if (lp) {
+          const hedef = rehberHedef(list, landedId, lp.x + lp.width * ratio, W, CHARACTER_WIDTH * 0.8);
+          if (hedef >= 0 && hedef !== rehberId.value) sicra(hedef, 200);
+        }
+      } else if (rehberId.value !== landedId) {
+        sicra(landedId, 150);
       }
-      if (REHBER_OTO && rehberFinal.value === 0) setTimeout(() => otoZiplaRef.current(), 1700);
+      if (REHBER_OTO) setTimeout(() => otoZiplaRef.current(), 1700);
     }
     if (MAHALLE_ON && !raceRef.current) {
       const kind = sakin(landedId);
@@ -2379,8 +2402,8 @@ export default function Game() {
     catWoken.value = -1;
     neighborLook.value = -1;
     if (REHBER_ON) {
-      setTekirKart(false);
-      rehberId.value = -1; rehberEski.value = -1; cancelAnimation(rehberHop); rehberHop.value = 1; cancelAnimation(rehberFinal); rehberFinal.value = 0; rehberAdimRef.current = 0;
+      rehberId.value = -1; rehberEski.value = -1; cancelAnimation(rehberHop); rehberHop.value = 1;
+      kediHak.value = 1; kediUyku.value = 0; cancelAnimation(kediTut); kediTut.value = 1; kediBorcRef.current = false; kediUykuSayRef.current = 0;
       // Koşu başında kedi ilk hedefinde beklesin (yeni kuleler üretildikten sonra).
       setTimeout(() => rehberYerlesRef.current(), 400);
     }
@@ -2890,9 +2913,11 @@ export default function Game() {
     const from = lastLandedId.value;
     const fp = platformById(list, from);
     if (!fp) return;
-    const hedef = otoAdimRef.current === 0 ? from + 1 : rehberId.value;
+    // Kanıt sırası: 2 güvenli zıplayış, 3. bilerek kısa (kurtarış), sonra güvenli; borçta kedinin kulesine.
+    const adim = otoAdimRef.current;
     otoAdimRef.current += 1;
-    const c = ortaSarj(list, from, px.value, hedef, W, CHARACTER_WIDTH * 0.8);
+    const hedef = kediBorcRef.current && rehberId.value > from ? rehberId.value : from + 1;
+    const c = adim === 2 ? iskaSarj(list, from, px.value, W, CHARACTER_WIDTH * 0.8) : ortaSarj(list, from, px.value, hedef, W, CHARACTER_WIDTH * 0.8);
     if (c < 0) return;
     runOnUI((cc: number) => {
       "worklet";
@@ -2911,8 +2936,8 @@ export default function Game() {
     const sid = lastLandedId.value;
     const sp = platformById(list, sid);
     if (!sp) return;
-    const h = rehberHedef(list, sid, sp.x + sp.width * 0.5, W, CHARACTER_WIDTH * 0.8);
-    if (h >= 0) { rehberEski.value = h; rehberId.value = h; rehberHop.value = 1; }
+    // TUTTUM!: kedi koşu başında amcanın kulesinin arka ucunda oturur.
+    rehberEski.value = sid; rehberId.value = sid; rehberHop.value = 1;
     if (REHBER_OTO) { otoAdimRef.current = 0; setTimeout(() => otoZiplaRef.current(), 1500); }
   };
   const onPressOut = useCallback((event: GestureResponderEvent) => {
@@ -3450,7 +3475,34 @@ export default function Game() {
         if (dusus.value === 0) {
           const el = MARTI_ON && denizIlk.value >= 0 ? hareketliListe(list, denizT.value) : list;
           const ll = KURUKAFA_ON && effectLeft.value > 0 ? scaledPlatforms(el, effectK.value) : el;
-          if (dususKesin(vy.value, py.value + PH / 2, ll)) { dusus.value = 1; dususAt.value = frame.timestamp; }
+          if (dususKesin(vy.value, py.value + PH / 2, ll)) {
+            dusus.value = 1; dususAt.value = frame.timestamp;
+            // TUTTUM!: hakkı olan uyanık kedi, amcanın zıpladığı kuledeyse onu kendi kulesine geri çeker
+            // (Şıp ile aynı yerleştirme; fizik/kamera/iniş değişmez). Deniz bölümünde önce Şıp.
+            const denizde = MARTI_ON && denizIlk.value >= 0 && lastLandedId.value >= denizIlk.value - 1 && lastLandedId.value < denizSon.value + 1;
+            if (REHBER_ON && !denizde && kediHak.value === 1 && kediUyku.value === 0 && rehberId.value >= 0 && rehberId.value === lastLandedId.value) {
+              let kp: any = null;
+              for (let i = 0; i < list.length; i++) if (list[i].id === rehberId.value) kp = list[i];
+              if (kp) {
+                px.value = kp.x + kp.width * 0.25; // kedi ön kenarda tutuyor; amca arkasına çekilir
+                py.value = kp.topY - PH / 2;
+                vx.value = 0;
+                vy.value = 0;
+                baseY.value = kp.topY;
+                phase.value = PHASE.IDLE;
+                dusus.value = 0;
+                lastLandedId.value = kp.id;
+                standingPlatformId.value = kp.id;
+                ayakOfs.value = 0;
+                kediHak.value = 0;
+                kediUyku.value = 1;
+                rehberHop.value = 1;
+                kediTut.value = 0;
+                kediTut.value = withTiming(1, { duration: 1500, easing: Easing.linear });
+                runOnJS(kediKurtardi)();
+              }
+            }
+          }
         } else {
           const kare = 1 + (Math.floor((frame.timestamp - dususAt.value) / DUSUS_KARE_MS) % 2);
           if (kare !== dusus.value) dusus.value = kare;
@@ -3741,12 +3793,12 @@ export default function Game() {
   const kediStil = (k: number) =>
     // eslint-disable-next-line react-hooks/rules-of-hooks
     useAnimatedStyle(() => {
-      const d = kediDurum(platforms.value, rehberId.value, rehberEski.value, rehberHop.value, rehberFinal.value, rehberBak.value, phase.value === PHASE.CHARGING ? 1 : 0);
+      const d = kediDurum(platforms.value, rehberId.value, rehberEski.value, rehberHop.value, kediTut.value, kediUyku.value);
       const q = TEKIR_POZ[k];
       if (!d || d.poz !== k) return { opacity: 0, transform: [{ translateX: -99999 }, { translateY: -99999 }] };
       const nefes = k === 0 ? 1 + 0.025 * rehberNefes.value : 1;
       // Ölçek merkezden uygulanır: takip noktasını (ax, ay) dünyada (d.x, d.y)'ye oturtmak için düzelt.
-      const sx = d.sc, sy = d.sc * nefes;
+      const sx = 1, sy = nefes;
       const cw = (q.w * TEKIR_S) / 2, ch = (q.h * TEKIR_S) / 2;
       const axw = (d.ters ? q.w - q.ax : q.ax) * TEKIR_S, ayw = q.ay * TEKIR_S;
       return {
@@ -4420,7 +4472,7 @@ export default function Game() {
             <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, width: PENCERE_W, height: PENCERE_H }, rehberPencereStyle]}>
               <Image source={PENCERE_SRC} style={{ width: "100%", height: "100%" }} resizeMode="stretch" fadeDuration={0} />
             </Animated.View>
-{TEKIR_POZ.map((q, k) => (
+{TEKIR_POZ.map((q, k) => k === 5 || k === 6 ? null : (
               <Animated.View key={`tekir-${k}`} pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, width: q.w * TEKIR_S, height: q.h * TEKIR_S }, tekirStil[k]]}>
                 <Image source={q.src} style={{ width: "100%", height: "100%" }} resizeMode="stretch" fadeDuration={0} />
               </Animated.View>
@@ -4594,6 +4646,12 @@ export default function Game() {
             feetCenterOffset={SOLE_CENTER_OFFSET + ANCHOR_SHIFT_PX * SPRITE_SCALE} feetHalf={PH / 2} gor={rigGor} poz={rigPoz} />
         ) : null}
         </Animated.View>
+        {/* TUTTUM!: uzanma ve tutma pozları amcanın ÖNÜNDE çizilir (dar kulede bacaklarının arkasında kalıyordu). */}
+        {REHBER_ON && [5, 6].map((k) => (
+          <Animated.View key={`tekir-on-${k}`} pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, width: TEKIR_POZ[k].w * TEKIR_S, height: TEKIR_POZ[k].h * TEKIR_S }, tekirStil[k]]}>
+            <Image source={TEKIR_POZ[k].src} style={{ width: "100%", height: "100%" }} resizeMode="stretch" fadeDuration={0} />
+          </Animated.View>
+        ))}
         {/* KIZARAN YÜZ FENER: sis katmanı amcanın üstünde; ortası açık, şarjla büyür (yalnız çizim). */}
         {FENER_ON && (
           <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, width: FENER_BOY, height: FENER_BOY }, fenerStyle]}>
@@ -5905,51 +5963,45 @@ const FIN_SC = 0.5;
 /** PEŞİMDEKİ KEDİ: Kıvılcım poz sayfasından kesilen 5 poz (aynı ölçek). ax/ay = takip noktası (piksel):
  *  yerdeki pozlarda basan patiler, havada gövde ortası. TEKIR_S: piksel → dünya (bekleme ≈ 110 birim boy). */
 const TEKIR_POZ = [
-  // Video 14-01 sonrası: oyun üslubunda yeniden çizim (Kıvılcım kedi-pozlar2.png, aynı ölçek). Sıra kod içi poz numarası.
-  { src: require("@/assets/environment/mahalle/tekir-bekleme.png"), w: 281, h: 385, ax: 150, ay: 378 },
-  { src: require("@/assets/environment/mahalle/tekir-hazir.png"), w: 383, h: 237, ax: 225, ay: 230 },
-  { src: require("@/assets/environment/mahalle/tekir-kalkis.png"), w: 355, h: 366, ax: 70, ay: 359 },
-  { src: require("@/assets/environment/mahalle/tekir-havada.png"), w: 377, h: 271, ax: 196, ay: 137 },
-  { src: require("@/assets/environment/mahalle/tekir-inis.png"), w: 370, h: 369, ax: 269, ay: 362 },
-  { src: require("@/assets/environment/mahalle/tekir-cagirma.png"), w: 300, h: 375, ax: 181, ay: 368 },
-  { src: require("@/assets/environment/mahalle/tekir-geribak.png"), w: 374, h: 361, ax: 159, ay: 354 },
-  { src: require("@/assets/environment/mahalle/tekir-mama.png"), w: 325, h: 307, ax: 165, ay: 300 },
+  // Video 15-43 sonrası "Tuttum!" (Kıvılcım kedi-pozlar3.png, sabit gövde ölçeği). Sıra kod içi poz numarası.
+  { src: require("@/assets/environment/mahalle/tekir3-hazir.png"), w: 297, h: 345, ax: 151, ay: 341 },
+  { src: require("@/assets/environment/mahalle/tekir3-hazirlanma.png"), w: 418, h: 247, ax: 235, ay: 243 },
+  { src: require("@/assets/environment/mahalle/tekir3-kalkis.png"), w: 345, h: 347, ax: 79, ay: 343 },
+  { src: require("@/assets/environment/mahalle/tekir3-havada.png"), w: 381, h: 276, ax: 190, ay: 137 },
+  { src: require("@/assets/environment/mahalle/tekir3-inis.png"), w: 355, h: 356, ax: 243, ay: 351 },
+  { src: require("@/assets/environment/mahalle/tekir3-uzanma.png"), w: 365, h: 303, ax: 332, ay: 298 },
+  { src: require("@/assets/environment/mahalle/tekir3-tutma.png"), w: 338, h: 297, ax: 290, ay: 292 },
+  { src: require("@/assets/environment/mahalle/tekir3-uyuma.png"), w: 284, h: 232, ax: 138, ay: 228 },
 ] as const;
-const TEKIR_S = 143 / 372; // video 14-01: telefonda küçüktü → 1,3 kat (bekleme ≈ 143 birim)
+/** Video 15-43: kedi amcanın boyunun ~2/3'üydü → oturan kedi ≈ amcanın %40'ı (≈ 81 birim). */
+const TEKIR_S = 81 / 345;
+/** Kedi kulenin arka ucunda oturur (amcanın üstüne binmesin). */
+const KEDI_ARKA = 0.16;
+const KEDI_ON_UC = 0.86;
 /** Sıçrama zaman çizelgesi (rehberHop 0→1): hazırlanma → kalkış → havada → iniş → oturma. */
 const T_HAZIR = 0.18, T_KALK = 0.3, T_INIS = 0.78, T_OTUR = 0.9;
-/** Kedinin konumu ve pozu (yalnız değer alır). poz: 0 bekleme, 1 hazırlanma, 2 kalkış, 3 havada, 4 iniş,
- *  5 çağırma (amca şarj ederken), 6 geri bakma (izlenmeyince), 7 mama (pencere finali). */
-function kediDurum(list: any[], id: number, eski: number, h: number, fin: number, bak: number, cagir: number) {
+/** Kedinin konumu ve pozu (yalnız değer alır). poz: 0 hazır, 1 hazırlanma, 2 kalkış, 3 havada, 4 iniş,
+ *  5 uzanma ve 6 tutma (kurtarış, tut 0→1), 7 uyuma. */
+function kediDurum(list: any[], id: number, eski: number, h: number, tut: number, uyku: number) {
   "worklet";
   if (id < 0) return null;
   let a: any = null, b: any = null;
   for (let i = 0; i < list.length; i++) { if (list[i].id === id) b = list[i]; if (list[i].id === eski) a = list[i]; }
   if (!b) return null;
-  const bx = b.x + b.width * 0.68, by = b.topY;
-  const ax = a ? a.x + a.width * 0.68 : bx, ay = a ? a.topY : by;
+  const by = b.topY;
+  // Kurtarış: kulenin ön kenarına uzanır, sonra dişleriyle tutup çeker.
+  if (tut < 1) return { x: b.x + b.width + 4, y: by, poz: tut < 0.3 ? 5 : 6, ters: false };
+  // Uyurken kurtardığı ön kenarda kıvrılır (amca arkada durur).
+  const bx = b.x + b.width * (uyku > 0 && h >= T_OTUR ? KEDI_ON_UC : KEDI_ARKA);
+  const ax = a ? a.x + a.width * KEDI_ARKA : bx, ay = a ? a.topY : by;
   const u = Math.max(0, Math.min(1, (h - T_HAZIR) / (T_OTUR - T_HAZIR)));
-  let x = ax + (bx - ax) * u;
-  let y = ay + (by - ay) * u - Math.sin(Math.PI * u) * 150;
-  // h = 0: sıçrama bekliyor (eski kulede oturur; geri bakma burada).
+  const x = ax + (bx - ax) * u;
+  let y = ay + (by - ay) * u - Math.sin(Math.PI * u) * 110;
   let poz = h <= 0 || h >= T_OTUR ? 0 : h < T_HAZIR ? 1 : h < T_KALK ? 2 : h < T_INIS ? 3 : 4;
-  if (poz === 3) y -= 35; // havada takip noktası gövde ortası
-  // Final: kedi çatıdan cephedeki ışıklı pencerenin pervazına iner (amcanın üstüne binmesin).
-  let sc = 1;
-  if (fin > 0) {
-    const px2 = b.x + b.width / 2 - PENCERE_W / 2 + PERVAZ_X, py2 = b.topY + PERVAZ_Y;
-    x = bx + (px2 - bx) * fin;
-    y = by + (py2 - by) * fin - Math.sin(Math.PI * fin) * 70;
-    sc = 1 + (FIN_SC - 1) * fin;
-    poz = fin < 0.85 ? 3 : 7;
-    if (poz === 3) y -= 35 * sc;
-  }
-  if (poz === 0 && fin <= 0) {
-    if (bak > 0.5) poz = 6; // "sen nereye?"
-    else if (cagir > 0) poz = 5; // amca şarj ederken miyavlayıp çağırır
-  }
-  const ters = bx < ax && (poz >= 1 && poz <= 4);
-  return { x, y, poz, ters, sc };
+  if (poz === 3) y -= 20; // havada takip noktası gövde ortası
+  if (poz === 0 && uyku > 0) poz = 7;
+  const ters = bx < ax && poz >= 1 && poz <= 4;
+  return { x, y, poz, ters };
 }
 const DenizSlot = memo(function DenizSlot({ index, platforms, denizT, govdeY, denizIlk }: any) {
   const st = useAnimatedStyle(() => {

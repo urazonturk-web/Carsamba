@@ -3560,3 +3560,10 @@ CHANGED: Kod değişmedi. Yeni: KEDI-VIDEO-1543-2026-11-28/ (DENETIM.md, kareler
 EVIDENCE: Ölçüm (yakin.jpg, göz ile piksel karşılaştırma, ±%10): oturan kedi ≈ amca boyunun 2/3'ü. Gözlem: havada pozu daha küçük gövdeli; 7,5 ve 10,5 sn karelerinde kedi amcanın üstünde. Teknik editörün kod okuması: Marmara Şıp kurtarışı fall→game over bloğunda, kedi kurtarışı aynı kalıpla bağlanabilir (doğrulanmadı, uygulanmadı).
 OPEN_ISSUES: Şıp/kedi çakışma önceliği; yeni pozlar çizilmedi; oran düzeltmesi uygulanmadı.
 NEXT: Kullanıcı onayıyla Kıvılcım şeridi, sonra pozlar ve kod.
+
+## KEDI-TUTTUM v1 — oyuna bağlama — 2026-11-28
+TASK: Kullanıcı "Evet, bağla": Tuttum! kurtarışı + 8 yeni poz.
+CHANGED: src/game/rehber.ts (KEDI_UYKU_N, iskaSarj), app/index.tsx (kedi durum makinesi, düşüşte kurtarış, kediDurum, TEKIR_POZ/TEKIR_S, kurtarış pozları amcanın önünde), assets/environment/mahalle/tekir3-*.png (8 dosya, toplam 1,3 MB).
+EVIDENCE (asset alanları): Dosya: Kıvılcım kedi-pozlar3.png → bağlı bileşen kesimi → assets/environment/mahalle/tekir3-{hazir,hazirlanma,kalkis,havada,inis,uzanma,tutma,uyuma}.png. Ölçü/pivot: alfa>120 taraması; yer pozlarında en alt 8 satırdaki patilerin ortası, havada kutu ortası; uzanma ax=332 (ön pati), tutma ax=290 elle ön patilere kaydırıldı. Katman: 0-4 ve 7 kule havuzundan sonra (amcanın arkasında), 5-6 karakter sarmalayıcısından sonra (amcanın önünde). Simülatör: üç Release kaydı, kurtarış → uyku → uyanış → hak geri akışı gözlendi (ai_review_evidence/KEDI-FIKIR-2026-11-28/RAPOR.md). Fizik/kamera/iniş/kule üretimi/puan dosyalarına dokunulmadı; yalnız düşüş eşiğinde Şıp kalıbıyla yerleştirme.
+OPEN_ISSUES: Telefonda elle oynanmadı. Dar kulede kısmi üst üste binme. Kurtarışta çekilme animasyonu yok.
+NEXT: Kullanıcının telefon videosu.

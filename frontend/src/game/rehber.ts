@@ -84,3 +84,34 @@ export function ortaSarj(list: readonly P[], fromId: number, startX: number, tar
   }
   return isabet.length ? isabet[Math.floor(isabet.length / 2)] : -1;
 }
+
+// TUTTUM! (2026-11-28, kullanıcı: "peşinden gelebilir, düşmek üzereyken ... kurtarabilmek"; 6 editör, şerit + poz onaylı).
+// Kedi amcanın PEŞİNDEN gelir (indiği kulenin arka ucuna sıçrar). Düşüş kesinleşince, hakkı varsa amcayı kendi kulesine
+// (amcanın zıpladığı kule) geri çeker: koşu sürer, puan yok. Sonra uyur; KEDI_UYKU_N iniş sonra uyanıp öne geçer,
+// onun kulesine inersen hak geri gelir ("pati borcu"). Fizik, kamera, kule üretimi, puan DEĞİŞMEZ.
+/** Kedi uyandıktan önce geçmesi gereken iniş sayısı. */
+export const KEDI_UYKU_N = 5;
+
+/** YALNIZ KANIT VİDEOSU: fromId'den hiçbir aday kuleye (from..from+2) inmeyen, from+1'e inen ilk şarjdan küçük bir şarj. */
+export function iskaSarj(list: readonly P[], fromId: number, startX: number, screenW: number, footW: number) {
+  const a = bul(list, fromId);
+  if (!a) return -1;
+  const aday: P[] = [];
+  for (let id = fromId; id <= fromId + 2; id++) { const q = bul(list, id); if (q) aday.push(q); }
+  const PH = CONFIG.playerHeight, dt = 1 / 120;
+  const bos: number[] = [];
+  for (let k = 1; k <= ADIM; k++) {
+    const v = jumpVelocity(k / ADIM, screenW);
+    let x = startX, y = a.topY - PH / 2, vy = v.vy, sonuc = -1;
+    for (let s = 0; s < 480; s++) {
+      const prevX = x, prevBottom = y + PH / 2;
+      const f = advanceFlight(x, y, v.vx, vy, dt, screenW);
+      x = f.x; y = f.y; vy = f.vy;
+      if (vy > 0) { const c = findFootLanding(aday, prevX, x, prevBottom, y + PH / 2, footW); if (c) { sonuc = aday[c.index].id; break; } }
+      if (y > 3000) break;
+    }
+    if (sonuc === fromId + 1) break;
+    if (sonuc < 0) bos.push(k / ADIM);
+  }
+  return bos.length ? bos[Math.floor(bos.length / 2)] : -1;
+}
