@@ -3528,3 +3528,10 @@ TASK: Üç fikir şeridi için 7 editöre 3-2-1 sıralama anketi.
 CHANGED: Kod değişmedi. Yeni: SERIT-2026-11-28/anket.md, anket/ (7 oy + codex kayıtları), ANKET-SONUC.md.
 EVIDENCE: Kedi 17 (4 birincilik), Veresiye 15 (3), Simit 10 (0). Kıvılcım görsel üretmeden metinle oy verdi.
 OPEN_ISSUES: Kedi ile Veresiye arası fark küçük; birleşik tasarım önerisi kullanıcı onayı bekliyor.
+
+## KEDI-REHBER-2026-11-28 — Peşimdeki Kedi gri kutu — 2026-11-28
+TASK: Anket birincisi "Peşimdeki Kedi"yi gri kutu olarak oyuna bağla.
+CHANGED: Yeni src/game/rehber.ts (hedef seçimi + adillik araması, REHBER_OTO kanıt pilotu false). app/index.tsx: rehber kedi/pencere çizimi, onLanding tepkisi, koşu başı ve menü yerleştirmesi, BUILD_TAG "PESIMDEKI KEDI GRI KUTU". Fizik/kamera/kule üretimi/puan kuralı değişmedi.
+EVIDENCE: Simülasyon sonucu (sim_rehber.cjs, gerçek kod, 40 tohum × 43 kule × 3 ayak): W=393 N+1 pencere medyan %16,0, N+2 %11,5, iki ileri %97,2, seçilen hedefe inmeyen 0; W=440 N+1 %15,0, N+2 %11,0, iki ileri %99,7, inmeyen 0. Simülatör videosu sim-kedi.mp4 (otomatik pilot; 4 izleme + final). Telefon paketi: strings main.jsbundle | grep PESIMDEKI KEDI = 1; devicectl yükleme başarılı. Telefonda elle oynanmadı.
+OPEN_ISSUES: Kurukafa DAR kuleler etkisinde adillik denetimi ölçeksiz genişlikle; final penceresi gri kutu; kedi tepki balonu yok.
+NEXT: Kullanıcı videosu/değerlendirmesi; beğenilirse Kıvılcım ile kedi sıçrama pozları ve pencere sahnesi.

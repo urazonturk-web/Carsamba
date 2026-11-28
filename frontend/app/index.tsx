@@ -101,6 +101,7 @@ function hideOpening() {
 }
 setTimeout(hideOpening, 6000); // güvenlik: bir şey takılırsa açılış ekranında kalmasın
 const MENU_ON = true; // açılış menüsü
+import { REHBER_ON, REHBER_N, rehberHedef, REHBER_OTO, ortaSarj } from "../src/game/rehber";
 import { MARTI_ON, MARTI_TETIK_ID, SIMIT_LIFT, SIMIT_SIZE, SIMIT_HIT_R, TASIMA_MS, TASIMA_YAY, PHASE_CARRIED, BOLUM_N, KONTEYNER_N, BOLUM_TEMA, bolumSigar, bolumUret, denizX, hareketliListe } from "../src/game/deniz";
 import { KURUKAFA_ON, SKULL_SOURCE, SKULL_SIZE, SKULL_HIT_R, skullTouches, skullAfter, skullLift, skullPoint, scaledPlatforms, rollSkullEffect } from "../src/game/kurukafa";
 import { referencePlatform, referenceTowerWidth } from "../src/game/reference-course";
@@ -394,7 +395,7 @@ const AnimatedImage = Animated.createAnimatedComponent(Image);
 const BG_SCROLL_TEST = true as boolean;
 const BG_SCROLL_RATIO = 0.45;
 const BG_SCROLL_TILES = 4;
-const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "TEK SAYFA 6 KARE + YUMUSAK DOGRULMA") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
+const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "PESIMDEKI KEDI GRI KUTU") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
 const DIAG_MAX_EXAMPLES = 6;
 const HOUSE_AB_FROZEN = false as boolean;
 // REVIZYON-066 experiment (one variable): expo-linear-gradient's iOS layer
@@ -1099,6 +1100,14 @@ export default function Game() {
   const catsRef = useRef<string[]>([]);
   const catWoken = useSharedValue(-1); // amcanın indiği kedili kule: turuncu kedi gerinir
   const neighborLook = useSharedValue(-1); // amcanın indiği cumbalı kule: teyze başını kaldırıp bakar
+  // PEŞİMDEKİ KEDİ (gri kutu): kedinin beklediği kule, bir önceki kulesi (sıçrama yayı), sıçrama 0→1, pencere finali.
+  const rehberId = useSharedValue(-1);
+  const rehberEski = useSharedValue(-1);
+  const rehberHop = useSharedValue(1);
+  const rehberFinal = useSharedValue(0);
+  const rehberAdimRef = useRef(0);
+  const otoZiplaRef = useRef<() => void>(() => {});
+  const rehberYerlesRef = useRef<() => void>(() => {});
   // KARGALAR: kaba saat (250 ms; her karede değil, 14 kule × 8 katman eşleyici her karede koşmasın),
   // kaçan kuleler ve son kaçışın ilerlemesi.
   const kTick = useSharedValue(0);
@@ -2050,6 +2059,27 @@ export default function Game() {
       }
     }
     if (KARGA_ON) kargaKacirRef.current(landedId, ratio);
+    if (REHBER_ON && !raceRef.current && rehberFinal.value === 0) {
+      // PEŞİMDEKİ KEDİ: kedinin kulesine indiysen izledin; kedi yeniden (adilse) iki kule ileri sıçrar.
+      const izledi = rehberId.value >= 0 && landedId === rehberId.value;
+      if (izledi) rehberAdimRef.current += 1;
+      const list = platforms.value;
+      const lp = platformById(list, landedId);
+      if (izledi && rehberAdimRef.current >= REHBER_N) {
+        rehberFinal.value = withTiming(1, { duration: 900 });
+        setTimeout(() => showToast("🐈 Tekir seni ışıklı bir pencereye getirdi. \"Demek buraya...\""), 500);
+      } else if (lp) {
+        const hedef = rehberHedef(list, landedId, lp.x + lp.width * ratio, W, CHARACTER_WIDTH * 0.8);
+        if (hedef >= 0 && hedef !== rehberId.value) {
+          rehberEski.value = rehberId.value >= 0 ? rehberId.value : landedId;
+          rehberId.value = hedef;
+          rehberHop.value = 0;
+          rehberHop.value = withDelay(izledi ? 450 : 250, withTiming(1, { duration: 650, easing: Easing.inOut(Easing.quad) }));
+        }
+        if (izledi) setTimeout(() => showToast(`🐈 Tekir'i izliyorsun ${rehberAdimRef.current}/${REHBER_N}`), 300);
+      }
+      if (REHBER_OTO && rehberFinal.value === 0) setTimeout(() => otoZiplaRef.current(), 1700);
+    }
     if (MAHALLE_ON && !raceRef.current) {
       const kind = sakin(landedId);
       const list = platforms.value;
@@ -2336,6 +2366,11 @@ export default function Game() {
     setSpeech(null);
     catWoken.value = -1;
     neighborLook.value = -1;
+    if (REHBER_ON) {
+      rehberId.value = -1; rehberEski.value = -1; cancelAnimation(rehberHop); rehberHop.value = 1; cancelAnimation(rehberFinal); rehberFinal.value = 0; rehberAdimRef.current = 0;
+      // Koşu başında kedi ilk hedefinde beklesin (yeni kuleler üretildikten sonra).
+      setTimeout(() => rehberYerlesRef.current(), 400);
+    }
     SAKIN_TOHUM.value = (Math.random() * 2147483647) | 0; // her oyunda başka sakinler (CESIT-SAKIN 14:03 videosu)
     kGone.value = [];
     cancelAnimation(tepki);
@@ -2834,6 +2869,39 @@ export default function Game() {
     }
   };
 
+  // PEŞİMDEKİ KEDİ kanıt videosu otomatik pilotu (REHBER_OTO false iken hiç çalışmaz).
+  const otoAdimRef = useRef(0);
+  const otoZipla = useCallback(() => {
+    if (!REHBER_OTO) return;
+    const list = platforms.value;
+    const from = lastLandedId.value;
+    const fp = platformById(list, from);
+    if (!fp) return;
+    const hedef = otoAdimRef.current === 0 ? from + 1 : rehberId.value;
+    otoAdimRef.current += 1;
+    const c = ortaSarj(list, from, px.value, hedef, W, CHARACTER_WIDTH * 0.8);
+    if (c < 0) return;
+    runOnUI((cc: number) => {
+      "worklet";
+      if (running.value !== 1 || phase.value !== PHASE.IDLE) return;
+      touchStartedAt.value = 0;
+      charge.value = 0;
+      phase.value = PHASE.CHARGING;
+      doLaunch(cc * CONFIG.maxChargeDuration * 1000, 0);
+    })(c);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [W]);
+  otoZiplaRef.current = otoZipla;
+  rehberYerlesRef.current = () => {
+    if (!REHBER_ON || raceRef.current || rehberId.value >= 0) return;
+    const list = platforms.value;
+    const sid = lastLandedId.value;
+    const sp = platformById(list, sid);
+    if (!sp) return;
+    const h = rehberHedef(list, sid, sp.x + sp.width * 0.5, W, CHARACTER_WIDTH * 0.8);
+    if (h >= 0) { rehberEski.value = h; rehberId.value = h; rehberHop.value = 1; }
+    if (REHBER_OTO) { otoAdimRef.current = 0; setTimeout(() => otoZiplaRef.current(), 1500); }
+  };
   const onPressOut = useCallback((event: GestureResponderEvent) => {
     const timestamp = event.nativeEvent.timestamp;
     runOnUI((endedAt: number) => {
@@ -3654,6 +3722,33 @@ export default function Game() {
   }));
   const doorOpenStyle = useAnimatedStyle(() => ({ opacity: doorOpen.value }));
   // MARTI KAPTI (gri kutu) çizimleri: simit halkası, taşıyan martı, gemi gövdesi.
+  // PEŞİMDEKİ KEDİ: tekir, beklediği kulenin çatısında (uzak yarısında) oturur; yeni kuleye yay çizerek sıçrar.
+  const rehberKediStyle = useAnimatedStyle(() => {
+    const list = platforms.value;
+    const id = rehberId.value;
+    if (id < 0) return { opacity: 0, transform: [{ translateX: -99999 }, { translateY: -99999 }] };
+    let a: any = null, b: any = null;
+    for (let i = 0; i < list.length; i++) { if (list[i].id === id) b = list[i]; if (list[i].id === rehberEski.value) a = list[i]; }
+    if (!b) return { opacity: 0, transform: [{ translateX: -99999 }, { translateY: -99999 }] };
+    const t = rehberHop.value;
+    const bx = b.x + b.width * 0.68, by = b.topY;
+    const ax = a ? a.x + a.width * 0.68 : bx, ay = a ? a.topY : by;
+    // Final: kedi çatıdan cephedeki ışıklı pencerenin pervazına iner (amcanın üstüne binmesin).
+    const fin = rehberFinal.value;
+    const cx = ax + (bx - ax) * t;
+    const fy = ay + (by - ay) * t - Math.sin(Math.PI * t) * 150 + fin * (60 + REHBER_PENCERE_W * 1.25) - Math.sin(Math.PI * fin) * 60;
+    const h = REHBER_KEDI_W * KEDI_YENI_ASPECT;
+    return { opacity: 1, transform: [{ translateX: cx - REHBER_KEDI_W / 2 }, { translateY: fy - h * KEDI_YENI[3].foot }, { scaleX: bx < ax ? -1 : 1 }] };
+  });
+  // Final: kedinin oturduğu kulenin cephesinde sarı ışıklı pencere.
+  const rehberPencereStyle = useAnimatedStyle(() => {
+    const list = platforms.value;
+    const id = rehberId.value;
+    let b: any = null;
+    for (let i = 0; i < list.length; i++) if (list[i].id === id) b = list[i];
+    if (!b || rehberFinal.value <= 0) return { opacity: 0, transform: [{ translateX: -99999 }, { translateY: -99999 }] };
+    return { opacity: rehberFinal.value, transform: [{ translateX: b.x + b.width * 0.68 - REHBER_PENCERE_W / 2 }, { translateY: b.topY + 60 }] };
+  });
   const simitStyle = useAnimatedStyle(() => {
     const a = skullBob.value * Math.PI * 2;
     return { opacity: simitVis.value, transform: [{ translateX: simitX.value - SIMIT_SIZE / 2 }, { translateY: simitY.value - SIMIT_SIZE / 2 + Math.sin(a) * 6 }, { rotate: `${Math.sin(a) * 10}deg` }] };
@@ -4300,6 +4395,14 @@ export default function Game() {
             effectK={KURUKAFA_ON ? effectK : undefined}
           />
         ))}
+        {REHBER_ON && (
+          <>
+            <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, width: REHBER_PENCERE_W, height: REHBER_PENCERE_W * 1.25, borderRadius: 6, backgroundColor: "#ffd970", borderWidth: 5, borderColor: "#6b4a2b", shadowColor: "#ffcf4a", shadowOpacity: 0.9, shadowRadius: 18 }, rehberPencereStyle]} />
+            <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, width: REHBER_KEDI_W, height: REHBER_KEDI_W * KEDI_YENI_ASPECT }, rehberKediStyle]}>
+              <Image source={KEDI_YENI[3].src} style={{ width: "100%", height: "100%" }} resizeMode="stretch" fadeDuration={0} />
+            </Animated.View>
+          </>
+        )}
         
         {HEDEF_PARILTI && (
           <Animated.View style={[styles.targetGlow, targetGlowStyle]}>
@@ -4897,7 +5000,7 @@ export default function Game() {
                       <Text style={styles.friendPillGo}>Oyna ›</Text>
                     </Pressable>
                   )}
-                  <Pressable testID="menu-play" style={({ pressed }) => [styles.trPlayBtn, styles.iconBtn, styles.pcTicket, { marginTop: 8 }, pressed && styles.playBtnPressed]} onPress={() => { setMenuOpen(false); announceDay(); }}>
+                  <Pressable testID="menu-play" style={({ pressed }) => [styles.trPlayBtn, styles.iconBtn, styles.pcTicket, { marginTop: 8 }, pressed && styles.playBtnPressed]} onPress={() => { setMenuOpen(false); announceDay(); setTimeout(() => rehberYerlesRef.current(), 300); }}>
                     <View pointerEvents="none" style={[styles.pcNotch, { left: -9 }]} /><View pointerEvents="none" style={[styles.pcNotch, { right: -9 }]} />
                     <Ico name="play.fill" size={20} color="#fff8ec" />
                     <Text style={styles.playBtnText}>Oyna</Text>
@@ -5757,6 +5860,9 @@ const PopupHouseView = memo(function PopupHouseView({ index, platforms, styles }
 
 // MARTI KAPTI (gri kutu): deniz bölümü yüzeyleri. 1 konteyner istifi (güverteye kadar), 2 sallanan kayık, 3 iskele.
 const KONTEYNER_RENK = ["#c0392b", "#2e6da4", "#2f8f5b", "#d08a26"];
+/** PEŞİMDEKİ KEDİ çizim ölçüleri (dünya birimi). */
+const REHBER_KEDI_W = 150;
+const REHBER_PENCERE_W = 80;
 const DenizSlot = memo(function DenizSlot({ index, platforms, denizT, govdeY, denizIlk }: any) {
   const st = useAnimatedStyle(() => {
     const list = platforms.value;
