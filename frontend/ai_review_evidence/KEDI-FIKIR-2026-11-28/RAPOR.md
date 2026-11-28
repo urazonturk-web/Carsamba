@@ -34,3 +34,6 @@ Neden: zıplama kontrolü değişmez (amca havada tekrar zıplayamaz; "kedinin k
 
 ## Sonraki adım (onay gerekir)
 Kural gereği yeni fikir önce Kıvılcım ile 5 karelik şerit olarak çizilir; ardından eksik pozlar (uzanıp tutma, uyuma) ve oranı düzeltilmiş tüm poz sayfası.
+
+## Şerit (2026-11-28, kullanıcı onayı "Evet, çizdir", 1 Kıvılcım çağrısı)
+serit/serit-tuttum.png (1536×1024), komut serit/prompt.md. 5 kare: peşinden gelen kedi → kısa ıska → "Tuttum!" yakadan yakalama → okşama, kedi yoruluyor → kedi bacada uyuyor, amca "Sen dinlen, ben dikkatli olurum." Denetim: amca/kedi referanslara sadık, Türkçe balonlar doğru, din motifi yok. Oran 1., 2., 4., 5. karelerde amcanın dizi-beli arası; 3. karede kurtarış anı için kedi abartılı büyük. Oyuna bağlanmadı.
