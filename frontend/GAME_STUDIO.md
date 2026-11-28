@@ -2117,3 +2117,4 @@ TESLIM_HAZIR: KEDI-POZ-2026-11-28 — tekir kedi 6 poz sayfası (ai_review_evide
 TESLIM_HAZIR: KEDI-POZ-BAG-2026-11-28 — kedi 5 pozla hareket ediyor (telefonda, BUILD_TAG PESIMDEKI KEDI 5 POZ); pencere finali çiziliyor.
 TESLIM_HAZIR: KEDI-PENCERE-2026-11-28 — final ışıklı pencere görseli (ai_review_evidence/KEDI-REHBER-2026-11-28/kedi-pencere.png); oyuna bağlanmadı, kullanıcı kabulü bekleniyor.
 TESLIM_HAZIR: KEDI-PENCERE-BAG-2026-11-28 — Peşimdeki Kedi finali çizilmiş ışıklı cumbayla (telefonda, BUILD_TAG PESIMDEKI KEDI + PENCERE); kullanıcının oynayıp değerlendirmesi bekleniyor.
+TESLIM_HAZIR: KEDI-V2-2026-11-28 — kedi oyun üslubunda 8 pozla, 1,3 kat büyük, finalde 'Tekir'in penceresi' kartpostalı (telefonda, BUILD_TAG KEDI v2); kullanıcının oynayıp değerlendirmesi bekleniyor.

@@ -45,3 +45,15 @@ Kullanıcı: "peşimdeki kedi ile devam edelim" (anket: Kedi 17, Veresiye 15, Si
 - Hata ve düzeltme: ilk derlemede kedi finalde kayboldu. Sebep: worklet kediDurum(), sonradan tanımlanan PENCERE_* sabitlerini tanımsız yakalıyordu (AI_REVIEW'daki classifyGap sıra hatasıyla aynı sınıf). Sabitler fonksiyonun önüne taşındı; ikinci kayıtta kedi pervazda (final2.jpg, final-yakin.jpg).
 - Kanıt: sim-kedi-final.mp4 (simülatör, otomatik pilot). Telefon: BUILD_TAG "PESIMDEKI KEDI + PENCERE", paket strings = 1, "App installed". Telefonda elle oynanmadı.
 - Risk: pencere, kulenin kendi cephe çizimlerinin (cumba/kilim) üstüne biniyor; dar kulelerde pencere kuleden geniş görünebilir; kedi finalde küçük (≈60 birim).
+
+## Görsel iyileştirme (video 14-01 sonrası, kullanıcı "Evet, hepsi")
+- Kıvılcım 2 çağrı (paralel): kedi-pozlar2.png 1536×1024 RGBA (gerçek alfa, %71 şeffaf), 4×2: bekleme, çağırma, geri bakma, hazırlanma / kalkış, havada, iniş, mama — kalın kontur, boyalı tüy, oyun üslubu. kart-tekir.png 1200×840: alacakaranlıkta cumba, el sallayan teyze, mama yiyen tekir, amca. Önizleme kedi-pozlar2-onizleme.jpg.
+- Kod (görselden bağımsız, henüz derlenmedi): TEKIR_S 110→143/359 (1,3 kat), izlenince kedi beklemeden sıçrar (gecikme 450→0 ms), FIN_SC 0,55→0,5.
+- Görseller oyuna BAĞLANMADI; kullanıcı kabulü bekleniyor.
+
+## Kedi v2 bağlandı (kullanıcı: "Evet, bağla")
+- 8 poz kesildi (assets/environment/mahalle/tekir-{bekleme,cagirma,geribak,hazir,kalkis,havada,inis,mama}.png); takip noktaları alfa taramasıyla (oturan pozlarda gövde/ayak arası, kalkışta arka ayak, inişte ön pati, havada gövde ortası). TEKIR_S = 143/372.
+- Poz kuralları: amca şarj ederken çağırma; izlenmeyince geri bakma (artık aynalama değil, çizilmiş poz); finalde pervazda mama.
+- Final kartpostalı: assets/postcards/kart-tekir.jpg; final anında 0,7 sn sonra açılır, 4 sn kalır (kamera değişmez, oyun sürer). İlk denemede kart beyaz kaldı (RN Image yüklemedi); diğer kartpostallar gibi expo-image ile çizilince düzeldi.
+- Simülatör kaydında Apple hesap penceresi çıktı; e-posta görünen kayıt silindi, yeniden kaydedildi.
+- Kanıt: sim-kedi-v2.mp4, v2-kareler.jpg, poz-yakin-v2.jpg. Telefon: BUILD_TAG "KEDI v2: YENI POZLAR + KARTPOSTAL", paket strings = 1, yükleme başarılı. Telefonda elle oynanmadı.

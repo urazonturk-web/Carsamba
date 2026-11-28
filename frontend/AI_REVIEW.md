@@ -3547,3 +3547,9 @@ TASK: Kabul edilen ışıklı cumbayı sarı gri kutunun yerine bağla; kedi per
 CHANGED: app/index.tsx (PENCERE_* sabitleri, kediDurum final yolu + ölçek, kedi stilinde merkezden ölçek düzeltmesi, pencere görseli), assets/environment/mahalle/kedi-pencere.png. BUILD_TAG "PESIMDEKI KEDI + PENCERE".
 EVIDENCE: Dosya kedi-pencere.png (Kıvılcım). Ölçü/pivot: 180×270 dünya, pervaz %63,5, kedi x %24,5. Katman: pencere kuleler önünde, kedi pencerenin önünde, karakter en önde. Gözlem: ilk kayıtta kedi kayboldu (worklet sabit sırası), düzeltme sonrası kedi pervazda (final-yakin.jpg). Telefon paketi strings = 1, yükleme başarılı.
 OPEN_ISSUES: Pencere kule cephe çizimleriyle çakışabilir; telefonda elle oynanmadı.
+
+## KEDI-V2-2026-11-28 — kedi görselleri yenilendi, kartpostal — 2026-11-28
+TASK: Video 14-01 denetimi sonrası kediyi oyun üslubunda yeniden çiz, büyüt, iniş çakışmasını gider, finali kartpostalla görünür kıl.
+CHANGED: app/index.tsx (8 pozlu TEKIR_POZ, kediDurum çağırma/geri bakma/mama, TEKIR_S 143/372, izlenince anında sıçrama, FIN_SC 0,5, tekirKart katmanı expo-image), 8 yeni kedi PNG, kart-tekir.jpg. Fizik/kamera/kule üretimi/puan değişmedi.
+EVIDENCE: Dosya: kedi-pozlar2.png ve kart-tekir.png (Kıvılcım, 2 çağrı). Ölçü/pivot: alfa taraması (ör. bekleme 281×385, nokta (150,378)). Katman: kedi kuleler önü/karakter arkası; kartpostal HUD altında, dokunmayı engellemez. Simülatör: sim-kedi-v2.mp4. Telefon paketi strings KEDI v2 = 1, yükleme başarılı.
+OPEN_ISSUES: Telefonda elle oynanmadı; kartpostal amcası oyundakinden biraz yuvarlak yüzlü.
