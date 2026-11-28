@@ -3553,3 +3553,10 @@ TASK: Video 14-01 denetimi sonrası kediyi oyun üslubunda yeniden çiz, büyüt
 CHANGED: app/index.tsx (8 pozlu TEKIR_POZ, kediDurum çağırma/geri bakma/mama, TEKIR_S 143/372, izlenince anında sıçrama, FIN_SC 0,5, tekirKart katmanı expo-image), 8 yeni kedi PNG, kart-tekir.jpg. Fizik/kamera/kule üretimi/puan değişmedi.
 EVIDENCE: Dosya: kedi-pozlar2.png ve kart-tekir.png (Kıvılcım, 2 çağrı). Ölçü/pivot: alfa taraması (ör. bekleme 281×385, nokta (150,378)). Katman: kedi kuleler önü/karakter arkası; kartpostal HUD altında, dokunmayı engellemez. Simülatör: sim-kedi-v2.mp4. Telefon paketi strings KEDI v2 = 1, yükleme başarılı.
 OPEN_ISSUES: Telefonda elle oynanmadı; kartpostal amcası oyundakinden biraz yuvarlak yüzlü.
+
+## KEDI-FIKIR — video 15-43 denetimi ve editör turu — 2026-11-28
+TASK: Kullanıcı: kedi orantısız, sıçrarken küçülüyor; hikâye "peşinden gelen kedi, düşerken kurtarış" olarak yeniden düşünülsün.
+CHANGED: Kod değişmedi. Yeni: KEDI-VIDEO-1543-2026-11-28/ (DENETIM.md, kareler), KEDI-FIKIR-2026-11-28/ (brief, 6 editör cevabı, RAPOR.md).
+EVIDENCE: Ölçüm (yakin.jpg, göz ile piksel karşılaştırma, ±%10): oturan kedi ≈ amca boyunun 2/3'ü. Gözlem: havada pozu daha küçük gövdeli; 7,5 ve 10,5 sn karelerinde kedi amcanın üstünde. Teknik editörün kod okuması: Marmara Şıp kurtarışı fall→game over bloğunda, kedi kurtarışı aynı kalıpla bağlanabilir (doğrulanmadı, uygulanmadı).
+OPEN_ISSUES: Şıp/kedi çakışma önceliği; yeni pozlar çizilmedi; oran düzeltmesi uygulanmadı.
+NEXT: Kullanıcı onayıyla Kıvılcım şeridi, sonra pozlar ve kod.
