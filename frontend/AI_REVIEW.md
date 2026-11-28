@@ -3515,3 +3515,10 @@ TASK: kullanıcı 22:04 videosu "bu fikri de beğenmedim" → "Evet, kapat".
 EVIDENCE (gözlem, ai_review_evidence/KAPALICARSI-VIDEO-2026-11-27/genel.jpg): çarşı bölümü çalışıyor; ama taş sütunlar kule gibi okunuyor ("aynı oyun, başka kaplama"), fener sisi (kimlik aralığına bağlı) çarşı bölümüne denk gelip manzarayı kararttı, geçiş parlaması kısa.
 CHANGED: deniz.ts MARTI_ON=false (tüm martı/çarşı yolları bu bayrakla kapalı). BUILD_TAG "TEK SAYFA 6 KARE + YUMUSAK DOGRULMA". Kalan tek ortak değişiklik: kare sonu kule üretimi `platforms.value` okur (aynı değer; davranış farkı yok). Telefona kuruldu.
 OPEN_ISSUES: fener sisi bölümlerle çakışabiliyordu (bayrak kapalıyken önemsiz). Süreç önerisi: yeni fikirler önce 4–6 karelik Kıvılcım şeridiyle onaylatılacak.
+
+## SERIT-2026-11-28 — üç fikir şeridi — 2026-11-28
+TASK: Editörlerden fikir topla, üç fikri 5 karelik çizgi roman şeridi olarak Kıvılcım'a çizdir.
+CHANGED: Kod değişmedi. Yeni: ai_review_evidence/SERIT-2026-11-28/ (brief, 4 editör yanıtı, 3 şerit PNG 1536×1024, codex kayıtları, RAPOR.md).
+EVIDENCE: Kıvılcım 3 çağrı (şerit başına 1). Görseller oyuna bağlanmadı.
+OPEN_ISSUES: Simit/sepet şeritlerinde amca üslubu oyundan yumuşak. Fikir seçimi kullanıcıda.
+NEXT: Kullanıcı bir fikir seçerse gri kutu prototip.

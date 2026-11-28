@@ -1,0 +1,102 @@
+OpenAI Codex v0.171.0-alpha.13.2
+--------
+workdir: /Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend/ai_review_evidence/SERIT-2026-11-28
+model: gpt-6-luna
+provider: openai
+approval: never
+sandbox: read-only
+reasoning effort: medium
+reasoning summaries: none
+session id: 01a22185-d230-7e00-8926-29b30e714a2a
+--------
+user
+# Byzantion — üç fikir şeridi için editör brief'i (2026-11-28)
+
+Oyun: iPhone, yan görünüş. Bir amca İstanbul sahil şeridi boyunca çatıdan çatıya / kuleden kuleye zıplıyor.
+Kontrol: ekrana bas-tut (şarj), bırak → zıplar. Yüzeye inerse puan, düşerse koşu biter. Arada duraklar (kartpostal), mevsimler, kedi/kuş dekorları var.
+
+DEĞİŞMEZ: zıplama fiziği, kamera, çatı silüeti, çarpışma. Tek dokunuş kontrolü kalır.
+YASAK İÇERİK: Arapça ünlem (maşallah, helal, nazar), dini motif (cami, minare vb.), film/karakter adı.
+
+KULLANICININ REDDETTİKLERİ (tekrar önerme):
+- "Kayıp Sefer": jetonla sepya geçmiş sahnesi (yalnız görünüş değişiyordu).
+- "Martı Kaptı": havada simit → martı amcayı gemiye taşır, konteyner/kayık parkuru. Kullanıcı: "olmamış, heyecan katmadı".
+- "Kapalıçarşı": havada anahtar → ani geçiş, çarşı çatılarında zıplama. Kullanıcı: "bu fikri de beğenmedim".
+- Sarnıç / yer altı su yolu (aynı "ışınlan, başka yerde aynı şeyi yap" kalıbı).
+DERS: Mekânı ya da kaplamayı değiştirmek hissi değiştirmiyor. Oyuncunun zıplarken düşündüğü, hissettiği, merak ettiği şey değişmeli.
+
+İSTENEN: Oyuncuda gerçek merak/heyecan uyandıracak, oyuna yeni bir KARAR veya DUYGU getiren 2 özgün fikir.
+Her fikir için:
+1. Ad (kısa, Türkçe).
+2. Tek cümle kanca: oyuncu ne yaşar, neden "bir daha oynayayım" der?
+3. Zıplama sırasında oyuncunun kafasındaki yeni soru/karar ne?
+4. 5 karelik çizgi roman şeridi: her kare için tek cümle sahne tarifi (görsel olarak çizilebilir, yan görünüş, amca + çatılar/sahil). Kısa konuşma balonu olabilir (Türkçe, 3-5 kelime).
+5. Neden önceki reddedilenlerden farklı (bir cümle).
+Kısa yaz, toplam 400 kelimeyi geçme.
+
+warning: Under-development features enabled: chronicle. Under-development features are incomplete and may behave unpredictably. To suppress this warning, set `suppress_unstable_features_warning = true` in /Users/bekirurazonturk/.codex/config.toml.
+codex
+### 1. Peşimdeki Kedi
+
+**Kanca:** Bir kedi her inişinden sonra başka bir çatıda belirir; oyuncu, amcanın peşine mi takıldığını yoksa onu bir yere mi götürdüğünü merak edip yeniden dener.
+
+**Yeni soru/karar:** Kedinin göründüğü çatıya mı atlayayım, yoksa bildiğim güvenli rotada mı kalayım?
+
+**Beş karelik şerit**
+
+1. Amca çatıya inerken bir kedi bacanın ardından ona bakar.  
+2. Amca sonraki çatıya atlarken kedi de kendi çatısında ilerler.  
+3. İki çatı ötede kedi durup geriye bakar; amca havada yönünü ona çevirir.  
+4. Amca kedinin çatısına inince kedi kısa bir miyavla ileriyi gösterir.  
+5. Son çatıda kedi bir pencerenin önüne oturur ve içeriden bir el ona mama uzatır.
+
+**Farkı:** Kedi dekor olarak kalmaz; oyuncunun iniş seçimine bağlı küçük bir ilişki ve merak hikâyesi taşır.
+
+### 2. Islığa Cevap
+
+**Kanca:** İleriden gelen kısa bir ıslığa her yaklaştığında yeni bir ipucu duyan oyuncu, sesin sahibini bulmak için bir tur daha atlar.
+
+**Yeni soru/karar:** Islığın geldiği çatıya ulaşmak için daha uzun sıçrayışı denemeye değer mi?
+
+**Beş karelik şerit**
+
+1. Amca bir çatıya inerken uzaktan iki notalı bir ıslık duyar.  
+2. Sonraki atlayışında sahildeki açık bir pencerede küçük bir gölge görür.  
+3. Amca güvenli yakın çatıyla sesin geldiği uzak çatı arasında seçim yapar.  
+4. Uzak çatıya inince ıslık bu kez hemen ileriden cevap verir.  
+5. Son çatının penceresindeki çocuk amcaya el sallar ve aynı ıslığı birlikte çalarlar.
+
+**Farkı:** Yeni bir mekâna ışınlanma yerine oyuncu, mevcut çatılardaki iniş kararlarıyla sesli bir karşılaşmanın peşinden gider.
+tokens used
+23.212.432
+### 1. Peşimdeki Kedi
+
+**Kanca:** Bir kedi her inişinden sonra başka bir çatıda belirir; oyuncu, amcanın peşine mi takıldığını yoksa onu bir yere mi götürdüğünü merak edip yeniden dener.
+
+**Yeni soru/karar:** Kedinin göründüğü çatıya mı atlayayım, yoksa bildiğim güvenli rotada mı kalayım?
+
+**Beş karelik şerit**
+
+1. Amca çatıya inerken bir kedi bacanın ardından ona bakar.  
+2. Amca sonraki çatıya atlarken kedi de kendi çatısında ilerler.  
+3. İki çatı ötede kedi durup geriye bakar; amca havada yönünü ona çevirir.  
+4. Amca kedinin çatısına inince kedi kısa bir miyavla ileriyi gösterir.  
+5. Son çatıda kedi bir pencerenin önüne oturur ve içeriden bir el ona mama uzatır.
+
+**Farkı:** Kedi dekor olarak kalmaz; oyuncunun iniş seçimine bağlı küçük bir ilişki ve merak hikâyesi taşır.
+
+### 2. Islığa Cevap
+
+**Kanca:** İleriden gelen kısa bir ıslığa her yaklaştığında yeni bir ipucu duyan oyuncu, sesin sahibini bulmak için bir tur daha atlar.
+
+**Yeni soru/karar:** Islığın geldiği çatıya ulaşmak için daha uzun sıçrayışı denemeye değer mi?
+
+**Beş karelik şerit**
+
+1. Amca bir çatıya inerken uzaktan iki notalı bir ıslık duyar.  
+2. Sonraki atlayışında sahildeki açık bir pencerede küçük bir gölge görür.  
+3. Amca güvenli yakın çatıyla sesin geldiği uzak çatı arasında seçim yapar.  
+4. Uzak çatıya inince ıslık bu kez hemen ileriden cevap verir.  
+5. Son çatının penceresindeki çocuk amcaya el sallar ve aynı ıslığı birlikte çalarlar.
+
+**Farkı:** Yeni bir mekâna ışınlanma yerine oyuncu, mevcut çatılardaki iniş kararlarıyla sesli bir karşılaşmanın peşinden gider.

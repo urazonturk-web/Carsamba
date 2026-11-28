@@ -1,0 +1,94 @@
+OpenAI Codex v0.171.0-alpha.13.2
+--------
+workdir: /Users/bekirurazonturk/Documents/GitHub/Carsamba/frontend/ai_review_evidence/SERIT-2026-11-28
+model: gpt-6-luna
+provider: openai
+approval: never
+sandbox: read-only
+reasoning effort: medium
+reasoning summaries: none
+session id: 01a22185-d1a4-78c1-9d91-f0d0166ae7dd
+--------
+user
+# Byzantion — üç fikir şeridi için editör brief'i (2026-11-28)
+
+Oyun: iPhone, yan görünüş. Bir amca İstanbul sahil şeridi boyunca çatıdan çatıya / kuleden kuleye zıplıyor.
+Kontrol: ekrana bas-tut (şarj), bırak → zıplar. Yüzeye inerse puan, düşerse koşu biter. Arada duraklar (kartpostal), mevsimler, kedi/kuş dekorları var.
+
+DEĞİŞMEZ: zıplama fiziği, kamera, çatı silüeti, çarpışma. Tek dokunuş kontrolü kalır.
+YASAK İÇERİK: Arapça ünlem (maşallah, helal, nazar), dini motif (cami, minare vb.), film/karakter adı.
+
+KULLANICININ REDDETTİKLERİ (tekrar önerme):
+- "Kayıp Sefer": jetonla sepya geçmiş sahnesi (yalnız görünüş değişiyordu).
+- "Martı Kaptı": havada simit → martı amcayı gemiye taşır, konteyner/kayık parkuru. Kullanıcı: "olmamış, heyecan katmadı".
+- "Kapalıçarşı": havada anahtar → ani geçiş, çarşı çatılarında zıplama. Kullanıcı: "bu fikri de beğenmedim".
+- Sarnıç / yer altı su yolu (aynı "ışınlan, başka yerde aynı şeyi yap" kalıbı).
+DERS: Mekânı ya da kaplamayı değiştirmek hissi değiştirmiyor. Oyuncunun zıplarken düşündüğü, hissettiği, merak ettiği şey değişmeli.
+
+İSTENEN: Oyuncuda gerçek merak/heyecan uyandıracak, oyuna yeni bir KARAR veya DUYGU getiren 2 özgün fikir.
+Her fikir için:
+1. Ad (kısa, Türkçe).
+2. Tek cümle kanca: oyuncu ne yaşar, neden "bir daha oynayayım" der?
+3. Zıplama sırasında oyuncunun kafasındaki yeni soru/karar ne?
+4. 5 karelik çizgi roman şeridi: her kare için tek cümle sahne tarifi (görsel olarak çizilebilir, yan görünüş, amca + çatılar/sahil). Kısa konuşma balonu olabilir (Türkçe, 3-5 kelime).
+5. Neden önceki reddedilenlerden farklı (bir cümle).
+Kısa yaz, toplam 400 kelimeyi geçme.
+
+warning: Under-development features enabled: chronicle. Under-development features are incomplete and may behave unpredictably. To suppress this warning, set `suppress_unstable_features_warning = true` in /Users/bekirurazonturk/.codex/config.toml.
+codex
+### 1. Işığı Kim Söndürüyor?
+
+**Kanca:** Her inişte sahildeki bir pencere ışığı sönüyor; amca son ışığa yetişip içeride kimin beklediğini anlamak için yeniden oynuyor.
+
+**Zıplarkenki karar:** Işığı kaybetmemek için kısa ve güvenli çatıyı mı, öne geçmek için uzun sıçrayışı mı seçeyim?
+
+1. Akşam sahilinde amca zıplarken uzaktaki tek sarı pencere birden kararır.  
+2. Önündeki iki çatıdan biri pencereye yaklaştırır, diğeri kolay iniş sunar.  
+3. Amca kısa çatıya inerken başka bir pencerede ışık yanar: “Orada kim var?”  
+4. Oyuncu ışığı izleyerek kule kule ilerler, her doğru seçim yeni bir pencereyi ortaya çıkarır.  
+5. Son inişte penceredeki kişi el sallar; sonraki koşuda başka ışıkların peşine düşülür.
+
+**Farkı:** Yeni mekâna geçiş veya dekor toplama yok; oyuncu iniş tercihiyle küçük bir sahil gizeminin izini sürüyor.
+
+### 2. Son Çatıdaki Ses
+
+**Kanca:** Rüzgârda duyulan üç kısa ses, amcayı sahildeki tanıdık bir melodiye götürüyor; hangi çatıda durup dinleyeceğini seçmek tekrar oynama merakı yaratıyor.
+
+**Zıplarkenki karar:** Bir sonraki sesi duymak için yakın inişi mi seçeyim, yoksa melodinin geldiği yöne uzanayım mı?
+
+1. Amca zıplarken uzaktan üç notalık bir ıslık duyar.  
+2. Sahil çatılarında iki rota açılır; birinde ses yaklaşır, ötekinde kesilir.  
+3. Amca inişini tamamlayınca melodiye yeni bir nota eklenir.  
+4. Oyuncu sonraki sıçrayışlarda eksik notayı arar; “Bir nota daha var mı?” diye düşünür.  
+5. Son çatıda mahalle sakinleri aynı melodiyi ıslıkla tamamlar.
+
+**Farkı:** Zıplama ve iniş kuralları sabit kalırken hedef, puan veya nesne değil, duyup tamamlanan bir melodidir.
+tokens used
+13.485.916
+### 1. Işığı Kim Söndürüyor?
+
+**Kanca:** Her inişte sahildeki bir pencere ışığı sönüyor; amca son ışığa yetişip içeride kimin beklediğini anlamak için yeniden oynuyor.
+
+**Zıplarkenki karar:** Işığı kaybetmemek için kısa ve güvenli çatıyı mı, öne geçmek için uzun sıçrayışı mı seçeyim?
+
+1. Akşam sahilinde amca zıplarken uzaktaki tek sarı pencere birden kararır.  
+2. Önündeki iki çatıdan biri pencereye yaklaştırır, diğeri kolay iniş sunar.  
+3. Amca kısa çatıya inerken başka bir pencerede ışık yanar: “Orada kim var?”  
+4. Oyuncu ışığı izleyerek kule kule ilerler, her doğru seçim yeni bir pencereyi ortaya çıkarır.  
+5. Son inişte penceredeki kişi el sallar; sonraki koşuda başka ışıkların peşine düşülür.
+
+**Farkı:** Yeni mekâna geçiş veya dekor toplama yok; oyuncu iniş tercihiyle küçük bir sahil gizeminin izini sürüyor.
+
+### 2. Son Çatıdaki Ses
+
+**Kanca:** Rüzgârda duyulan üç kısa ses, amcayı sahildeki tanıdık bir melodiye götürüyor; hangi çatıda durup dinleyeceğini seçmek tekrar oynama merakı yaratıyor.
+
+**Zıplarkenki karar:** Bir sonraki sesi duymak için yakın inişi mi seçeyim, yoksa melodinin geldiği yöne uzanayım mı?
+
+1. Amca zıplarken uzaktan üç notalık bir ıslık duyar.  
+2. Sahil çatılarında iki rota açılır; birinde ses yaklaşır, ötekinde kesilir.  
+3. Amca inişini tamamlayınca melodiye yeni bir nota eklenir.  
+4. Oyuncu sonraki sıçrayışlarda eksik notayı arar; “Bir nota daha var mı?” diye düşünür.  
+5. Son çatıda mahalle sakinleri aynı melodiyi ıslıkla tamamlar.
+
+**Farkı:** Zıplama ve iniş kuralları sabit kalırken hedef, puan veya nesne değil, duyup tamamlanan bir melodidir.

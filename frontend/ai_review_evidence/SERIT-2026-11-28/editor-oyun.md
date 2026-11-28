@@ -1,0 +1,3 @@
+(Oyun tasarımı editörü yanıtı — 2026-11-28)
+FİKİR 1: Son Nefes — sıcak simit torbası; uzun şarj = büyük çarpan ama simit soğur. Soru: "Uzağa mı, sıcağa mı?" Şerit: buharlı torba / şarjla buhar inceliyor / geniş boşlukta buhar kesilmiş / uzak kuleye iniş, yaşlı kadın el uzatır / soğuk simide gülümser, "Yine de olur."
+FİKİR 2: Pencerede Işık — ışıklı pencereli (daha dar/zor) kuleye yakın inersen içeriden biri el sallar, not sarkıtır; toplanan küçük insan anları. Soru: "Işıklı dar kule mi, karanlık geniş kule mi?" Şerit: gece tek sarı pencere / yanında geniş karanlık çatı "Hangisi?" / havada dar aralık / iniş, el sallama / saksı, şapka kaldırma "Günaydın dostum."

@@ -1,0 +1,3 @@
+(Anlatı editörü yanıtı — 2026-11-28)
+FİKİR 1: Veresiye Defteri — esnaf çatıdan iş ister; her uçuşta iki iniş: kolay çatı ya da söz verdiğin yer (balkon sepeti). Sözü tutmak puan; tutmamak o kişi küser. Şerit: balkondan teyze "Evladım, ekmek getir!" / ileride geniş çatı, yakında balkon / havada iki yay ayrışıyor / balkona ekmekle iniş / berber kepenk kapatmış "Bunu unutmam!"
+FİKİR 2: Amcanın Sırrı — seyrek, dar ve uzak çatılarda anı eşyası (fotoğraf, saat, çocuk terliği); alırsan amcanın neden denize gittiğini anlatan bir cümle açılır. Şerit: şafakta boş çerçeve "Burada duruyordu…" / uzak dar çatıda parlayan saat / tam şarj / havada saate uzanan el / saati göğsüne bastırır, kıyıda çocuk silueti "Bir parça daha."
