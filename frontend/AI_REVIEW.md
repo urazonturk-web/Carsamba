@@ -3541,3 +3541,9 @@ TASK: Kabul edilen 6 pozlu sayfadan 5 pozu kedi rehberine bağla.
 CHANGED: app/index.tsx (TEKIR_POZ, kediDurum worklet, 5 katman, rehberBak/rehberNefes, sıçrama 1000 ms), 5 yeni PNG (assets/environment/mahalle/tekir-*.png). Fizik/kamera/kule üretimi/puan değişmedi.
 EVIDENCE: Dosya: kedi-pozlar-seffaf.png'den kesildi. Ölçü/pivot: alfa taraması (ör. bekleme 336×371, ayak (174,364)). Katman: kuleler önü, karakter arkası. Simülatör videosu sim-kedi-poz.mp4; telefon paketi strings PESIMDEKI KEDI 5 POZ = 1, yükleme başarılı.
 OPEN_ISSUES: Geri bakma aynalanmış oturuşla; pencere finali gri kutu (Kıvılcım çiziyor); telefonda elle oynanmadı.
+
+## KEDI-PENCERE-BAG-2026-11-28 — final penceresi bağlandı — 2026-11-28
+TASK: Kabul edilen ışıklı cumbayı sarı gri kutunun yerine bağla; kedi pervaza insin.
+CHANGED: app/index.tsx (PENCERE_* sabitleri, kediDurum final yolu + ölçek, kedi stilinde merkezden ölçek düzeltmesi, pencere görseli), assets/environment/mahalle/kedi-pencere.png. BUILD_TAG "PESIMDEKI KEDI + PENCERE".
+EVIDENCE: Dosya kedi-pencere.png (Kıvılcım). Ölçü/pivot: 180×270 dünya, pervaz %63,5, kedi x %24,5. Katman: pencere kuleler önünde, kedi pencerenin önünde, karakter en önde. Gözlem: ilk kayıtta kedi kayboldu (worklet sabit sırası), düzeltme sonrası kedi pervazda (final-yakin.jpg). Telefon paketi strings = 1, yükleme başarılı.
+OPEN_ISSUES: Pencere kule cephe çizimleriyle çakışabilir; telefonda elle oynanmadı.

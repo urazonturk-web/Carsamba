@@ -38,3 +38,10 @@ Kullanıcı: "peşimdeki kedi ile devam edelim" (anket: Kedi 17, Veresiye 15, Si
 ## Final penceresi (kullanıcı: "sarı pencere o şekilde mi kalacak?" → "Evet, çizdir")
 - Kıvılcım 1 çağrı (codex-PENCERE.log): kedi-pencere.png 1024×1536 RGBA (gerçek alfa, %32 şeffaf). Yeşil ahşap cumba, içi sıcak ışıklı, dantel perde, sağda mama kabını bırakan el; pervaz üst yüzeyi ≈ y 975 px (%63,5). İç içe yola kaydetti, oradan alındı.
 - Önizleme: pencere-onizleme.jpg (kedi pervazda). Oyuna BAĞLANMADI; kullanıcı kabulü bekleniyor.
+
+## Final penceresi bağlandı (kullanıcı: "Evet, bağla")
+- assets/environment/mahalle/kedi-pencere.png (Kıvılcım 1024×1536 → 512×768). Dünya ölçüsü 180×270; görselin üstü kule tepesinin 20 birim altında, kule ortasında. Pervaz üstü %63,5 (975/1536, göz ve önizlemeyle), kedi yeri genişliğin %24,5'i.
+- Final: rehberFinal 0→1 (900 ms) — kedi çatıdan pervaza yay çizerek iner (havada pozu), %55 ölçeğe küçülür, pervazda oturma pozuna geçer; pencere belirerek gelir. Sarı dikdörtgen kaldırıldı.
+- Hata ve düzeltme: ilk derlemede kedi finalde kayboldu. Sebep: worklet kediDurum(), sonradan tanımlanan PENCERE_* sabitlerini tanımsız yakalıyordu (AI_REVIEW'daki classifyGap sıra hatasıyla aynı sınıf). Sabitler fonksiyonun önüne taşındı; ikinci kayıtta kedi pervazda (final2.jpg, final-yakin.jpg).
+- Kanıt: sim-kedi-final.mp4 (simülatör, otomatik pilot). Telefon: BUILD_TAG "PESIMDEKI KEDI + PENCERE", paket strings = 1, "App installed". Telefonda elle oynanmadı.
+- Risk: pencere, kulenin kendi cephe çizimlerinin (cumba/kilim) üstüne biniyor; dar kulelerde pencere kuleden geniş görünebilir; kedi finalde küçük (≈60 birim).

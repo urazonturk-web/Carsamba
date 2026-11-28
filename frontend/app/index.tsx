@@ -395,7 +395,7 @@ const AnimatedImage = Animated.createAnimatedComponent(Image);
 const BG_SCROLL_TEST = true as boolean;
 const BG_SCROLL_RATIO = 0.45;
 const BG_SCROLL_TILES = 4;
-const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "PESIMDEKI KEDI 5 POZ") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
+const BUILD_TAG = PERF_PROBE ? "" : HOUSE_ROOF_MASK_DIAG ? "R069-B: MASKE KAPALI (cati koseleri GECICI bozuk, olcum)" : GORUNUM_REV ? (TEST_START_TOWER > 0 ? `DENEME (${TEST_START_TOWER}. KULEDEN)` : PIJAMA_TEST_EARLY ? "PIJAMA DENEME (15. KULE)" : "PESIMDEKI KEDI + PENCERE") : DAILY_MAP ? "DURAK v2 + GUNUN HARITASI v1" : DURAK_SEFER ? "DURAK SEFERI v2 (15 KULE)" : FAZ2_IFADE ? "FAZ2 IFADE + HALE + GAZ" : FAZ2_HALO ? "FAZ2 HALE + GAZ" : FART_TRIAL ? "GAZ DENEME v3 GERCEK SES + FAZ2" : FAZ2_DUST || FAZ2_SQUASH || CHAR_SIZE_TRIAL !== 1 ? `FAZ2 ${SFX_ON ? "SES + " : ""}TOZ+ESNEME, KARAKTER x${CHAR_SIZE_TRIAL}` : FAZ1_UI ? "FAZ1 TR ARAYUZ + G018 KONTUR" : KONTUR_PARILTI ? (HEDEF_PARILTI ? "G018 KONTUR + PARILTI" : "G018 KONTUR") : FACADE_ATLAS ? "G018 12 CEPHE + R077" : GORSEL018_TRIAL ? "G018 DENEME + R077" : BG_SCROLL_TEST ? "R077: ARKA PLAN KAYAR" : NO_IMAGE_CLIP ? "R076: GORSEL KIRPMA YOK + SYNC PROPS" : ROUNDED_CLIP_OFF ? "R071-A: KOSE KIRPMA YOK" : FRAME_DIAG ? "R068-DIAG" : "R067-B: SAYAC KAPALI";
 const DIAG_MAX_EXAMPLES = 6;
 const HOUSE_AB_FROZEN = false as boolean;
 // REVIZYON-066 experiment (one variable): expo-linear-gradient's iOS layer
@@ -3740,25 +3740,29 @@ export default function Game() {
       const q = TEKIR_POZ[k];
       if (!d || d.poz !== k) return { opacity: 0, transform: [{ translateX: -99999 }, { translateY: -99999 }] };
       const nefes = k === 0 ? 1 + 0.025 * rehberNefes.value : 1;
+      // Ölçek merkezden uygulanır: takip noktasını (ax, ay) dünyada (d.x, d.y)'ye oturtmak için düzelt.
+      const sx = d.sc, sy = d.sc * nefes;
+      const cw = (q.w * TEKIR_S) / 2, ch = (q.h * TEKIR_S) / 2;
+      const axw = (d.ters ? q.w - q.ax : q.ax) * TEKIR_S, ayw = q.ay * TEKIR_S;
       return {
         opacity: 1,
         transform: [
-          { translateX: d.x - (d.ters ? q.w - q.ax : q.ax) * TEKIR_S },
-          { translateY: d.y - q.ay * TEKIR_S * nefes },
-          { scaleX: d.ters ? -1 : 1 },
-          { scaleY: nefes },
+          { translateX: d.x - cw - (axw - cw) * sx },
+          { translateY: d.y - ch - (ayw - ch) * sy },
+          { scaleX: (d.ters ? -1 : 1) * sx },
+          { scaleY: sy },
         ],
       };
     });
   const tekirStil = [kediStil(0), kediStil(1), kediStil(2), kediStil(3), kediStil(4)];
-  // Final: kedinin oturduğu kulenin cephesinde sarı ışıklı pencere.
+  // Final: kedinin oturduğu kulenin cephesinde ışıklı cumba (Kıvılcım 2026-11-28); belirerek gelir.
   const rehberPencereStyle = useAnimatedStyle(() => {
     const list = platforms.value;
     const id = rehberId.value;
     let b: any = null;
     for (let i = 0; i < list.length; i++) if (list[i].id === id) b = list[i];
     if (!b || rehberFinal.value <= 0) return { opacity: 0, transform: [{ translateX: -99999 }, { translateY: -99999 }] };
-    return { opacity: rehberFinal.value, transform: [{ translateX: b.x + b.width * 0.68 - REHBER_PENCERE_W / 2 }, { translateY: b.topY + 60 }] };
+    return { opacity: Math.min(1, rehberFinal.value * 1.6), transform: [{ translateX: b.x + b.width / 2 - PENCERE_W / 2 }, { translateY: b.topY + PENCERE_UST }] };
   });
   const simitStyle = useAnimatedStyle(() => {
     const a = skullBob.value * Math.PI * 2;
@@ -4408,7 +4412,9 @@ export default function Game() {
         ))}
         {REHBER_ON && (
           <>
-            <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, width: REHBER_PENCERE_W, height: REHBER_PENCERE_W * 1.25, borderRadius: 6, backgroundColor: "#ffd970", borderWidth: 5, borderColor: "#6b4a2b", shadowColor: "#ffcf4a", shadowOpacity: 0.9, shadowRadius: 18 }, rehberPencereStyle]} />
+            <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, width: PENCERE_W, height: PENCERE_H }, rehberPencereStyle]}>
+              <Image source={PENCERE_SRC} style={{ width: "100%", height: "100%" }} resizeMode="stretch" fadeDuration={0} />
+            </Animated.View>
 {TEKIR_POZ.map((q, k) => (
               <Animated.View key={`tekir-${k}`} pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, width: q.w * TEKIR_S, height: q.h * TEKIR_S }, tekirStil[k]]}>
                 <Image source={q.src} style={{ width: "100%", height: "100%" }} resizeMode="stretch" fadeDuration={0} />
@@ -5873,6 +5879,13 @@ const PopupHouseView = memo(function PopupHouseView({ index, platforms, styles }
 
 // MARTI KAPTI (gri kutu): deniz bölümü yüzeyleri. 1 konteyner istifi (güverteye kadar), 2 sallanan kayık, 3 iskele.
 const KONTEYNER_RENK = ["#c0392b", "#2e6da4", "#2f8f5b", "#d08a26"];
+// Worklet sıra kuralı: kediDurum() bu sabitleri tanımlandığı anda yakalar, bu yüzden ÖNCE tanımlanmalı.
+/** Final cumbası (kedi-pencere.png 1024×1536 → 512×768): dünya ölçüsü; pervaz üstü görselin %63,5'inde,
+ *  kedinin oturduğu yer genişliğin %24,5'inde; görselin üstü kule tepesinin PENCERE_UST altında. Kedi finalde FIN_SC ölçekte. */
+const PENCERE_SRC = require("@/assets/environment/mahalle/kedi-pencere.png");
+const PENCERE_W = 180, PENCERE_H = 270, PENCERE_UST = 20;
+const PERVAZ_Y = PENCERE_UST + PENCERE_H * (975 / 1536), PERVAZ_X = PENCERE_W * 0.245;
+const FIN_SC = 0.55;
 /** PEŞİMDEKİ KEDİ: Kıvılcım poz sayfasından kesilen 5 poz (aynı ölçek). ax/ay = takip noktası (piksel):
  *  yerdeki pozlarda basan patiler, havada gövde ortası. TEKIR_S: piksel → dünya (bekleme ≈ 110 birim boy). */
 const TEKIR_POZ = [
@@ -5901,15 +5914,19 @@ function kediDurum(list: any[], id: number, eski: number, h: number, fin: number
   let poz = h <= 0 || h >= T_OTUR ? 0 : h < T_HAZIR ? 1 : h < T_KALK ? 2 : h < T_INIS ? 3 : 4;
   if (poz === 3) y -= 35; // havada takip noktası gövde ortası
   // Final: kedi çatıdan cephedeki ışıklı pencerenin pervazına iner (amcanın üstüne binmesin).
+  let sc = 1;
   if (fin > 0) {
-    y += fin * (60 + REHBER_PENCERE_W * 1.25) - Math.sin(Math.PI * fin) * 60;
+    const px2 = b.x + b.width / 2 - PENCERE_W / 2 + PERVAZ_X, py2 = b.topY + PERVAZ_Y;
+    x = bx + (px2 - bx) * fin;
+    y = by + (py2 - by) * fin - Math.sin(Math.PI * fin) * 70;
+    sc = 1 + (FIN_SC - 1) * fin;
     poz = fin < 0.85 ? 3 : 0;
+    if (poz === 3) y -= 35 * sc;
   }
   // Geri bakma: oturan poz sola (amcaya) döner.
   const ters = poz === 0 && bak > 0.5 ? true : bx < ax && poz !== 0;
-  return { x, y, poz, ters };
+  return { x, y, poz, ters, sc };
 }
-const REHBER_PENCERE_W = 80;
 const DenizSlot = memo(function DenizSlot({ index, platforms, denizT, govdeY, denizIlk }: any) {
   const st = useAnimatedStyle(() => {
     const list = platforms.value;
