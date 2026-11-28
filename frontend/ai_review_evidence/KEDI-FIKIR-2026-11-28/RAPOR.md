@@ -37,3 +37,8 @@ Kural gereği yeni fikir önce Kıvılcım ile 5 karelik şerit olarak çizilir;
 
 ## Şerit (2026-11-28, kullanıcı onayı "Evet, çizdir", 1 Kıvılcım çağrısı)
 serit/serit-tuttum.png (1536×1024), komut serit/prompt.md. 5 kare: peşinden gelen kedi → kısa ıska → "Tuttum!" yakadan yakalama → okşama, kedi yoruluyor → kedi bacada uyuyor, amca "Sen dinlen, ben dikkatli olurum." Denetim: amca/kedi referanslara sadık, Türkçe balonlar doğru, din motifi yok. Oran 1., 2., 4., 5. karelerde amcanın dizi-beli arası; 3. karede kurtarış anı için kedi abartılı büyük. Oyuna bağlanmadı.
+
+## Poz sayfası 3 (2026-11-28, onay "Evet, pozları çizdir", 1 Kıvılcım çağrısı)
+poz3/kedi-pozlar3.png (1536×1024, gerçek alfa: min 0). Bağlı bileşen ile 8 poza kesildi: poz3/tekir3-{hazir,hazirlanma,kalkis,havada,inis,uzanma,tutma,uyuma}.png.
+Ölçüm (alfa>40 piksel alanı): havada/oturuş oranı eski sayfada 0,78, yenide 0,89 → gövde ölçeği tutarlı, zıplarken küçülme büyük ölçüde giderildi. Hücre sınırları taştığı için ızgara değil bileşen kesimi kullanıldı.
+Oran önizlemesi poz3/oran-onizleme.jpg: oturan kedi amca boyunun %36'sı ölçeğinde. Oyuna bağlanmadı, kullanıcı kabulü bekleniyor.
