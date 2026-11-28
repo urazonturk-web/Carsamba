@@ -21,3 +21,9 @@ Kullanıcı: "peşimdeki kedi ile devam edelim" (anket: Kedi 17, Veresiye 15, Si
 - Kurukafa "DAR kuleler" etkisi sürerken adillik denetimi daraltılmamış genişlikle yapılıyor; o sırada kedinin kulesi beklenenden zor olabilir.
 - Final penceresi gri kutu (sarı dikdörtgen); cephedeki pencere/komşu çizimlerinin üstüne binebilir.
 - Kedi "Sen nereye?" tepkisi yok (balon sistemi kapalı); izlemeyince yalnız ileri sıçrar.
+
+## Kedi pozları (2026-11-28, kullanıcı: "kedinin vücudu hiç hareket etmiyor ... bunlar çizilmeli")
+- Kıvılcım 1 çağrı (codex-POZ.log): kedi-pozlar.png 1536×1024, 3×2: bekleme, geri bakma, hazırlanma / kalkış, havada, iniş. Sağa bakan yan görünüş.
+- Görselde dama arka plan "boyanmış" geldi (alfa yok); kenardan taşma doldurmayla temizlendi → kedi-pozlar-seffaf.png (piksellerin %77'si şeffaf). Önizleme: kedi-pozlar-onizleme.jpg.
+- Not: 2. poz (geri bakma) başı tam geriye çevrik değil, öne-yukarı bakıyor.
+- Oyuna BAĞLANMADI; kullanıcı kabulü bekleniyor.
